@@ -1,0 +1,23 @@
+[project]
+name = "media-offload"
+version = "0.1.0"
+description = "Media offload tooling for S3-compatible storage."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0",
+    "watchdog>=3.0.0",
+]
+
+[build-system]
+requires = [
+    "hatchling",
+]
+build-backend = "hatchling.build"
+
+[tool.deploy]
+type = "plugin"
+source = "."

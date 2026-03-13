@@ -1,0 +1,33 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Composer / PHP
+vendor/
+.phpunit.result.cache
+coverage/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# JavaScript / assets
+node_modules/
+dist/
+build/
+
+# Logs / temp
+*.log
+*.tmp
+*.swp

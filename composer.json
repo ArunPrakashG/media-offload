@@ -1,0 +1,15 @@
+{
+  "name": "arun-prakash/media-offload",
+  "description": "Offloads WordPress media uploads to Amazon S3, Cloudflare R2, and S3-compatible storage.",
+  "type": "wordpress-plugin",
+  "require": {
+    "aws/aws-sdk-php": "^3.200"
+  },
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Arun Prakash"
+    }
+  ],
+  "minimum-stability": "stable"
+}
