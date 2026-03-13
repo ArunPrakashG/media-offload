@@ -16,7 +16,9 @@ final class SettingsRegistrar
       'media_offload_connection',
       'media_offload_delivery',
       'media_offload_path_filters',
-      'media_offload_off_hours',
+      'media_offload_off_hours'
+    ],
+    'logs' => [
       'media_offload_logging'
     ]
   ];

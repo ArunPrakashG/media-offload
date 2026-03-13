@@ -40,7 +40,6 @@ final class OnboardingManager
 
     $url = add_query_arg([
       'page' => MEDIA_OFFLOAD_SLUG,
-      'tab' => 'onboarding',
     ], admin_url('upload.php'));
 
     wp_safe_redirect($url);

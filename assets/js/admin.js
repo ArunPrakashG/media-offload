@@ -317,6 +317,216 @@ jQuery(document).ready(function ($) {
     });
   });
 
+  (function initOnboardingWizard() {
+    var $wizard = $('#pt-mo-onboarding-wizard');
+    if (!$wizard.length) {
+      return;
+    }
+
+    var steps = ['account', 'storage', 'delivery', 'review'];
+    var currentStep = parseInt($wizard.data('currentStep') || 0, 10);
+    var $form = $wizard.find('form');
+    var $notice = $('<div/>', {
+      'class': 'pt-mo-onboarding-inline-notice',
+      hidden: true
+    });
+
+    $form.prepend($notice);
+
+    function providerValue() {
+      return (($form.find('[name="provider"]').val() || '') + '').toLowerCase();
+    }
+
+    function fieldByName(name) {
+      return $form.find('[name="' + name + '"]').first();
+    }
+
+    function fieldWrapper(name) {
+      var $field = fieldByName(name);
+      return $field.closest('.pt-mo-onboarding-field, .pt-mo-onboarding-choice-card');
+    }
+
+    function showNotice(message) {
+      $notice.text(message).prop('hidden', false);
+    }
+
+    function clearNotice() {
+      $notice.text('').prop('hidden', true);
+    }
+
+    function setFieldVisible(name, visible) {
+      var $wrapper = fieldWrapper(name);
+      var $field = fieldByName(name);
+
+      if (!$wrapper.length || !$field.length) {
+        return;
+      }
+
+      $wrapper.prop('hidden', !visible).toggleClass('is-hidden', !visible);
+      $field.prop('disabled', !visible);
+    }
+
+    function applyOnboardingProviderVisibility() {
+      var provider = providerValue();
+      var isLocal = provider === 'local';
+      var isR2 = provider === 'r2';
+      var isS3Compatible = provider === 's3_compatible';
+      var $region = fieldByName('region');
+
+      if (isR2 && $.trim($region.val() || '') === '') {
+        $region.val('auto');
+      }
+
+      $region.prop('readonly', isR2);
+
+      setFieldVisible('bucket', !isLocal);
+      setFieldVisible('region', !isLocal);
+      setFieldVisible('prefix', !isLocal);
+      setFieldVisible('access_key', !isLocal);
+      setFieldVisible('secret_key', !isLocal);
+      setFieldVisible('session_token', !isLocal && !isR2);
+      setFieldVisible('r2_account_id', isR2);
+      setFieldVisible('endpoint', isR2 || isS3Compatible);
+    }
+
+    function validateStep(step) {
+      var provider = providerValue();
+
+      if (step === 'account' && $.trim(fieldByName('license_key').val() || '') === '') {
+        return 'Enter a license key before continuing.';
+      }
+
+      if (step !== 'storage' || provider === 'local') {
+        return '';
+      }
+
+      if ($.trim(fieldByName('bucket').val() || '') === '') {
+        return 'Enter the storage bucket before continuing.';
+      }
+
+      if ($.trim(fieldByName('access_key').val() || '') === '') {
+        return 'Enter the access key before continuing.';
+      }
+
+      if ($.trim(fieldByName('secret_key').val() || '') === '') {
+        return 'Enter the secret key before continuing.';
+      }
+
+      if ((provider === 's3' || provider === 's3_compatible') && $.trim(fieldByName('region').val() || '') === '') {
+        return 'Enter the storage region before continuing.';
+      }
+
+      if (provider === 's3_compatible' && $.trim(fieldByName('endpoint').val() || '') === '') {
+        return 'Enter the custom endpoint for your S3-compatible storage.';
+      }
+
+      if (provider === 'r2') {
+        var hasAccountId = $.trim(fieldByName('r2_account_id').val() || '') !== '';
+        var hasEndpoint = $.trim(fieldByName('endpoint').val() || '') !== '';
+
+        if (!hasAccountId && !hasEndpoint) {
+          return 'Enter either the R2 account ID or a custom R2 endpoint before continuing.';
+        }
+      }
+
+      return '';
+    }
+
+    function focusCurrentStep() {
+      var $current = $wizard.find('.pt-mo-onboarding-step[data-step="' + steps[currentStep] + '"]');
+      var $focusable = $current.find('input, select, textarea, button').filter(':visible').first();
+
+      if ($focusable.length) {
+        $focusable.trigger('focus');
+      }
+    }
+
+    function renderSteps() {
+      $.each(steps, function (index, step) {
+        var isActive = index === currentStep;
+        var isComplete = index < currentStep;
+        var $section = $wizard.find('.pt-mo-onboarding-step[data-step="' + step + '"]');
+        var $item = $wizard.find('.pt-mo-onboarding-step-item[data-step-item="' + step + '"]');
+
+        $section.prop('hidden', !isActive);
+        $item.toggleClass('is-active', isActive);
+        $item.toggleClass('is-complete', isComplete);
+      });
+    }
+
+    function goToStep(index) {
+      if (index < 0 || index >= steps.length) {
+        return;
+      }
+
+      currentStep = index;
+      clearNotice();
+      applyOnboardingProviderVisibility();
+      renderSteps();
+      focusCurrentStep();
+    }
+
+    $wizard.on('click', '[data-onboarding-next]', function () {
+      var message = validateStep(steps[currentStep]);
+
+      if (message) {
+        showNotice(message);
+        return;
+      }
+
+      goToStep(currentStep + 1);
+    });
+
+    $wizard.on('click', '[data-onboarding-back]', function () {
+      goToStep(currentStep - 1);
+    });
+
+    $wizard.on('click', '.pt-mo-onboarding-step-item', function () {
+      var step = $(this).data('stepItem');
+      var targetIndex = steps.indexOf(step);
+
+      if (targetIndex === -1 || targetIndex === currentStep) {
+        return;
+      }
+
+      if (targetIndex > currentStep) {
+        var message = validateStep(steps[currentStep]);
+        if (message) {
+          showNotice(message);
+          return;
+        }
+      }
+
+      goToStep(targetIndex);
+    });
+
+    $form.on('change', '[name="provider"]', function () {
+      applyOnboardingProviderVisibility();
+    });
+
+    $form.on('submit', function (event) {
+      var blockingSteps = ['account', 'storage'];
+
+      applyOnboardingProviderVisibility();
+
+      for (var i = 0; i < blockingSteps.length; i += 1) {
+        var message = validateStep(blockingSteps[i]);
+        if (message) {
+          event.preventDefault();
+          goToStep(steps.indexOf(blockingSteps[i]));
+          showNotice(message);
+          return;
+        }
+      }
+    });
+
+    if (Number.isNaN(currentStep) || currentStep < 0 || currentStep >= steps.length) {
+      currentStep = 0;
+    }
+
+    goToStep(currentStep);
+  })();
+
   (function initBulkJobsUi() {
     var $app = $('#pt-mo-bulk-job-app');
     if (!$app.length || !adminConfig.restBase || !adminConfig.restNonce) {

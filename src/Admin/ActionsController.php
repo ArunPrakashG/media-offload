@@ -214,6 +214,7 @@ final class ActionsController
 
     $provider = isset($_POST['provider']) ? sanitize_key((string) wp_unslash($_POST['provider'])) : $this->settings->provider();
     $licenseKey = isset($_POST['license_key']) ? sanitize_text_field((string) wp_unslash($_POST['license_key'])) : '';
+    $conflictAcknowledged = !empty($_POST['conflict_acknowledged']);
     $values = [
       'enabled' => !empty($_POST['enabled']),
       'serve_from_storage' => !empty($_POST['serve_from_storage']),
@@ -226,15 +227,27 @@ final class ActionsController
       'session_token' => isset($_POST['session_token']) ? sanitize_text_field((string) wp_unslash($_POST['session_token'])) : '',
       'prefix' => isset($_POST['prefix']) ? sanitize_text_field((string) wp_unslash($_POST['prefix'])) : '',
       'endpoint' => isset($_POST['endpoint']) ? esc_url_raw((string) wp_unslash($_POST['endpoint'])) : '',
+      'custom_domain' => isset($_POST['custom_domain']) ? sanitize_text_field((string) wp_unslash($_POST['custom_domain'])) : '',
       'use_path_style_endpoint' => !empty($_POST['use_path_style_endpoint']),
     ];
 
     $normalized = $this->settings->sanitize(array_merge($this->settings->all(), $values));
-    $missing = $normalized['enabled'] ? $this->settings->missing_required_credentials($normalized, $provider) : [];
+    $missing = $provider !== 'local' ? $this->settings->missing_required_credentials($normalized, $provider) : [];
 
-    if ($normalized['enabled'] && $provider !== 'local' && !empty($missing)) {
-      pushAdminNotice(sprintf(__('Please complete the required onboarding fields before enabling offload: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), implode(', ', $missing)), 'error');
-      $this->redirectToTab('onboarding');
+    if ($licenseKey === '') {
+      pushAdminNotice(__('Add your license key before finishing onboarding.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'error');
+      $this->redirectToTab('onboarding', ['onboarding_step' => 'account']);
+    }
+
+    if ($provider !== 'local' && !empty($missing)) {
+      pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), implode(', ', $missing)), 'error');
+      $this->redirectToTab('onboarding', ['onboarding_step' => 'storage']);
+    }
+
+    $activeConflicts = array_filter($this->onboardingManager->state()['conflicts'] ?? [], static fn (array $plugin): bool => !empty($plugin['active']));
+    if (!empty($activeConflicts) && !$conflictAcknowledged) {
+      pushAdminNotice(__('Please review the active plugin conflicts and confirm you understand them before finishing setup.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'error');
+      $this->redirectToTab('onboarding', ['onboarding_step' => 'review']);
     }
 
     $this->settings->update($normalized);
@@ -245,11 +258,10 @@ final class ActionsController
     ]);
     $this->onboardingManager->markCompleted();
 
-    $activeConflicts = array_filter($this->onboardingManager->state()['conflicts'] ?? [], static fn (array $plugin): bool => !empty($plugin['active']));
     if (!empty($activeConflicts)) {
-      pushAdminNotice(__('Onboarding completed, but one or more other media offload plugins are still active. Review the warning in the Integrations tab before enabling aggressive URL rewriting.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
+      pushAdminNotice(__('Setup complete, but one or more other media offload plugins are still active. Review the integration warnings in Tools before enabling aggressive URL rewriting.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
     } else {
-      pushAdminNotice(__('Onboarding complete. Your storage and license preferences have been saved.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'success');
+      pushAdminNotice(__('Setup complete. Your dashboard is now unlocked and your storage preferences have been saved.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'success');
     }
 
     $this->redirectToTab('overview');

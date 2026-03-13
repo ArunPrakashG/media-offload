@@ -22,8 +22,8 @@ final class PageRenderer
     'setup' => 'onboarding',
     'storage' => 'settings',
     'delivery' => 'settings',
-    'integrations' => 'settings',
-    'license' => 'settings',
+    'integrations' => 'tools',
+    'license' => 'overview',
     'logs' => 'tools',
     'url-updates' => 'tools',
   ];
@@ -53,22 +53,29 @@ final class PageRenderer
 
     settings_errors(MEDIA_OFFLOAD_SETTINGS_GROUP);
 
-    $activeTab = $this->resolveActiveTab();
     $onboarding = $this->onboardingManager->state();
+    if (empty($onboarding['completed'])) {
+      ?>
+      <div class="wrap media-offload-settings media-offload-settings--onboarding">
+        <h1><?php esc_html_e('Set up Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h1>
+        <?php $this->renderOnboardingTab(); ?>
+      </div>
+      <?php
+      return;
+    }
+
+    $activeTab = $this->resolveActiveTab();
     ?>
     <div class="wrap media-offload-settings">
       <h1><?php esc_html_e('Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h1>
 
       <h2 class="nav-tab-wrapper">
-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=onboarding" class="nav-tab <?php echo $activeTab === 'onboarding' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Onboarding', MEDIA_OFFLOAD_TEXT_DOMAIN); ?><?php echo !empty($onboarding['completed']) ? '' : ' •'; ?></a>
         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=overview" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>">Overview</a>
         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=settings" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>">Settings</a>
         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=tools" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>">Tools</a>
       </h2>
 
-      <?php if ($activeTab === 'onboarding') : ?>
-        <?php $this->renderOnboardingTab(); ?>
-      <?php elseif ($activeTab === 'overview') : ?>
+      <?php if ($activeTab === 'overview') : ?>
         <?php $this->renderOverviewTab(); ?>
       <?php elseif ($activeTab === 'settings') : ?>
         <?php $this->renderSettingsTab(); ?>
@@ -83,11 +90,15 @@ final class PageRenderer
 
   private function resolveActiveTab(): string
   {
-    $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : ($this->onboardingManager->isCompleted() ? 'overview' : 'onboarding');
+    if (!$this->onboardingManager->isCompleted()) {
+      return 'onboarding';
+    }
+
+    $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : 'overview';
     $tab = self::TAB_ALIASES[$tab] ?? $tab;
 
-    if (!in_array($tab, ['onboarding', 'overview', 'settings', 'tools'], true)) {
-      return $this->onboardingManager->isCompleted() ? 'overview' : 'onboarding';
+    if (!in_array($tab, ['overview', 'settings', 'tools'], true)) {
+      return 'overview';
     }
 
     return $tab;
@@ -98,129 +109,267 @@ final class PageRenderer
     $settings = $this->settings->all();
     $license = $this->licenseManager->all();
     $state = $this->onboardingManager->state();
+    $requestedStep = isset($_GET['onboarding_step']) ? sanitize_key((string) wp_unslash($_GET['onboarding_step'])) : 'account';
+    $stepKeys = ['account', 'storage', 'delivery', 'review'];
+    $currentStepIndex = array_search($requestedStep, $stepKeys, true);
+    if ($currentStepIndex === false) {
+      $currentStepIndex = 0;
+    }
     ?>
-    <div class="pt-mo-settings-shell">
-      <div class="pt-mo-settings-hero">
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('First-run setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Connect licensing, storage, and delivery in one pass', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('This onboarding flow is designed for fresh installs: capture the license key, configure the bucket, and catch conflicts with other media offload plugins before URLs start rewriting.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+    <div id="pt-mo-onboarding-wizard" class="pt-mo-onboarding-shell" data-current-step="<?php echo esc_attr((string) $currentStepIndex); ?>">
+      <aside class="pt-mo-onboarding-sidebar">
+        <div class="pt-mo-card pt-mo-onboarding-hero-card">
+          <p class="pt-mo-eyebrow"><?php esc_html_e('Guided setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <h2><?php esc_html_e('Finish setup to unlock the dashboard', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+          <p><?php esc_html_e('Complete each step in order. Overview, Settings, and Tools stay locked until this flow is finished.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+        </div>
+
+        <ol class="pt-mo-onboarding-step-list">
+          <li class="pt-mo-onboarding-step-item" data-step-item="account">
+            <span class="pt-mo-onboarding-step-index">1</span>
+            <div>
+              <strong><?php esc_html_e('Account', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span><?php esc_html_e('Add your license key.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
+          </li>
+          <li class="pt-mo-onboarding-step-item" data-step-item="storage">
+            <span class="pt-mo-onboarding-step-index">2</span>
+            <div>
+              <strong><?php esc_html_e('Storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span><?php esc_html_e('Connect the provider and bucket.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
+          </li>
+          <li class="pt-mo-onboarding-step-item" data-step-item="delivery">
+            <span class="pt-mo-onboarding-step-index">3</span>
+            <div>
+              <strong><?php esc_html_e('Delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span><?php esc_html_e('Choose how media should be served.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
+          </li>
+          <li class="pt-mo-onboarding-step-item" data-step-item="review">
+            <span class="pt-mo-onboarding-step-index">4</span>
+            <div>
+              <strong><?php esc_html_e('Review', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span><?php esc_html_e('Confirm and unlock the dashboard.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
+          </li>
+        </ol>
+
+        <div class="pt-mo-card pt-mo-onboarding-status-card">
+          <h3><?php esc_html_e('Current checklist', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <ul class="pt-mo-bullet-list">
             <li><?php echo !empty($state['license_ready']) ? '✅ ' : '⬜ '; ?><?php esc_html_e('License key recorded', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
             <li><?php echo !empty($state['storage_ready']) ? '✅ ' : '⬜ '; ?><?php esc_html_e('Storage credentials configured', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
-            <li><?php echo empty($state['has_active_conflicts']) ? '✅ ' : '⚠️ '; ?><?php esc_html_e('No conflicting media offload plugins active', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+            <li><?php echo empty($state['has_active_conflicts']) ? '✅ ' : '⚠️ '; ?><?php esc_html_e('Conflicts reviewed', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
           </ul>
         </div>
+      </aside>
 
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Heads up', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('We inspect other media offload plugins before enabling aggressive rewrites', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('If another plugin is already rewriting media URLs or storing its own offload metadata, Media Offload will warn you here so you can avoid double-rewrites or split-brain media state.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-        </div>
-      </div>
-
-      <?php if (!empty($state['conflicts'])) : ?>
-        <div class="pt-mo-card pt-mo-conflict-card">
-          <h3><?php esc_html_e('Potential plugin conflicts', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <ul class="pt-mo-status-list">
-            <?php foreach ($state['conflicts'] as $plugin) : ?>
-              <li>
-                <span class="dashicons <?php echo !empty($plugin['active']) ? 'dashicons-warning status-error' : 'dashicons-info status-warning'; ?>"></span>
-                <div>
-                  <strong><?php echo esc_html((string) ($plugin['name'] ?? '')); ?></strong>
-                  <span class="pt-mo-inline-badge"><?php echo !empty($plugin['active']) ? esc_html__('Active', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Installed', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
-                  <div class="pt-mo-muted"><?php echo esc_html((string) ($plugin['reason'] ?? '')); ?></div>
-                </div>
-              </li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
-      <?php endif; ?>
-
-      <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="pt-mo-onboarding-form">
+      <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="pt-mo-onboarding-form pt-mo-onboarding-main">
         <?php wp_nonce_field(MEDIA_OFFLOAD_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>
         <input type="hidden" name="action" value="<?php echo esc_attr(MEDIA_OFFLOAD_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>" />
 
-        <div class="pt-mo-grid-2 pt-mo-onboarding-grid">
-          <section class="pt-mo-card pt-mo-settings-section-card">
-            <h2><?php esc_html_e('License', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-            <table class="form-table" role="presentation">
-              <tr>
-                <th scope="row"><label for="media-offload-license-key"><?php esc_html_e('License key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-                <td>
-                  <input type="text" id="media-offload-license-key" name="license_key" class="regular-text" value="<?php echo esc_attr((string) ($license['key'] ?? '')); ?>" placeholder="mo_live_xxxxxxxxx" />
-                  <p class="description"><?php esc_html_e('Monthly billing status will hook into this key later. For now we store it and expose the status via the REST API.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-                </td>
-              </tr>
-            </table>
-          </section>
+        <section class="pt-mo-card pt-mo-onboarding-step" data-step="account">
+          <div class="pt-mo-onboarding-step-header">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Step 1', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Connect your account', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Paste the Media Offload license key you received. This is required before the plugin dashboard becomes available.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
 
-          <section class="pt-mo-card pt-mo-settings-section-card">
-            <h2><?php esc_html_e('Behavior', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-            <table class="form-table" role="presentation">
-              <tr>
-                <th scope="row"><?php esc_html_e('Enable plugin', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></th>
-                <td><label><input type="checkbox" name="enabled" value="1" <?php checked(!empty($settings['enabled'])); ?> /> <?php esc_html_e('Turn on offloading once setup looks sane.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></td>
-              </tr>
-              <tr>
-                <th scope="row"><?php esc_html_e('Serve from storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></th>
-                <td><label><input type="checkbox" name="serve_from_storage" value="1" <?php checked(!empty($settings['serve_from_storage'])); ?> /> <?php esc_html_e('Rewrite public media URLs to the remote bucket/CDN.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></td>
-              </tr>
-              <tr>
-                <th scope="row"><?php esc_html_e('Use path-style endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></th>
-                <td><label><input type="checkbox" name="use_path_style_endpoint" value="1" <?php checked(!empty($settings['use_path_style_endpoint'])); ?> /> <?php esc_html_e('Recommended for R2 and some S3-compatible providers.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></td>
-              </tr>
-            </table>
-          </section>
-        </div>
+          <label class="pt-mo-onboarding-field pt-mo-onboarding-field--full">
+            <span><?php esc_html_e('License key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            <input type="text" id="media-offload-license-key" name="license_key" value="<?php echo esc_attr((string) ($license['key'] ?? '')); ?>" placeholder="mo_live_xxxxxxxxx" autocomplete="off" />
+          </label>
 
-        <section class="pt-mo-card pt-mo-settings-section-card">
-          <h2><?php esc_html_e('Bucket connection', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <table class="form-table" role="presentation">
-            <tr>
-              <th scope="row"><label for="media-offload-provider"><?php esc_html_e('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td>
-                <select id="media-offload-provider" name="provider">
-                  <?php foreach ($this->settings->available_provider_keys() as $providerKey) : ?>
-                    <option value="<?php echo esc_attr($providerKey); ?>" <?php selected((string) ($settings['provider'] ?? 's3'), $providerKey); ?>><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></option>
+          <div class="pt-mo-card pt-mo-onboarding-helper-card">
+            <h3><?php esc_html_e('How to do this', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+            <ul class="pt-mo-bullet-list">
+              <li><?php esc_html_e('Copy the key exactly as shown in your account or email.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('Avoid spaces before or after the value.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('If you do not have a key yet, pause here and get one before continuing.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+            </ul>
+          </div>
+
+          <div class="pt-mo-onboarding-actions">
+            <span></span>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+          </div>
+        </section>
+
+        <section class="pt-mo-card pt-mo-onboarding-step" data-step="storage" hidden>
+          <div class="pt-mo-onboarding-step-header">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Step 2', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Connect your storage provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Select the provider where media should live, then enter the bucket and credentials needed for offloading.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
+
+          <div class="pt-mo-onboarding-field-grid pt-mo-onboarding-field-grid--two-up">
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <select id="media-offload-provider" name="provider">
+                <?php foreach ($this->settings->available_provider_keys() as $providerKey) : ?>
+                  <option value="<?php echo esc_attr($providerKey); ?>" <?php selected((string) ($settings['provider'] ?? 's3'), $providerKey); ?>><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></option>
+                <?php endforeach; ?>
+              </select>
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="text" id="media-offload-bucket" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Region', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="text" id="media-offload-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="ap-south-1 / auto" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Path prefix', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="text" id="media-offload-prefix" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="media/uploads" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Access key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="text" id="media-offload-access-key" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Secret key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="password" id="media-offload-secret-key" name="secret_key" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" autocomplete="new-password" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('R2 account ID', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="text" id="media-offload-r2-account-id" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" placeholder="For Cloudflare R2" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field">
+              <span><?php esc_html_e('Custom endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="url" id="media-offload-endpoint" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://account-id.r2.cloudflarestorage.com" autocomplete="off" />
+            </label>
+
+            <label class="pt-mo-onboarding-field pt-mo-onboarding-field--full">
+              <span><?php esc_html_e('Session token (optional)', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <input type="password" id="media-offload-session-token" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password" />
+            </label>
+          </div>
+
+          <div class="pt-mo-card pt-mo-onboarding-helper-card">
+            <h3><?php esc_html_e('How to do this', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+            <ul class="pt-mo-bullet-list">
+              <li><?php esc_html_e('Amazon S3 usually needs bucket, region, access key, and secret key.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('Cloudflare R2 usually needs bucket, access key, secret key, and either an account ID or custom endpoint. Use region “auto”.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('S3-compatible services normally need a custom endpoint in addition to standard credentials.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+            </ul>
+          </div>
+
+          <div class="pt-mo-onboarding-actions">
+            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+          </div>
+        </section>
+
+        <section class="pt-mo-card pt-mo-onboarding-step" data-step="delivery" hidden>
+          <div class="pt-mo-onboarding-step-header">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Step 3', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Choose delivery behavior', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Decide how Media Offload should behave once setup is complete. You can still tune these later from Settings.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
+
+          <div class="pt-mo-onboarding-preference-grid">
+            <label class="pt-mo-card pt-mo-onboarding-choice-card">
+              <input type="checkbox" name="enabled" value="1" <?php checked(!empty($settings['enabled'])); ?> />
+              <div>
+                <strong><?php esc_html_e('Enable Media Offload after setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+                <p><?php esc_html_e('Turn on the offload workflow once the wizard is finished.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              </div>
+            </label>
+
+            <label class="pt-mo-card pt-mo-onboarding-choice-card">
+              <input type="checkbox" name="serve_from_storage" value="1" <?php checked(!empty($settings['serve_from_storage'])); ?> />
+              <div>
+                <strong><?php esc_html_e('Serve media from remote storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+                <p><?php esc_html_e('Rewrite public media URLs so visitors load files from your bucket or CDN.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              </div>
+            </label>
+
+            <label class="pt-mo-card pt-mo-onboarding-choice-card">
+              <input type="checkbox" name="use_path_style_endpoint" value="1" <?php checked(!empty($settings['use_path_style_endpoint'])); ?> />
+              <div>
+                <strong><?php esc_html_e('Use path-style requests', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+                <p><?php esc_html_e('Recommended for Cloudflare R2 and some S3-compatible providers.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              </div>
+            </label>
+          </div>
+
+          <label class="pt-mo-onboarding-field pt-mo-onboarding-field--full">
+            <span><?php esc_html_e('Custom delivery domain (optional)', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            <input type="url" name="custom_domain" value="<?php echo esc_attr((string) ($settings['custom_domain'] ?? '')); ?>" placeholder="https://cdn.example.com" autocomplete="off" />
+          </label>
+
+          <div class="pt-mo-card pt-mo-onboarding-helper-card">
+            <h3><?php esc_html_e('What happens next', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+            <ul class="pt-mo-bullet-list">
+              <li><?php esc_html_e('After setup, you can validate the connection from Tools.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('You can delay public URL rewriting by leaving remote delivery off for now.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              <li><?php esc_html_e('All of these preferences remain editable from Settings later.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+            </ul>
+          </div>
+
+          <div class="pt-mo-onboarding-actions">
+            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to review', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+          </div>
+        </section>
+
+        <section class="pt-mo-card pt-mo-onboarding-step" data-step="review" hidden>
+          <div class="pt-mo-onboarding-step-header">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Step 4', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Review and finish setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Confirm the final checklist below. Once you finish this step, the plugin dashboard unlocks and the guided setup disappears.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
+
+          <div class="pt-mo-onboarding-review-grid">
+            <div class="pt-mo-card pt-mo-onboarding-helper-card">
+              <h3><?php esc_html_e('Final checklist', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+              <ul class="pt-mo-status-list">
+                <li><span class="dashicons dashicons-admin-network"></span><strong><?php esc_html_e('License key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong><span class="pt-mo-spacer"></span><?php echo !empty($license['key']) ? esc_html__('Previously saved', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Will be saved now', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+                <li><span class="dashicons dashicons-cloud"></span><strong><?php esc_html_e('Storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong><span class="pt-mo-spacer"></span><?php esc_html_e('Connected in this setup flow', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+                <li><span class="dashicons dashicons-admin-home"></span><strong><?php esc_html_e('Dashboard', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong><span class="pt-mo-spacer"></span><?php esc_html_e('Unlocks after finish', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></li>
+              </ul>
+            </div>
+
+            <div class="pt-mo-card pt-mo-onboarding-helper-card">
+              <h3><?php esc_html_e('Conflict review', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+              <?php if (!empty($state['conflicts'])) : ?>
+                <ul class="pt-mo-status-list">
+                  <?php foreach ($state['conflicts'] as $plugin) : ?>
+                    <li>
+                      <span class="dashicons <?php echo !empty($plugin['active']) ? 'dashicons-warning status-error' : 'dashicons-info status-warning'; ?>"></span>
+                      <div>
+                        <strong><?php echo esc_html((string) ($plugin['name'] ?? '')); ?></strong>
+                        <div class="pt-mo-muted"><?php echo esc_html((string) ($plugin['reason'] ?? '')); ?></div>
+                      </div>
+                    </li>
                   <?php endforeach; ?>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-bucket"><?php esc_html_e('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="text" id="media-offload-bucket" name="bucket" class="regular-text" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-region"><?php esc_html_e('Region', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="text" id="media-offload-region" name="region" class="regular-text" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="ap-south-1 / auto" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-r2-account-id"><?php esc_html_e('R2 account ID', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="text" id="media-offload-r2-account-id" name="r2_account_id" class="regular-text" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-access-key"><?php esc_html_e('Access key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="text" id="media-offload-access-key" name="access_key" class="regular-text" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-secret-key"><?php esc_html_e('Secret key', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="password" id="media-offload-secret-key" name="secret_key" class="regular-text" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-session-token"><?php esc_html_e('Session token', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="password" id="media-offload-session-token" name="session_token" class="regular-text" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-prefix"><?php esc_html_e('Path prefix', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="text" id="media-offload-prefix" name="prefix" class="regular-text" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="media/uploads" /></td>
-            </tr>
-            <tr>
-              <th scope="row"><label for="media-offload-endpoint"><?php esc_html_e('Custom endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></label></th>
-              <td><input type="url" id="media-offload-endpoint" name="endpoint" class="regular-text code" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://<account_id>.r2.cloudflarestorage.com" /></td>
-            </tr>
-          </table>
-          <p class="submit"><button type="submit" class="button button-primary"><?php esc_html_e('Save onboarding setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button></p>
+                </ul>
+              <?php else : ?>
+                <p class="pt-mo-muted"><?php esc_html_e('No conflicting media offload plugins were detected. Nice and clean.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              <?php endif; ?>
+
+              <?php if (!empty($state['has_active_conflicts'])) : ?>
+                <label class="pt-mo-onboarding-checkbox-note">
+                  <input type="checkbox" name="conflict_acknowledged" value="1" />
+                  <span><?php esc_html_e('I understand another media offload plugin is active and I will review the warnings after setup.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+                </label>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <div class="pt-mo-onboarding-actions">
+            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+            <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup and unlock dashboard', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+          </div>
         </section>
       </form>
     </div>
@@ -235,6 +384,7 @@ final class PageRenderer
     $integrationSummary = $this->integrationDiscovery->summary();
     $onboarding = $this->onboardingManager->state();
     $migration = DataMigration::status();
+    $license = $this->licenseManager->all();
     ?>
     <div class="pt-mo-settings-shell">
       <div class="pt-mo-settings-hero">
@@ -253,24 +403,77 @@ final class PageRenderer
           <p class="pt-mo-eyebrow"><?php esc_html_e('Quick actions', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
           <h2><?php esc_html_e('Move fast without playing settings hide-and-seek', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
           <div class="pt-mo-code-list pt-mo-link-list">
-            <a href="<?php echo esc_url($this->adminTabUrl('onboarding')); ?>"><?php esc_html_e('Complete onboarding checklist', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('storage')); ?>"><?php esc_html_e('Configure provider and bucket', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('delivery')); ?>"><?php esc_html_e('Review CDN and delivery settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-setup-health')); ?>"><?php esc_html_e('Review setup health and readiness', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Configure provider, bucket, and delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-automation')); ?>"><?php esc_html_e('Review automation, schedules, and path rules', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
             <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>"><?php printf(esc_html__('Open tools (%d pending URL updates)', MEDIA_OFFLOAD_TEXT_DOMAIN), $pending); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php printf(esc_html__('Review integrations (%d detected)', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($integrationSummary['detected'] ?? 0)); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('logs')); ?>"><?php esc_html_e('Inspect logs and diagnostics', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php printf(esc_html__('Review integrations (%d detected)', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($integrationSummary['detected'] ?? 0)); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('tools', 'logs-panel')); ?>"><?php esc_html_e('Inspect logs and diagnostics', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-license')); ?>"><?php esc_html_e('Check license status', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
           </div>
         </div>
       </div>
 
       <?php $this->renderDashboard(); ?>
 
+      <div class="pt-mo-grid-2 pt-mo-overview-actions-grid">
+        <div class="pt-mo-card" id="overview-integrations">
+          <h3><?php esc_html_e('Integration compatibility', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <ul class="pt-mo-status-list">
+            <li>
+              <span class="dashicons dashicons-admin-plugins"></span>
+              <strong><?php esc_html_e('Detected surfaces', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span class="pt-mo-spacer"></span>
+              <?php echo number_format((int) ($integrationSummary['detected'] ?? 0)); ?>
+            </li>
+            <li>
+              <span class="dashicons dashicons-update"></span>
+              <strong><?php esc_html_e('Rewrite ready', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span class="pt-mo-spacer"></span>
+              <?php echo number_format((int) ($integrationSummary['rewrite_ready'] ?? 0)); ?>
+            </li>
+          </ul>
+          <p class="pt-mo-muted"><?php esc_html_e('Compatibility scans and rewrite actions now live under Tools so Settings stays focused on configuration.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <div class="pt-mo-actions pt-mo-actions-left">
+            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php esc_html_e('Open integration tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+          </div>
+        </div>
+
+        <div class="pt-mo-card" id="overview-license">
+          <h3><?php esc_html_e('License snapshot', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <ul class="pt-mo-status-list">
+            <li>
+              <span class="dashicons dashicons-admin-network"></span>
+              <strong><?php esc_html_e('Plan', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span class="pt-mo-spacer"></span>
+              <?php echo esc_html((string) ($license['plan'] ?? 'monthly')); ?>
+            </li>
+            <li>
+              <span class="dashicons dashicons-lock"></span>
+              <strong><?php esc_html_e('Status', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span class="pt-mo-spacer"></span>
+              <?php echo esc_html((string) ($license['status'] ?? 'inactive')); ?>
+            </li>
+            <li>
+              <span class="dashicons dashicons-admin-generic"></span>
+              <strong><?php esc_html_e('Key present', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+              <span class="pt-mo-spacer"></span>
+              <?php echo !empty($license['key']) ? esc_html__('Yes', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('No', MEDIA_OFFLOAD_TEXT_DOMAIN); ?>
+            </li>
+          </ul>
+          <p class="pt-mo-muted"><?php esc_html_e('License capture happens during onboarding, while this snapshot helps you verify plan and status after setup is complete.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <div class="pt-mo-actions pt-mo-actions-left">
+            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Open configuration settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+          </div>
+        </div>
+      </div>
+
       <?php if (!empty($migration['needs_migration'])) : ?>
         <?php $this->renderActivationRecoveryPanel($migration); ?>
       <?php endif; ?>
 
       <div class="pt-mo-grid-2 pt-mo-overview-actions-grid">
-        <div class="pt-mo-card">
+        <div class="pt-mo-card" id="overview-setup-health">
           <h3><?php esc_html_e('Setup health', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <ul class="pt-mo-status-list">
             <li>
@@ -304,8 +507,8 @@ final class PageRenderer
           <h3><?php esc_html_e('What’s next', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <p><?php esc_html_e('This screen now surfaces onboarding, integration compatibility, and API-backed operational status. The next product slice can focus on resumable jobs, single-item actions in the media grid, and license validation.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
           <div class="pt-mo-code-list pt-mo-link-list">
-            <a href="<?php echo esc_url($this->adminTabUrl('license')); ?>"><?php esc_html_e('Review license state', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Inspect plugin-specific asset roots', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-license')); ?>"><?php esc_html_e('Review license state', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+            <a href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php esc_html_e('Inspect plugin-specific asset roots', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
           </div>
         </div>
       </div>
@@ -350,28 +553,121 @@ final class PageRenderer
 
   private function renderSettingsTab(): void
   {
+    $settings = $this->settings->all();
+    $providerLabel = $this->settings->provider_profile((string) ($settings['provider'] ?? 's3'))->label();
+    $allowedPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['allowed_path_patterns'] ?? '')) ?: []));
+    $ignoredPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['ignored_path_patterns'] ?? '')) ?: []));
     ?>
     <div class="pt-mo-settings-shell">
       <div class="pt-mo-settings-hero">
         <div class="pt-mo-card pt-mo-settings-hero-card">
           <p class="pt-mo-eyebrow"><?php esc_html_e('Settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Storage, Delivery & Behaviors', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('Configure your provider, bucket, custom domain, caching, logging behavior all in one place.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <h2><?php esc_html_e('Connection, delivery, and automation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+          <p><?php esc_html_e('This tab is now focused on the settings that directly control how media is offloaded and served. Diagnostics and integration tools have been moved out so this area stays easier to scan.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+        </div>
+
+        <div class="pt-mo-card pt-mo-settings-hero-card">
+          <p class="pt-mo-eyebrow"><?php esc_html_e('Focused layout', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <h2><?php esc_html_e('Two groups, one save action', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+          <p><?php esc_html_e('Use Core setup for provider and delivery settings, then Automation for path rules and off-hours behavior.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+        </div>
+      </div>
+
+      <div class="pt-mo-grid pt-mo-settings-summary-grid">
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <div class="pt-mo-stat"><?php echo esc_html($providerLabel); ?></div>
+          <div class="pt-mo-substat"><?php echo esc_html((string) ($settings['bucket'] ?? __('Bucket not set', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></div>
+        </div>
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <div class="pt-mo-stat"><?php echo !empty($settings['serve_from_storage']) ? esc_html__('Remote', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Local', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
+          <div class="pt-mo-substat"><?php echo !empty($settings['custom_domain']) ? esc_html((string) $settings['custom_domain']) : esc_html__('No custom domain configured', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
+        </div>
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Path rules', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <div class="pt-mo-stat"><?php echo number_format(count($allowedPatterns) + count($ignoredPatterns)); ?></div>
+          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('Allowed: %1$d · Ignored: %2$d', MEDIA_OFFLOAD_TEXT_DOMAIN), count($allowedPatterns), count($ignoredPatterns))); ?></div>
+        </div>
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Off-hours batch', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <div class="pt-mo-stat"><?php echo !empty($settings['off_hours_batch_enabled']) ? esc_html__('On', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Off', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
+          <div class="pt-mo-substat"><?php echo esc_html((string) (!empty($settings['off_hours_batch_time']) ? $settings['off_hours_batch_time'] : __('No schedule set', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></div>
         </div>
       </div>
 
       <form method="post" action="options.php" autocomplete="off" class="pt-mo-settings-form">
-        <div class="pt-mo-card pt-mo-settings-section-card">
-        <?php
-        settings_fields(MEDIA_OFFLOAD_SETTINGS_GROUP);
-        $this->settingsRegistrar->renderSections($this->settingsRegistrar->getSectionIdsForTab('settings'));
-        submit_button(__('Save All Settings', MEDIA_OFFLOAD_TEXT_DOMAIN));
-        ?>
+        <?php settings_fields(MEDIA_OFFLOAD_SETTINGS_GROUP); ?>
+
+        <div class="pt-mo-settings-layout">
+          <aside class="pt-mo-settings-sidebar">
+            <div class="pt-mo-card pt-mo-settings-nav-card">
+              <h3><?php esc_html_e('Jump to', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+              <div class="pt-mo-settings-jumpnav">
+                <a href="#settings-core">
+                  <strong><?php esc_html_e('Core setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+                  <span><?php esc_html_e('Provider, bucket, credentials, and delivery behavior.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+                </a>
+                <a href="#settings-automation">
+                  <strong><?php esc_html_e('Automation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong>
+                  <span><?php esc_html_e('Path filters and off-hours scheduling controls.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+                </a>
+              </div>
+            </div>
+
+            <div class="pt-mo-card pt-mo-settings-nav-card">
+              <h3><?php esc_html_e('Moved out of Settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+              <div class="pt-mo-code-list pt-mo-link-list">
+                <a href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php esc_html_e('Integrations & rewrites → Tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+                <a href="<?php echo esc_url($this->adminTabUrl('tools', 'logs-panel')); ?>"><?php esc_html_e('Logging & diagnostics → Tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+                <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-license')); ?>"><?php esc_html_e('License snapshot → Overview', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+              </div>
+            </div>
+          </aside>
+
+          <div class="pt-mo-settings-main">
+            <section id="settings-core" class="pt-mo-settings-cluster">
+              <div class="pt-mo-settings-cluster-header">
+                <p class="pt-mo-eyebrow"><?php esc_html_e('Core setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+                <h2><?php esc_html_e('Connection and delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+                <p><?php esc_html_e('Everything required to connect a provider, define the bucket, and decide how media URLs are served.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              </div>
+              <?php $this->settingsRegistrar->renderSections(['media_offload_connection', 'media_offload_delivery']); ?>
+            </section>
+
+            <section id="settings-automation" class="pt-mo-settings-cluster">
+              <div class="pt-mo-settings-cluster-header">
+                <p class="pt-mo-eyebrow"><?php esc_html_e('Automation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+                <h2><?php esc_html_e('Rules and scheduling', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+                <p><?php esc_html_e('Control which paths are eligible for offload and when background batching should run.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+              </div>
+              <?php $this->settingsRegistrar->renderSections(['media_offload_path_filters', 'media_offload_off_hours']); ?>
+            </section>
+
+            <div class="pt-mo-settings-submit">
+              <?php submit_button(__('Save Settings', MEDIA_OFFLOAD_TEXT_DOMAIN)); ?>
+            </div>
+          </div>
         </div>
       </form>
-      
-      <?php $this->renderIntegrationsTab(); ?>
-      <?php $this->renderLicenseTab(); ?>
+
+      <div class="pt-mo-secondary-surface-grid">
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Integration rewrites', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <p class="pt-mo-muted"><?php esc_html_e('Plugin-specific asset roots and rewrite actions are now grouped with operational tools, where you can test and execute them without cluttering configuration.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <div class="pt-mo-actions pt-mo-actions-left">
+            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php esc_html_e('Open integration tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+          </div>
+        </div>
+
+        <div class="pt-mo-card">
+          <h3><?php esc_html_e('Account and licensing', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
+          <p class="pt-mo-muted"><?php esc_html_e('License state is shown on Overview, while initial key entry remains in onboarding so setup stays linear for new installs.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <div class="pt-mo-actions pt-mo-actions-left">
+            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-license')); ?>"><?php esc_html_e('View license snapshot', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+          </div>
+        </div>
+      </div>
     </div>
     <?php
   }
@@ -406,6 +702,7 @@ final class PageRenderer
       <?php endif; ?>
       <?php $this->renderAttachmentInspector(); ?>
       <?php $this->renderUrlUpdatesPanel(); ?>
+      <?php $this->renderIntegrationsTab(true); ?>
       <?php $this->renderLogs(); ?>
     </div>
     <?php
@@ -536,12 +833,15 @@ final class PageRenderer
     <?php
   }
 
-  private function renderIntegrationsTab(): void
+  private function renderIntegrationsTab(bool $embedded = false): void
   {
     $summary = $this->integrationDiscovery->summary();
     $items = $summary['items'] ?? [];
     ?>
+    <?php if (!$embedded) : ?>
     <div class="pt-mo-settings-shell">
+    <?php endif; ?>
+      <section id="tools-integrations" class="pt-mo-embedded-surface">
       <div class="pt-mo-settings-hero">
         <div class="pt-mo-card pt-mo-settings-hero-card">
           <p class="pt-mo-eyebrow"><?php esc_html_e('External assets', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
@@ -633,7 +933,10 @@ final class PageRenderer
           </section>
         <?php endforeach; ?>
       </div>
+      </section>
+    <?php if (!$embedded) : ?>
     </div>
+    <?php endif; ?>
     <?php
   }
 
@@ -816,7 +1119,7 @@ final class PageRenderer
     $errorCount = (int) (($stats['by_level']['error'] ?? 0) + ($stats['by_level']['critical'] ?? 0));
     $warningCount = (int) ($stats['by_level']['warning'] ?? 0);
     ?>
-    <div class="pt-mo-settings-shell">
+    <div class="pt-mo-settings-shell" id="logs-panel">
       <div class="pt-mo-grid pt-mo-log-stats-grid">
         <div class="pt-mo-card">
           <h3><?php esc_html_e('Stored entries', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
@@ -1077,12 +1380,18 @@ final class PageRenderer
     <?php
   }
 
-  private function adminTabUrl(string $tab): string
+  private function adminTabUrl(string $tab, string $fragment = ''): string
   {
-    return add_query_arg([
+    $url = add_query_arg([
       'page' => MEDIA_OFFLOAD_SLUG,
       'tab' => $tab,
     ], admin_url('upload.php'));
+
+    if ($fragment !== '') {
+      $url .= '#' . sanitize_title($fragment);
+    }
+
+    return $url;
   }
 
   private function countPendingUrlUpdates(): int
