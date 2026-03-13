@@ -1,0 +1,57 @@
+--- src/Admin/PageRenderer.php
++++ src/Admin/PageRenderer.php
+@@ -19,10 +19,8 @@
+ {
+   private const TAB_ALIASES = [
+     'dashboard' => 'overview',
+-    'settings' => 'storage',
+-    'url-updates' => 'tools',
+     'setup' => 'onboarding',
+   ];
+ 
+   public function __construct(
+@@ -58,35 +56,21 @@
+       <h2 class="nav-tab-wrapper">
+         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=onboarding" class="nav-tab <?php echo $activeTab === 'onboarding' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Onboarding', MEDIA_OFFLOAD_TEXT_DOMAIN); ?><?php echo !empty($onboarding['completed']) ? '' : ' •'; ?></a>
+         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=overview" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>">Overview</a>
+-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=storage" class="nav-tab <?php echo $activeTab === 'storage' ? 'nav-tab-active' : ''; ?>">Storage</a>
+-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=delivery" class="nav-tab <?php echo $activeTab === 'delivery' ? 'nav-tab-active' : ''; ?>">Delivery</a>
++        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=settings" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>">Settings</a>
+         <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=tools" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>">Tools</a>
+-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=integrations" class="nav-tab <?php echo $activeTab === 'integrations' ? 'nav-tab-active' : ''; ?>">Integrations</a>
+-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=license" class="nav-tab <?php echo $activeTab === 'license' ? 'nav-tab-active' : ''; ?>">License</a>
+-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=logs" class="nav-tab <?php echo $activeTab === 'logs' ? 'nav-tab-active' : ''; ?>">Logs</a>
+       </h2>
+ 
+       <?php if ($activeTab === 'onboarding') : ?>
+         <?php $this->renderOnboardingTab(); ?>
+       <?php elseif ($activeTab === 'overview') : ?>
+         <?php $this->renderOverviewTab(); ?>
+-      <?php elseif ($activeTab === 'storage') : ?>
+-        <?php $this->renderStorageTab(); ?>
+-      <?php elseif ($activeTab === 'delivery') : ?>
+-        <?php $this->renderDeliveryTab(); ?>
++      <?php elseif ($activeTab === 'settings') : ?>
++        <?php $this->renderSettingsTab(); ?>
+       <?php elseif ($activeTab === 'tools') : ?>
+         <?php $this->renderToolsTab(); ?>
+-      <?php elseif ($activeTab === 'integrations') : ?>
+-        <?php $this->renderIntegrationsTab(); ?>
+-      <?php elseif ($activeTab === 'license') : ?>
+-        <?php $this->renderLicenseTab(); ?>
+-      <?php elseif ($activeTab === 'logs') : ?>
+-        <?php $this->renderLogs(); ?>
+       <?php else : ?>
+         <?php $this->renderOverviewTab(); ?>
+       <?php endif; ?>
+     </div>
+@@ -95,7 +79,7 @@
+   private function resolveActiveTab(): string
+   {
+     $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : ($this->onboardingManager->isCompleted() ? 'overview' : 'onboarding');
+     $tab = self::TAB_ALIASES[$tab] ?? $tab;
+ 
+-    if (!in_array($tab, ['onboarding', 'overview', 'storage', 'delivery', 'tools', 'integrations', 'license', 'logs'], true)) {
++    if (!in_array($tab, ['onboarding', 'overview', 'settings', 'tools'], true)) {
+       return $this->onboardingManager->isCompleted() ? 'overview' : 'onboarding';
+     }

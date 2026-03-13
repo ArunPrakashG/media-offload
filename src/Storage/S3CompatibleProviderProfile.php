@@ -1,0 +1,73 @@
+<?php
+namespace ArunPrakash\MediaOffload\Storage;
+
+if (!defined('ABSPATH')) {
+  exit;
+}
+
+final class S3CompatibleProviderProfile extends AbstractProviderProfile
+{
+  public function key(): string
+  {
+    return 's3_compatible';
+  }
+
+  public function adapterType(): string
+  {
+    return 's3';
+  }
+
+  public function label(): string
+  {
+    return __('S3-compatible', MEDIA_OFFLOAD_TEXT_DOMAIN);
+  }
+
+  public function title(): string
+  {
+    return __('S3-compatible storage', MEDIA_OFFLOAD_TEXT_DOMAIN);
+  }
+
+  public function summary(): string
+  {
+    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+  }
+
+  public function requiredFields(): array
+  {
+    return [
+      'bucket' => __('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'region' => __('Region', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'endpoint' => __('Custom Endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'access_key' => __('Access Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'secret_key' => __('Secret Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
+    ];
+  }
+
+  public function normalize(array $values): array
+  {
+    $values = $this->normalizeCommon($values);
+    $values['provider'] = $this->key();
+
+    if ($this->endpointLooksLikeR2((string) $values['endpoint'])) {
+      if ($values['region'] === '' || strtolower((string) $values['region']) === 'us-east-1') {
+        $values['region'] = 'auto';
+      }
+
+      $values['use_path_style_endpoint'] = true;
+      $values['session_token'] = '';
+    }
+
+    return $values;
+  }
+
+  public function hasValidCredentials(array $values): bool
+  {
+    $values = $this->normalize($values);
+
+    return $values['bucket'] !== ''
+      && $values['region'] !== ''
+      && $values['endpoint'] !== ''
+      && $values['access_key'] !== ''
+      && $values['secret_key'] !== '';
+  }
+}

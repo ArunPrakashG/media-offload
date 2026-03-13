@@ -1,8 +1,10 @@
-# Arun Prakash Media Offload — Refactor Roadmap
+# Media Offload — Refactor Roadmap
+
+Maintainer: **Arun Prakash** (`contact@arunprakashg.com`)
 
 ## Why this refactor exists
 
-This plugin already solves a real problem, but the current codebase mixes bootstrap, admin UI, settings validation, storage-provider concerns, and batch workflow logic too closely. It also still carries old branding and legacy Python tooling metadata that do not belong in a clean commercial WordPress plugin story.
+This plugin already solves a real problem, but the current codebase mixes bootstrap, admin UI, settings validation, storage-provider concerns, and batch workflow logic too closely. It also carried old branding and legacy root-level tooling that did not belong in a clean commercial WordPress plugin story.
 
 The goal of the refactor is to produce a paid, maintainable plugin with:
 
@@ -48,9 +50,9 @@ Those guidelines map well to this project and support a long-lived commercial pl
 5. **Operational workflows are coupled to UI and CLI paths**
    - Batch processing, URL updates, and attachment eligibility logic need clearer application services.
 
-6. **Python tooling is ambiguous**
-   - `pyproject.toml` exists, but Python is not part of the runtime plugin architecture.
-   - That creates confusion for contributors and future packaging work.
+6. **Release/build tooling still needs a cleaner story**
+   - Root-level Python metadata has been removed, which reduces confusion.
+   - A dedicated release/build workflow is still needed so packaging remains explicit and reproducible.
 
 ## Target architecture
 
@@ -233,27 +235,19 @@ Phase the rename rather than breaking everything at once:
 - add deprecation logging for old internals
 - remove old shims only after one or two stable paid releases
 
-## What to do about the Python pieces
+## Tooling direction
 
-Python should not be part of the runtime plugin architecture.
+Python is no longer part of the root plugin setup, and it should stay out of the runtime architecture.
 
-Choose one of these paths:
+If auxiliary tooling is added in the future, keep it isolated and explicit, for example under a dedicated path such as:
 
-### Option A — Remove it
-
-If Python is not actually needed, delete `pyproject.toml` and any related tooling.
-
-### Option B — Isolate it
-
-If Python will be used for packaging/deployment/release automation, move it under a dedicated tooling path such as:
-
-- `tools/python/`
+- `tools/`
 
 Rules:
 
-- no runtime dependency on Python for the WordPress plugin
+- no runtime dependency on non-PHP tooling for the WordPress plugin
 - no mixed messaging in the root README
-- clear developer docs describing when Python is needed
+- clear developer docs describing when any auxiliary tooling is needed
 
 ## Testing and quality gates
 
@@ -333,6 +327,39 @@ Priority order:
 - add static analysis, coding standards, tests, packaging
 - produce a clean commercial release artifact
 
+## Competitor-informed priorities
+
+After reviewing WP Offload Media's public product pages, pricing, and docs structure, the most important priorities for `Media Offload` are:
+
+1. **A stronger setup experience**
+   - guided provider selection
+   - credential validation
+   - connection diagnostics
+   - better explanation of delivery/CDN choices
+
+2. **Background bulk tools**
+   - offload existing library in the background
+   - clear progress, pause/resume, and recovery states
+   - reversible tools for download/remove/restore
+
+3. **Media Library controls**
+   - filter offloaded/local/failed items
+   - bulk actions for offload, restore, and remote cleanup
+   - attachment-level storage status details
+
+4. **Commercial-grade licensing UX**
+   - license screen, usage metering, plan visibility, renewal notices
+   - graceful handling when limits are reached or subscriptions lapse
+
+5. **Integration surface**
+   - WooCommerce, Easy Digital Downloads, ACF, WPML, media replacement, image optimization, and builder compatibility
+
+6. **A premium-looking admin interface**
+   - cleaner onboarding flow
+   - card-based layout
+   - richer status surfaces
+   - background job progress and diagnostics
+
 ## Recommended next implementation slice
 
 Before adding any new feature, the next practical slice should be:
@@ -343,3 +370,22 @@ Before adding any new feature, the next practical slice should be:
 4. isolate provider profiles for S3 / R2 / generic S3-compatible
 
 That slice gives the biggest maintainability win with the least product risk.
+
+## Immediate execution plan
+
+The next best sequence for this repository is:
+
+1. rebuild bootstrap and autoloading under `src/`
+2. extract `Settings_UI` into separate admin page, settings registry, action controller, and diagnostics services
+3. build a new admin information architecture inspired by leading commercial plugins:
+   - Overview
+   - Storage
+   - Delivery
+   - Tools
+   - Integrations
+   - License
+   - Logs / Diagnostics
+4. formalize provider profiles for Amazon S3, Cloudflare R2, and Generic S3-compatible
+5. add a bulk operations engine with resumable jobs
+6. add licensing and plan/usage tracking
+7. expand integration coverage and polish
