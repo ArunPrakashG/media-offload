@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Media Offload
  * Description: Offloads WordPress media uploads to Amazon S3, Cloudflare R2, and S3-compatible storage with URL rewriting.
- * Version: 0.1.3
+ * Version: 0.1.4
  * Author: Arun Prakash
  * Text Domain: media-offload
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('MEDIA_OFFLOAD_VERSION', '0.1.3');
+define('MEDIA_OFFLOAD_VERSION', '0.1.4');
 define('MEDIA_OFFLOAD_FILE', __FILE__);
 define('MEDIA_OFFLOAD_PATH', plugin_dir_path(__FILE__));
 define('MEDIA_OFFLOAD_URL', plugin_dir_url(__FILE__));
