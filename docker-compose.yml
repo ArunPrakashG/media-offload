@@ -1,0 +1,90 @@
+services:
+  db:
+    image: mariadb:11.4
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mariadb-admin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  wordpress:
+    image: wordpress:6.8-php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: "1"
+    volumes:
+      - wp_data:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/media-offload
+
+  setup:
+    image: wordpress:cli-php8.2
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WP_PATH: /var/www/html
+      SITE_URL: http://localhost:8080
+      SITE_TITLE: Media Offload Lab
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: password
+      ADMIN_EMAIL: admin@example.com
+    working_dir: /var/www/html
+    volumes:
+      - wp_data:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/media-offload
+      - ./tools/local-wp:/scripts:ro
+    entrypoint: ["/bin/sh", "/scripts/setup.sh"]
+    restart: "no"
+
+  wpcli:
+    image: wordpress:cli-php8.2
+    profiles:
+      - cli
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    working_dir: /var/www/html
+    volumes:
+      - wp_data:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/media-offload
+    entrypoint: ["wp", "--allow-root", "--path=/var/www/html"]
+
+volumes:
+  db_data:
+  wp_data:

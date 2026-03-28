@@ -35,21 +35,60 @@ final class FieldRenderer
   public function renderProviderField(): void
   {
     $settings = $this->settings->all();
-    $provider = $settings['provider'];
+    $provider = (string) ($settings['provider'] ?? 's3');
     $providers = $this->providerCatalog->selectOptions();
+    $providerDetails = $this->providerCatalog->all();
+    $currentProvider = $providerDetails[$provider] ?? ($providerDetails['s3'] ?? [
+      'title' => __('Storage provider', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'summary' => '',
+      'required' => [],
+    ]);
+    $requiredLabels = $this->normalizeRequiredLabels((array) ($currentProvider['required'] ?? []));
     ?>
-    <div class="pt-mo-provider-picker">
+    <div class="pt-mo-provider-field">
+      <div class="pt-mo-provider-picker">
         <select id="media-offload-provider-select" name="<?php echo esc_attr(MEDIA_OFFLOAD_OPTION_KEY); ?>[provider]">
-        <?php foreach ($providers as $key => $providerConfig) : ?>
-          <option value="<?php echo esc_attr($key); ?>" <?php selected($provider, $key); ?>><?php echo esc_html($providerConfig['label']); ?></option>
-        <?php endforeach; ?>
-      </select>
-        <button type="button" class="button-link pt-mo-advanced-toggle" id="media-offload-toggle-advanced" aria-expanded="false">
-        <?php esc_html_e('Show advanced connection fields', MEDIA_OFFLOAD_TEXT_DOMAIN); ?>
-      </button>
+          <?php foreach ($providers as $key => $providerConfig) : ?>
+            <option value="<?php echo esc_attr($key); ?>" <?php selected($provider, $key); ?>><?php echo esc_html($providerConfig['label']); ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div class="pt-mo-provider-summary">
+        <div class="pt-mo-provider-summary-header">
+          <div>
+            <h3 id="pt-mo-provider-summary-title"><?php echo esc_html((string) ($currentProvider['title'] ?? __('Storage provider', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></h3>
+            <p id="pt-mo-provider-summary-copy"><?php echo esc_html((string) ($currentProvider['summary'] ?? '')); ?></p>
+          </div>
+          <button type="button" class="button-link pt-mo-advanced-toggle" id="pt-mo-toggle-advanced" aria-expanded="false">
+            <?php esc_html_e('Show advanced connection fields', MEDIA_OFFLOAD_TEXT_DOMAIN); ?>
+          </button>
+        </div>
+
+        <div class="pt-mo-chip-list" id="pt-mo-provider-required-fields">
+          <?php foreach ($requiredLabels as $requiredFieldLabel) : ?>
+            <span class="pt-mo-chip"><?php echo esc_html((string) $requiredFieldLabel); ?></span>
+          <?php endforeach; ?>
+        </div>
+      </div>
     </div>
     <p class="description"><?php esc_html_e('The form below now focuses on required fields first. Provider-specific extras stay hidden until you need them.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
     <?php
+  }
+
+  /**
+   * @param array<int, string> $labels
+   * @return array<int, string>
+   */
+  private function normalizeRequiredLabels(array $labels): array
+  {
+    $labels = array_values(array_filter(array_map('strval', $labels)));
+
+    if (count($labels) === 1 && strtolower($labels[0]) === 'provider') {
+      return [__('No extra credentials required', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+    }
+
+    return $labels;
   }
 
   public function renderSelectField(array $args): void

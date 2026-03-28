@@ -317,6 +317,40 @@ At the moment, the plugin code ships from the repository root. As part of the re
 
 See `docs/refactor-roadmap.md` for the architecture/commercialization roadmap and `docs/competitor-analysis.md` for the UI + feature gap analysis against WP Offload Media.
 
+## Local WordPress sandbox with Docker
+
+This repository now includes a ready-to-run local WordPress sandbox for plugin testing.
+
+- WordPress URL: `http://localhost:8080`
+- Admin URL: `http://localhost:8080/wp-admin/`
+- Admin username: `admin`
+- Admin password: `password`
+- Plugin mount path inside the container: `wp-content/plugins/media-offload`
+
+What the bootstrap does automatically:
+
+- starts WordPress + MariaDB via Docker Compose
+- installs WordPress if the database is empty
+- activates the `media-offload` plugin from this repository
+- configures the plugin to use the built-in `local` provider for safe offline testing
+- writes a dummy local license key and marks onboarding as completed so the dashboard is unlocked
+- creates a sample page and a tiny sample image attachment for testing offload flows
+
+Start the sandbox:
+
+- `docker compose up -d`
+
+The first run also executes the `setup` container, which bootstraps WordPress and configures the plugin.
+
+Useful follow-ups:
+
+- Re-run setup after resetting volumes: `docker compose run --rm setup`
+- Open a WP-CLI command: `docker compose --profile cli run --rm wpcli plugin list`
+- Stop containers: `docker compose down`
+- Reset everything (database + WordPress files): `docker compose down -v`
+
+The local test stack intentionally uses the plugin's `Local / Debug Mode` provider, so you can verify uploads, URL rewriting, logs, and admin flows without real S3 or R2 credentials.
+
 ## WP-CLI Migration Workflow (Uploads Directory)
 
 ### 1) Deploy uploads to object storage

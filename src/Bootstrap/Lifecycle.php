@@ -33,7 +33,9 @@ final class Lifecycle
       wp_clear_scheduled_hook($hook);
       wp_clear_scheduled_hook(MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK);
       wp_clear_scheduled_hook(MEDIA_OFFLOAD_CLEANUP_HOOK);
+      wp_clear_scheduled_hook(MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
       wp_clear_scheduled_hook('media_offload_data_migration_batch');
+      delete_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY);
       return;
     }
 
@@ -48,5 +50,13 @@ final class Lifecycle
       wp_unschedule_event($migrationNext, 'media_offload_data_migration_batch');
       $migrationNext = wp_next_scheduled('media_offload_data_migration_batch');
     }
+
+    $purgeNext = wp_next_scheduled(MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
+    while ($purgeNext) {
+      wp_unschedule_event($purgeNext, MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
+      $purgeNext = wp_next_scheduled(MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
+    }
+
+    delete_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY);
   }
 }

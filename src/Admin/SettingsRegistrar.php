@@ -497,20 +497,30 @@ final class SettingsRegistrar
 
       $section = $wp_settings_sections[self::SETTINGS_PAGE][$sectionId];
 
-      echo '<section class="pt-mo-card pt-mo-settings-section-card">';
+      echo '<section class="pt-mo-card pt-mo-settings-section-card pt-mo-settings-section-card--' . esc_attr($sectionId) . '">';
 
-      if (!empty($section['title'])) {
-        printf('<h2>%s</h2>', esc_html($section['title']));
-      }
+      if (!empty($section['title']) || !empty($section['callback'])) {
+        echo '<div class="pt-mo-settings-section-header">';
 
-      if (!empty($section['callback'])) {
-        call_user_func($section['callback'], $section);
+        if (!empty($section['title'])) {
+          printf('<h2>%s</h2>', esc_html($section['title']));
+        }
+
+        if (!empty($section['callback'])) {
+          echo '<div class="pt-mo-settings-section-description">';
+          call_user_func($section['callback'], $section);
+          echo '</div>';
+        }
+
+        echo '</div>';
       }
 
       if (!empty($wp_settings_fields[self::SETTINGS_PAGE][$sectionId])) {
+        echo '<div class="pt-mo-settings-section-body">';
         echo '<table class="form-table" role="presentation">';
         do_settings_fields(self::SETTINGS_PAGE, $sectionId);
         echo '</table>';
+        echo '</div>';
       }
 
       echo '</section>';

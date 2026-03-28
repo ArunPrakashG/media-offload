@@ -67,13 +67,13 @@ final class PageRenderer
     $activeTab = $this->resolveActiveTab();
     ?>
     <div class="wrap media-offload-settings">
-      <h1><?php esc_html_e('Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h1>
+      <?php $this->renderAdminShellHeader($activeTab); ?>
 
-      <h2 class="nav-tab-wrapper">
-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=overview" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>">Overview</a>
-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=settings" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>">Settings</a>
-        <a href="?page=<?php echo esc_attr(MEDIA_OFFLOAD_SLUG); ?>&tab=tools" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>">Tools</a>
-      </h2>
+      <nav class="nav-tab-wrapper pt-mo-shell-tabs" aria-label="<?php esc_attr_e('Media Offload navigation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?>">
+        <a href="<?php echo esc_url($this->adminTabUrl('overview')); ?>" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Overview', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('settings')); ?>" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+      </nav>
 
       <?php if ($activeTab === 'overview') : ?>
         <?php $this->renderOverviewTab(); ?>
@@ -387,32 +387,29 @@ final class PageRenderer
     $license = $this->licenseManager->all();
     ?>
     <div class="pt-mo-settings-shell">
-      <div class="pt-mo-settings-hero">
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Commercial admin foundation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Storage, delivery, and tools now have dedicated surfaces', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('This new layout keeps provider setup, CDN delivery, and operational tools separate so each workflow is easier to understand and maintain.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <div class="pt-mo-chip-list">
-            <span class="pt-mo-chip"><?php esc_html_e('Amazon S3', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
-            <span class="pt-mo-chip"><?php esc_html_e('Cloudflare R2', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
-            <span class="pt-mo-chip"><?php esc_html_e('S3-compatible', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+      <section class="pt-mo-card pt-mo-panel-intro">
+        <div class="pt-mo-panel-intro__body">
+          <div class="pt-mo-panel-intro__content">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Overview', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Everything important is visible without digging through forms', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Track media volume, storage readiness, pending URL work, and follow-up actions from one dashboard that stays readable even on a busy WordPress admin.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <div class="pt-mo-chip-list">
+              <span class="pt-mo-chip"><?php esc_html_e('Amazon S3', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <span class="pt-mo-chip"><?php esc_html_e('Cloudflare R2', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <span class="pt-mo-chip"><?php esc_html_e('S3-compatible', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
           </div>
-        </div>
 
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Quick actions', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Move fast without playing settings hide-and-seek', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <div class="pt-mo-code-list pt-mo-link-list">
-            <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-setup-health')); ?>"><?php esc_html_e('Review setup health and readiness', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Configure provider, bucket, and delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-automation')); ?>"><?php esc_html_e('Review automation, schedules, and path rules', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>"><?php printf(esc_html__('Open tools (%d pending URL updates)', MEDIA_OFFLOAD_TEXT_DOMAIN), $pending); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php printf(esc_html__('Review integrations (%d detected)', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($integrationSummary['detected'] ?? 0)); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('tools', 'logs-panel')); ?>"><?php esc_html_e('Inspect logs and diagnostics', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
-            <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-license')); ?>"><?php esc_html_e('Check license status', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+          <div class="pt-mo-panel-intro__aside">
+            <div class="pt-mo-link-list pt-mo-link-list--compact">
+              <a href="<?php echo esc_url($this->adminTabUrl('overview', 'overview-setup-health')); ?>"><?php esc_html_e('Review setup health', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+              <a href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Configure provider and delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></a>
+              <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>"><?php printf(esc_html__('Open tools (%d pending)', MEDIA_OFFLOAD_TEXT_DOMAIN), $pending); ?></a>
+              <a href="<?php echo esc_url($this->adminTabUrl('tools', 'tools-integrations')); ?>"><?php printf(esc_html__('Review integrations (%d)', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($integrationSummary['detected'] ?? 0)); ?></a>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <?php $this->renderDashboard(); ?>
 
@@ -554,47 +551,67 @@ final class PageRenderer
   private function renderSettingsTab(): void
   {
     $settings = $this->settings->all();
-    $providerLabel = $this->settings->provider_profile((string) ($settings['provider'] ?? 's3'))->label();
+    $providerKey = (string) ($settings['provider'] ?? 's3');
+    $providerLabel = $this->settings->provider_profile($providerKey)->label();
+    $isLocalProvider = $providerKey === 'local';
     $allowedPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['allowed_path_patterns'] ?? '')) ?: []));
     $ignoredPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['ignored_path_patterns'] ?? '')) ?: []));
+    $deliveryLabel = $isLocalProvider
+      ? __('Local debug', MEDIA_OFFLOAD_TEXT_DOMAIN)
+      : (!empty($settings['serve_from_storage']) ? __('Remote', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Local', MEDIA_OFFLOAD_TEXT_DOMAIN));
+    $providerSubstat = $isLocalProvider
+      ? __('No bucket required in local mode', MEDIA_OFFLOAD_TEXT_DOMAIN)
+      : (string) ($settings['bucket'] ?? __('Bucket not set', MEDIA_OFFLOAD_TEXT_DOMAIN));
     ?>
     <div class="pt-mo-settings-shell">
-      <div class="pt-mo-settings-hero">
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Settings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Connection, delivery, and automation', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('This tab is now focused on the settings that directly control how media is offloaded and served. Diagnostics and integration tools have been moved out so this area stays easier to scan.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-        </div>
+      <section class="pt-mo-card pt-mo-panel-intro pt-mo-panel-intro--compact">
+        <div class="pt-mo-panel-intro__body">
+          <div class="pt-mo-panel-intro__content">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Storage setup', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Configure provider credentials, delivery rules, and automation in one clean workflow', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Required fields stay obvious, provider-specific controls stay contextual, and advanced knobs stay out of the way until your stack actually needs them.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
 
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Focused layout', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Two groups, one save action', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('Use Core setup for provider and delivery settings, then Automation for path rules and off-hours behavior.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          <div class="pt-mo-panel-intro__aside">
+            <div class="pt-mo-chip-list">
+              <span class="pt-mo-chip"><?php esc_html_e('Contextual fields', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <span class="pt-mo-chip"><?php esc_html_e('Fewer screens', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <span class="pt-mo-chip"><?php esc_html_e('Responsive layout', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="pt-mo-grid pt-mo-settings-summary-grid">
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo esc_html($providerLabel); ?></div>
-          <div class="pt-mo-substat"><?php echo esc_html((string) ($settings['bucket'] ?? __('Bucket not set', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo !empty($settings['serve_from_storage']) ? esc_html__('Remote', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Local', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-          <div class="pt-mo-substat"><?php echo !empty($settings['custom_domain']) ? esc_html((string) $settings['custom_domain']) : esc_html__('No custom domain configured', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Path rules', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format(count($allowedPatterns) + count($ignoredPatterns)); ?></div>
-          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('Allowed: %1$d · Ignored: %2$d', MEDIA_OFFLOAD_TEXT_DOMAIN), count($allowedPatterns), count($ignoredPatterns))); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Off-hours batch', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo !empty($settings['off_hours_batch_enabled']) ? esc_html__('On', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Off', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-          <div class="pt-mo-substat"><?php echo esc_html((string) (!empty($settings['off_hours_batch_time']) ? $settings['off_hours_batch_time'] : __('No schedule set', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></div>
-        </div>
-      </div>
+      <?php $this->renderSummaryStrip([
+        [
+          'label' => __('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => $providerLabel,
+          'value_id' => 'pt-mo-settings-provider-label',
+          'substat' => $providerSubstat,
+          'substat_id' => 'pt-mo-settings-provider-substat',
+        ],
+        [
+          'label' => __('Delivery', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => $deliveryLabel,
+          'value_id' => 'pt-mo-settings-delivery-label',
+          'substat' => !empty($settings['custom_domain']) ? (string) $settings['custom_domain'] : __('No custom domain configured', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'substat_id' => 'pt-mo-settings-delivery-substat',
+        ],
+        [
+          'label' => __('Path rules', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format(count($allowedPatterns) + count($ignoredPatterns)),
+          'value_id' => 'pt-mo-settings-rules-count',
+          'substat' => sprintf(__('Allowed: %1$d · Ignored: %2$d', MEDIA_OFFLOAD_TEXT_DOMAIN), count($allowedPatterns), count($ignoredPatterns)),
+          'substat_id' => 'pt-mo-settings-rules-substat',
+        ],
+        [
+          'label' => __('Off-hours batch', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => !empty($settings['off_hours_batch_enabled']) ? __('On', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Off', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value_id' => 'pt-mo-settings-batch-label',
+          'substat' => !empty($settings['off_hours_batch_time']) ? (string) $settings['off_hours_batch_time'] : __('No schedule set', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'substat_id' => 'pt-mo-settings-batch-substat',
+        ],
+      ], 'pt-mo-settings-summary-strip'); ?>
 
       <form method="post" action="options.php" autocomplete="off" class="pt-mo-settings-form">
         <?php settings_fields(MEDIA_OFFLOAD_SETTINGS_GROUP); ?>
@@ -677,24 +694,22 @@ final class PageRenderer
     $migration = DataMigration::status();
     ?>
     <div class="pt-mo-settings-shell">
-      <div class="pt-mo-settings-hero">
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Operational tools', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Run maintenance tasks and control background behavior', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('Start an existing-library offload, restore local copies from storage, or retry the failed subset from the most recent job.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-        </div>
-
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Connection check', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Validate storage access', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('Verify credentials work with your configured bucket.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <div class="pt-mo-actions pt-mo-actions-left">
-            <button type="button" id="pt-mo-test-connection" class="button button-secondary"><?php esc_html_e('Test Connection', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
-            <span id="pt-mo-connection-status" style="margin-left: 10px;"></span>
+      <section class="pt-mo-card pt-mo-panel-intro pt-mo-panel-intro--tools">
+        <div class="pt-mo-panel-intro__body pt-mo-panel-intro__body--wide">
+          <div class="pt-mo-panel-intro__content">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('Operations', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Run jobs, repair data, inspect media state, and keep the pipeline healthy', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Bulk jobs, URL updates, integration rewrites, diagnostics, and logs live here—but the layout stays compact so you can scan it quickly instead of hopping across stacked promo cards.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
           </div>
-          <div id="mo-connection-results" class="mo-connection-results" hidden></div>
+
+          <div class="pt-mo-panel-toolbar">
+            <span class="pt-mo-inline-badge"><?php esc_html_e('Connectivity', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+            <button type="button" id="pt-mo-test-connection" class="button button-secondary"><?php esc_html_e('Test Connection', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
+            <span id="pt-mo-connection-status"></span>
+          </div>
         </div>
-      </div>
+        <div id="mo-connection-results" class="mo-connection-results" hidden></div>
+      </section>
 
       <?php $this->renderBulkJobsPanel(); ?>
       <?php if (!empty($migration['needs_migration'])) : ?>
@@ -723,8 +738,8 @@ final class PageRenderer
         <span id="pt-mo-job-status-badge" class="pt-mo-inline-badge <?php echo $hasJob ? esc_attr($this->jobBadgeClass((string) ($job['status'] ?? 'idle'))) : ''; ?>"><?php echo esc_html($hasJob ? (string) ($job['status_label'] ?? __('Idle', MEDIA_OFFLOAD_TEXT_DOMAIN)) : __('Idle', MEDIA_OFFLOAD_TEXT_DOMAIN)); ?></span>
       </div>
 
-      <div class="pt-mo-grid pt-mo-bulk-job-grid">
-        <div class="pt-mo-card pt-mo-bulk-job-card">
+      <div class="pt-mo-bulk-job-grid">
+        <div class="pt-mo-bulk-job-pane">
           <h3><?php esc_html_e('Current job', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-stat" id="pt-mo-job-label"><?php echo esc_html($hasJob ? (string) ($job['type_label'] ?? __('No active job', MEDIA_OFFLOAD_TEXT_DOMAIN)) : __('No active job', MEDIA_OFFLOAD_TEXT_DOMAIN)); ?></div>
           <div class="pt-mo-substat" id="pt-mo-job-message"><?php echo esc_html($hasJob ? (string) ($job['last_message'] ?? '') : __('Choose a bulk task to begin.', MEDIA_OFFLOAD_TEXT_DOMAIN)); ?></div>
@@ -732,7 +747,7 @@ final class PageRenderer
           <div class="pt-mo-substat" id="pt-mo-job-progress-text"><?php echo esc_html(sprintf(__('%1$d%% complete', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($job['percent_complete'] ?? 0))); ?></div>
         </div>
 
-        <div class="pt-mo-card pt-mo-bulk-job-card">
+        <div class="pt-mo-bulk-job-pane">
           <h3><?php esc_html_e('Queue state', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <ul class="pt-mo-status-list">
             <li><strong><?php esc_html_e('Processed', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong><span class="pt-mo-spacer"></span><span id="pt-mo-job-processed"><?php echo number_format((int) ($job['processed_items'] ?? 0)); ?></span> / <span id="pt-mo-job-total"><?php echo number_format((int) ($job['total_items'] ?? 0)); ?></span></li>
@@ -742,7 +757,7 @@ final class PageRenderer
           </ul>
         </div>
 
-        <div class="pt-mo-card pt-mo-bulk-job-card">
+        <div class="pt-mo-bulk-job-pane">
           <h3><?php esc_html_e('Actions', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-bulk-job-actions">
             <button type="button" class="button button-primary" data-job-action="start" data-job-type="offload_existing"><?php esc_html_e('Offload existing library', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></button>
@@ -842,17 +857,24 @@ final class PageRenderer
     <div class="pt-mo-settings-shell">
     <?php endif; ?>
       <section id="tools-integrations" class="pt-mo-embedded-surface">
-      <div class="pt-mo-settings-hero">
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('External assets', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php esc_html_e('Detect plugin-specific asset directories and rewrite candidates', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
-          <p><?php esc_html_e('Some plugins keep files outside the default year/month upload pattern or store URLs inside their own database tables. This tab surfaces those locations and lets Media Offload run supported rewrite passes.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-        </div>
+      <div class="pt-mo-card pt-mo-panel-intro pt-mo-panel-intro--compact">
+        <div class="pt-mo-panel-intro__body pt-mo-panel-intro__body--wide">
+          <div class="pt-mo-panel-intro__content">
+            <p class="pt-mo-eyebrow"><?php esc_html_e('External assets', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+            <h2><?php esc_html_e('Detect plugin-specific asset directories and rewrite candidates', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h2>
+            <p><?php esc_html_e('Some plugins keep files outside the default year/month upload pattern or store URLs inside their own database tables. This section surfaces those locations and lets Media Offload run supported rewrite passes without taking over the whole page.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+          </div>
 
-        <div class="pt-mo-card pt-mo-settings-hero-card">
-          <p class="pt-mo-eyebrow"><?php esc_html_e('Current support', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
-          <h2><?php printf(esc_html__('%d integration surfaces detected', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($summary['detected'] ?? 0)); ?></h2>
-          <p><?php printf(esc_html__('%d integrations are ready for automated rewrites right now.', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($summary['rewrite_ready'] ?? 0)); ?></p>
+          <div class="pt-mo-summary-inline">
+            <div class="pt-mo-summary-inline__item">
+              <span><?php esc_html_e('Detected', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <strong><?php echo number_format((int) ($summary['detected'] ?? 0)); ?></strong>
+            </div>
+            <div class="pt-mo-summary-inline__item">
+              <span><?php esc_html_e('Rewrite ready', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+              <strong><?php echo number_format((int) ($summary['rewrite_ready'] ?? 0)); ?></strong>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -992,27 +1014,27 @@ final class PageRenderer
     <div class="pt-mo-dashboard">
       <div class="pt-mo-grid">
         <div class="pt-mo-card">
-          <h3>Total Media</h3>
+          <h3><?php esc_html_e('Library assets', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-stat"><?php echo number_format($stats['total']); ?></div>
-          <div class="pt-mo-substat">Attachments in Library</div>
+          <div class="pt-mo-substat"><?php esc_html_e('Attachments currently stored in WordPress', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
         </div>
         <div class="pt-mo-card">
-          <h3>Offloaded</h3>
+          <h3><?php esc_html_e('Offloaded items', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-stat"><?php echo number_format($stats['offloaded']); ?></div>
           <div class="pt-mo-progress">
             <div class="pt-mo-bar" style="width: <?php echo $stats['percent']; ?>%"></div>
           </div>
-          <div class="pt-mo-substat"><?php echo $stats['percent']; ?>% Complete</div>
+          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('%d%% of the media library is linked to remote storage', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) $stats['percent'])); ?></div>
         </div>
         <div class="pt-mo-card">
-          <h3>S3 Storage</h3>
+          <h3><?php esc_html_e('Remote storage', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-stat"><?php echo size_format($storageSize); ?></div>
-          <div class="pt-mo-substat"><?php echo number_format($storageCount); ?> objects</div>
+          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('%d remote objects currently tracked', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) $storageCount)); ?></div>
         </div>
         <div class="pt-mo-card">
-          <h3>Est. Monthly Cost</h3>
+          <h3><?php esc_html_e('Estimated storage cost', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
           <div class="pt-mo-stat">$<?php echo number_format($storageCost, 2); ?></div>
-          <div class="pt-mo-substat">Based on $0.023/GB</div>
+          <div class="pt-mo-substat"><?php esc_html_e('Rough monthly estimate based on the tracked remote footprint', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
         </div>
       </div>
 
@@ -1120,28 +1142,28 @@ final class PageRenderer
     $warningCount = (int) ($stats['by_level']['warning'] ?? 0);
     ?>
     <div class="pt-mo-settings-shell" id="logs-panel">
-      <div class="pt-mo-grid pt-mo-log-stats-grid">
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Stored entries', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format((int) ($stats['total'] ?? 0)); ?></div>
-          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('Retention cap: %d entries', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($settings['log_max_entries'] ?? 2000))); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Warnings', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format($warningCount); ?></div>
-          <div class="pt-mo-substat"><?php esc_html_e('Messages stored at warning severity.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Errors + critical', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format($errorCount); ?></div>
-          <div class="pt-mo-substat"><?php esc_html_e('High-severity issues worth investigating first.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Logger status', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo !empty($settings['logging_enabled']) ? esc_html__('On', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Off', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-          <div class="pt-mo-substat"><?php echo esc_html(sprintf(__('Minimum level: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), strtoupper((string) ($settings['log_level'] ?? 'info')))); ?></div>
-        </div>
-      </div>
+      <?php $this->renderSummaryStrip([
+        [
+          'label' => __('Stored entries', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format((int) ($stats['total'] ?? 0)),
+          'substat' => sprintf(__('Retention cap: %d entries', MEDIA_OFFLOAD_TEXT_DOMAIN), (int) ($settings['log_max_entries'] ?? 2000)),
+        ],
+        [
+          'label' => __('Warnings', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format($warningCount),
+          'substat' => __('Messages stored at warning severity.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+        [
+          'label' => __('Errors + critical', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format($errorCount),
+          'substat' => __('High-severity issues worth investigating first.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+        [
+          'label' => __('Logger status', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => !empty($settings['logging_enabled']) ? __('On', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Off', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'substat' => sprintf(__('Minimum level: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), strtoupper((string) ($settings['log_level'] ?? 'info'))),
+        ],
+      ], 'pt-mo-log-summary-strip'); ?>
 
       <div class="pt-mo-grid-2 pt-mo-logs-grid">
         <section class="pt-mo-card pt-mo-settings-section-card">
@@ -1317,31 +1339,28 @@ final class PageRenderer
         </div>
       <?php endif; ?>
 
-      <div class="pt-mo-grid">
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Pending URL Updates', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format($pending); ?></div>
-          <div class="pt-mo-substat"><?php esc_html_e('Attachments waiting for URL/offload metadata update', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Offloaded Attachments', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format((int) ($stats['offloaded'] ?? 0)); ?></div>
-          <div class="pt-mo-substat"><?php esc_html_e('Already linked with offload metadata', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Plugin Status', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo $isEnabled ? esc_html__('Enabled', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Disabled', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-          <div class="pt-mo-substat"><?php echo $hasCredentials ? esc_html__('Credentials configured', MEDIA_OFFLOAD_TEXT_DOMAIN) : esc_html__('Credentials missing', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-
-        <div class="pt-mo-card">
-          <h3><?php esc_html_e('Total Attachments', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
-          <div class="pt-mo-stat"><?php echo number_format((int) ($stats['total'] ?? 0)); ?></div>
-          <div class="pt-mo-substat"><?php esc_html_e('In media library', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></div>
-        </div>
-      </div>
+      <?php $this->renderSummaryStrip([
+        [
+          'label' => __('Pending URL updates', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format($pending),
+          'substat' => __('Attachments waiting for URL/offload metadata update', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+        [
+          'label' => __('Offloaded attachments', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format((int) ($stats['offloaded'] ?? 0)),
+          'substat' => __('Already linked with offload metadata', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+        [
+          'label' => __('Plugin status', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => $isEnabled ? __('Enabled', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Disabled', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'substat' => $hasCredentials ? __('Credentials configured', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Credentials missing', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+        [
+          'label' => __('Total attachments', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'value' => number_format((int) ($stats['total'] ?? 0)),
+          'substat' => __('In media library', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        ],
+      ], 'pt-mo-url-update-summary-strip'); ?>
 
       <div class="pt-mo-card">
         <h3><?php esc_html_e('Run URL Updates', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h3>
@@ -1356,7 +1375,7 @@ final class PageRenderer
           <p><strong><?php esc_html_e('Valid storage credentials are required before URL updates can run.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></strong></p>
         <?php endif; ?>
 
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div class="pt-mo-inline-actions">
           <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field(MEDIA_OFFLOAD_ADMIN_ACTION_RUN_URL_UPDATES); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr(MEDIA_OFFLOAD_ADMIN_ACTION_RUN_URL_UPDATES); ?>" />
@@ -1377,6 +1396,83 @@ final class PageRenderer
         </div>
       </div>
     </div>
+    <?php
+  }
+
+  private function renderAdminShellHeader(string $activeTab): void
+  {
+    $settings = $this->settings->all();
+    $providerKey = (string) ($settings['provider'] ?? 's3');
+    $providerLabel = $this->settings->provider_profile($providerKey)->label();
+    $deliveryLabel = $providerKey === 'local'
+      ? __('Local debug mode', MEDIA_OFFLOAD_TEXT_DOMAIN)
+      : (!empty($settings['serve_from_storage']) ? __('Serving from storage', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Serving from local URLs', MEDIA_OFFLOAD_TEXT_DOMAIN));
+    $loggingLabel = !empty($settings['logging_enabled']) ? __('Logging enabled', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Logging disabled', MEDIA_OFFLOAD_TEXT_DOMAIN);
+
+    $headerContent = match ($activeTab) {
+      'settings' => [
+        'kicker' => __('Settings', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'description' => __('Designated for provider setup, delivery behavior, caching rules, and automation—without burying the important controls under a wall of unrelated tools.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      ],
+      'tools' => [
+        'kicker' => __('Tools', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'description' => __('The operational workbench for jobs, migration recovery, URL repair, integrations, and logging—built for confidence instead of guesswork.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      ],
+      default => [
+        'kicker' => __('Overview', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'description' => __('A clean command center for checking readiness, volume, pipeline health, and the next actions worth taking on your media stack.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      ],
+    };
+    ?>
+    <section class="pt-mo-shell-header">
+      <div class="pt-mo-shell-header__content">
+        <p class="pt-mo-shell-kicker"><?php echo esc_html($headerContent['kicker']); ?></p>
+        <h1><?php esc_html_e('Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></h1>
+        <p class="pt-mo-shell-lede"><?php echo esc_html($headerContent['description']); ?></p>
+      </div>
+
+      <div class="pt-mo-shell-header__meta">
+        <div class="pt-mo-shell-meta-card">
+          <span class="pt-mo-shell-meta-card__label"><?php esc_html_e('Active view', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+          <strong><?php echo esc_html(ucfirst($activeTab)); ?></strong>
+        </div>
+        <div class="pt-mo-shell-meta-card">
+          <span class="pt-mo-shell-meta-card__label"><?php esc_html_e('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+          <strong id="pt-mo-shell-meta-provider"><?php echo esc_html($providerLabel); ?></strong>
+        </div>
+        <div class="pt-mo-shell-meta-card">
+          <span class="pt-mo-shell-meta-card__label"><?php esc_html_e('Delivery', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+          <strong id="pt-mo-shell-meta-delivery"><?php echo esc_html($deliveryLabel); ?></strong>
+        </div>
+        <div class="pt-mo-shell-meta-card">
+          <span class="pt-mo-shell-meta-card__label"><?php esc_html_e('Diagnostics', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></span>
+          <strong id="pt-mo-shell-meta-diagnostics"><?php echo esc_html($loggingLabel); ?></strong>
+        </div>
+      </div>
+    </section>
+    <?php
+  }
+
+  /**
+   * @param array<int, array{label:string, value:string, substat?:string, value_id?:string, substat_id?:string}> $items
+   */
+  private function renderSummaryStrip(array $items, string $className = ''): void
+  {
+    $classes = trim('pt-mo-card pt-mo-summary-strip ' . $className);
+    ?>
+    <section class="<?php echo esc_attr($classes); ?>">
+      <div class="pt-mo-summary-strip__grid">
+        <?php foreach ($items as $item) : ?>
+          <div class="pt-mo-summary-item">
+            <span class="pt-mo-summary-item__label"><?php echo esc_html((string) ($item['label'] ?? '')); ?></span>
+            <strong<?php echo !empty($item['value_id']) ? ' id="' . esc_attr((string) $item['value_id']) . '"' : ''; ?>><?php echo esc_html((string) ($item['value'] ?? '')); ?></strong>
+            <?php if (!empty($item['substat'])) : ?>
+              <span class="pt-mo-summary-item__meta"<?php echo !empty($item['substat_id']) ? ' id="' . esc_attr((string) $item['substat_id']) . '"' : ''; ?>><?php echo esc_html((string) $item['substat']); ?></span>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </section>
     <?php
   }
 

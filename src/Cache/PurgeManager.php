@@ -11,6 +11,10 @@ if (!defined('ABSPATH')) {
 
 final class PurgeManager
 {
+  private const DEFAULT_BATCH_SIZE = 5;
+
+  private const DEFAULT_SCHEDULE_DELAY = 2;
+
   public function __construct(
     private Settings $settings,
     private Logger $logger,
@@ -22,6 +26,7 @@ final class PurgeManager
     add_action(Events::REMOTE_DELETE_COMPLETED, [$this, 'handleRemoteDeleteCompleted'], 10, 1);
     add_action(Events::REWRITE_COMPLETED, [$this, 'handleRewriteCompleted'], 10, 1);
     add_action(Events::INTEGRATION_REWRITE_COMPLETED, [$this, 'handleIntegrationRewriteCompleted'], 10, 1);
+    add_action(MEDIA_OFFLOAD_CACHE_PURGE_HOOK, [$this, 'processScheduledPurges']);
   }
 
   /**
@@ -112,7 +117,113 @@ final class PurgeManager
   public function requestPurge(array $request): array
   {
     $request = $this->normalizeRequest($request);
-    Events::dispatch(Events::CACHE_PURGE_REQUESTED, $request);
+
+    $defaultAsync = !(wp_doing_cron() && doing_action(MEDIA_OFFLOAD_CACHE_PURGE_HOOK));
+    $async = (bool) apply_filters('media_offload_cache_purge_async', $defaultAsync, $request, $this);
+
+    Events::dispatch(Events::CACHE_PURGE_REQUESTED, $request + [
+      'mode' => $async ? 'queued' : 'inline',
+    ]);
+
+    if ($async) {
+      return $this->enqueuePurge($request);
+    }
+
+    return $this->executePurge($request);
+  }
+
+  public function processScheduledPurges(): void
+  {
+    $batchSize = max(1, (int) apply_filters('media_offload_cache_purge_batch_size', self::DEFAULT_BATCH_SIZE, $this));
+    $processed = 0;
+
+    while ($processed < $batchSize) {
+      $request = $this->dequeueNextRequest();
+      if ($request === null) {
+        break;
+      }
+
+      $this->executePurge($request + [
+        'mode' => 'background',
+      ]);
+
+      $processed++;
+    }
+
+    if ($processed > 0) {
+      $this->logger->info('Processed queued cache purge batch. Requests: {count}', [
+        'count' => $processed,
+        'source' => 'cache',
+        'event' => 'cache_purge_batch',
+        'code' => 'cache_purge_batch_processed',
+      ]);
+    }
+
+    if ($this->hasQueuedRequests()) {
+      $this->scheduleWorker();
+    }
+  }
+
+  /**
+   * @param array<string, mixed> $request
+   * @return array<string, mixed>
+   */
+  private function enqueuePurge(array $request): array
+  {
+    $queue = $this->loadQueue();
+
+    if (!empty($request['purge_all'])) {
+      $existingFullPurge = $this->findQueuedFullPurge($queue);
+      if (is_array($existingFullPurge)) {
+        $this->scheduleWorker();
+
+        return $request + [
+          'scheduled' => true,
+          'queue_size' => count($queue),
+          'coalesced_into' => (string) ($existingFullPurge['id'] ?? ''),
+        ];
+      }
+
+      $queue = [$request + ['queued_at' => time()]];
+    } else {
+      $existingFullPurge = $this->findQueuedFullPurge($queue);
+      if (is_array($existingFullPurge)) {
+        $this->scheduleWorker();
+
+        return $request + [
+          'scheduled' => true,
+          'queue_size' => count($queue),
+          'covered_by_purge_all' => true,
+          'coalesced_into' => (string) ($existingFullPurge['id'] ?? ''),
+        ];
+      }
+
+      $queue[] = $request + ['queued_at' => time()];
+    }
+
+    $this->saveQueue($queue);
+    $this->scheduleWorker();
+
+    $this->logger->info('Queued cache purge request for background processing. Reason: {reason}, Queue size: {queue_size}', [
+      'reason' => (string) ($request['reason'] ?? 'manual'),
+      'queue_size' => count($queue),
+      'source' => 'cache',
+      'event' => 'cache_purge_queue',
+      'code' => 'cache_purge_queued',
+    ]);
+
+    return $request + [
+      'scheduled' => true,
+      'queue_size' => count($queue),
+    ];
+  }
+
+  /**
+   * @param array<string, mixed> $request
+   * @return array<string, mixed>
+   */
+  private function executePurge(array $request): array
+  {
 
     $integrations = $this->integrations();
     $integrationIds = array_map(static fn (PurgeIntegration $integration): string => $integration->id(), $integrations);
@@ -152,6 +263,83 @@ final class PurgeManager
     }
 
     return $summary;
+  }
+
+  /**
+   * @return array<int, array<string, mixed>>
+   */
+  private function loadQueue(): array
+  {
+    $queue = get_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY, []);
+    if (!is_array($queue)) {
+      return [];
+    }
+
+    $normalized = [];
+    foreach ($queue as $item) {
+      if (!is_array($item)) {
+        continue;
+      }
+
+      $normalized[] = $this->normalizeRequest($item) + [
+        'queued_at' => (int) ($item['queued_at'] ?? time()),
+      ];
+    }
+
+    return array_values($normalized);
+  }
+
+  /**
+   * @param array<int, array<string, mixed>> $queue
+   */
+  private function saveQueue(array $queue): void
+  {
+    update_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY, array_values($queue), false);
+  }
+
+  /**
+   * @param array<int, array<string, mixed>> $queue
+   * @return array<string, mixed>|null
+   */
+  private function findQueuedFullPurge(array $queue): ?array
+  {
+    foreach ($queue as $item) {
+      if (!empty($item['purge_all'])) {
+        return $item;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * @return array<string, mixed>|null
+   */
+  private function dequeueNextRequest(): ?array
+  {
+    $queue = $this->loadQueue();
+    if (empty($queue)) {
+      return null;
+    }
+
+    $next = array_shift($queue);
+    $this->saveQueue($queue);
+
+    return is_array($next) ? $next : null;
+  }
+
+  private function hasQueuedRequests(): bool
+  {
+    return !empty($this->loadQueue());
+  }
+
+  private function scheduleWorker(): void
+  {
+    if (wp_next_scheduled(MEDIA_OFFLOAD_CACHE_PURGE_HOOK)) {
+      return;
+    }
+
+    wp_schedule_single_event(time() + self::DEFAULT_SCHEDULE_DELAY, MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
   }
 
   /**

@@ -41,6 +41,7 @@ define('MEDIA_OFFLOAD_IGNORE_META_KEY', '_media_offload_ignore');
 define('MEDIA_OFFLOAD_LOG_OPTION_KEY', 'media_offload_logs');
 define('MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY', 'media_offload_admin_notices');
 define('MEDIA_OFFLOAD_DATA_VERSION_OPTION_KEY', 'media_offload_data_version');
+define('MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY', 'media_offload_cache_purge_queue');
 define('MEDIA_OFFLOAD_PENDING_AT_META_KEY', '_media_offload_pending_at');
 define('MEDIA_OFFLOAD_CLAIMED_BY_META_KEY', '_media_offload_claimed_by');
 define('MEDIA_OFFLOAD_CLAIMED_AT_META_KEY', '_media_offload_claimed_at');
@@ -48,6 +49,7 @@ define('MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY', '_media_offload_missing_sourc
 define('MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK', 'media_offload_nightly_batch');
 define('MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK', 'media_offload_nightly_worker');
 define('MEDIA_OFFLOAD_CLEANUP_HOOK', 'media_offload_cleanup_attachment');
+define('MEDIA_OFFLOAD_CACHE_PURGE_HOOK', 'media_offload_cache_purge_worker');
 
 if (file_exists(MEDIA_OFFLOAD_PATH . 'vendor/autoload.php')) {
   require_once MEDIA_OFFLOAD_PATH . 'vendor/autoload.php';

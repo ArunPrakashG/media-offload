@@ -23,6 +23,7 @@ jQuery(document).ready(function ($) {
     }
 
     var $controls = $row.find('input, select, textarea');
+    $row.prop('hidden', !visible);
 
     if (visible) {
       $row.removeClass('pt-mo-hidden-row');
@@ -59,6 +60,26 @@ jQuery(document).ready(function ($) {
     return $.trim($control.val() || '') !== '';
   }
 
+  function lineCount(value) {
+    return $.grep(String(value || '').split(/\r\n|\r|\n/), function (line) {
+      return $.trim(line) !== '';
+    }).length;
+  }
+
+  function formatTemplate(template, values) {
+    return String(template || '').replace(/%([0-9]+)\$d/g, function (_, index) {
+      var position = parseInt(index, 10) - 1;
+      return typeof values[position] !== 'undefined' ? values[position] : '0';
+    });
+  }
+
+  function setText(selector, value) {
+    var $target = $(selector);
+    if ($target.length) {
+      $target.text(value);
+    }
+  }
+
   function updateAdvancedToggle() {
     var $toggle = $('#pt-mo-toggle-advanced');
     if (!$toggle.length) {
@@ -86,12 +107,57 @@ jQuery(document).ready(function ($) {
     $copy.text(config.summary || '');
     $chips.empty();
 
-    $.each(config.required || [], function (_, label) {
+    var required = (config.required || []).slice();
+    var strings = adminConfig.strings || {};
+
+    if (required.length === 1 && String(required[0]).toLowerCase() === 'provider') {
+      required = [strings.noExtraCredentials || 'No extra credentials required'];
+    }
+
+    $.each(required, function (_, label) {
       $('<span/>', {
         'class': 'pt-mo-chip',
         text: label
       }).appendTo($chips);
     });
+  }
+
+  function updateSettingsSummary($form, provider) {
+    var strings = adminConfig.strings || {};
+    var providerLabel = fieldControl($form, 'provider').find('option:selected').text() || 'Storage provider';
+    var bucketValue = $.trim(fieldControl($form, 'bucket').val() || '');
+    var customDomainValue = $.trim(fieldControl($form, 'custom_domain').val() || '');
+    var allowedCount = lineCount(fieldControl($form, 'allowed_path_patterns').val());
+    var ignoredCount = lineCount(fieldControl($form, 'ignored_path_patterns').val());
+    var offHoursEnabled = fieldControl($form, 'off_hours_batch_enabled').is(':checked');
+    var batchTimeValue = $.trim(fieldControl($form, 'off_hours_batch_time').val() || '');
+    var serveFromStorage = fieldControl($form, 'serve_from_storage').is(':checked');
+    var isLocal = provider === 'local';
+
+    var providerSubstat = isLocal
+      ? (strings.providerNoBucket || 'No bucket required in local mode')
+      : (bucketValue || strings.providerBucketNotSet || 'Bucket not set');
+
+    var deliveryLabel = isLocal
+      ? (strings.deliveryLocalDebug || 'Local debug')
+      : (serveFromStorage ? (strings.deliveryRemote || 'Remote') : (strings.deliveryLocal || 'Local'));
+
+    var deliverySubstat = customDomainValue || strings.deliveryNoCustomDomain || 'No custom domain configured';
+    var rulesText = formatTemplate(strings.rulesTemplate || 'Allowed: %1$d · Ignored: %2$d', [allowedCount, ignoredCount]);
+    var shellDelivery = isLocal
+      ? (strings.shellLocalDebugMode || 'Local debug mode')
+      : (serveFromStorage ? (strings.shellServingStorage || 'Serving from storage') : (strings.shellServingLocal || 'Serving from local URLs'));
+
+    setText('#pt-mo-settings-provider-label', providerLabel);
+    setText('#pt-mo-settings-provider-substat', providerSubstat);
+    setText('#pt-mo-settings-delivery-label', deliveryLabel);
+    setText('#pt-mo-settings-delivery-substat', deliverySubstat);
+    setText('#pt-mo-settings-rules-count', String(allowedCount + ignoredCount));
+    setText('#pt-mo-settings-rules-substat', rulesText);
+    setText('#pt-mo-settings-batch-label', offHoursEnabled ? (strings.batchOn || 'On') : (strings.batchOff || 'Off'));
+    setText('#pt-mo-settings-batch-substat', batchTimeValue || (strings.batchNoSchedule || 'No schedule set'));
+    setText('#pt-mo-shell-meta-provider', providerLabel);
+    setText('#pt-mo-shell-meta-delivery', shellDelivery);
   }
 
   function providerHasAdvancedValues($form, provider) {
@@ -145,6 +211,7 @@ jQuery(document).ready(function ($) {
     var provider = ($provider.val() || '').toLowerCase();
     var $serveFromStorageControl = fieldControl($form, 'serve_from_storage');
     var $purgeToggleControl = fieldControl($form, 'purge_cloudflare_cache_on_delete');
+    var $proxyToggleControl = fieldControl($form, 'purge_proxy_cache');
     var $offHoursControl = fieldControl($form, 'off_hours_batch_enabled');
     var $customDomainControl = fieldControl($form, 'custom_domain');
 
@@ -165,6 +232,12 @@ jQuery(document).ready(function ($) {
     var $purgeToggle = rowForField($form, 'purge_cloudflare_cache_on_delete');
     var $zoneId = rowForField($form, 'cloudflare_zone_id');
     var $apiToken = rowForField($form, 'cloudflare_api_token');
+    var $liteSpeedPurge = rowForField($form, 'purge_litespeed_cache');
+    var $wpFastestPurge = rowForField($form, 'purge_wp_fastest_cache');
+    var $proxyPurgeToggle = rowForField($form, 'purge_proxy_cache');
+    var $proxyPurgeMethod = rowForField($form, 'proxy_cache_purge_method');
+    var $proxyPurgeUrls = rowForField($form, 'proxy_cache_purge_urls');
+    var $proxyPurgeAllUrls = rowForField($form, 'proxy_cache_purge_all_urls');
     var $batchTime = rowForField($form, 'off_hours_batch_time');
     var $workerCount = rowForField($form, 'off_hours_worker_count');
     var $workerBatchSize = rowForField($form, 'off_hours_worker_batch_size');
@@ -178,12 +251,17 @@ jQuery(document).ready(function ($) {
     var showStorage = !showLocal;
     var serveFromStorage = $serveFromStorageControl.is(':checked');
     var purgeEnabled = $purgeToggleControl.is(':checked');
+    var proxyPurgeEnabled = $proxyToggleControl.is(':checked');
     var offHoursEnabled = $offHoursControl.is(':checked');
     var customDomainHasValue = hasValue($customDomainControl);
+    var proxyPurgeHasUrls = hasValue(fieldControl($form, 'proxy_cache_purge_urls')) || hasValue(fieldControl($form, 'proxy_cache_purge_all_urls'));
     var showAdvanced = connectionAdvancedOpen || providerHasAdvancedValues($form, provider);
+    var showRemoteDeliveryControls = showStorage && serveFromStorage;
 
     renderProviderSummary(provider);
+    updateSettingsSummary($form, provider);
     updateAdvancedToggle();
+    $('#pt-mo-toggle-advanced').prop('hidden', showLocal);
 
     setRowVisible($bucket, showStorage);
     setRowVisible($access, showStorage);
@@ -200,9 +278,15 @@ jQuery(document).ready(function ($) {
     setRowVisible($serveFromStorage, showStorage);
     setRowVisible($customDomain, showStorage && (serveFromStorage || customDomainHasValue));
     setRowVisible($removeLocal, showStorage);
-    setRowVisible($purgeToggle, showStorage && serveFromStorage && (customDomainHasValue || purgeEnabled));
-    setRowVisible($zoneId, showStorage && serveFromStorage && purgeEnabled);
-    setRowVisible($apiToken, showStorage && serveFromStorage && purgeEnabled);
+    setRowVisible($purgeToggle, showRemoteDeliveryControls && (customDomainHasValue || purgeEnabled));
+    setRowVisible($zoneId, showRemoteDeliveryControls && purgeEnabled);
+    setRowVisible($apiToken, showRemoteDeliveryControls && purgeEnabled);
+    setRowVisible($liteSpeedPurge, showRemoteDeliveryControls);
+    setRowVisible($wpFastestPurge, showRemoteDeliveryControls);
+    setRowVisible($proxyPurgeToggle, showRemoteDeliveryControls || proxyPurgeEnabled || proxyPurgeHasUrls);
+    setRowVisible($proxyPurgeMethod, showRemoteDeliveryControls && (proxyPurgeEnabled || proxyPurgeHasUrls));
+    setRowVisible($proxyPurgeUrls, showRemoteDeliveryControls && (proxyPurgeEnabled || proxyPurgeHasUrls));
+    setRowVisible($proxyPurgeAllUrls, showRemoteDeliveryControls && (proxyPurgeEnabled || proxyPurgeHasUrls));
     setRowVisible($batchTime, offHoursEnabled);
     setRowVisible($workerCount, offHoursEnabled);
     setRowVisible($workerBatchSize, offHoursEnabled);
@@ -233,8 +317,15 @@ jQuery(document).ready(function ($) {
   $(document).on('change input', [
     fieldSelector('serve_from_storage'),
     fieldSelector('purge_cloudflare_cache_on_delete'),
+    fieldSelector('purge_proxy_cache'),
     fieldSelector('off_hours_batch_enabled'),
-    fieldSelector('custom_domain')
+    fieldSelector('off_hours_batch_time'),
+    fieldSelector('bucket'),
+    fieldSelector('custom_domain'),
+    fieldSelector('allowed_path_patterns'),
+    fieldSelector('ignored_path_patterns'),
+    fieldSelector('proxy_cache_purge_urls'),
+    fieldSelector('proxy_cache_purge_all_urls')
   ].join(', '), applyProviderVisibility);
 
   $(document).on('click', '#pt-mo-toggle-advanced', function (e) {
@@ -544,6 +635,8 @@ jQuery(document).ready(function ($) {
     var $success = $('#pt-mo-job-success');
     var $failed = $('#pt-mo-job-failed');
     var $skipped = $('#pt-mo-job-skipped');
+    var refreshFailures = 0;
+    var refreshTimer = null;
 
     function badgeClassFor(status) {
       if (status === 'completed' || status === 'offloaded') {
@@ -596,20 +689,40 @@ jQuery(document).ready(function ($) {
       }
 
       return fetch(adminConfig.restBase + path, options).then(function (response) {
-        return response.json().then(function (data) {
+        return response.text().then(function (text) {
+          var data = null;
+
+          if (text) {
+            try {
+              data = JSON.parse(text);
+            } catch (error) {
+              data = null;
+            }
+          }
+
           if (!response.ok) {
-            var message = (data && data.message) || 'Request failed';
+            var message = (data && data.message) || response.statusText || 'Request failed';
             throw new Error(message);
           }
 
-          return data;
+          return data || {};
         });
       });
     }
 
     function refresh() {
-      request('/jobs').then(renderJobState).catch(function () {
-        // Keep current UI state if polling fails.
+      request('/jobs').then(function (state) {
+        refreshFailures = 0;
+        renderJobState(state);
+      }).catch(function () {
+        refreshFailures += 1;
+
+        if (refreshFailures >= 3 && refreshTimer) {
+          window.clearInterval(refreshTimer);
+          refreshTimer = null;
+          $badge.attr('class', 'pt-mo-inline-badge is-warning').text('Status unavailable');
+          $message.text('Live queue updates are temporarily unavailable. Reload after fixing REST access to resume polling.');
+        }
       });
     }
 
@@ -651,6 +764,6 @@ jQuery(document).ready(function ($) {
     });
 
     refresh();
-    window.setInterval(refresh, 5000);
+    refreshTimer = window.setInterval(refresh, 5000);
   })();
 });
