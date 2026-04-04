@@ -47,9 +47,9 @@ services:
       context: ../apps/backend
       dockerfile: Dockerfile
     restart: unless-stopped
-    # Not exposed publicly — only nimbus-web reaches it via the internal network.
-    expose:
-      - "8090"
+    # Bound to loopback only — route via your reverse proxy to port 8090.
+    ports:
+      - "127.0.0.1:8090:8090"
     environment:
       PORT: "8090"
       DATABASE_URL: "postgres://nimbus:${DB_PASSWORD}@nimbus-db:5432/nimbus_backend"
