@@ -15,7 +15,10 @@ nimbus/
 ├── packages/       Shared libraries and utilities consumed across apps
 ├── infra/          Infrastructure-as-code (Terraform / Docker / CI configs)
 ├── scripts/        Repo-level dev and automation scripts
-└── docker-compose.yml   Local WordPress sandbox for plugin development
+└── infra/
+    ├── dev/
+    │   └── docker-compose.yml   Local WordPress sandbox for plugin development
+    └── docker-compose.yml       Production infrastructure
 ```
 
 ## Apps
@@ -30,16 +33,14 @@ nimbus/
 
 ```bash
 # Start local WordPress sandbox
-docker compose up -d
-
+docker compose -f infra/dev/docker-compose.yml up -d
 # WP-CLI shortcut
-docker compose --profile cli run --rm wpcli plugin list
+docker compose -f infra/dev/docker-compose.yml --profile cli run --rm wpcli plugin list
 
 # Stop
-docker compose down
-
+docker compose -f infra/dev/docker-compose.yml down
 # Full reset (wipes database + uploads)
-docker compose down -v
+docker compose -f infra/dev/docker-compose.yml down -v
 ```
 
 WordPress runs at `http://localhost:8080` · admin / password

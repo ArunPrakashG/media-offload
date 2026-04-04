@@ -594,6 +594,8 @@ const plans = [
     width: calc(100vw - 2rem);
     background: var(--nmb-surface);
     color: var(--nmb-text);
+    /* showModal() puts the dialog in the top layer; margin:auto centers it. */
+    margin: auto;
   }
 
   .email-dialog::backdrop {
@@ -766,6 +768,17 @@ const plans = [
     .addEventListener("click", () => {
       emailDialog.close();
     });
+
+  // Close when clicking on the backdrop (outside the dialog box).
+  emailDialog.addEventListener("click", (e) => {
+    const rect = emailDialog.getBoundingClientRect();
+    const clickedOutside =
+      e.clientX < rect.left ||
+      e.clientX > rect.right ||
+      e.clientY < rect.top ||
+      e.clientY > rect.bottom;
+    if (clickedOutside) emailDialog.close();
+  });
 
   let pendingPlan = null;
 

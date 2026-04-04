@@ -227,19 +227,17 @@ Each stored entry includes: `level`, `level_key`, `source`, `event`, `code`, `me
 
 ```bash
 # Start
-docker compose up -d
-
+docker compose -f ../../infra/dev/docker-compose.yml up -d
 # Re-run setup after a volume reset
-docker compose run --rm setup
+docker compose -f ../../infra/dev/docker-compose.yml run --rm setup
 
 # WP-CLI
-docker compose --profile cli run --rm wpcli plugin list
+docker compose -f ../../infra/dev/docker-compose.yml --profile cli run --rm wpcli plugin list
 
 # Stop
-docker compose down
-
+docker compose -f ../../infra/dev/docker-compose.yml down
 # Full reset (database + files)
-docker compose down -v
+docker compose -f ../../infra/dev/docker-compose.yml down -v
 ```
 
 - WordPress URL: `http://localhost:8080`
