@@ -63,13 +63,13 @@ Activate the plugin in WordPress. On first activation you will be redirected to 
 
 All endpoints require a user with `manage_options` capability.
 
-| Method | Endpoint |
-|--------|----------|
-| `GET` | `/wp-json/nimbus/v1/status` |
-| `GET` | `/wp-json/nimbus/v1/statistics` |
-| `GET` | `/wp-json/nimbus/v1/integrations` |
-| `POST` | `/wp-json/nimbus/v1/offload/pending` |
-| `POST` | `/wp-json/nimbus/v1/offload/item/<attachment_id>` |
+| Method | Endpoint                                               |
+| ------ | ------------------------------------------------------ |
+| `GET`  | `/wp-json/nimbus/v1/status`                            |
+| `GET`  | `/wp-json/nimbus/v1/statistics`                        |
+| `GET`  | `/wp-json/nimbus/v1/integrations`                      |
+| `POST` | `/wp-json/nimbus/v1/offload/pending`                   |
+| `POST` | `/wp-json/nimbus/v1/offload/item/<attachment_id>`      |
 | `POST` | `/wp-json/nimbus/v1/integrations/smart_slider/rewrite` |
 
 ### Hooks
@@ -100,33 +100,33 @@ Opt-out filters: `nimbus_should_purge_cache_on_remote_delete` · `nimbus_should_
 
 Add to the `nimbus_integrations` filter with these fields:
 
-| Field | Purpose |
-|-------|---------|
-| `key` | Unique machine identifier |
-| `label` | Display name |
-| `plugin_files` | Array of plugin file paths to detect installation |
-| `directories` | Asset root directories for scanning |
-| `rewrite_supported` | `true` if a rewrite pass is available |
-| `rewrite_action_label` | Button label for the admin rewrite action |
-| `table_callback` | `callable` returning tables to rewrite |
-| `rewrite_callback` | `callable` performing the rewrite |
+| Field                    | Purpose                                               |
+| ------------------------ | ----------------------------------------------------- |
+| `key`                    | Unique machine identifier                             |
+| `label`                  | Display name                                          |
+| `plugin_files`           | Array of plugin file paths to detect installation     |
+| `directories`            | Asset root directories for scanning                   |
+| `rewrite_supported`      | `true` if a rewrite pass is available                 |
+| `rewrite_action_label`   | Button label for the admin rewrite action             |
+| `table_callback`         | `callable` returning tables to rewrite                |
+| `rewrite_callback`       | `callable` performing the rewrite                     |
 | `rewrite_ready_callback` | `callable` returning whether the integration is ready |
 
 ---
 
 ## Cloudflare R2 Setup
 
-| Setting | Value |
-|---------|-------|
-| Provider | `Cloudflare R2` |
-| Bucket | your bucket name |
-| R2 Account ID | your Cloudflare account ID |
-| Region | `auto` |
-| Access Key | R2 API Token Access Key ID |
-| Secret Key | R2 API Token Secret Access Key |
-| Session Token | leave empty for R2 API keys |
+| Setting         | Value                                                                       |
+| --------------- | --------------------------------------------------------------------------- |
+| Provider        | `Cloudflare R2`                                                             |
+| Bucket          | your bucket name                                                            |
+| R2 Account ID   | your Cloudflare account ID                                                  |
+| Region          | `auto`                                                                      |
+| Access Key      | R2 API Token Access Key ID                                                  |
+| Secret Key      | R2 API Token Secret Access Key                                              |
+| Session Token   | leave empty for R2 API keys                                                 |
 | Custom Endpoint | `https://<account_id>.r2.cloudflarestorage.com` (do not append bucket name) |
-| Use Path Style | enabled automatically |
+| Use Path Style  | enabled automatically                                                       |
 
 Set **Custom Domain** to your CDN or public bucket domain for production delivery.
 
@@ -187,12 +187,12 @@ Restores offloaded attachments from storage to local uploads and rewrites DB URL
 
 Restrict which upload paths are eligible for offloading:
 
-| Pattern | Meaning |
-|---------|---------|
-| `{year}/**` | year-based upload folders only |
-| `sites/*/{year}/**` | multisite year folders |
-| `cache/**` | ignore cache folders |
-| `{year}/{month}/**` | specific month folders |
+| Pattern             | Meaning                        |
+| ------------------- | ------------------------------ |
+| `{year}/**`         | year-based upload folders only |
+| `sites/*/{year}/**` | multisite year folders         |
+| `cache/**`          | ignore cache folders           |
+| `{year}/{month}/**` | specific month folders         |
 
 Supported wildcards: `*` (any chars except `/`), `**` (nested path), `?` (single char), `{year}`, `{month}`, `{day}`.
 

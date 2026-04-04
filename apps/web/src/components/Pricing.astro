@@ -727,8 +727,41 @@ const plans = [
 </style>
 
 <script>
+  // ── Razorpay type declarations ─────────────────────────────────────────────
+  interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_subscription_id: string;
+    razorpay_signature: string;
+  }
+
+  interface RazorpayOptions {
+    key: string;
+    subscription_id: string;
+    name: string;
+    description: string;
+    image: string;
+    prefill: { email: string };
+    theme: { color: string };
+    handler: (response: RazorpayResponse) => void;
+    modal: { ondismiss: () => void };
+  }
+
+  interface RazorpayInstance {
+    open(): void;
+  }
+
+  interface RazorpayConstructor {
+    new (options: RazorpayOptions): RazorpayInstance;
+  }
+
+  declare global {
+    interface Window {
+      Razorpay: RazorpayConstructor;
+    }
+  }
+
   // ── Helpers ───────────────────────────────────────────────────────────────
-  function loadRazorpayScript() {
+  function loadRazorpayScript(): Promise<boolean> {
     if (typeof window.Razorpay !== "undefined") return Promise.resolve(true);
     return new Promise((resolve) => {
       const s = document.createElement("script");
@@ -739,38 +772,56 @@ const plans = [
     });
   }
 
-  function showOverlay(type, title, msg) {
-    document.getElementById("pay-icon-success").hidden = type !== "success";
-    document.getElementById("pay-icon-error").hidden = type !== "error";
-    document.getElementById("pay-overlay-title").textContent = title;
-    document.getElementById("pay-overlay-msg").textContent = msg;
-    document.getElementById("pay-overlay").hidden = false;
+  function showOverlay(
+    type: "success" | "error",
+    title: string,
+    msg: string,
+  ): void {
+    (document.getElementById("pay-icon-success") as HTMLElement).hidden =
+      type !== "success";
+    (document.getElementById("pay-icon-error") as HTMLElement).hidden =
+      type !== "error";
+    (document.getElementById("pay-overlay-title") as HTMLElement).textContent =
+      title;
+    (document.getElementById("pay-overlay-msg") as HTMLElement).textContent =
+      msg;
+    (document.getElementById("pay-overlay") as HTMLElement).hidden = false;
   }
 
-  document.getElementById("pay-overlay-close").addEventListener("click", () => {
-    document.getElementById("pay-overlay").hidden = true;
+  (
+    document.getElementById("pay-overlay-close") as HTMLElement
+  ).addEventListener("click", () => {
+    (document.getElementById("pay-overlay") as HTMLElement).hidden = true;
   });
 
   // ── Email dialog ──────────────────────────────────────────────────────────
-  const emailDialog = /** @type {HTMLDialogElement} */ (
-    document.getElementById("email-dialog")
-  );
-  const emailInput = /** @type {HTMLInputElement} */ (
-    document.getElementById("checkout-email")
-  );
-  const emailError = document.getElementById("email-dialog-error");
-  const emailSubmitBtn = document.getElementById("email-dialog-submit");
-  const emailSubmitLabel = document.getElementById("email-submit-label");
-  const emailSubmitSpinner = document.getElementById("email-submit-spinner");
+  const emailDialog = document.getElementById(
+    "email-dialog",
+  ) as HTMLDialogElement;
+  const emailInput = document.getElementById(
+    "checkout-email",
+  ) as HTMLInputElement;
+  const emailError = document.getElementById(
+    "email-dialog-error",
+  ) as HTMLElement;
+  const emailSubmitBtn = document.getElementById(
+    "email-dialog-submit",
+  ) as HTMLButtonElement;
+  const emailSubmitLabel = document.getElementById(
+    "email-submit-label",
+  ) as HTMLElement;
+  const emailSubmitSpinner = document.getElementById(
+    "email-submit-spinner",
+  ) as HTMLElement;
 
-  document
-    .getElementById("email-dialog-cancel")
-    .addEventListener("click", () => {
-      emailDialog.close();
-    });
+  (
+    document.getElementById("email-dialog-cancel") as HTMLElement
+  ).addEventListener("click", () => {
+    emailDialog.close();
+  });
 
   // Close when clicking on the backdrop (outside the dialog box).
-  emailDialog.addEventListener("click", (e) => {
+  emailDialog.addEventListener("click", (e: MouseEvent) => {
     const rect = emailDialog.getBoundingClientRect();
     const clickedOutside =
       e.clientX < rect.left ||
@@ -780,21 +831,21 @@ const plans = [
     if (clickedOutside) emailDialog.close();
   });
 
-  let pendingPlan = null;
+  let pendingPlan: string | null = null;
 
   // Collect email then proceed to payment (paid plans only).
-  document.querySelectorAll("[data-plan]").forEach((btn) => {
+  document.querySelectorAll<HTMLElement>("[data-plan]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      pendingPlan = btn.dataset.plan;
+      pendingPlan = btn.dataset.plan ?? null;
       emailInput.value = "";
       emailError.hidden = true;
       emailDialog.showModal();
     });
   });
 
-  document
-    .getElementById("email-form")
-    .addEventListener("submit", async (e) => {
+  (document.getElementById("email-form") as HTMLElement).addEventListener(
+    "submit",
+    async (e) => {
       e.preventDefault();
       if (!pendingPlan) return;
 
@@ -814,7 +865,7 @@ const plans = [
       };
 
       // Step 1 — Create subscription server-side
-      let subResp = null;
+      let subResp: Response | null = null;
       try {
         subResp = await fetch("/api/create-subscription", {
           method: "POST",
@@ -858,9 +909,9 @@ const plans = [
         prefill: { email },
         theme: { color: "#4f63f5" },
 
-        handler: async (response) => {
+        handler: async (response: RazorpayResponse) => {
           // Step 3 — Verify subscription payment signature server-side
-          let verifyResp = null;
+          let verifyResp: Response | null = null;
           try {
             verifyResp = await fetch("/api/verify-payment", {
               method: "POST",
@@ -898,5 +949,6 @@ const plans = [
       });
 
       rzp.open();
-    });
+    },
+  );
 </script>
