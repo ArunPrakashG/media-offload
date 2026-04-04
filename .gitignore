@@ -1,33 +1,56 @@
-# OS / editor
+# ── OS / editor ───────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
 
-# Environment / secrets
+# ── Secrets & environment ──────────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
 
-# Composer / PHP
-vendor/
-.phpunit.result.cache
-coverage/
+# ── apps/plugin (PHP / WordPress) ─────────────────────────────────────────────
+apps/plugin/vendor/
+apps/plugin/.phpunit.result.cache
+apps/plugin/coverage/
 
-# Python
-.venv/
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# JavaScript / assets
+# ── pnpm workspace ───────────────────────────────────────────────────────────
 node_modules/
-dist/
-build/
+**/node_modules/
+package-lock.json
+yarn.lock
 
-# Logs / temp
+# ── apps/web (JavaScript / Node) ──────────────────────────────────────────────
+apps/web/.next/
+apps/web/dist/
+apps/web/build/
+apps/web/.output/
+apps/web/.astro/
+
+# ── apps/backend (Go) ─────────────────────────────────────────────────────────
+apps/backend/bin/
+apps/backend/tmp/
+
+# ── apps/backend (Python — if chosen instead) ─────────────────────────────────
+apps/backend/.venv/
+apps/backend/__pycache__/
+apps/backend/*.py[cod]
+apps/backend/.pytest_cache/
+apps/backend/.mypy_cache/
+apps/backend/.ruff_cache/
+
+# ── packages (shared libs) ────────────────────────────────────────────────────
+packages/**/dist/
+packages/**/__pycache__/
+
+# ── infra ─────────────────────────────────────────────────────────────────────
+infra/**/.terraform/
+infra/**/*.tfstate
+infra/**/*.tfstate.backup
+infra/**/*.tfvars
+!infra/**/*.tfvars.example
+
+# ── Logs / temp ───────────────────────────────────────────────────────────────
 *.log
 *.tmp
 *.swp

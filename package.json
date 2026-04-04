@@ -1,0 +1,17 @@
+{
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=9"
+  },
+  "name": "nimbus",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter @nimbus/web build",
+    "dev": "pnpm --filter @nimbus/web dev",
+    "preview": "pnpm --filter @nimbus/web preview",
+    "web:build": "pnpm --filter @nimbus/web build",
+    "web:dev": "pnpm --filter @nimbus/web dev",
+    "web:preview": "pnpm --filter @nimbus/web preview"
+  },
+  "version": "0.1.0"
+}

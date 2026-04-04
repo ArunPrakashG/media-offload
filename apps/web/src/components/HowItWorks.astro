@@ -1,0 +1,174 @@
+---
+const steps = [
+  {
+    num:    '01',
+    title:  'Install & activate',
+    desc:   'Install Nimbus from the WordPress plugin directory or upload a zip manually. Activate it — setup takes under a minute.',
+    detail: 'No code required. Works with any WordPress hosting.',
+  },
+  {
+    num:    '02',
+    title:  'Connect your bucket',
+    desc:   'Enter your storage provider credentials and bucket name. Nimbus tests the connection and verifies write permissions instantly.',
+    detail: 'Supports IAM roles, access keys, and R2 API tokens.',
+  },
+  {
+    num:    '03',
+    title:  'Offload your library',
+    desc:   'New uploads go straight to the cloud. For existing files, run the bulk migrator — it processes your library in background batches without timing out.',
+    detail: 'All media URLs rewrite automatically. Zero downtime.',
+  },
+];
+---
+
+<section class="section hiw" id="how-it-works">
+  <div class="container">
+
+    <div class="hiw-header">
+      <p class="section-label">How it works</p>
+      <h2 class="section-headline">Up and running in&nbsp;minutes.</h2>
+      <p class="section-sub">
+        Three steps from install to a fully offloaded media library. No server config,
+        no code changes, no downtime.
+      </p>
+    </div>
+
+    <!-- Steps -->
+    <div class="hiw-steps">
+      {steps.map((step, i) => (
+        <div class="hiw-step">
+          <!-- Left: number -->
+          <div class="step-num-wrap">
+            <span class="step-num">{step.num}</span>
+            {i < steps.length - 1 && <span class="step-connector" aria-hidden="true"></span>}
+          </div>
+          <!-- Right: content -->
+          <div class="step-body">
+            <h3 class="step-title">{step.title}</h3>
+            <p class="step-desc">{step.desc}</p>
+            <p class="step-detail">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              {step.detail}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ── Header ─────────────────────────────────────────────────────────────── */
+  .hiw-header {
+    max-width: 520px;
+    margin-bottom: 3.5rem;
+  }
+
+  .hiw-header .section-label    { margin-bottom: 0.625rem; }
+  .hiw-header .section-headline { margin-bottom: 1rem; }
+
+  /* ── Steps list ─────────────────────────────────────────────────────────── */
+  .hiw-steps {
+    display: flex;
+    flex-direction: column;
+    max-width: 680px;
+  }
+
+  /* ── Single step ─────────────────────────────────────────────────────────── */
+  .hiw-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0 1.5rem;
+  }
+
+  /* ── Number column ──────────────────────────────────────────────────────── */
+  .step-num-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--nmb-border);
+    background: var(--nmb-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--nmb-font-mono);
+    color: var(--nmb-accent);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    transition: border-color var(--nmb-t), background var(--nmb-t);
+  }
+
+  .hiw-step:hover .step-num {
+    background: var(--nmb-accent-light);
+    border-color: var(--nmb-accent);
+  }
+
+  .step-connector {
+    flex: 1;
+    width: 1.5px;
+    background: var(--nmb-border);
+    margin: 0.375rem 0;
+    min-height: 2rem;
+  }
+
+  /* ── Content column ─────────────────────────────────────────────────────── */
+  .step-body {
+    padding-bottom: 2.5rem;
+    padding-top: 0.625rem;
+  }
+
+  .hiw-step:last-child .step-body { padding-bottom: 0; }
+
+  .step-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    letter-spacing: -0.018em;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-desc {
+    font-size: 0.9875rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.7;
+    margin-bottom: 0.625rem;
+    max-width: 52ch;
+  }
+
+  .step-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--nmb-text-subtle);
+    line-height: 1.4;
+  }
+
+  .step-detail svg { color: var(--nmb-accent); flex-shrink: 0; }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 639px) {
+    .hiw-step {
+      grid-template-columns: 40px 1fr;
+      gap: 0 1rem;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      font-size: 0.6875rem;
+    }
+  }
+</style>

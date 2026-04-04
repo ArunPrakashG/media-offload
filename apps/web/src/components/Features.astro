@@ -1,0 +1,155 @@
+---
+const features = [
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15.5C3 13 4.8 11 7.2 10.6A6.5 6.5 0 0 1 18 9a4 4 0 0 1 3 7"/><path d="M10 20l2.5-3 2.5 3"/><line x1="12.5" y1="17" x2="12.5" y2="22"/></svg>`,
+    title: "Any S3-compatible provider",
+    desc: "Amazon S3, Cloudflare R2, Backblaze B2, MinIO, Wasabi, DigitalOcean Spaces — if it speaks S3, Nimbus supports it. No vendor lock-in.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
+    title: "Zero workflow disruption",
+    desc: "Upload images the same way you always have. Nimbus silently offloads every new file in the background — no plugin or theme changes needed.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+    title: "CDN URL rewriting",
+    desc: "Serve every asset from your CDN edge network. All media URLs are automatically rewritten — your visitors get files from the nearest PoP.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+    title: "Bulk migration",
+    desc: "Move thousands of existing media files to the cloud in one click. Track progress in real time with a live progress bar — no timeouts, no memory limits.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    title: "WordPress Multisite",
+    desc: "Full Multisite network support. Each subsite connects its own bucket, or shares a single one — your choice. Managed under a single license.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
+    title: "Cache purge integration",
+    desc: "Nimbus automatically purges Cloudflare, LiteSpeed, and WP Fastest Cache after offloading. Your visitors always get the latest version of your files.",
+  },
+];
+---
+
+<section class="section features" id="features">
+  <div class="container">
+    <div class="features-header">
+      <p class="section-label">Features</p>
+      <h2 class="section-headline">
+        Everything you need.<br />Nothing you don't.
+      </h2>
+      <p class="section-sub">
+        Nimbus handles the heavy lifting of cloud media delivery so you can
+        focus on building your site — not managing storage infrastructure.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      {
+        features.map((f) => (
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true" set:html={f.icon} />
+            <h3 class="feature-title">{f.title}</h3>
+            <p class="feature-desc">{f.desc}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Section header ──────────────────────────────────────────────────────── */
+  .features-header {
+    max-width: 560px;
+    margin-bottom: 3.5rem;
+  }
+
+  .features-header .section-label {
+    margin-bottom: 0.625rem;
+  }
+  .features-header .section-headline {
+    margin-bottom: 1rem;
+  }
+
+  /* ── Grid ───────────────────────────────────────────────────────────────── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25px;
+    background: var(--nmb-border);
+    border: 1px solid var(--nmb-border);
+    border-radius: var(--nmb-radius-lg);
+    overflow: hidden;
+  }
+
+  /* ── Card ───────────────────────────────────────────────────────────────── */
+  .feature-card {
+    background: var(--nmb-surface);
+    padding: 2rem 1.875rem;
+    transition: background var(--nmb-t);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .feature-card:hover {
+    background: var(--nmb-surface-alt);
+  }
+
+  /* ── Icon ───────────────────────────────────────────────────────────────── */
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--nmb-radius-sm);
+    background: var(--nmb-accent-dim);
+    border: 1px solid rgba(79, 99, 245, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nmb-accent);
+    flex-shrink: 0;
+    transition:
+      background var(--nmb-t),
+      border-color var(--nmb-t);
+  }
+
+  .feature-card:hover .feature-icon {
+    background: var(--nmb-accent-light);
+    border-color: rgba(79, 99, 245, 0.2);
+  }
+
+  /* ── Text ───────────────────────────────────────────────────────────────── */
+  .feature-title {
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .feature-desc {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.65;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .features-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .feature-card {
+      padding: 1.75rem 1.5rem;
+    }
+  }
+</style>

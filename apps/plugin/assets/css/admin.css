@@ -539,8 +539,7 @@ body.upload_page_media-offload #wpcontent {
   border-color: var(--nmb-border-strong);
 }
 
-.nimbus-settings
-  input[type="checkbox"]:not(.nmb-toggle-switch input):checked {
+.nimbus-settings input[type="checkbox"]:not(.nmb-toggle-switch input):checked {
   background-color: var(--nmb-accent);
   border-color: var(--nmb-accent);
 }
@@ -1521,7 +1520,7 @@ body.upload_page_media-offload #wpcontent {
   grid-template-columns: 260px minmax(0, 1fr);
   gap: var(--nmb-space-5);
   margin-top: var(--nmb-space-4);
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
@@ -1529,7 +1528,8 @@ body.upload_page_media-offload #wpcontent {
 .nmb-onboarding-sidebar {
   position: sticky;
   top: 32px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--nmb-space-4);
 }
 
@@ -1571,9 +1571,10 @@ body.upload_page_media-offload #wpcontent {
   line-height: 1.5;
 }
 
-/* Step navigator card */
+/* Step navigator card — grows to fill remaining sidebar height */
 .nmb-onboarding-step-nav {
   padding: var(--nmb-space-4);
+  flex: 1;
 }
 
 /* ── Step list ───────────────────────────────────────────────────────────── */
@@ -1589,13 +1590,14 @@ body.upload_page_media-offload #wpcontent {
 
 /* Vertical connector line through the step index circles */
 .nmb-onboarding-step-list::before {
-  content: '';
+  content: "";
   position: absolute;
-  left: calc(12px + 16px); /* li padding-left + half circle width */
-  top: 40px;
-  bottom: 40px;
+  left: calc(
+    12px + 16px - 1px
+  ); /* item padding-left + half circle - half line-width */
+  top: 45px; /* below first circle center (12+1+16=29px + 16 = ~45px) */
+  bottom: 45px;
   width: 2px;
-  margin-left: -1px;
   background: var(--nmb-border);
   z-index: 0;
 }
@@ -1604,7 +1606,7 @@ body.upload_page_media-offload #wpcontent {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
   gap: var(--nmb-space-3);
-  align-items: center;
+  align-items: start;
   padding: var(--nmb-space-3) var(--nmb-space-3);
   border-radius: var(--nmb-radius);
   cursor: pointer;
@@ -1641,7 +1643,12 @@ body.upload_page_media-offload #wpcontent {
   font-weight: 700;
   color: var(--nmb-text-2);
   flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  /* Optically align circle top with the title text baseline */
+  margin-top: 1px;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
 
 /* Active step */
@@ -1782,7 +1789,7 @@ body.upload_page_media-offload #wpcontent {
 }
 
 .nmb-onboarding-tips li::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 7px;

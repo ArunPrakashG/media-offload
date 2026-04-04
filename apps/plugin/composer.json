@@ -1,0 +1,24 @@
+{
+  "authors": [
+    {
+      "email": "contact@arunprakashg.com",
+      "name": "Arun Prakash"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Nimbus\\Plugin\\": "src/"
+    }
+  },
+  "description": "Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "stable",
+  "name": "arun-prakash/nimbus",
+  "require": {
+    "aws/aws-sdk-php": "^3.200"
+  },
+  "support": {
+    "email": "contact@arunprakashg.com"
+  },
+  "type": "wordpress-plugin"
+}

@@ -7,45 +7,45 @@
 .nimbus-settings,
 .nmb-license-overlay {
   /* ── Surface ─────────────────────────────────────────────────────── */
-  --nmb-bg:             #f0f0f1;   /* WordPress admin page background    */
-  --nmb-surface:        #ffffff;   /* Card / panel surface               */
-  --nmb-surface-alt:    #f7f8ff;   /* Subtle indigo-tinted surface       */
+  --nmb-bg: #f0f0f1; /* WordPress admin page background    */
+  --nmb-surface: #ffffff; /* Card / panel surface               */
+  --nmb-surface-alt: #f7f8ff; /* Subtle indigo-tinted surface       */
 
   /* ── Border ──────────────────────────────────────────────────────── */
-  --nmb-border:         #dcdcde;   /* Default 1px border                 */
-  --nmb-border-strong:  #8c8f94;   /* Strong / focus adjacent            */
+  --nmb-border: #dcdcde; /* Default 1px border                 */
+  --nmb-border-strong: #8c8f94; /* Strong / focus adjacent            */
 
   /* ── Text ────────────────────────────────────────────────────────── */
-  --nmb-text:           #1d2327;   /* Primary text                       */
-  --nmb-text-2:         #50575e;   /* Secondary / muted                  */
-  --nmb-text-3:         #787c82;   /* Tertiary / placeholder             */
+  --nmb-text: #1d2327; /* Primary text                       */
+  --nmb-text-2: #50575e; /* Secondary / muted                  */
+  --nmb-text-3: #787c82; /* Tertiary / placeholder             */
 
   /* ── Accent (Nimbus indigo) ──────────────────────────────────────── */
-  --nmb-accent:         #4f63f5;   /* Brand indigo                       */
-  --nmb-accent-hover:   #3b4fd4;   /* Darker on hover                    */
-  --nmb-accent-bg:      #f0f1fe;   /* Faint indigo tint for backgrounds  */
+  --nmb-accent: #4f63f5; /* Brand indigo                       */
+  --nmb-accent-hover: #3b4fd4; /* Darker on hover                    */
+  --nmb-accent-bg: #f0f1fe; /* Faint indigo tint for backgrounds  */
 
   /* ── Status ──────────────────────────────────────────────────────── */
-  --nmb-ok:             #00a32a;
-  --nmb-ok-bg:          #edfaef;
-  --nmb-warn:           #b56900;
-  --nmb-warn-bg:        #fcf9e8;
-  --nmb-error:          #d63638;
-  --nmb-error-bg:       #fcf0f1;
-  --nmb-info:           #4f63f5;
-  --nmb-info-bg:        #f0f1fe;
+  --nmb-ok: #00a32a;
+  --nmb-ok-bg: #edfaef;
+  --nmb-warn: #b56900;
+  --nmb-warn-bg: #fcf9e8;
+  --nmb-error: #d63638;
+  --nmb-error-bg: #fcf0f1;
+  --nmb-info: #4f63f5;
+  --nmb-info-bg: #f0f1fe;
 
   /* ── Shape ───────────────────────────────────────────────────────── */
-  --nmb-radius:         5px;       /* Softened card corners              */
-  --nmb-radius-lg:      8px;       /* Larger panels / overlays           */
-  --nmb-pill:           999px;     /* Pill / badge shape                 */
+  --nmb-radius: 5px; /* Softened card corners              */
+  --nmb-radius-lg: 8px; /* Larger panels / overlays           */
+  --nmb-pill: 999px; /* Pill / badge shape                 */
 
   /* ── Elevation ───────────────────────────────────────────────────── */
-  --nmb-shadow:         0 1px 3px rgba(79,99,245,.06);
+  --nmb-shadow: 0 1px 3px rgba(79, 99, 245, 0.06);
 
   /* ── Spacing scale ───────────────────────────────────────────────── */
-  --nmb-space-1:  4px;
-  --nmb-space-2:  8px;
+  --nmb-space-1: 4px;
+  --nmb-space-2: 8px;
   --nmb-space-3: 12px;
   --nmb-space-4: 16px;
   --nmb-space-5: 20px;
@@ -53,8 +53,10 @@
   --nmb-space-8: 32px;
 
   /* ── Typography ──────────────────────────────────────────────────── */
-  --nmb-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-             Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  --nmb-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-             "Liberation Mono", "Courier New", monospace;
+  --nmb-font:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
+    Cantarell, "Helvetica Neue", sans-serif;
+  --nmb-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
