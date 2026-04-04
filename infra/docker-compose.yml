@@ -8,7 +8,7 @@
 # First-time setup:
 #   1. cp .env.example .env  and fill in every value.
 #   2. docker compose up -d
-#   3. docker compose exec nimbus-api ./server migrate  (if migrations are manual)
+#   3. docker compose exec nimbus-api /migrate up
 #
 # Rebuild after code changes:
 #   docker compose build nimbus-web nimbus-api
