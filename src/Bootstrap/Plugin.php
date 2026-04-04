@@ -1,23 +1,23 @@
 <?php
-namespace ArunPrakash\MediaOffload\Bootstrap;
+namespace Nimbus\Plugin\Bootstrap;
 
-use ArunPrakash\MediaOffload\Cache\PurgeManager;
-use ArunPrakash\MediaOffload\Jobs\BulkJobManager;
-use ArunPrakash\MediaOffload\Integration\DatabaseIntegrationRewriter;
-use ArunPrakash\MediaOffload\Integration\IntegrationDiscovery;
-use ArunPrakash\MediaOffload\Integration\SmartSliderAssetRewriter;
-use ArunPrakash\MediaOffload\License\LicenseManager;
-use ArunPrakash\MediaOffload\Cli\Command;
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Delivery\UrlRewriter;
-use ArunPrakash\MediaOffload\Media\UploadHandler;
-use ArunPrakash\MediaOffload\Onboarding\ConflictDetector;
-use ArunPrakash\MediaOffload\Onboarding\OnboardingManager;
-use ArunPrakash\MediaOffload\Rest\ApiController;
-use ArunPrakash\MediaOffload\Admin\SettingsUi;
-use ArunPrakash\MediaOffload\Stats\Statistics;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Cache\PurgeManager;
+use Nimbus\Plugin\Jobs\BulkJobManager;
+use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
+use Nimbus\Plugin\Integration\IntegrationDiscovery;
+use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
+use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\Cli\Command;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Delivery\UrlRewriter;
+use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Onboarding\ConflictDetector;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
+use Nimbus\Plugin\Rest\ApiController;
+use Nimbus\Plugin\Admin\SettingsUi;
+use Nimbus\Plugin\Stats\Statistics;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Logger;
 
 if (!defined('ABSPATH')) {
   exit;

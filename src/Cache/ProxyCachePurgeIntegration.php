@@ -1,8 +1,8 @@
 <?php
-namespace ArunPrakash\MediaOffload\Cache;
+namespace Nimbus\Plugin\Cache;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Support\Logger;
 use RuntimeException;
 
 if (!defined('ABSPATH')) {
@@ -59,7 +59,7 @@ final class ProxyCachePurgeIntegration implements PurgeIntegration
         'timeout' => 15,
       ];
 
-      $args = apply_filters('media_offload_proxy_cache_purge_request_args', $args, $target, $request, $this);
+      $args = apply_filters('nimbus_proxy_cache_purge_request_args', $args, $target, $request, $this);
 
       $response = wp_remote_request($target, $args);
       if (is_wp_error($response)) {

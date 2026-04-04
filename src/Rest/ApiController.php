@@ -1,14 +1,14 @@
 <?php
-namespace ArunPrakash\MediaOffload\Rest;
+namespace Nimbus\Plugin\Rest;
 
-use ArunPrakash\MediaOffload\Jobs\BulkJobManager;
-use ArunPrakash\MediaOffload\Integration\IntegrationDiscovery;
-use ArunPrakash\MediaOffload\License\LicenseManager;
-use ArunPrakash\MediaOffload\Onboarding\OnboardingManager;
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Media\UploadHandler;
-use ArunPrakash\MediaOffload\Stats\Statistics;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Jobs\BulkJobManager;
+use Nimbus\Plugin\Integration\IntegrationDiscovery;
+use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Stats\Statistics;
+use Nimbus\Plugin\Support\Logger;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -16,8 +16,8 @@ if (!defined('ABSPATH')) {
 
 final class ApiController
 {
-  private const PROCESS_PENDING_HOOK = 'media_offload_rest_process_pending';
-  private const PROCESS_SINGLE_HOOK = 'media_offload_rest_process_single';
+  private const PROCESS_PENDING_HOOK = 'nimbus_rest_process_pending';
+  private const PROCESS_SINGLE_HOOK = 'nimbus_rest_process_single';
 
   public function __construct(
     private Settings $settings,
@@ -40,67 +40,67 @@ final class ApiController
 
   public function registerRoutes(): void
   {
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/status', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/status', [
       'methods' => 'GET',
       'callback' => [$this, 'getStatus'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/statistics', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/statistics', [
       'methods' => 'GET',
       'callback' => [$this, 'getStatistics'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/integrations', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/integrations', [
       'methods' => 'GET',
       'callback' => [$this, 'getIntegrations'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/jobs', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/jobs', [
       'methods' => 'GET',
       'callback' => [$this, 'getJobs'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/jobs/start', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/jobs/start', [
       'methods' => 'POST',
       'callback' => [$this, 'postStartJob'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/jobs/pause', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/jobs/pause', [
       'methods' => 'POST',
       'callback' => [$this, 'postPauseJob'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/jobs/resume', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/jobs/resume', [
       'methods' => 'POST',
       'callback' => [$this, 'postResumeJob'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/jobs/retry-failed', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/jobs/retry-failed', [
       'methods' => 'POST',
       'callback' => [$this, 'postRetryFailedJob'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/offload/pending', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/offload/pending', [
       'methods' => 'POST',
       'callback' => [$this, 'postPendingOffload'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/offload/item/(?P<id>\d+)', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/offload/item/(?P<id>\d+)', [
       'methods' => 'POST',
       'callback' => [$this, 'postSingleOffload'],
       'permission_callback' => [$this, 'canManage'],
     ]);
 
-    register_rest_route(MEDIA_OFFLOAD_REST_NAMESPACE, '/integrations/(?P<key>[a-z0-9_-]+)/rewrite', [
+    register_rest_route(NIMBUS_REST_NAMESPACE, '/integrations/(?P<key>[a-z0-9_-]+)/rewrite', [
       'methods' => 'POST',
       'callback' => [$this, 'postIntegrationRewrite'],
       'permission_callback' => [$this, 'canManage'],
@@ -116,7 +116,7 @@ final class ApiController
   {
     return new \WP_REST_Response([
       'plugin' => [
-        'version' => MEDIA_OFFLOAD_VERSION,
+        'version' => NIMBUS_VERSION,
         'enabled' => $this->settings->is_enabled(),
         'provider' => $this->settings->provider(),
         'bucket' => (string) $this->settings->get('bucket', ''),
@@ -199,7 +199,7 @@ final class ApiController
     $background = $this->toBool($request->get_param('background'), true);
 
     if (!$this->settings->is_enabled() || !$this->settings->has_valid_credentials()) {
-      return new \WP_Error('media_offload_not_ready', __('Storage is not configured well enough to process offloads.', MEDIA_OFFLOAD_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_not_ready', __('Storage is not configured well enough to process offloads.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
     }
 
     if ($background) {
@@ -224,7 +224,7 @@ final class ApiController
     $background = $this->toBool($request->get_param('background'), false);
 
     if ($attachmentId <= 0) {
-      return new \WP_Error('media_offload_invalid_attachment', __('Attachment ID is required.', MEDIA_OFFLOAD_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid_attachment', __('Attachment ID is required.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
     }
 
     if ($background) {
@@ -248,11 +248,11 @@ final class ApiController
     $key = sanitize_key((string) $request['key']);
 
     if ($key === '' || !$this->integrationDiscovery->canRewrite($key)) {
-      return new \WP_Error('media_offload_integration_unsupported', __('Rewrite automation is not available for this integration.', MEDIA_OFFLOAD_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_integration_unsupported', __('Rewrite automation is not available for this integration.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
     }
 
     if (!$this->settings->has_valid_credentials()) {
-      return new \WP_Error('media_offload_credentials_missing', __('Configure storage credentials before rewriting integration asset URLs.', MEDIA_OFFLOAD_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before rewriting integration asset URLs.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
     }
 
     return new \WP_REST_Response([

@@ -1,7 +1,7 @@
 <?php
-namespace ArunPrakash\MediaOffload\Stats;
+namespace Nimbus\Plugin\Stats;
 
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -45,10 +45,10 @@ final class Statistics
   {
     global $wpdb;
 
-    $ignoreMetaKey = esc_sql((string) MEDIA_OFFLOAD_IGNORE_META_KEY);
+    $ignoreMetaKey = esc_sql((string) NIMBUS_IGNORE_META_KEY);
 
     $totalAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'");
-    $offloadedAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . MEDIA_OFFLOAD_META_KEY . "'");
+    $offloadedAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . NIMBUS_META_KEY . "'");
     $ignoredAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . $ignoreMetaKey . "' AND meta_value = '1'");
 
     $pendingAttachments = max(0, $totalAttachments - $offloadedAttachments - $ignoredAttachments);
@@ -148,7 +148,7 @@ final class Statistics
            AND p.post_status = %s
          GROUP BY p.post_mime_type
          ORDER BY total DESC",
-        MEDIA_OFFLOAD_META_KEY,
+        NIMBUS_META_KEY,
         'attachment',
         'inherit'
       ),
@@ -199,7 +199,7 @@ final class Statistics
          GROUP BY DATE_FORMAT(p.post_date, '%%Y-%%m')
          ORDER BY month DESC
          LIMIT 6",
-        MEDIA_OFFLOAD_META_KEY,
+        NIMBUS_META_KEY,
         'attachment',
         'inherit'
       ),

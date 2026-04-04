@@ -1,9 +1,9 @@
 <?php
-namespace ArunPrakash\MediaOffload\Config;
+namespace Nimbus\Plugin\Config;
 
-use ArunPrakash\MediaOffload\Storage\ProviderProfile;
-use ArunPrakash\MediaOffload\Storage\ProviderRegistry;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Storage\ProviderProfile;
+use Nimbus\Plugin\Storage\ProviderRegistry;
+use Nimbus\Plugin\Support\Logger;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -59,7 +59,7 @@ final class Settings
 
   public function all(): array
   {
-    return wp_parse_args(get_option(MEDIA_OFFLOAD_OPTION_KEY, []), $this->defaults);
+    return wp_parse_args(get_option(NIMBUS_OPTION_KEY, []), $this->defaults);
   }
 
   public function is_enabled(): bool
@@ -179,7 +179,7 @@ final class Settings
   {
     $current = $this->all();
     $sanitized = $this->sanitize(array_merge($current, $values));
-    update_option(MEDIA_OFFLOAD_OPTION_KEY, $sanitized, false);
+    update_option(NIMBUS_OPTION_KEY, $sanitized, false);
   }
 
   public function isEnabled(): bool

@@ -1,19 +1,19 @@
 <?php
-namespace ArunPrakash\MediaOffload\Admin;
+namespace Nimbus\Plugin\Admin;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Jobs\BulkJobManager;
-use ArunPrakash\MediaOffload\Integration\IntegrationDiscovery;
-use ArunPrakash\MediaOffload\Integration\DatabaseIntegrationRewriter;
-use ArunPrakash\MediaOffload\Integration\SmartSliderAssetRewriter;
-use ArunPrakash\MediaOffload\License\LicenseManager;
-use ArunPrakash\MediaOffload\Media\UploadHandler;
-use ArunPrakash\MediaOffload\Onboarding\ConflictDetector;
-use ArunPrakash\MediaOffload\Onboarding\OnboardingManager;
-use ArunPrakash\MediaOffload\Stats\Statistics;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Jobs\BulkJobManager;
+use Nimbus\Plugin\Integration\IntegrationDiscovery;
+use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
+use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
+use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Onboarding\ConflictDetector;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
+use Nimbus\Plugin\Stats\Statistics;
+use Nimbus\Plugin\Support\Logger;
 
-use function ArunPrakash\MediaOffload\Support\popAdminNotices;
+use function Nimbus\Plugin\Support\popAdminNotices;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -63,13 +63,15 @@ final class SettingsUi
     add_action('admin_init', [$this, 'register_settings']);
     add_action('admin_init', [$this, 'handle_onboarding_redirect'], 5);
     add_action('admin_notices', [$this, 'render_admin_notices']);
+    add_action('admin_notices', [$this, 'render_license_banner']);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
-    add_action('wp_ajax_' . MEDIA_OFFLOAD_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
-    add_action('admin_post_' . MEDIA_OFFLOAD_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
-    add_action('admin_post_' . MEDIA_OFFLOAD_ADMIN_ACTION_RESUME_MIGRATION, [$this, 'handle_resume_migration']);
-    add_action('admin_post_' . MEDIA_OFFLOAD_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
-    add_action('admin_post_' . MEDIA_OFFLOAD_ADMIN_ACTION_COMPLETE_ONBOARDING, [$this, 'handle_complete_onboarding']);
-    add_action('admin_post_' . MEDIA_OFFLOAD_ADMIN_ACTION_REWRITE_INTEGRATION, [$this, 'handle_rewrite_integration']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
+    add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RESUME_MIGRATION, [$this, 'handle_resume_migration']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING, [$this, 'handle_complete_onboarding']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION, [$this, 'handle_rewrite_integration']);
     $this->mediaLibraryController->register();
   }
 
@@ -79,51 +81,53 @@ final class SettingsUi
       return;
     }
 
-    $css_version = file_exists(MEDIA_OFFLOAD_PATH . 'assets/css/admin.css') ? filemtime(MEDIA_OFFLOAD_PATH . 'assets/css/admin.css') : MEDIA_OFFLOAD_VERSION;
-    $js_version = file_exists(MEDIA_OFFLOAD_PATH . 'assets/js/admin.js') ? filemtime(MEDIA_OFFLOAD_PATH . 'assets/js/admin.js') : MEDIA_OFFLOAD_VERSION;
+    $tokens_version = file_exists(NIMBUS_PATH . 'assets/css/tokens.css') ? filemtime(NIMBUS_PATH . 'assets/css/tokens.css') : NIMBUS_VERSION;
+    $css_version = file_exists(NIMBUS_PATH . 'assets/css/admin.css') ? filemtime(NIMBUS_PATH . 'assets/css/admin.css') : NIMBUS_VERSION;
+    $js_version = file_exists(NIMBUS_PATH . 'assets/js/admin.js') ? filemtime(NIMBUS_PATH . 'assets/js/admin.js') : NIMBUS_VERSION;
 
-    wp_enqueue_style(MEDIA_OFFLOAD_SCRIPT_HANDLE, MEDIA_OFFLOAD_URL . 'assets/css/admin.css', [], $css_version);
-    wp_enqueue_script(MEDIA_OFFLOAD_SCRIPT_HANDLE, MEDIA_OFFLOAD_URL . 'assets/js/admin.js', ['jquery'], $js_version, true);
+    wp_enqueue_style(NIMBUS_SCRIPT_HANDLE . '-tokens', NIMBUS_URL . 'assets/css/tokens.css', [], $tokens_version);
+    wp_enqueue_style(NIMBUS_SCRIPT_HANDLE, NIMBUS_URL . 'assets/css/admin.css', [NIMBUS_SCRIPT_HANDLE . '-tokens'], $css_version);
+    wp_enqueue_script(NIMBUS_SCRIPT_HANDLE, NIMBUS_URL . 'assets/js/admin.js', ['jquery'], $js_version, true);
 
     $scriptData = [
-      'nonce' => wp_create_nonce(MEDIA_OFFLOAD_AJAX_TEST_CONNECTION),
+      'nonce' => wp_create_nonce(NIMBUS_AJAX_TEST_CONNECTION),
       'restNonce' => wp_create_nonce('wp_rest'),
-      'restBase' => add_query_arg('rest_route', '/' . trim(MEDIA_OFFLOAD_REST_NAMESPACE, '/'), home_url('/')),
-      'optionKey' => MEDIA_OFFLOAD_OPTION_KEY,
-      'actions' => ['testConnection' => MEDIA_OFFLOAD_AJAX_TEST_CONNECTION],
-      'restNamespace' => MEDIA_OFFLOAD_REST_NAMESPACE,
+      'restBase' => add_query_arg('rest_route', '/' . trim(NIMBUS_REST_NAMESPACE, '/'), home_url('/')),
+      'optionKey' => NIMBUS_OPTION_KEY,
+      'actions' => ['testConnection' => NIMBUS_AJAX_TEST_CONNECTION],
+      'restNamespace' => NIMBUS_REST_NAMESPACE,
       'strings' => [
-        'showAdvanced' => __('Show advanced connection fields', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'hideAdvanced' => __('Hide advanced connection fields', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'noExtraCredentials' => __('No extra credentials required', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'providerNoBucket' => __('No bucket required in local mode', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'providerBucketNotSet' => __('Bucket not set', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'deliveryLocalDebug' => __('Local debug', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'deliveryRemote' => __('Remote', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'deliveryLocal' => __('Local', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'deliveryNoCustomDomain' => __('No custom domain configured', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'batchOn' => __('On', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'batchOff' => __('Off', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'batchNoSchedule' => __('No schedule set', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'shellLocalDebugMode' => __('Local debug mode', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'shellServingStorage' => __('Serving from storage', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'shellServingLocal' => __('Serving from local URLs', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'testing' => __('Testing…', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'testingMessage' => __('Testing connection…', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'testConnection' => __('Test Connection', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'serverError' => __('Server error occurred.', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'detailsHeading' => __('Connection details', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'hintsHeading' => __('Suggested checks', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'jobStartError' => __('Unable to start the requested bulk job.', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'jobPauseError' => __('Unable to pause the current bulk job.', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'jobResumeError' => __('Unable to resume the current bulk job.', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'jobRetryError' => __('Unable to retry failed items right now.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'showAdvanced' => __('Show advanced connection fields', NIMBUS_TEXT_DOMAIN),
+        'hideAdvanced' => __('Hide advanced connection fields', NIMBUS_TEXT_DOMAIN),
+        'noExtraCredentials' => __('No extra credentials required', NIMBUS_TEXT_DOMAIN),
+        'providerNoBucket' => __('No bucket required in local mode', NIMBUS_TEXT_DOMAIN),
+        'providerBucketNotSet' => __('Bucket not set', NIMBUS_TEXT_DOMAIN),
+        'deliveryLocalDebug' => __('Local debug', NIMBUS_TEXT_DOMAIN),
+        'deliveryRemote' => __('Remote', NIMBUS_TEXT_DOMAIN),
+        'deliveryLocal' => __('Local', NIMBUS_TEXT_DOMAIN),
+        'deliveryNoCustomDomain' => __('No custom domain configured', NIMBUS_TEXT_DOMAIN),
+        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', NIMBUS_TEXT_DOMAIN),
+        'batchOn' => __('On', NIMBUS_TEXT_DOMAIN),
+        'batchOff' => __('Off', NIMBUS_TEXT_DOMAIN),
+        'batchNoSchedule' => __('No schedule set', NIMBUS_TEXT_DOMAIN),
+        'shellLocalDebugMode' => __('Local debug mode', NIMBUS_TEXT_DOMAIN),
+        'shellServingStorage' => __('Serving from storage', NIMBUS_TEXT_DOMAIN),
+        'shellServingLocal' => __('Serving from local URLs', NIMBUS_TEXT_DOMAIN),
+        'testing' => __('Testing…', NIMBUS_TEXT_DOMAIN),
+        'testingMessage' => __('Testing connection…', NIMBUS_TEXT_DOMAIN),
+        'testConnection' => __('Test Connection', NIMBUS_TEXT_DOMAIN),
+        'serverError' => __('Server error occurred.', NIMBUS_TEXT_DOMAIN),
+        'detailsHeading' => __('Connection details', NIMBUS_TEXT_DOMAIN),
+        'hintsHeading' => __('Suggested checks', NIMBUS_TEXT_DOMAIN),
+        'jobStartError' => __('Unable to start the requested bulk job.', NIMBUS_TEXT_DOMAIN),
+        'jobPauseError' => __('Unable to pause the current bulk job.', NIMBUS_TEXT_DOMAIN),
+        'jobResumeError' => __('Unable to resume the current bulk job.', NIMBUS_TEXT_DOMAIN),
+        'jobRetryError' => __('Unable to retry failed items right now.', NIMBUS_TEXT_DOMAIN),
       ],
       'providers' => $this->providerCatalog->scriptData(),
     ];
 
-    wp_localize_script(MEDIA_OFFLOAD_SCRIPT_HANDLE, MEDIA_OFFLOAD_SCRIPT_OBJECT, $scriptData);
+    wp_localize_script(NIMBUS_SCRIPT_HANDLE, NIMBUS_SCRIPT_OBJECT, $scriptData);
   }
 
   public function handle_test_connection(): void
@@ -134,10 +138,10 @@ final class SettingsUi
   public function add_menu(): void
   {
     $hook = add_media_page(
-      __('Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      __('Media Offload', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      __('Nimbus', NIMBUS_TEXT_DOMAIN),
+      __('Nimbus', NIMBUS_TEXT_DOMAIN),
       'manage_options',
-      MEDIA_OFFLOAD_SLUG,
+      NIMBUS_SLUG,
       [$this, 'render_page']
     );
 
@@ -186,6 +190,11 @@ final class SettingsUi
     $this->actionsController->handleRewriteIntegration();
   }
 
+  public function handle_toggle_integration(): void
+  {
+    $this->actionsController->handleToggleIntegration();
+  }
+
   public function handle_onboarding_redirect(): void
   {
     $this->onboardingManager->handleActivationRedirect();
@@ -202,5 +211,52 @@ final class SettingsUi
       $class = 'notice notice-' . esc_attr($notice['type']);
       printf('<div class="%1$s"><p>%2$s</p></div>', $class, esc_html($notice['message']));
     }
+  }
+
+  public function render_license_banner(): void
+  {
+    // Don't show if already on the Nimbus admin page (overlay handles it there).
+    $screen = get_current_screen();
+    if ($screen && str_contains((string) ($screen->id ?? ''), NIMBUS_SLUG)) {
+      return;
+    }
+
+    if ($this->licenseManager->hasKey() && $this->licenseManager->status() === 'active') {
+      return;
+    }
+
+    $dismissed = get_transient('mo_license_banner_dismissed_' . get_current_user_id());
+    if ($dismissed) {
+      return;
+    }
+
+    $licenseUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'license'], admin_url('upload.php'));
+    ?>
+    <div class="notice notice-warning mo-license-notice" data-mo-dismiss-nonce="<?php echo esc_attr(wp_create_nonce('mo_dismiss_license_banner')); ?>">
+      <p>
+        <strong><?php esc_html_e('Nimbus – License required', NIMBUS_TEXT_DOMAIN); ?></strong>
+        <?php esc_html_e('This plugin requires a valid license key to operate. Please activate your license to enable offloading.', NIMBUS_TEXT_DOMAIN); ?>
+        &nbsp;<a href="<?php echo esc_url($licenseUrl); ?>"><?php esc_html_e('Activate license →', NIMBUS_TEXT_DOMAIN); ?></a>
+      </p>
+      <button type="button" class="notice-dismiss" data-mo-dismiss-banner></button>
+    </div>
+    <script>
+    (function () {
+      var banner = document.querySelector('.mo-license-notice');
+      if (!banner) return;
+      var btn = banner.querySelector('[data-mo-dismiss-banner]');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        banner.remove();
+        var nonce = banner.dataset.moDismissNonce || '';
+        if (!nonce) return;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', ajaxurl);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('action=mo_dismiss_license_banner&nonce=' + encodeURIComponent(nonce));
+      });
+    })();
+    </script>
+    <?php
   }
 }

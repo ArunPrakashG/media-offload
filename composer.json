@@ -1,10 +1,10 @@
 {
-  "name": "arun-prakash/media-offload",
-  "description": "Offloads WordPress media uploads to Amazon S3, Cloudflare R2, and S3-compatible storage.",
+  "name": "arun-prakash/nimbus",
+  "description": "Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.",
   "type": "wordpress-plugin",
   "autoload": {
     "psr-4": {
-      "ArunPrakash\\MediaOffload\\": "src/"
+      "Nimbus\\Plugin\\": "src/"
     }
   },
   "require": {

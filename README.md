@@ -1,400 +1,270 @@
-# Media Offload
+# Nimbus
 
-Custom WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, and other S3-compatible object storage while preserving thumbnail generation and URL rewriting. The main WordPress bootstrap lives in `media-offload.php`, and the runtime/plugin domain logic lives under `src/`.
+> Your media, elevated.
 
-Maintained by **Arun Prakash** — contact: `contact@arunprakashg.com`
+Nimbus is a WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, or any S3-compatible storage provider, with automatic URL rewriting, optional CDN delivery, and a clean admin UI designed for developers and site operators.
+
+The plugin entry point is `nimbus.php`. Runtime and domain logic lives under `src/`, namespaced as `Nimbus\Plugin\*`.
+
+Maintained by **Arun Prakash** — `contact@arunprakashg.com`
+
+---
 
 ## Features
 
-- Amazon S3, Cloudflare R2, and S3-compatible storage adapter support with optional path-style endpoints and custom domains
-- Local adapter for debugging or non-production environments
-- Attachment metadata sync that preserves WordPress-generated image sizes
-- Optional removal of local files after successful offload
-- URL rewriting for attachment URLs, `srcset`, and content references
-- WP-CLI command `media-offload deploy` to upload everything under `wp-content/uploads`
-- WP-CLI command `media-offload rewrite` to verify remote objects and rewrite DB domains
-- WP-CLI command `media-offload revert` to restore media locally and rewrite DB back to local URLs
-- WP-CLI command `media-offload config` to show/update provider credentials and delivery settings
-- Per-attachment ignore toggle in the Media Library to keep selected files local-only and skip offload/sync processing
-- Media Library status filter plus native bulk actions for offload, restore, and retry flows
-- Configurable path filters so you can allow only specific uploads folders, such as `{year}/**`, and ignore everything else
-- Smart Slider 3 compatibility pass for `wp_nextend2_*` tables (including escaped JSON URLs and `$upload$/...` placeholders)
-- Built-in integration rewrites for Smart Slider 3, Slider Revolution, Elementor postmeta payloads, and NextGEN Gallery tables
-- First-run onboarding flow for license key + bucket configuration
-- Integrations tab that detects plugin-specific asset roots and built-in rewrite targets
-- Built-in cache purge integrations for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and generic proxy/Nginx PURGE endpoints
-- REST API endpoints for status, statistics, integration discovery, pending offload triggers, and single-item offload triggers
-- Admin settings screen for credentials and behaviour toggles
-- Deep statistics dashboard with media-type, monthly, asset-root, and estimated provider cost comparisons
-- Audit-friendly logging + admin notices when credentials are misconfigured
-- Standardized logger with source/level/context metadata, retention controls, and an admin Logs tab with filtering
-- Event hooks for rewrites, offloads, restores, remote deletes, and cache purging
-- Pluggable cache purge manager with built-in Cloudflare, LiteSpeed Cache, WP Fastest Cache, and proxy/Nginx support plus extension points for more cache layers
+- Amazon S3, Cloudflare R2, and S3-compatible storage with optional path-style endpoints and custom domains
+- Local adapter for development and offline environments
+- Attachment metadata sync that preserves all WordPress-generated image sizes
+- Optional removal of local files after a successful offload
+- URL rewriting for attachment URLs, `srcset`, and raw content references
+- WP-CLI commands: `nimbus deploy`, `nimbus rewrite`, `nimbus revert`, `nimbus config`
+- Per-attachment ignore toggle in the Media Library
+- Media Library status column, dropdown filter, and native bulk actions (offload / restore / retry)
+- Configurable path filters: allow-list and deny-list with glob placeholders
+- Smart Slider 3, Slider Revolution, Elementor, and NextGEN Gallery integration rewrites
+- First-run onboarding flow for license key and bucket configuration
+- Integrations tab driven by the `nimbus_integrations` filter — extensible without core edits
+- Cache purge integrations for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and generic proxy/Nginx endpoints
+- REST API endpoints for status, statistics, integration discovery, and offload triggers
+- Statistics dashboard with media-type, monthly trend, asset-root, and estimated provider cost breakdowns
+- Structured logger with source/level/context metadata, retention cap, and a dedicated Logs admin tab
+
+---
 
 ## Requirements
 
 - WordPress 6.0+
 - PHP 8.1+
-- AWS SDK for PHP (`aws/aws-sdk-php`) when using the S3 adapter. Install via Composer inside the WordPress container, e.g. `composer require aws/aws-sdk-php`.
-- Valid S3 (or compatible) credentials with write access to the target bucket.
+- `aws/aws-sdk-php` ^3.200 (install via Composer — see below)
+- Valid S3-compatible credentials with write access to the target bucket
+
+---
+
+## Installation
+
+```bash
+# Inside the plugin folder (or your WordPress container)
+composer install
+```
+
+Activate the plugin in WordPress. On first activation you will be redirected to the **Onboarding** tab.
+
+---
 
 ## Configuration
 
-1. Activate the plugin inside WordPress.
-2. You will be redirected into the **Onboarding** tab on first install.
-3. Enter the license key and bucket/provider credentials.
-4. Review any warnings about other installed media offload plugins.
-5. Toggle "Serve From Storage" to rewrite public URLs.
-6. Leave "Remove Local Copies" disabled in development until the workflow is verified.
+1. Activate Nimbus in WordPress.
+2. Complete the **Onboarding** tab: enter your license key and bucket credentials.
+3. Review any conflict warnings for other media offload plugins you may have installed.
+4. Enable **Serve From Storage** to rewrite public URLs.
+5. Leave **Remove Local Copies** disabled in development until everything is verified.
 
 ### REST API
 
-Authenticated administrators can query and trigger operational flows through the WordPress REST API:
+All endpoints require a user with `manage_options` capability.
 
-- `GET /wp-json/media-offload/v1/status`
-- `GET /wp-json/media-offload/v1/statistics`
-- `GET /wp-json/media-offload/v1/integrations`
-- `POST /wp-json/media-offload/v1/offload/pending`
-- `POST /wp-json/media-offload/v1/offload/item/<attachment_id>`
-- `POST /wp-json/media-offload/v1/integrations/smart_slider/rewrite`
+| Method | Endpoint |
+|--------|----------|
+| `GET` | `/wp-json/nimbus/v1/status` |
+| `GET` | `/wp-json/nimbus/v1/statistics` |
+| `GET` | `/wp-json/nimbus/v1/integrations` |
+| `POST` | `/wp-json/nimbus/v1/offload/pending` |
+| `POST` | `/wp-json/nimbus/v1/offload/item/<attachment_id>` |
+| `POST` | `/wp-json/nimbus/v1/integrations/smart_slider/rewrite` |
 
-The integration rewrite endpoint is now registry-driven, so the same route pattern also supports any registered built-in integration key such as:
+### Hooks
 
-- `smart_slider`
-- `slider_revolution`
-- `elementor`
-- `nextgen_gallery`
+Nimbus emits standard WordPress actions for every core lifecycle operation. Each action receives a single associative array payload containing fields such as `source`, `scope`, `operation`, `attachment_id`, `urls`, `keys`, counts, and error details where applicable.
 
-These routes are intended for internal admin tooling / automation and currently require a user with `manage_options` capability.
+Key actions:
 
-### Hooks and cache purge integrations
+`nimbus_rewrite_started` · `nimbus_rewrite_completed` · `nimbus_rewrite_failed`  
+`nimbus_offload_started` · `nimbus_offload_completed` · `nimbus_offload_failed`  
+`nimbus_restore_started` · `nimbus_restore_completed` · `nimbus_restore_failed`  
+`nimbus_remote_delete_started` · `nimbus_remote_delete_completed` · `nimbus_remote_delete_failed`  
+`nimbus_cache_purge_requested` · `nimbus_cache_purge_started` · `nimbus_cache_purge_completed` · `nimbus_cache_purge_failed`  
+`nimbus_integration_rewrite_started` · `nimbus_integration_rewrite_completed` · `nimbus_integration_rewrite_failed`
 
-The plugin now emits a small lifecycle event vocabulary using standard WordPress actions. These are intended for custom automation, observability, and cache invalidation integrations.
+#### Custom cache purge integration
 
-Core actions include:
+Register an object implementing `Nimbus\Plugin\Cache\PurgeIntegration` via the `nimbus_cache_purge_integrations` filter:
 
-- `media_offload_rewrite_started`
-- `media_offload_rewrite_completed`
-- `media_offload_rewrite_failed`
-- `media_offload_integration_rewrite_started`
-- `media_offload_integration_rewrite_completed`
-- `media_offload_integration_rewrite_failed`
-- `media_offload_offload_started`
-- `media_offload_offload_completed`
-- `media_offload_offload_failed`
-- `media_offload_restore_started`
-- `media_offload_restore_completed`
-- `media_offload_restore_failed`
-- `media_offload_remote_delete_started`
-- `media_offload_remote_delete_completed`
-- `media_offload_remote_delete_failed`
-- `media_offload_cache_purge_requested`
-- `media_offload_cache_purge_started`
-- `media_offload_cache_purge_completed`
-- `media_offload_cache_purge_failed`
+- use `$request['urls']` for per-URL purges
+- use `$request['purge_all']` for full-cache purges after a rewrite operation
+- use `$request['reason']` to distinguish operation types
+- respect `$request['context']['auto_purge']` if you want to suppress automatic purges selectively
 
-Each action receives one associative array payload with context such as `source`, `scope`, `operation`, `attachment_id`, `urls`, `keys`, counts, `auto_purge`, and error messages when relevant.
+Opt-out filters: `nimbus_should_purge_cache_on_remote_delete` · `nimbus_should_purge_cache_on_rewrite` · `nimbus_should_purge_cache_on_integration_rewrite`
 
-#### Register a custom cache purge integration
+#### Register additional integrations
 
-Use the `media_offload_cache_purge_integrations` filter to register a handler object implementing `ArunPrakash\MediaOffload\Cache\PurgeIntegration`.
+Add to the `nimbus_integrations` filter with these fields:
 
-Example outline:
+| Field | Purpose |
+|-------|---------|
+| `key` | Unique machine identifier |
+| `label` | Display name |
+| `plugin_files` | Array of plugin file paths to detect installation |
+| `directories` | Asset root directories for scanning |
+| `rewrite_supported` | `true` if a rewrite pass is available |
+| `rewrite_action_label` | Button label for the admin rewrite action |
+| `table_callback` | `callable` returning tables to rewrite |
+| `rewrite_callback` | `callable` performing the rewrite |
+| `rewrite_ready_callback` | `callable` returning whether the integration is ready |
 
-- inspect `$request['reason']` to distinguish rewrite completion vs remote delete
-- use `$request['urls']` for exact URL purges
-- use `$request['purge_all']` for full-cache purges when a rewrite operation finishes
-- inspect `$request['context']['auto_purge']` if you want to honor workflows that emit lifecycle hooks but intentionally avoid automatic purges in core
+---
 
-Related opt-out filters:
+## Cloudflare R2 Setup
 
-- `media_offload_should_purge_cache_on_remote_delete`
-- `media_offload_should_purge_cache_on_rewrite`
-- `media_offload_should_purge_cache_on_integration_rewrite`
+| Setting | Value |
+|---------|-------|
+| Provider | `Cloudflare R2` |
+| Bucket | your bucket name |
+| R2 Account ID | your Cloudflare account ID |
+| Region | `auto` |
+| Access Key | R2 API Token Access Key ID |
+| Secret Key | R2 API Token Secret Access Key |
+| Session Token | leave empty for R2 API keys |
+| Custom Endpoint | `https://<account_id>.r2.cloudflarestorage.com` (do not append bucket name) |
+| Use Path Style | enabled automatically |
 
-This allows you to plug in Nginx cache purgers, WP Fastest Cache, Redis-backed edge purges, or any custom invalidation layer without changing core plugin code.
+Set **Custom Domain** to your CDN or public bucket domain for production delivery.
 
-Built-in purge integrations now include:
+> Some S3-compatible providers deny `HeadObject` while still allowing read access. Nimbus falls back to a byte-range `GetObject` probe for existence checks in that case.
 
-- Cloudflare
-- LiteSpeed Cache
-- WP Fastest Cache
-- generic proxy / Nginx PURGE endpoints
+---
 
-### Delivery cache integrations
+## WP-CLI
 
-The **Delivery** tab now exposes first-party toggles for several cache integrations:
+### Configure
 
-- **Cloudflare Cache Purging**
-- **LiteSpeed Cache Purging**
-- **WP Fastest Cache Purging**
-- **Proxy / Nginx Cache Purging**
+```bash
+# Show current config
+wp nimbus config --show
 
-For the generic proxy integration, configure:
+# Configure Cloudflare R2
+wp nimbus config --provider=r2 --bucket=my-bucket --r2-account-id=abc123 \
+  --access-key=KEY --secret-key=SECRET --enabled=1 --serve-from-storage=1 --test-connection
 
-- **Proxy Purge Method**: `PURGE`, `GET`, or `POST`
-- **Proxy Purge URL Templates**: one endpoint template per line for exact-URL purges
-- **Proxy Full Purge Endpoints**: optional endpoints for rewrite-triggered full purges
+# Configure an S3-compatible endpoint
+wp nimbus config --provider=s3 --bucket=my-bucket --region=ap-south-1 \
+  --access-key=KEY --secret-key=SECRET --endpoint=https://s3.example.com \
+  --use-path-style-endpoint=1 --enabled=1
 
-Supported template placeholders:
+# Restrict offloading to year-based upload folders only
+wp nimbus config --allowed-path-patterns='{year}/**'
+```
 
-- `{url}`
-- `{url_encoded}`
-- `{scheme}`
-- `{host}`
-- `{path}`
-- `{path_encoded}`
+Available flags: `--enabled`, `--serve-from-storage`, `--remove-local-copies`, `--off-hours-batch-enabled`, `--off-hours-batch-time`, `--prefix`, `--custom-domain`, `--allowed-path-patterns`, `--ignored-path-patterns`, `--test-connection`
 
-Example exact-URL proxy purge templates:
+### Deploy uploads to storage
 
-- `https://cache.example.com/purge?url={url_encoded}`
-- `https://origin.example.com{path}`
+```bash
+wp nimbus deploy [--parallel=<n>] [--force]
+```
 
-#### Register additional media integrations
+Uploads files from year-based upload directories (e.g. `2026/02/...`, `sites/<id>/2026/...`) to the configured bucket. Non-year plugin/system directories are skipped. After each month-group batch, object existence in storage is verified.
 
-The Integrations tab now uses the `media_offload_integrations` filter as its registry surface.
+### Rewrite DB URLs to storage domain
 
-You can register additional integrations by adding array definitions with fields such as:
+```bash
+wp nimbus rewrite [--dry-run] [--force]
+```
 
-- `key`
-- `label`
-- `plugin_files`
-- `directories`
-- `rewrite_supported`
-- `rewrite_action_label`
-- `table_callback`
-- `rewrite_callback`
-- `rewrite_ready_callback`
-- `notes`
+Verifies all attachment objects exist remotely first, then replaces the local uploads domain in the database. Also runs a Smart Slider 3 pass on `wp_nextend2_*` tables.
 
-That makes it possible to add support for more plugin-specific asset roots and rewrite workflows without editing the admin UI/controller every time.
+### Revert to local storage
 
-### Logging and the admin Logs tab
+```bash
+wp nimbus revert [--batch-size=<n>]
+```
 
-The **Logs** tab now includes:
+Restores offloaded attachments from storage to local uploads and rewrites DB URLs back to local. Performs pre-flight disk space checks before starting.
 
-- logger enable/disable control
+---
+
+## Path Filters
+
+Restrict which upload paths are eligible for offloading:
+
+| Pattern | Meaning |
+|---------|---------|
+| `{year}/**` | year-based upload folders only |
+| `sites/*/{year}/**` | multisite year folders |
+| `cache/**` | ignore cache folders |
+| `{year}/{month}/**` | specific month folders |
+
+Supported wildcards: `*` (any chars except `/`), `**` (nested path), `?` (single char), `{year}`, `{month}`, `{day}`.
+
+If **Allowed Paths** is empty, all uploads are eligible except anything matched by **Ignored Paths**.
+
+---
+
+## Logging
+
+The **Logs** tab provides:
+
+- enable/disable logging
 - minimum stored log level
 - retained-entry cap
 - optional mirroring to the PHP error log
 - filtering by level, source, and text search
-- normalized context display for each log record
 
-Each stored log entry includes standardized metadata such as:
+Each stored entry includes: `level`, `level_key`, `source`, `event`, `code`, `message`, `context`.
 
-- `level` / `level_key`
-- `source`
-- `event`
-- `code`
-- `message`
-- `context`
+---
 
-The legacy `media_offload_log` action still fires for compatibility, and a richer `media_offload_log_entry` action now exposes the fully normalized log entry.
+## Media Library Controls
 
-### Media Library controls
+- **Offload Status** column with state badges
+- **Nimbus status** dropdown filter on `upload.php`
+- Native bulk actions: Offload to storage · Restore local copies · Retry failed offloads
+- Per-item ignore toggle in the attachment detail view
 
-The WordPress Media Library now includes first-party operational controls for Media Offload:
+---
 
-- an **Offload Status** column with attachment state badges
-- a **Media Offload status** dropdown filter on `upload.php`
-- native bulk actions for:
-  - **Offload to storage**
-  - **Restore local copies**
-  - **Retry failed offloads**
-- per-item row actions and attachment-detail status output
+## Local Development Sandbox
 
-Bulk actions automatically skip attachments whose current state does not match the requested operation, and the completion notice shows how many items were updated, failed, or skipped.
+```bash
+# Start
+docker compose up -d
 
-### Cloudflare R2 Setup
+# Re-run setup after a volume reset
+docker compose run --rm setup
 
-The plugin now supports **Cloudflare R2** as a first-class provider (internally via S3-compatible APIs).
+# WP-CLI
+docker compose --profile cli run --rm wpcli plugin list
 
-Use these values in **Settings → Media Offload**:
+# Stop
+docker compose down
 
-- **Provider**: `Cloudflare R2`
-- **Bucket**: your bucket name (example: `synarch-group-media`)
-- **R2 Account ID**: your Cloudflare account ID (example: `2648c6dbb6901794166cdf02b48b8aa2`)
-- **Region**: `auto`
-- **Access Key**: your **R2 API Token Access Key ID**
-- **Secret Key**: your **R2 API Token Secret Access Key**
-- **Session Token (optional)**: only for temporary STS-style S3 credentials. Leave empty for Cloudflare R2 API keys.
-- **Custom Endpoint** (optional if Account ID is set):
-  - `https://<account_id>.r2.cloudflarestorage.com`
-  - Do **not** append the bucket name to this endpoint field.
-- **Use Path Style**: enabled automatically for R2
-
-If you use a public/custom domain in front of R2 (recommended for production), set it in **Custom Domain**.
-
-> Note: Some S3-compatible providers/policies can deny `HeadObject` while still allowing read access.
-> The plugin now falls back to a read-only byte-range `GetObject` probe for existence checks in that case.
-
-### WP-CLI Configuration
-
-Use WP-CLI when you want a repeatable, production-safe way to configure the plugin for cron/manual runs.
-
-- Show current config:
-  - `wp media-offload config --show`
-- Configure Cloudflare R2 and test immediately:
-  - `wp media-offload config --provider=r2 --bucket=your-bucket --r2-account-id=your-account-id --access-key=your-access-key --secret-key=your-secret-key --enabled=1 --serve-from-storage=1 --test-connection`
-- Configure S3-compatible storage:
-  - `wp media-offload config --provider=s3 --bucket=your-bucket --region=ap-south-1 --access-key=your-access-key --secret-key=your-secret-key --endpoint=https://s3.example.com --use-path-style-endpoint=1 --enabled=1`
-- Only sync standard year-based upload folders:
-  - `wp media-offload config --allowed-path-patterns='{year}/**'`
-- Allow year-based uploads but still skip generated/cache folders:
-  - `wp media-offload config --allowed-path-patterns='{year}/**' --ignored-path-patterns='cache/**,smush/**'`
-
-Helpful flags/options:
-
-- `--enabled=1|0`
-- `--serve-from-storage=1|0`
-- `--remove-local-copies=1|0`
-- `--off-hours-batch-enabled=1|0`
-- `--off-hours-batch-time=03:00`
-- `--prefix=media/uploads`
-- `--custom-domain=https://cdn.example.com`
-- `--allowed-path-patterns='{year}/**'`
-- `--ignored-path-patterns='cache/**,smush/**'`
-- `--test-connection`
-
-### Ignoring Specific Files
-
-Sometimes a file should always stay on the WordPress server even when the rest of the library is offloaded.
-
-- Open the item in the Media Library attachment details view.
-- Enable **Ignore from Media Offload**.
-- The file will be skipped by:
-  - nightly queue processing
-  - admin URL update runs
-  - future sync/offload attempts
-  - local cleanup after offload
-
-This is useful for files that must remain local for theme/plugin compatibility or site-specific server access.
-
-### Limiting Which Upload Paths Are Offloaded
-
-You can restrict syncing/offloading to specific relative paths under `wp-content/uploads`.
-
-- **Allowed Paths**: optional allow-list, one pattern per line
-- **Ignored Paths**: optional deny-list, one pattern per line
-- supported wildcards/placeholders:
-  - `*` = any characters except `/`
-  - `**` = any nested path
-  - `?` = any single character except `/`
-  - `{year}` = 4-digit year
-  - `{month}` = 2-digit month
-  - `{day}` = 2-digit day
-
-Examples:
-
-- only standard year folders:
-  - `{year}/**`
-- multisite year folders:
-  - `sites/*/{year}/**`
-- skip generated/cache folders:
-  - `cache/**`
-  - `smush/**`
-
-If **Allowed Paths** is empty, everything is eligible except anything matched by **Ignored Paths**.
-
-### High-Traffic Optimization (Cloudflare + S3)
-
-To minimize costs and server load for high-traffic sites:
-
-1.  **Generate Thumbnails Locally**: Let WordPress generate all image sizes as usual.
-2.  **Enable "Remove Local Copies"**: In the plugin settings, check this box. This ensures your web server disk stays empty.
-3.  **Configure Cloudflare Proxy**:
-    - Create a CNAME record in your DNS (e.g., `cdn.yourdomain.com`) pointing to your S3 bucket URL (e.g., `your-bucket.s3.amazonaws.com`).
-    - In Cloudflare, ensure the "Orange Cloud" (Proxy) is enabled for this CNAME.
-4.  **Set Custom Domain**:
-    - In the plugin settings, set **Custom Domain** to `https://cdn.yourdomain.com`.
-    - This routes all image traffic through Cloudflare's global CDN, saving you massive amounts of S3 bandwidth fees.
-
-## Development
-
-There is currently no separate asset-build or Python-based tooling requirement for the plugin itself. For PHP dependencies, use Composer in your WordPress/plugin environment.
-
-At the moment, the plugin code ships from the repository root. As part of the refactor, the release process should build a clean distributable package instead of relying on the full development tree.
-
-See `docs/refactor-roadmap.md` for the architecture/commercialization roadmap and `docs/competitor-analysis.md` for the UI + feature gap analysis against WP Offload Media.
-
-## Local WordPress sandbox with Docker
-
-This repository now includes a ready-to-run local WordPress sandbox for plugin testing.
+# Full reset (database + files)
+docker compose down -v
+```
 
 - WordPress URL: `http://localhost:8080`
-- Admin URL: `http://localhost:8080/wp-admin/`
-- Admin username: `admin`
-- Admin password: `password`
-- Plugin mount path inside the container: `wp-content/plugins/media-offload`
+- Admin: `http://localhost:8080/wp-admin/` · user `admin` · password `password`
+- Plugin mount: `wp-content/plugins/nimbus`
 
-What the bootstrap does automatically:
+The sandbox uses the `Local / Debug Mode` provider so you can test all admin flows, URL rewriting, and logs without real cloud credentials.
 
-- starts WordPress + MariaDB via Docker Compose
-- installs WordPress if the database is empty
-- activates the `media-offload` plugin from this repository
-- configures the plugin to use the built-in `local` provider for safe offline testing
-- writes a dummy local license key and marks onboarding as completed so the dashboard is unlocked
-- creates a sample page and a tiny sample image attachment for testing offload flows
+---
 
-Start the sandbox:
+## High-Traffic Optimization
 
-- `docker compose up -d`
+1. Let WordPress generate all image sizes locally.
+2. Enable **Remove Local Copies** in settings.
+3. Create a Cloudflare CNAME (`cdn.yourdomain.com`) pointing to your S3/R2 bucket URL with the orange-cloud proxy enabled.
+4. Set **Custom Domain** to `https://cdn.yourdomain.com`.
 
-The first run also executes the `setup` container, which bootstraps WordPress and configures the plugin.
+All image traffic flows through Cloudflare's CDN — eliminating inbound S3/R2 bandwidth costs.
 
-Useful follow-ups:
-
-- Re-run setup after resetting volumes: `docker compose run --rm setup`
-- Open a WP-CLI command: `docker compose --profile cli run --rm wpcli plugin list`
-- Stop containers: `docker compose down`
-- Reset everything (database + WordPress files): `docker compose down -v`
-
-The local test stack intentionally uses the plugin's `Local / Debug Mode` provider, so you can verify uploads, URL rewriting, logs, and admin flows without real S3 or R2 credentials.
-
-## WP-CLI Migration Workflow (Uploads Directory)
-
-### 1) Deploy uploads to object storage
-
-Uploads files from **year-based upload directories only** (e.g. `2026/...`, `2026/02/...`, or multisite `sites/<id>/2026/...`) to the configured bucket while preserving relative paths.
-
-Non-year plugin/system directories under `wp-content/uploads` are skipped by design.
-
-- Command: `wp media-offload deploy`
-- Flags:
-  - `--parallel=<n>` number of month-based subdirectories handled per batch
-  - `--force` re-upload even if object already exists remotely
-
-After each month-group batch is uploaded, the command verifies object existence in storage.
-
-### 2) Rewrite DB URLs to storage domain
-
-Verifies all attachment objects exist remotely first, then replaces local uploads domain in the DB.
-
-After the global replacement, the plugin also runs a Smart Slider 3 pass on `wp_nextend2_*` tables to update escaped URL formats and convert `$upload$/...` references to the storage base URL.
-
-- Command: `wp media-offload rewrite`
-- Flags:
-  - `--dry-run` verify and preview only (no DB writes)
-  - `--force` delete local files after successful rewrite
-
-### 3) Revert back to local storage
-
-Restores offloaded attachments from object storage to local uploads and rewrites DB URLs from remote domain back to local uploads domain.
-
-During revert, Smart Slider 3 tables are also normalized for escaped URL variants so slider assets return cleanly to local upload URLs.
-
-Before restore begins, the plugin performs preflight checks:
-
-- verifies bucket objects are accessible and calculates total allocated restore size
-- checks local server free disk space
-- proceeds only when local free space is sufficient (includes a 10% safety buffer)
-
-- Command: `wp media-offload revert`
-- Flags:
-  - `--batch-size=<n>` number of attachments restored per batch (default `100`)
+---
 
 ## Notes
 
-- Remote deletions are tied to WordPress attachment deletion; no background syncing occurs yet.
-- Failed uploads surface as admin notices and fall back to local storage.
-- Additional storage providers can be added by implementing `Storage_Adapter` and wiring it through the adapter factory.
+- Remote deletions fire when a WordPress attachment is deleted; no independent background sync runs.
+- Failed uploads surface as admin notices and fall back transparently to local storage.
+- Additional storage providers can be added by implementing `Nimbus\Plugin\Storage\StorageAdapter` and registering via `StorageAdapterFactory`.
+
+See [`docs/refactor-roadmap.md`](docs/refactor-roadmap.md) for the architecture and commercialization roadmap, and [`docs/competitor-analysis.md`](docs/competitor-analysis.md) for the UI and feature gap analysis.

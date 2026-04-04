@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Cache;
+namespace Nimbus\Plugin\Cache;
 
 if (!defined('ABSPATH')) {
   exit;

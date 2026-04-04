@@ -1,8 +1,8 @@
 <?php
-namespace ArunPrakash\MediaOffload\Onboarding;
+namespace Nimbus\Plugin\Onboarding;
 
-use ArunPrakash\MediaOffload\License\LicenseManager;
-use ArunPrakash\MediaOffload\Config\Settings;
+use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\Config\Settings;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -32,14 +32,14 @@ final class OnboardingManager
       return;
     }
 
-    if ((string) get_option(MEDIA_OFFLOAD_ONBOARDING_REDIRECT_OPTION, '') !== '1') {
+    if ((string) get_option(NIMBUS_ONBOARDING_REDIRECT_OPTION, '') !== '1') {
       return;
     }
 
-    delete_option(MEDIA_OFFLOAD_ONBOARDING_REDIRECT_OPTION);
+    delete_option(NIMBUS_ONBOARDING_REDIRECT_OPTION);
 
     $url = add_query_arg([
-      'page' => MEDIA_OFFLOAD_SLUG,
+      'page' => NIMBUS_SLUG,
     ], admin_url('upload.php'));
 
     wp_safe_redirect($url);
@@ -48,7 +48,7 @@ final class OnboardingManager
 
   public function state(): array
   {
-    $stored = get_option(MEDIA_OFFLOAD_ONBOARDING_OPTION_KEY, []);
+    $stored = get_option(NIMBUS_ONBOARDING_OPTION_KEY, []);
     $state = wp_parse_args(is_array($stored) ? $stored : [], self::DEFAULTS);
     $conflicts = $this->conflictDetector->detectSimilarPlugins();
 
@@ -69,10 +69,10 @@ final class OnboardingManager
 
   public function markCompleted(): void
   {
-    update_option(MEDIA_OFFLOAD_ONBOARDING_OPTION_KEY, [
+    update_option(NIMBUS_ONBOARDING_OPTION_KEY, [
       'completed' => true,
       'completed_at' => time(),
     ], false);
-    delete_option(MEDIA_OFFLOAD_ONBOARDING_REDIRECT_OPTION);
+    delete_option(NIMBUS_ONBOARDING_REDIRECT_OPTION);
   }
 }

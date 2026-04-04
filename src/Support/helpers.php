@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Support;
+namespace Nimbus\Plugin\Support;
 
 use RuntimeException;
 
@@ -44,7 +44,7 @@ function ensureDirectory(string $path): void
 function pushAdminNotice(string $message, string $type = 'error'): void
 {
   $type = in_array($type, ['error', 'warning', 'success', 'info'], true) ? $type : 'error';
-  $notices = get_option(MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY, []);
+  $notices = get_option(NIMBUS_ADMIN_NOTICES_OPTION_KEY, []);
   if (!is_array($notices)) {
     $notices = [];
   }
@@ -55,22 +55,22 @@ function pushAdminNotice(string $message, string $type = 'error'): void
     'timestamp' => time(),
   ];
 
-  update_option(MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY, $notices, false);
+  update_option(NIMBUS_ADMIN_NOTICES_OPTION_KEY, $notices, false);
 }
 
 function popAdminNotices(): array
 {
-  $notices = get_option(MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY, []);
+  $notices = get_option(NIMBUS_ADMIN_NOTICES_OPTION_KEY, []);
   if (!is_array($notices)) {
     $notices = [];
   }
 
-  delete_option(MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY);
+  delete_option(NIMBUS_ADMIN_NOTICES_OPTION_KEY);
 
   return $notices;
 }
 
 function isDebug(): bool
 {
-  return (bool) apply_filters('media_offload_debug', defined('WP_DEBUG') && WP_DEBUG);
+  return (bool) apply_filters('nimbus_debug', defined('WP_DEBUG') && WP_DEBUG);
 }

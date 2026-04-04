@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Support;
+namespace Nimbus\Plugin\Support;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -81,12 +81,12 @@ final class Logger
 
   public function clearEntries(): void
   {
-    delete_option(MEDIA_OFFLOAD_LOG_OPTION_KEY);
+    delete_option(NIMBUS_LOG_OPTION_KEY);
   }
 
   public function queryEntries(array $filters = []): array
   {
-    $entries = get_option(MEDIA_OFFLOAD_LOG_OPTION_KEY, []);
+    $entries = get_option(NIMBUS_LOG_OPTION_KEY, []);
     if (!is_array($entries)) {
       return [];
     }
@@ -157,13 +157,13 @@ final class Logger
 
     $interpolated = $this->interpolate($message, $context);
 
-    $entries = get_option(MEDIA_OFFLOAD_LOG_OPTION_KEY, []);
+    $entries = get_option(NIMBUS_LOG_OPTION_KEY, []);
     if (!is_array($entries)) {
       $entries = [];
     }
 
     $entry = [
-      'id' => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : uniqid('media-offload-', true),
+      'id' => function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : uniqid('nimbus-', true),
       'timestamp' => time(),
       'datetime' => function_exists('wp_date') ? wp_date('Y-m-d H:i:s') : gmdate('Y-m-d H:i:s'),
       'level' => strtoupper($level),
@@ -183,14 +183,14 @@ final class Logger
       $entries = array_slice($entries, -$maxEntries);
     }
 
-    update_option(MEDIA_OFFLOAD_LOG_OPTION_KEY, $entries, false);
+    update_option(NIMBUS_LOG_OPTION_KEY, $entries, false);
 
     if ($this->shouldMirrorToPhpErrorLog() && function_exists('error_log')) {
-      error_log('[Media Offload][' . strtoupper($level) . '][' . $entry['source'] . '] ' . $interpolated);
+      error_log('[Nimbus][' . strtoupper($level) . '][' . $entry['source'] . '] ' . $interpolated);
     }
 
-    do_action('media_offload_log', strtoupper($level), $message, $context);
-    do_action('media_offload_log_entry', $entry, $message, $context);
+    do_action('nimbus_log', strtoupper($level), $message, $context);
+    do_action('nimbus_log_entry', $entry, $message, $context);
   }
 
   private function normalizeContext(array $context): array
@@ -296,7 +296,7 @@ final class Logger
 
   private function config(): array
   {
-    $settings = get_option(MEDIA_OFFLOAD_OPTION_KEY, []);
+    $settings = get_option(NIMBUS_OPTION_KEY, []);
     if (!is_array($settings)) {
       $settings = [];
     }

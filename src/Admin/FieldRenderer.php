@@ -1,7 +1,7 @@
 <?php
-namespace ArunPrakash\MediaOffload\Admin;
+namespace Nimbus\Plugin\Admin;
 
-use ArunPrakash\MediaOffload\Config\Settings;
+use Nimbus\Plugin\Config\Settings;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -24,8 +24,8 @@ final class FieldRenderer
     $checked = !empty($settings[$key]);
 
     printf(
-      '<label class="mo-toggle-switch"><input type="checkbox" name="%1$s[%2$s]" value="1" %3$s /> <span class="mo-toggle-label">%4$s</span></label>',
-      esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+      '<label class="nmb-toggle-switch"><input type="checkbox" name="%1$s[%2$s]" value="1" %3$s /> <span class="nmb-toggle-label">%4$s</span></label>',
+      esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       checked($checked, true, false),
       esc_html($label)
@@ -39,40 +39,40 @@ final class FieldRenderer
     $providers = $this->providerCatalog->selectOptions();
     $providerDetails = $this->providerCatalog->all();
     $currentProvider = $providerDetails[$provider] ?? ($providerDetails['s3'] ?? [
-      'title' => __('Storage provider', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'title' => __('Storage provider', NIMBUS_TEXT_DOMAIN),
       'summary' => '',
       'required' => [],
     ]);
     $requiredLabels = $this->normalizeRequiredLabels((array) ($currentProvider['required'] ?? []));
     ?>
-    <div class="pt-mo-provider-field">
-      <div class="pt-mo-provider-picker">
-        <select id="media-offload-provider-select" name="<?php echo esc_attr(MEDIA_OFFLOAD_OPTION_KEY); ?>[provider]">
+    <div class="nmb-provider-field">
+      <div class="nmb-provider-picker">
+        <select id="nimbus-provider-select" name="<?php echo esc_attr(NIMBUS_OPTION_KEY); ?>[provider]">
           <?php foreach ($providers as $key => $providerConfig) : ?>
             <option value="<?php echo esc_attr($key); ?>" <?php selected($provider, $key); ?>><?php echo esc_html($providerConfig['label']); ?></option>
           <?php endforeach; ?>
         </select>
       </div>
 
-      <div class="pt-mo-provider-summary">
-        <div class="pt-mo-provider-summary-header">
+      <div class="nmb-provider-summary">
+        <div class="nmb-provider-summary-header">
           <div>
-            <h3 id="pt-mo-provider-summary-title"><?php echo esc_html((string) ($currentProvider['title'] ?? __('Storage provider', MEDIA_OFFLOAD_TEXT_DOMAIN))); ?></h3>
-            <p id="pt-mo-provider-summary-copy"><?php echo esc_html((string) ($currentProvider['summary'] ?? '')); ?></p>
+            <h3 id="nmb-provider-summary-title"><?php echo esc_html((string) ($currentProvider['title'] ?? __('Storage provider', NIMBUS_TEXT_DOMAIN))); ?></h3>
+            <p id="nmb-provider-summary-copy"><?php echo esc_html((string) ($currentProvider['summary'] ?? '')); ?></p>
           </div>
-          <button type="button" class="button-link pt-mo-advanced-toggle" id="pt-mo-toggle-advanced" aria-expanded="false">
-            <?php esc_html_e('Show advanced connection fields', MEDIA_OFFLOAD_TEXT_DOMAIN); ?>
+          <button type="button" class="button-link nmb-advanced-toggle" id="nmb-toggle-advanced" aria-expanded="false">
+            <?php esc_html_e('Show advanced connection fields', NIMBUS_TEXT_DOMAIN); ?>
           </button>
         </div>
 
-        <div class="pt-mo-chip-list" id="pt-mo-provider-required-fields">
+        <div class="nmb-chip-list" id="nmb-provider-required-fields">
           <?php foreach ($requiredLabels as $requiredFieldLabel) : ?>
-            <span class="pt-mo-chip"><?php echo esc_html((string) $requiredFieldLabel); ?></span>
+            <span class="nmb-chip"><?php echo esc_html((string) $requiredFieldLabel); ?></span>
           <?php endforeach; ?>
         </div>
       </div>
     </div>
-    <p class="description"><?php esc_html_e('The form below now focuses on required fields first. Provider-specific extras stay hidden until you need them.', MEDIA_OFFLOAD_TEXT_DOMAIN); ?></p>
+    <p class="description"><?php esc_html_e('The form below now focuses on required fields first. Provider-specific extras stay hidden until you need them.', NIMBUS_TEXT_DOMAIN); ?></p>
     <?php
   }
 
@@ -85,7 +85,7 @@ final class FieldRenderer
     $labels = array_values(array_filter(array_map('strval', $labels)));
 
     if (count($labels) === 1 && strtolower($labels[0]) === 'provider') {
-      return [__('No extra credentials required', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return [__('No extra credentials required', NIMBUS_TEXT_DOMAIN)];
     }
 
     return $labels;
@@ -100,7 +100,7 @@ final class FieldRenderer
 
     printf(
       '<select name="%1$s[%2$s]">',
-      esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+      esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key)
     );
 
@@ -131,7 +131,7 @@ final class FieldRenderer
 
     printf(
       '<input type="text" name="%1$s[%2$s]" value="%3$s" class="regular-text" placeholder="%4$s" %5$s />',
-        esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+        esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       esc_attr($value),
       esc_attr($placeholder),
@@ -152,7 +152,7 @@ final class FieldRenderer
 
     printf(
       '<input type="time" name="%1$s[%2$s]" value="%3$s" step="60" />',
-        esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+        esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       esc_attr($value)
     );
@@ -174,7 +174,7 @@ final class FieldRenderer
 
     printf(
       '<input type="number" name="%1$s[%2$s]" value="%3$s" min="%4$d" max="%5$d" step="%6$d" class="small-text" />',
-        esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+        esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       esc_attr((string) $value),
       $min,
@@ -197,7 +197,7 @@ final class FieldRenderer
 
     printf(
       '<textarea name="%1$s[%2$s]" rows="%3$d" class="large-text code" placeholder="%4$s">%5$s</textarea>',
-        esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+        esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       $rows,
       esc_attr($placeholder),
@@ -218,7 +218,7 @@ final class FieldRenderer
 
     printf(
       '<input type="password" name="%1$s[%2$s]" value="%3$s" class="regular-text" autocomplete="off" %4$s />',
-        esc_attr(MEDIA_OFFLOAD_OPTION_KEY),
+        esc_attr(NIMBUS_OPTION_KEY),
       esc_attr($key),
       esc_attr($value),
       $required

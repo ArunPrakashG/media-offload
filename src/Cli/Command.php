@@ -1,11 +1,11 @@
 <?php
-namespace ArunPrakash\MediaOffload\Cli;
+namespace Nimbus\Plugin\Cli;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Media\UploadHandler;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Events;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Events;
+use Nimbus\Plugin\Support\Logger;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -27,31 +27,31 @@ final class Command
       return;
     }
 
-    \WP_CLI::add_command('media-offload config', [$this, 'config'], [
-      'shortdesc' => 'Show or update Media Offload plugin settings.',
+    \WP_CLI::add_command('nimbus config', [$this, 'config'], [
+      'shortdesc' => 'Show or update Nimbus plugin settings.',
     ]);
-    \WP_CLI::add_command('media-offload process-pending', [$this, 'process_pending'], [
+    \WP_CLI::add_command('nimbus process-pending', [$this, 'process_pending'], [
       'shortdesc' => 'Process queued pending offloads.',
     ]);
-    \WP_CLI::add_command('media-offload deploy', [$this, 'deploy'], [
+    \WP_CLI::add_command('nimbus deploy', [$this, 'deploy'], [
       'shortdesc' => 'Offload one or more attachments to remote storage.',
     ]);
-    \WP_CLI::add_command('media-offload rewrite', [$this, 'rewrite'], [
+    \WP_CLI::add_command('nimbus rewrite', [$this, 'rewrite'], [
       'shortdesc' => 'Rewrite local media URLs in post content to remote URLs.',
     ]);
-    \WP_CLI::add_command('media-offload revert', [$this, 'revert'], [
+    \WP_CLI::add_command('nimbus revert', [$this, 'revert'], [
       'shortdesc' => 'Restore remote URLs in post content back to local URLs.',
     ]);
-    \WP_CLI::add_command('media-offload download', [$this, 'download'], [
+    \WP_CLI::add_command('nimbus download', [$this, 'download'], [
       'shortdesc' => 'Download offloaded attachments back to local storage.',
     ]);
-    \WP_CLI::add_command('media-offload replace-urls', [$this, 'replace_urls'], [
+    \WP_CLI::add_command('nimbus replace-urls', [$this, 'replace_urls'], [
       'shortdesc' => 'Alias of rewrite/revert with explicit source and target URLs.',
     ]);
-    \WP_CLI::add_command('media-offload offload-single', [$this, 'offload_single'], [
+    \WP_CLI::add_command('nimbus offload-single', [$this, 'offload_single'], [
       'shortdesc' => 'Offload a single attachment by ID.',
     ]);
-    \WP_CLI::add_command('media-offload sync', [$this, 'sync'], [
+    \WP_CLI::add_command('nimbus sync', [$this, 'sync'], [
       'shortdesc' => 'Queue or offload attachments missing remote metadata.',
     ]);
   }
@@ -301,7 +301,7 @@ final class Command
   {
     try {
       $adapter = $this->factory->getAdapter();
-      $probeName = 'media-offload-url-probe';
+      $probeName = 'nimbus-url-probe';
       $prefix = (string) $this->settings->get('prefix', '');
       $key = $prefix !== '' ? trim($prefix, '/') . '/' . $probeName : $probeName;
       $url = $adapter->getUrl($key);

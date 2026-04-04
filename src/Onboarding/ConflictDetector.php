@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Onboarding;
+namespace Nimbus\Plugin\Onboarding;
 
 if (!defined('ABSPATH')) {
   exit;

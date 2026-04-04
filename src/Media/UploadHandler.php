@@ -1,14 +1,14 @@
 <?php
-namespace ArunPrakash\MediaOffload\Media;
+namespace Nimbus\Plugin\Media;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Storage\StorageAdapter;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Events;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Storage\StorageAdapter;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Events;
+use Nimbus\Plugin\Support\Logger;
 use RuntimeException;
 
-use function ArunPrakash\MediaOffload\Support\buildStorageKey;
+use function Nimbus\Plugin\Support\buildStorageKey;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 
 final class UploadHandler
 {
-  private const NIGHTLY_BATCH_LOCK_TRANSIENT = 'media_offload_nightly_batch_lock';
+  private const NIGHTLY_BATCH_LOCK_TRANSIENT = 'nimbus_nightly_batch_lock';
 
   public function __construct(
     private Settings $settings,
@@ -32,9 +32,9 @@ final class UploadHandler
     add_filter('wp_get_attachment_url', [$this, 'filter_attachment_url'], 20, 2);
     add_filter('wp_get_attachment_metadata', [$this, 'inject_remote_metadata'], 20, 2);
     add_action('delete_attachment', [$this, 'delete_remote_files'], 20, 1);
-    add_action(MEDIA_OFFLOAD_CLEANUP_HOOK, [$this, 'cleanup_local_files'], 20, 1);
-    add_action(MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK, [$this, 'run_nightly_pending_batch'], 20, 0);
-    add_action(MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK, [$this, 'run_nightly_worker'], 20, 4);
+    add_action(NIMBUS_CLEANUP_HOOK, [$this, 'cleanup_local_files'], 20, 1);
+    add_action(NIMBUS_NIGHTLY_BATCH_HOOK, [$this, 'run_nightly_pending_batch'], 20, 0);
+    add_action(NIMBUS_NIGHTLY_WORKER_HOOK, [$this, 'run_nightly_worker'], 20, 4);
 
     if ($this->settings->should_process_off_hours_batch()) {
       $this->ensure_nightly_schedule();
@@ -46,7 +46,7 @@ final class UploadHandler
   public function sync_ignore_state(int $attachment_id, bool $ignored): void
   {
     if ($ignored) {
-      update_post_meta($attachment_id, MEDIA_OFFLOAD_IGNORE_META_KEY, '1');
+      update_post_meta($attachment_id, NIMBUS_IGNORE_META_KEY, '1');
       $this->clear_pending_state($attachment_id);
       $this->clear_missing_source_marker($attachment_id);
       $this->clear_cleanup_schedule($attachment_id);
@@ -54,7 +54,7 @@ final class UploadHandler
       return;
     }
 
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_IGNORE_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_IGNORE_META_KEY);
 
     if (!$this->should_offload()) {
       $this->reconcile_nightly_batch_schedule();
@@ -74,7 +74,7 @@ final class UploadHandler
       return;
     }
 
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     if (!empty($meta['key'])) {
       $file = $this->resolve_attachment_file_path($attachment_id, $metadata);
       $existingSizes = is_array($meta['sizes'] ?? null) ? $meta['sizes'] : [];
@@ -137,7 +137,7 @@ final class UploadHandler
       return $metadata;
     }
 
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     if (!empty($meta['key'])) {
       $file = $this->resolve_attachment_file_path($attachment_id, $metadata);
       $existingSizes = is_array($meta['sizes'] ?? null) ? $meta['sizes'] : [];
@@ -178,8 +178,8 @@ final class UploadHandler
         return;
       }
 
-      $hours = max(1, (int) apply_filters('media_offload_nightly_hours', 24));
-      $workerBatchSize = max(1, (int) apply_filters('media_offload_nightly_limit', $this->settings->off_hours_worker_batch_size()));
+      $hours = max(1, (int) apply_filters('nimbus_nightly_hours', 24));
+      $workerBatchSize = max(1, (int) apply_filters('nimbus_nightly_limit', $this->settings->off_hours_worker_batch_size()));
       $workerCount = $this->settings->off_hours_worker_count();
 
       if ($workerCount <= 1) {
@@ -204,7 +204,7 @@ final class UploadHandler
     $hours = max(1, $hours);
     $limit = max(1, $limit);
 
-    $lock = 'media_offload_worker_lock_' . md5($run_token . '|' . $worker_index);
+    $lock = 'nimbus_worker_lock_' . md5($run_token . '|' . $worker_index);
     if (get_transient($lock)) {
       $this->logger->warning('Nightly worker {worker} skipped: run lock already active.', ['worker' => $worker_index]);
       return;
@@ -255,7 +255,7 @@ final class UploadHandler
         }
 
         $file = $this->resolve_attachment_file_path($attachmentId, $metadata);
-        $existingMeta = get_post_meta($attachmentId, MEDIA_OFFLOAD_META_KEY, true);
+        $existingMeta = get_post_meta($attachmentId, NIMBUS_META_KEY, true);
         $existingSizes = is_array($existingMeta['sizes'] ?? null) ? $existingMeta['sizes'] : [];
 
         if (!empty($existingMeta['key']) && !$this->has_pending_local_sizes($file, $metadata, $existingSizes)) {
@@ -279,7 +279,7 @@ final class UploadHandler
 
   public function ensure_nightly_schedule(): void
   {
-    $hook = MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK;
+    $hook = NIMBUS_NIGHTLY_BATCH_HOOK;
 
     if (!$this->settings->should_process_off_hours_batch()) {
       $this->clear_nightly_schedule();
@@ -322,8 +322,8 @@ final class UploadHandler
 
   public function clear_nightly_schedule(): void
   {
-    $this->unschedule_all_events_for_hook(MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK);
-    $this->unschedule_all_events_for_hook(MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK);
+    $this->unschedule_all_events_for_hook(NIMBUS_NIGHTLY_BATCH_HOOK);
+    $this->unschedule_all_events_for_hook(NIMBUS_NIGHTLY_WORKER_HOOK);
   }
 
   public function filter_attachment_url(string $url, int $attachment_id): string
@@ -332,11 +332,11 @@ final class UploadHandler
       return $url;
     }
 
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     if (empty($meta['key'])) {
       $metadata = wp_get_attachment_metadata($attachment_id);
-      if (isset($metadata['media_offload']['key'])) {
-        $meta = $metadata['media_offload'];
+      if (isset($metadata['nimbus']['key'])) {
+        $meta = $metadata['nimbus'];
       }
     }
 
@@ -360,7 +360,7 @@ final class UploadHandler
       return $metadata;
     }
 
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     $this->apply_offload_meta_to_metadata($metadata, $meta);
 
     return $metadata;
@@ -446,7 +446,7 @@ final class UploadHandler
 
   public function delete_remote_files(int $attachment_id): void
   {
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     $keysToPurge = [];
 
     if (!empty($meta['key']) && is_string($meta['key'])) {
@@ -501,7 +501,7 @@ final class UploadHandler
         Events::dispatch(Events::REMOTE_DELETE_COMPLETED, $eventContext);
       }
 
-      delete_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY);
+      delete_post_meta($attachment_id, NIMBUS_META_KEY);
     }
 
     $this->clear_pending_state($attachment_id);
@@ -515,7 +515,7 @@ final class UploadHandler
       return;
     }
 
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     if (empty($meta['key'])) {
       return;
     }
@@ -545,7 +545,7 @@ final class UploadHandler
 
   public function download_media(int $attachment_id): bool
   {
-    $meta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $meta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     if (empty($meta['key'])) {
       return false;
     }
@@ -613,14 +613,14 @@ final class UploadHandler
       }
     }
 
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_META_KEY);
 
     if (is_array($metadata)) {
-      unset($metadata['media_offload']);
+      unset($metadata['nimbus']);
       if (isset($metadata['sizes'])) {
         foreach ($metadata['sizes'] as $size => $data) {
-          if (isset($data['media_offload'])) {
-            unset($metadata['sizes'][$size]['media_offload']);
+          if (isset($data['nimbus'])) {
+            unset($metadata['sizes'][$size]['nimbus']);
           }
         }
       }
@@ -637,46 +637,46 @@ final class UploadHandler
   public function get_attachment_status(int $attachment_id): array
   {
     if ($attachment_id <= 0 || get_post_type($attachment_id) !== 'attachment') {
-      return ['status' => 'unknown', 'label' => __('Unknown', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('Attachment could not be found.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'unknown', 'label' => __('Unknown', NIMBUS_TEXT_DOMAIN), 'reason' => __('Attachment could not be found.', NIMBUS_TEXT_DOMAIN)];
     }
 
-    $offloadMeta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
-    $pendingAt = (int) get_post_meta($attachment_id, MEDIA_OFFLOAD_PENDING_AT_META_KEY, true);
-    $claimedBy = (string) get_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY, true);
-    $missingSourceAt = (int) get_post_meta($attachment_id, MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, true);
+    $offloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
+    $pendingAt = (int) get_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY, true);
+    $claimedBy = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
+    $missingSourceAt = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
 
     if ($this->is_ignored_attachment($attachment_id)) {
-      return ['status' => 'ignored', 'label' => __('Ignored', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('This attachment is marked to stay local-only.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'ignored', 'label' => __('Ignored', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is marked to stay local-only.', NIMBUS_TEXT_DOMAIN)];
     }
 
     if (!empty($offloadMeta['key'])) {
-      return ['status' => 'offloaded', 'label' => __('Offloaded', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('Remote object metadata is present for this attachment.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'offloaded', 'label' => __('Offloaded', NIMBUS_TEXT_DOMAIN), 'reason' => __('Remote object metadata is present for this attachment.', NIMBUS_TEXT_DOMAIN)];
     }
 
     if ($pendingAt > 0 && $claimedBy !== '') {
-      return ['status' => 'processing', 'label' => __('Processing', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('This attachment is currently claimed by a background worker.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'processing', 'label' => __('Processing', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is currently claimed by a background worker.', NIMBUS_TEXT_DOMAIN)];
     }
 
     if ($pendingAt > 0) {
-      return ['status' => 'pending', 'label' => __('Pending', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('This attachment is queued for a future offload.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'pending', 'label' => __('Pending', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is queued for a future offload.', NIMBUS_TEXT_DOMAIN)];
     }
 
     if ($missingSourceAt > 0) {
-      return ['status' => 'failed', 'label' => __('Needs attention', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+      return ['status' => 'failed', 'label' => __('Needs attention', NIMBUS_TEXT_DOMAIN), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', NIMBUS_TEXT_DOMAIN)];
     }
 
-    return ['status' => 'local', 'label' => __('Local only', MEDIA_OFFLOAD_TEXT_DOMAIN), 'reason' => __('This attachment is still being served from local storage.', MEDIA_OFFLOAD_TEXT_DOMAIN)];
+    return ['status' => 'local', 'label' => __('Local only', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is still being served from local storage.', NIMBUS_TEXT_DOMAIN)];
   }
 
   private function dispatch_nightly_workers(string $run_token, int $worker_count, int $hours, int $limit): void
   {
     for ($i = 1; $i <= max(1, $worker_count); $i++) {
       $args = [$i, $run_token, $hours, $limit];
-      if (wp_next_scheduled(MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK, $args)) {
+      if (wp_next_scheduled(NIMBUS_NIGHTLY_WORKER_HOOK, $args)) {
         continue;
       }
 
-      wp_schedule_single_event(time() + 1, MEDIA_OFFLOAD_NIGHTLY_WORKER_HOOK, $args);
+      wp_schedule_single_event(time() + 1, NIMBUS_NIGHTLY_WORKER_HOOK, $args);
     }
 
     $this->logger->info('Dispatched nightly workers. Count: {count}, Run: {run}', ['count' => $worker_count, 'run' => $run_token]);
@@ -684,12 +684,12 @@ final class UploadHandler
 
   private function schedule_next_single_nightly_event(): void
   {
-    if (!$this->settings->should_process_off_hours_batch() || wp_next_scheduled(MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK)) {
+    if (!$this->settings->should_process_off_hours_batch() || wp_next_scheduled(NIMBUS_NIGHTLY_BATCH_HOOK)) {
       return;
     }
 
     [$hour, $minute] = $this->resolve_configured_batch_time();
-    wp_schedule_single_event($this->resolve_next_nightly_timestamp($hour, $minute), MEDIA_OFFLOAD_NIGHTLY_BATCH_HOOK);
+    wp_schedule_single_event($this->resolve_next_nightly_timestamp($hour, $minute), NIMBUS_NIGHTLY_BATCH_HOOK);
   }
 
   private function unschedule_all_events_for_hook(string $hook): void
@@ -716,7 +716,7 @@ final class UploadHandler
     $this->logger->info('Starting offload for ID {id}. File: {file}', ['id' => $attachment_id, 'file' => $file]);
     $adapter = $this->factory->getAdapter();
     $uploads = wp_upload_dir();
-    $existingOffloadMeta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    $existingOffloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
     $existingSizes = is_array($existingOffloadMeta['sizes'] ?? null) ? $existingOffloadMeta['sizes'] : [];
 
     $relativePath = function_exists('wp_relative_upload_path') ? wp_relative_upload_path($file) : false;
@@ -745,7 +745,7 @@ final class UploadHandler
       $offloadMeta['sizes'] = $this->offload_sizes($attachment_id, $file, $metadata, $adapter, $existingSizes);
     }
 
-    update_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, $offloadMeta);
+    update_post_meta($attachment_id, NIMBUS_META_KEY, $offloadMeta);
     if ($this->settings->should_remove_local()) {
       $this->schedule_local_cleanup($attachment_id);
     }
@@ -768,7 +768,7 @@ final class UploadHandler
 
       if (!empty($existing_sizes[$size]['key'])) {
         $results[$size] = $existing_sizes[$size];
-        $metadata['sizes'][$size]['media_offload'] = $existing_sizes[$size];
+        $metadata['sizes'][$size]['nimbus'] = $existing_sizes[$size];
         continue;
       }
 
@@ -799,7 +799,7 @@ final class UploadHandler
       }
 
       $results[$size] = ['key' => $uploadedSizeKey];
-      $metadata['sizes'][$size]['media_offload'] = ['key' => $uploadedSizeKey];
+      $metadata['sizes'][$size]['nimbus'] = ['key' => $uploadedSizeKey];
     }
 
     return $results;
@@ -832,21 +832,21 @@ final class UploadHandler
 
   private function schedule_local_cleanup(int $attachment_id): void
   {
-    $delay = max(30, (int) apply_filters('media_offload_cleanup_delay', 180));
+    $delay = max(30, (int) apply_filters('nimbus_cleanup_delay', 180));
     $this->clear_cleanup_schedule($attachment_id);
-    wp_schedule_single_event(time() + $delay, MEDIA_OFFLOAD_CLEANUP_HOOK, [$attachment_id]);
+    wp_schedule_single_event(time() + $delay, NIMBUS_CLEANUP_HOOK, [$attachment_id]);
   }
 
   private function clear_cleanup_schedule(int $attachment_id): void
   {
     if (function_exists('wp_clear_scheduled_hook')) {
-      wp_clear_scheduled_hook(MEDIA_OFFLOAD_CLEANUP_HOOK, [$attachment_id]);
+      wp_clear_scheduled_hook(NIMBUS_CLEANUP_HOOK, [$attachment_id]);
       return;
     }
 
-    $nextCleanup = wp_next_scheduled(MEDIA_OFFLOAD_CLEANUP_HOOK, [$attachment_id]);
+    $nextCleanup = wp_next_scheduled(NIMBUS_CLEANUP_HOOK, [$attachment_id]);
     if ($nextCleanup) {
-      wp_unschedule_event($nextCleanup, MEDIA_OFFLOAD_CLEANUP_HOOK, [$attachment_id]);
+      wp_unschedule_event($nextCleanup, NIMBUS_CLEANUP_HOOK, [$attachment_id]);
     }
   }
 
@@ -857,8 +857,8 @@ final class UploadHandler
       return;
     }
 
-    if ((int) get_post_meta($attachment_id, MEDIA_OFFLOAD_PENDING_AT_META_KEY, true) <= 0) {
-      update_post_meta($attachment_id, MEDIA_OFFLOAD_PENDING_AT_META_KEY, time());
+    if ((int) get_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY, true) <= 0) {
+      update_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY, time());
     }
 
     $this->ensure_nightly_schedule();
@@ -866,9 +866,9 @@ final class UploadHandler
 
   private function clear_pending_state(int $attachment_id): void
   {
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_PENDING_AT_META_KEY);
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY);
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_AT_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
   }
 
   private function claim_pending_attachment_ids(int $hours, int $limit, string $claim_owner, int $claim_ttl): array
@@ -882,22 +882,22 @@ final class UploadHandler
       'post_status' => 'inherit',
       'posts_per_page' => $candidateLimit,
       'fields' => 'ids',
-      'meta_key' => MEDIA_OFFLOAD_PENDING_AT_META_KEY,
+      'meta_key' => NIMBUS_PENDING_AT_META_KEY,
       'orderby' => 'meta_value_num',
       'order' => 'ASC',
       'meta_query' => [
         'relation' => 'AND',
-        ['key' => MEDIA_OFFLOAD_PENDING_AT_META_KEY, 'compare' => 'EXISTS'],
-        ['key' => MEDIA_OFFLOAD_PENDING_AT_META_KEY, 'value' => $threshold, 'type' => 'NUMERIC', 'compare' => '>='],
+        ['key' => NIMBUS_PENDING_AT_META_KEY, 'compare' => 'EXISTS'],
+        ['key' => NIMBUS_PENDING_AT_META_KEY, 'value' => $threshold, 'type' => 'NUMERIC', 'compare' => '>='],
         [
           'relation' => 'OR',
-          ['key' => MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, 'compare' => 'NOT EXISTS'],
-          ['key' => MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, 'value' => $missingSourceRetryBefore, 'type' => 'NUMERIC', 'compare' => '<'],
+          ['key' => NIMBUS_MISSING_SOURCE_AT_META_KEY, 'compare' => 'NOT EXISTS'],
+          ['key' => NIMBUS_MISSING_SOURCE_AT_META_KEY, 'value' => $missingSourceRetryBefore, 'type' => 'NUMERIC', 'compare' => '<'],
         ],
         [
           'relation' => 'OR',
-          ['key' => MEDIA_OFFLOAD_IGNORE_META_KEY, 'compare' => 'NOT EXISTS'],
-          ['key' => MEDIA_OFFLOAD_IGNORE_META_KEY, 'value' => '1', 'compare' => '!='],
+          ['key' => NIMBUS_IGNORE_META_KEY, 'compare' => 'NOT EXISTS'],
+          ['key' => NIMBUS_IGNORE_META_KEY, 'value' => '1', 'compare' => '!='],
         ],
       ],
     ]);
@@ -928,8 +928,8 @@ final class UploadHandler
 
   private function try_claim_pending_attachment(int $attachment_id, string $claim_owner, int $claim_ttl): bool
   {
-    $currentOwner = (string) get_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY, true);
-    $currentClaimedAt = (int) get_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_AT_META_KEY, true);
+    $currentOwner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
+    $currentClaimedAt = (int) get_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY, true);
 
     if ($currentOwner !== '' && $currentOwner !== $claim_owner) {
       $isFreshClaim = $currentClaimedAt > 0 && (time() - $currentClaimedAt) < $claim_ttl;
@@ -937,27 +937,27 @@ final class UploadHandler
         return false;
       }
 
-      delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY);
-      delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_AT_META_KEY);
+      delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
+      delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
     }
 
-    if (!add_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY, $claim_owner, true)) {
-      $owner = (string) get_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY, true);
+    if (!add_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, $claim_owner, true)) {
+      $owner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
       if ($owner !== $claim_owner) {
         return false;
       }
     }
 
-    update_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_AT_META_KEY, time());
+    update_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY, time());
     return true;
   }
 
   private function release_pending_claim(int $attachment_id, string $claim_owner): void
   {
-    $owner = (string) get_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY, true);
+    $owner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
     if ($owner === '' || $owner === $claim_owner) {
-      delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_BY_META_KEY);
-      delete_post_meta($attachment_id, MEDIA_OFFLOAD_CLAIMED_AT_META_KEY);
+      delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
+      delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
     }
   }
 
@@ -973,16 +973,16 @@ final class UploadHandler
       'no_found_rows' => true,
       'meta_query' => [
         'relation' => 'AND',
-        ['key' => MEDIA_OFFLOAD_PENDING_AT_META_KEY, 'compare' => 'EXISTS'],
+        ['key' => NIMBUS_PENDING_AT_META_KEY, 'compare' => 'EXISTS'],
         [
           'relation' => 'OR',
-          ['key' => MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, 'compare' => 'NOT EXISTS'],
-          ['key' => MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, 'value' => $missingSourceRetryBefore, 'type' => 'NUMERIC', 'compare' => '<'],
+          ['key' => NIMBUS_MISSING_SOURCE_AT_META_KEY, 'compare' => 'NOT EXISTS'],
+          ['key' => NIMBUS_MISSING_SOURCE_AT_META_KEY, 'value' => $missingSourceRetryBefore, 'type' => 'NUMERIC', 'compare' => '<'],
         ],
         [
           'relation' => 'OR',
-          ['key' => MEDIA_OFFLOAD_IGNORE_META_KEY, 'compare' => 'NOT EXISTS'],
-          ['key' => MEDIA_OFFLOAD_IGNORE_META_KEY, 'value' => '1', 'compare' => '!='],
+          ['key' => NIMBUS_IGNORE_META_KEY, 'compare' => 'NOT EXISTS'],
+          ['key' => NIMBUS_IGNORE_META_KEY, 'value' => '1', 'compare' => '!='],
         ],
       ],
     ]);
@@ -1134,11 +1134,11 @@ final class UploadHandler
       return;
     }
 
-    $metadata['media_offload'] = $offload_meta;
+    $metadata['nimbus'] = $offload_meta;
     if (!empty($offload_meta['sizes']) && !empty($metadata['sizes'])) {
       foreach ($offload_meta['sizes'] as $size => $sizeMeta) {
         if (!empty($metadata['sizes'][$size])) {
-          $metadata['sizes'][$size]['media_offload'] = $sizeMeta;
+          $metadata['sizes'][$size]['nimbus'] = $sizeMeta;
         }
       }
     }
@@ -1147,10 +1147,10 @@ final class UploadHandler
   private function mark_missing_source(int $attachment_id): void
   {
     $now = time();
-    $previous = (int) get_post_meta($attachment_id, MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, true);
-    update_post_meta($attachment_id, MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY, $now);
+    $previous = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
+    update_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, $now);
 
-    $cooldown = max(300, (int) apply_filters('media_offload_missing_source_log_cooldown_seconds', 6 * HOUR_IN_SECONDS));
+    $cooldown = max(300, (int) apply_filters('nimbus_missing_source_log_cooldown_seconds', 6 * HOUR_IN_SECONDS));
     if ($previous > 0 && ($now - $previous) < $cooldown) {
       return;
     }
@@ -1160,12 +1160,12 @@ final class UploadHandler
 
   private function clear_missing_source_marker(int $attachment_id): void
   {
-    delete_post_meta($attachment_id, MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY);
+    delete_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY);
   }
 
   private function missing_source_retry_cooldown_seconds(): int
   {
-    return max(300, (int) apply_filters('media_offload_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
+    return max(300, (int) apply_filters('nimbus_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
   }
 
   private function is_attachment_excluded_by_path_rules(int $attachment_id, ?array $metadata = null): bool
@@ -1180,6 +1180,6 @@ final class UploadHandler
 
   private function is_ignored_attachment(int $attachment_id): bool
   {
-    return (bool) get_post_meta($attachment_id, MEDIA_OFFLOAD_IGNORE_META_KEY, true);
+    return (bool) get_post_meta($attachment_id, NIMBUS_IGNORE_META_KEY, true);
   }
 }

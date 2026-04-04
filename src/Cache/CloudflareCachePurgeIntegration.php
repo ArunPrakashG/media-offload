@@ -1,8 +1,8 @@
 <?php
-namespace ArunPrakash\MediaOffload\Cache;
+namespace Nimbus\Plugin\Cache;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Support\Logger;
 use RuntimeException;
 
 if (!defined('ABSPATH')) {

@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,25 +19,25 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile
 
   public function label(): string
   {
-    return __('Cloudflare R2', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Cloudflare R2', NIMBUS_TEXT_DOMAIN);
   }
 
   public function title(): string
   {
-    return __('Cloudflare R2', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Cloudflare R2', NIMBUS_TEXT_DOMAIN);
   }
 
   public function summary(): string
   {
-    return __('R2 uses account-scoped endpoints, region=auto, and path-style signing. Provide your bucket and either an account ID or a custom R2 endpoint.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('R2 uses account-scoped endpoints, region=auto, and path-style signing. Provide your bucket and either an account ID or a custom R2 endpoint.', NIMBUS_TEXT_DOMAIN);
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'access_key' => __('Access Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'secret_key' => __('Secret Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'bucket' => __('Bucket', NIMBUS_TEXT_DOMAIN),
+      'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
+      'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
     ];
   }
 
@@ -47,7 +47,7 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile
     $missing = parent::missingCredentialLabels($values);
 
     if ($values['r2_account_id'] === '' && $values['endpoint'] === '') {
-      $missing[] = __('R2 Account ID or Custom Endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN);
+      $missing[] = __('R2 Account ID or Custom Endpoint', NIMBUS_TEXT_DOMAIN);
     }
 
     return $missing;

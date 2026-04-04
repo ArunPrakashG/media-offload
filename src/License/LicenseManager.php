@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\License;
+namespace Nimbus\Plugin\License;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -16,7 +16,7 @@ final class LicenseManager
 
   public function all(): array
   {
-    $stored = get_option(MEDIA_OFFLOAD_LICENSE_OPTION_KEY, []);
+    $stored = get_option(NIMBUS_LICENSE_OPTION_KEY, []);
     return wp_parse_args(is_array($stored) ? $stored : [], self::DEFAULTS);
   }
 
@@ -43,7 +43,7 @@ final class LicenseManager
     $payload['plan'] = sanitize_key((string) ($payload['plan'] ?? 'monthly')) ?: 'monthly';
     $payload['last_validated_at'] = max(0, (int) ($payload['last_validated_at'] ?? 0));
 
-    update_option(MEDIA_OFFLOAD_LICENSE_OPTION_KEY, $payload, false);
+    update_option(NIMBUS_LICENSE_OPTION_KEY, $payload, false);
 
     return $payload;
   }

@@ -1,13 +1,13 @@
 <?php
-namespace ArunPrakash\MediaOffload\Integration;
+namespace Nimbus\Plugin\Integration;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Storage\StorageAdapter;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Events;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Storage\StorageAdapter;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Events;
+use Nimbus\Plugin\Support\Logger;
 
-use function ArunPrakash\MediaOffload\Support\buildStorageKey;
+use function Nimbus\Plugin\Support\buildStorageKey;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -125,7 +125,7 @@ final class SmartSliderAssetRewriter
 
   private function resolveRemoteBaseUrlFromAdapter(StorageAdapter $adapter): string
   {
-    $probeName = 'media-offload-url-probe';
+    $probeName = 'nimbus-url-probe';
     $probeKey = buildStorageKey($probeName, (string) $this->settings->get('prefix', ''));
 
     try {

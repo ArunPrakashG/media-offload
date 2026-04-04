@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,26 +19,26 @@ final class AmazonS3ProviderProfile extends AbstractProviderProfile
 
   public function label(): string
   {
-    return __('Amazon S3', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Amazon S3', NIMBUS_TEXT_DOMAIN);
   }
 
   public function title(): string
   {
-    return __('Amazon S3', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Amazon S3', NIMBUS_TEXT_DOMAIN);
   }
 
   public function summary(): string
   {
-    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', NIMBUS_TEXT_DOMAIN);
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'region' => __('Region', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'access_key' => __('Access Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'secret_key' => __('Secret Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'bucket' => __('Bucket', NIMBUS_TEXT_DOMAIN),
+      'region' => __('Region', NIMBUS_TEXT_DOMAIN),
+      'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
+      'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
     ];
   }
 

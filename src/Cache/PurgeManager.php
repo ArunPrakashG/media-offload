@@ -1,9 +1,9 @@
 <?php
-namespace ArunPrakash\MediaOffload\Cache;
+namespace Nimbus\Plugin\Cache;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Support\Events;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Support\Events;
+use Nimbus\Plugin\Support\Logger;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -26,7 +26,7 @@ final class PurgeManager
     add_action(Events::REMOTE_DELETE_COMPLETED, [$this, 'handleRemoteDeleteCompleted'], 10, 1);
     add_action(Events::REWRITE_COMPLETED, [$this, 'handleRewriteCompleted'], 10, 1);
     add_action(Events::INTEGRATION_REWRITE_COMPLETED, [$this, 'handleIntegrationRewriteCompleted'], 10, 1);
-    add_action(MEDIA_OFFLOAD_CACHE_PURGE_HOOK, [$this, 'processScheduledPurges']);
+    add_action(NIMBUS_CACHE_PURGE_HOOK, [$this, 'processScheduledPurges']);
   }
 
   /**
@@ -34,7 +34,7 @@ final class PurgeManager
    */
   public function handleRemoteDeleteCompleted(array $payload): void
   {
-    if (!apply_filters('media_offload_should_purge_cache_on_remote_delete', true, $payload)) {
+    if (!apply_filters('nimbus_should_purge_cache_on_remote_delete', true, $payload)) {
       return;
     }
 
@@ -68,7 +68,7 @@ final class PurgeManager
       return;
     }
 
-    if (!apply_filters('media_offload_should_purge_cache_on_rewrite', true, $payload)) {
+    if (!apply_filters('nimbus_should_purge_cache_on_rewrite', true, $payload)) {
       return;
     }
 
@@ -93,7 +93,7 @@ final class PurgeManager
       return;
     }
 
-    if (!apply_filters('media_offload_should_purge_cache_on_integration_rewrite', true, $payload)) {
+    if (!apply_filters('nimbus_should_purge_cache_on_integration_rewrite', true, $payload)) {
       return;
     }
 
@@ -118,8 +118,8 @@ final class PurgeManager
   {
     $request = $this->normalizeRequest($request);
 
-    $defaultAsync = !(wp_doing_cron() && doing_action(MEDIA_OFFLOAD_CACHE_PURGE_HOOK));
-    $async = (bool) apply_filters('media_offload_cache_purge_async', $defaultAsync, $request, $this);
+    $defaultAsync = !(wp_doing_cron() && doing_action(NIMBUS_CACHE_PURGE_HOOK));
+    $async = (bool) apply_filters('nimbus_cache_purge_async', $defaultAsync, $request, $this);
 
     Events::dispatch(Events::CACHE_PURGE_REQUESTED, $request + [
       'mode' => $async ? 'queued' : 'inline',
@@ -134,7 +134,7 @@ final class PurgeManager
 
   public function processScheduledPurges(): void
   {
-    $batchSize = max(1, (int) apply_filters('media_offload_cache_purge_batch_size', self::DEFAULT_BATCH_SIZE, $this));
+    $batchSize = max(1, (int) apply_filters('nimbus_cache_purge_batch_size', self::DEFAULT_BATCH_SIZE, $this));
     $processed = 0;
 
     while ($processed < $batchSize) {
@@ -270,7 +270,7 @@ final class PurgeManager
    */
   private function loadQueue(): array
   {
-    $queue = get_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY, []);
+    $queue = get_option(NIMBUS_CACHE_PURGE_QUEUE_OPTION_KEY, []);
     if (!is_array($queue)) {
       return [];
     }
@@ -294,7 +294,7 @@ final class PurgeManager
    */
   private function saveQueue(array $queue): void
   {
-    update_option(MEDIA_OFFLOAD_CACHE_PURGE_QUEUE_OPTION_KEY, array_values($queue), false);
+    update_option(NIMBUS_CACHE_PURGE_QUEUE_OPTION_KEY, array_values($queue), false);
   }
 
   /**
@@ -335,11 +335,11 @@ final class PurgeManager
 
   private function scheduleWorker(): void
   {
-    if (wp_next_scheduled(MEDIA_OFFLOAD_CACHE_PURGE_HOOK)) {
+    if (wp_next_scheduled(NIMBUS_CACHE_PURGE_HOOK)) {
       return;
     }
 
-    wp_schedule_single_event(time() + self::DEFAULT_SCHEDULE_DELAY, MEDIA_OFFLOAD_CACHE_PURGE_HOOK);
+    wp_schedule_single_event(time() + self::DEFAULT_SCHEDULE_DELAY, NIMBUS_CACHE_PURGE_HOOK);
   }
 
   /**
@@ -347,7 +347,7 @@ final class PurgeManager
    */
   private function integrations(): array
   {
-    $integrations = apply_filters('media_offload_cache_purge_integrations', [
+    $integrations = apply_filters('nimbus_cache_purge_integrations', [
       new CloudflareCachePurgeIntegration($this->settings, $this->logger),
       new LiteSpeedCachePurgeIntegration($this->settings, $this->logger),
       new WpFastestCachePurgeIntegration($this->settings, $this->logger),

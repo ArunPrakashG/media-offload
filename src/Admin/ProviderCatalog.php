@@ -1,7 +1,7 @@
 <?php
-namespace ArunPrakash\MediaOffload\Admin;
+namespace Nimbus\Plugin\Admin;
 
-use ArunPrakash\MediaOffload\Storage\ProviderRegistry;
+use Nimbus\Plugin\Storage\ProviderRegistry;
 
 if (!defined('ABSPATH')) {
   exit;

@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,23 +19,23 @@ final class LocalProviderProfile extends AbstractProviderProfile
 
   public function label(): string
   {
-    return __('Local (debug only)', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Local (debug only)', NIMBUS_TEXT_DOMAIN);
   }
 
   public function title(): string
   {
-    return __('Local / Debug Mode', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Local / Debug Mode', NIMBUS_TEXT_DOMAIN);
   }
 
   public function summary(): string
   {
-    return __('Use local mode only for debugging or dry runs. Remote credentials and delivery features are not required.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Use local mode only for debugging or dry runs. Remote credentials and delivery features are not required.', NIMBUS_TEXT_DOMAIN);
   }
 
   public function requiredFields(): array
   {
     return [
-      'provider' => __('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'provider' => __('Provider', NIMBUS_TEXT_DOMAIN),
     ];
   }
 

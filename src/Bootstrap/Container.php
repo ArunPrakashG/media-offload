@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Bootstrap;
+namespace Nimbus\Plugin\Bootstrap;
 
 if (!defined('ABSPATH')) {
   exit;

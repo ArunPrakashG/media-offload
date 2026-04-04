@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
 if (!defined('ABSPATH')) {
   exit;

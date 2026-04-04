@@ -1,11 +1,11 @@
 <?php
-namespace ArunPrakash\MediaOffload\Delivery;
+namespace Nimbus\Plugin\Delivery;
 
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Logger;
 
-use function ArunPrakash\MediaOffload\Support\buildStorageKey;
+use function Nimbus\Plugin\Support\buildStorageKey;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -42,10 +42,10 @@ final class UrlRewriter
     }
 
     $offloadMeta = [];
-    if (!empty($meta['media_offload']['key'])) {
-      $offloadMeta = $meta['media_offload'];
+    if (!empty($meta['nimbus']['key'])) {
+      $offloadMeta = $meta['nimbus'];
     } else {
-      $offloadMeta = get_post_meta($id, MEDIA_OFFLOAD_META_KEY, true);
+      $offloadMeta = get_post_meta($id, NIMBUS_META_KEY, true);
     }
 
     if (empty($offloadMeta['key'])) {
@@ -64,8 +64,8 @@ final class UrlRewriter
     if ($size !== 'full') {
       if (is_string($size) && !empty($meta['sizes'][$size])) {
         $sizeData = $meta['sizes'][$size];
-        if (!empty($sizeData['media_offload']['key'])) {
-          $sizeUrl = $this->resolve_url($sizeData['media_offload']['key']);
+        if (!empty($sizeData['nimbus']['key'])) {
+          $sizeUrl = $this->resolve_url($sizeData['nimbus']['key']);
           if ($sizeUrl) {
             $url = $sizeUrl;
             $width = $sizeData['width'];
@@ -75,8 +75,8 @@ final class UrlRewriter
         }
       } elseif (is_array($size)) {
         foreach ($meta['sizes'] ?? [] as $data) {
-          if (($data['width'] ?? null) == $size[0] && ($data['height'] ?? null) == $size[1] && !empty($data['media_offload']['key'])) {
-            $sizeUrl = $this->resolve_url($data['media_offload']['key']);
+          if (($data['width'] ?? null) == $size[0] && ($data['height'] ?? null) == $size[1] && !empty($data['nimbus']['key'])) {
+            $sizeUrl = $this->resolve_url($data['nimbus']['key']);
             if ($sizeUrl) {
               $url = $sizeUrl;
               $width = $data['width'];
@@ -148,14 +148,14 @@ final class UrlRewriter
       $meta = get_post_meta($attachment_id, '_wp_attachment_metadata', true);
     }
 
-    if (empty($meta['media_offload']['key'])) {
-      $offloadMeta = get_post_meta($attachment_id, MEDIA_OFFLOAD_META_KEY, true);
+    if (empty($meta['nimbus']['key'])) {
+      $offloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
       if (!empty($offloadMeta['key'])) {
-        $meta['media_offload'] = $offloadMeta;
+        $meta['nimbus'] = $offloadMeta;
         if (!empty($offloadMeta['sizes']) && !empty($meta['sizes'])) {
           foreach ($offloadMeta['sizes'] as $sizeName => $sizeData) {
             if (isset($meta['sizes'][$sizeName])) {
-              $meta['sizes'][$sizeName]['media_offload'] = $sizeData;
+              $meta['sizes'][$sizeName]['nimbus'] = $sizeData;
             }
           }
         }
@@ -164,22 +164,22 @@ final class UrlRewriter
       }
     }
 
-    $url = $this->resolve_url($meta['media_offload']['key']);
+    $url = $this->resolve_url($meta['nimbus']['key']);
     if (!$url) {
       return $image;
     }
 
     $image[0] = $url;
     if ($size !== 'full') {
-      if (is_string($size) && !empty($meta['sizes'][$size]['media_offload']['key'])) {
-        $sizeUrl = $this->resolve_url($meta['sizes'][$size]['media_offload']['key']);
+      if (is_string($size) && !empty($meta['sizes'][$size]['nimbus']['key'])) {
+        $sizeUrl = $this->resolve_url($meta['sizes'][$size]['nimbus']['key']);
         if ($sizeUrl) {
           $image[0] = $sizeUrl;
         }
       } elseif (is_array($size)) {
         foreach ($meta['sizes'] ?? [] as $data) {
-          if (($data['width'] ?? null) == $size[0] && ($data['height'] ?? null) == $size[1] && !empty($data['media_offload']['key'])) {
-            $sizeUrl = $this->resolve_url($data['media_offload']['key']);
+          if (($data['width'] ?? null) == $size[0] && ($data['height'] ?? null) == $size[1] && !empty($data['nimbus']['key'])) {
+            $sizeUrl = $this->resolve_url($data['nimbus']['key']);
             if ($sizeUrl) {
               $image[0] = $sizeUrl;
               break;
@@ -204,8 +204,8 @@ final class UrlRewriter
       }
 
       $filename = preg_replace('/\?.*/', '', basename($source['url']));
-      if (isset($image_meta['file']) && $filename === basename($image_meta['file']) && !empty($image_meta['media_offload']['key'])) {
-        $remoteUrl = $this->resolve_url($image_meta['media_offload']['key']);
+      if (isset($image_meta['file']) && $filename === basename($image_meta['file']) && !empty($image_meta['nimbus']['key'])) {
+        $remoteUrl = $this->resolve_url($image_meta['nimbus']['key']);
         if ($remoteUrl) {
           $sources[$width]['url'] = $remoteUrl;
           continue;
@@ -217,8 +217,8 @@ final class UrlRewriter
         continue;
       }
 
-      if (!empty($image_meta['sizes'][$sizeKey]['media_offload']['key'])) {
-        $remoteUrl = $this->resolve_url($image_meta['sizes'][$sizeKey]['media_offload']['key']);
+      if (!empty($image_meta['sizes'][$sizeKey]['nimbus']['key'])) {
+        $remoteUrl = $this->resolve_url($image_meta['sizes'][$sizeKey]['nimbus']['key']);
         if ($remoteUrl) {
           $sources[$width]['url'] = $remoteUrl;
         }
@@ -257,16 +257,16 @@ final class UrlRewriter
       $meta = get_post_meta($post_id, '_wp_attachment_metadata', true);
     }
 
-    if (empty($meta['media_offload']['key'])) {
-      $offloadMeta = get_post_meta($post_id, MEDIA_OFFLOAD_META_KEY, true);
+    if (empty($meta['nimbus']['key'])) {
+      $offloadMeta = get_post_meta($post_id, NIMBUS_META_KEY, true);
       if (!empty($offloadMeta['key'])) {
-        $meta['media_offload'] = $offloadMeta;
+        $meta['nimbus'] = $offloadMeta;
       } else {
         return $url;
       }
     }
 
-    return $this->resolve_url($meta['media_offload']['key']) ?: $url;
+    return $this->resolve_url($meta['nimbus']['key']) ?: $url;
   }
 
   private function resolve_url(string $key): ?string

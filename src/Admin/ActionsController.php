@@ -1,17 +1,17 @@
 <?php
-namespace ArunPrakash\MediaOffload\Admin;
+namespace Nimbus\Plugin\Admin;
 
-use ArunPrakash\MediaOffload\Bootstrap\DataMigration;
-use ArunPrakash\MediaOffload\Integration\IntegrationDiscovery;
-use ArunPrakash\MediaOffload\License\LicenseManager;
-use ArunPrakash\MediaOffload\Onboarding\OnboardingManager;
-use ArunPrakash\MediaOffload\Config\Settings;
-use ArunPrakash\MediaOffload\Media\UploadHandler;
-use ArunPrakash\MediaOffload\Storage\StorageAdapterFactory;
-use ArunPrakash\MediaOffload\Support\Events;
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Bootstrap\DataMigration;
+use Nimbus\Plugin\Integration\IntegrationDiscovery;
+use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
+use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Storage\StorageAdapterFactory;
+use Nimbus\Plugin\Support\Events;
+use Nimbus\Plugin\Support\Logger;
 
-use function ArunPrakash\MediaOffload\Support\pushAdminNotice;
+use function Nimbus\Plugin\Support\pushAdminNotice;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 
 final class ActionsController
 {
-  private const MISSING_SOURCE_AT_META_KEY = MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY;
+  private const MISSING_SOURCE_AT_META_KEY = NIMBUS_MISSING_SOURCE_AT_META_KEY;
 
   public function __construct(
     private Settings $settings,
@@ -35,12 +35,12 @@ final class ActionsController
   {
     $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field((string) wp_unslash($_REQUEST['nonce'])) : '';
 
-    if (!$this->isValidNonce($nonce, MEDIA_OFFLOAD_AJAX_TEST_CONNECTION)) {
-      wp_send_json_error(['message' => __('Security check failed.', MEDIA_OFFLOAD_TEXT_DOMAIN)], 403);
+    if (!$this->isValidNonce($nonce, NIMBUS_AJAX_TEST_CONNECTION)) {
+      wp_send_json_error(['message' => __('Security check failed.', NIMBUS_TEXT_DOMAIN)], 403);
     }
 
     if (!current_user_can('manage_options')) {
-      wp_send_json_error(['message' => __('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN)], 403);
+      wp_send_json_error(['message' => __('Permission denied.', NIMBUS_TEXT_DOMAIN)], 403);
     }
 
     $factory = new StorageAdapterFactory($this->settings, $this->logger);
@@ -50,26 +50,26 @@ final class ActionsController
       if (method_exists($adapter, 'testConnection')) {
         if ($adapter->testConnection()) {
           wp_send_json_success([
-            'message' => __('Connection successful! Write access verified.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+            'message' => __('Connection successful! Write access verified.', NIMBUS_TEXT_DOMAIN),
             'details' => $this->connectionDetails(),
             'hints' => $this->connectionHints(),
           ]);
         }
 
         wp_send_json_error([
-          'message' => __('Connection failed. Check logs for details.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+          'message' => __('Connection failed. Check logs for details.', NIMBUS_TEXT_DOMAIN),
           'details' => $this->connectionDetails(),
           'hints' => $this->connectionHints(),
         ]);
       }
 
       wp_send_json_error([
-        'message' => __('Adapter does not support connection testing.', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'message' => __('Adapter does not support connection testing.', NIMBUS_TEXT_DOMAIN),
         'details' => $this->connectionDetails(),
       ]);
     } catch (\Throwable $exception) {
       wp_send_json_error([
-        'message' => sprintf(__('Connection failed: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), $exception->getMessage()),
+        'message' => sprintf(__('Connection failed: %s', NIMBUS_TEXT_DOMAIN), $exception->getMessage()),
         'details' => $this->connectionDetails(),
         'hints' => $this->connectionHints($exception),
       ]);
@@ -79,53 +79,53 @@ final class ActionsController
   public function handleClearLogs(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
     }
 
-    $this->verifyAdminNonce(MEDIA_OFFLOAD_ADMIN_ACTION_CLEAR_LOGS);
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_CLEAR_LOGS);
     $this->logger->clear_entries();
 
-    wp_safe_redirect(admin_url('upload.php?page=' . MEDIA_OFFLOAD_SLUG . '&tab=logs&media_offload_logs_cleared=1'));
+    wp_safe_redirect(admin_url('upload.php?page=' . NIMBUS_SLUG . '&tab=logs&nimbus_logs_cleared=1'));
     exit;
   }
 
   public function handleResumeMigration(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
     }
 
-    $this->verifyAdminNonce(MEDIA_OFFLOAD_ADMIN_ACTION_RESUME_MIGRATION);
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_RESUME_MIGRATION);
 
     $before = DataMigration::status();
     $after = DataMigration::resume();
 
     if (empty($before['needs_migration'])) {
-      pushAdminNotice(__('No unfinished activation recovery tasks were found.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'info');
+      pushAdminNotice(__('No unfinished activation recovery tasks were found.', NIMBUS_TEXT_DOMAIN), 'info');
       $this->redirectToTab('overview');
     }
 
     if (empty($after['needs_migration'])) {
-      pushAdminNotice(__('Activation recovery completed successfully.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'success');
+      pushAdminNotice(__('Activation recovery completed successfully.', NIMBUS_TEXT_DOMAIN), 'success');
       $this->redirectToTab('overview');
     }
 
     if (!empty($after['scheduled'])) {
-      pushAdminNotice(__('A recovery batch finished and more activation cleanup has been scheduled. You can click Resume again or let WordPress cron continue in the background.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
+      pushAdminNotice(__('A recovery batch finished and more activation cleanup has been scheduled. You can click Resume again or let WordPress cron continue in the background.', NIMBUS_TEXT_DOMAIN), 'warning');
       $this->redirectToTab('overview');
     }
 
-    pushAdminNotice(__('A recovery batch ran, but more activation cleanup still appears to be pending. Click Resume again to continue.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
+    pushAdminNotice(__('A recovery batch ran, but more activation cleanup still appears to be pending. Click Resume again to continue.', NIMBUS_TEXT_DOMAIN), 'warning');
     $this->redirectToTab('overview');
   }
 
   public function handleRunUrlUpdates(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
     }
 
-    $this->verifyAdminNonce(MEDIA_OFFLOAD_ADMIN_ACTION_RUN_URL_UPDATES);
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES);
 
     $mode = isset($_POST['mode']) ? sanitize_key((string) wp_unslash($_POST['mode'])) : 'single';
     if (!in_array($mode, ['single', 'full'], true)) {
@@ -207,10 +207,10 @@ final class ActionsController
   public function handleCompleteOnboarding(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
     }
 
-    $this->verifyAdminNonce(MEDIA_OFFLOAD_ADMIN_ACTION_COMPLETE_ONBOARDING);
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING);
 
     $provider = isset($_POST['provider']) ? sanitize_key((string) wp_unslash($_POST['provider'])) : $this->settings->provider();
     $licenseKey = isset($_POST['license_key']) ? sanitize_text_field((string) wp_unslash($_POST['license_key'])) : '';
@@ -235,18 +235,18 @@ final class ActionsController
     $missing = $provider !== 'local' ? $this->settings->missing_required_credentials($normalized, $provider) : [];
 
     if ($licenseKey === '') {
-      pushAdminNotice(__('Add your license key before finishing onboarding.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'error');
+      pushAdminNotice(__('Add your license key before finishing onboarding.', NIMBUS_TEXT_DOMAIN), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'account']);
     }
 
     if ($provider !== 'local' && !empty($missing)) {
-      pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', MEDIA_OFFLOAD_TEXT_DOMAIN), implode(', ', $missing)), 'error');
+      pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', NIMBUS_TEXT_DOMAIN), implode(', ', $missing)), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'storage']);
     }
 
     $activeConflicts = array_filter($this->onboardingManager->state()['conflicts'] ?? [], static fn (array $plugin): bool => !empty($plugin['active']));
     if (!empty($activeConflicts) && !$conflictAcknowledged) {
-      pushAdminNotice(__('Please review the active plugin conflicts and confirm you understand them before finishing setup.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'error');
+      pushAdminNotice(__('Please review the active plugin conflicts and confirm you understand them before finishing setup.', NIMBUS_TEXT_DOMAIN), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'review']);
     }
 
@@ -259,9 +259,9 @@ final class ActionsController
     $this->onboardingManager->markCompleted();
 
     if (!empty($activeConflicts)) {
-      pushAdminNotice(__('Setup complete, but one or more other media offload plugins are still active. Review the integration warnings in Tools before enabling aggressive URL rewriting.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
+      pushAdminNotice(__('Setup complete, but one or more other media offload plugins are still active. Review the integration warnings in Tools before enabling aggressive URL rewriting.', NIMBUS_TEXT_DOMAIN), 'warning');
     } else {
-      pushAdminNotice(__('Setup complete. Your dashboard is now unlocked and your storage preferences have been saved.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'success');
+      pushAdminNotice(__('Setup complete. Your dashboard is now unlocked and your storage preferences have been saved.', NIMBUS_TEXT_DOMAIN), 'success');
     }
 
     $this->redirectToTab('overview');
@@ -270,19 +270,19 @@ final class ActionsController
   public function handleRewriteIntegration(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
     }
 
-    $this->verifyAdminNonce(MEDIA_OFFLOAD_ADMIN_ACTION_REWRITE_INTEGRATION);
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION);
 
     $integration = isset($_POST['integration']) ? sanitize_key((string) wp_unslash($_POST['integration'])) : '';
     if ($integration === '' || !$this->integrationDiscovery->canRewrite($integration)) {
-      pushAdminNotice(__('This integration does not yet support automated URL rewriting.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'warning');
+      pushAdminNotice(__('This integration does not yet support automated URL rewriting.', NIMBUS_TEXT_DOMAIN), 'warning');
       $this->redirectToTab('integrations');
     }
 
     if (!$this->settings->has_valid_credentials()) {
-      pushAdminNotice(__('Configure storage credentials before rewriting external asset URLs.', MEDIA_OFFLOAD_TEXT_DOMAIN), 'error');
+      pushAdminNotice(__('Configure storage credentials before rewriting external asset URLs.', NIMBUS_TEXT_DOMAIN), 'error');
       $this->redirectToTab('integrations');
     }
 
@@ -290,17 +290,46 @@ final class ActionsController
     $label = (string) ($definition['label'] ?? ucwords(str_replace('_', ' ', $integration)));
     $result = $this->integrationDiscovery->runRewrite($integration);
     if (($result['errors'] ?? 0) > 0) {
-      pushAdminNotice(sprintf(__('%1$s rewrite finished with warnings. Tables: %2$d, Updated rows: %3$d, Errors: %4$d.', MEDIA_OFFLOAD_TEXT_DOMAIN), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0), (int) ($result['errors'] ?? 0)), 'warning');
+      pushAdminNotice(sprintf(__('%1$s rewrite finished with warnings. Tables: %2$d, Updated rows: %3$d, Errors: %4$d.', NIMBUS_TEXT_DOMAIN), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0), (int) ($result['errors'] ?? 0)), 'warning');
     } else {
-      pushAdminNotice(sprintf(__('%1$s rewrite complete. Tables: %2$d, Updated rows: %3$d.', MEDIA_OFFLOAD_TEXT_DOMAIN), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0)), 'success');
+      pushAdminNotice(sprintf(__('%1$s rewrite complete. Tables: %2$d, Updated rows: %3$d.', NIMBUS_TEXT_DOMAIN), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0)), 'success');
     }
 
     $this->redirectToTab('integrations');
   }
 
+  public function handleToggleIntegration(): void
+  {
+    if (!current_user_can('manage_options')) {
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
+    }
+
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION);
+
+    $key = isset($_POST['integration']) ? sanitize_key((string) wp_unslash($_POST['integration'])) : '';
+    if ($key === '') {
+      $this->redirectToTab('integrations');
+      return;
+    }
+
+    $disabled = (array) get_option(NIMBUS_DISABLED_INTEGRATIONS_KEY, []);
+    $disabled = array_map('strval', $disabled);
+
+    if (in_array($key, $disabled, true)) {
+      $disabled = array_values(array_filter($disabled, static fn ($k) => $k !== $key));
+      pushAdminNotice(sprintf(__('Integration "%s" enabled.', NIMBUS_TEXT_DOMAIN), $key), 'success');
+    } else {
+      $disabled[] = $key;
+      pushAdminNotice(sprintf(__('Integration "%s" disabled.', NIMBUS_TEXT_DOMAIN), $key), 'success');
+    }
+
+    update_option(NIMBUS_DISABLED_INTEGRATIONS_KEY, $disabled, false);
+    $this->redirectToTab('integrations');
+  }
+
   private function runUrlUpdates(int $limit = 0): array
   {
-    $batchSize = max(1, (int) apply_filters('media_offload_admin_url_update_batch_size', 100));
+    $batchSize = max(1, (int) apply_filters('nimbus_admin_url_update_batch_size', 100));
     if ($limit === 1) {
       $batchSize = 1;
     }
@@ -429,9 +458,9 @@ final class ActionsController
          AND (msm.meta_id IS NULL OR CAST(msm.meta_value AS UNSIGNED) < %d)
        ORDER BY p.ID ASC
        LIMIT %d",
-      MEDIA_OFFLOAD_META_KEY,
+      NIMBUS_META_KEY,
       self::MISSING_SOURCE_AT_META_KEY,
-      MEDIA_OFFLOAD_IGNORE_META_KEY,
+      NIMBUS_IGNORE_META_KEY,
       'attachment',
       'inherit',
       $afterId,
@@ -448,7 +477,7 @@ final class ActionsController
 
   private function redirectToUrlUpdates(array $queryArgs = []): void
   {
-    $url = add_query_arg($queryArgs, admin_url('upload.php?page=' . MEDIA_OFFLOAD_SLUG . '&tab=tools'));
+    $url = add_query_arg($queryArgs, admin_url('upload.php?page=' . NIMBUS_SLUG . '&tab=tools'));
     wp_safe_redirect($url);
     exit;
   }
@@ -456,7 +485,7 @@ final class ActionsController
   private function redirectToTab(string $tab, array $queryArgs = []): void
   {
     $url = add_query_arg(array_merge([
-      'page' => MEDIA_OFFLOAD_SLUG,
+      'page' => NIMBUS_SLUG,
       'tab' => $tab,
     ], $queryArgs), admin_url('upload.php'));
 
@@ -480,7 +509,7 @@ final class ActionsController
     $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field((string) wp_unslash($_REQUEST['_wpnonce'])) : '';
 
     if (!$this->isValidNonce($nonce, ...$actions)) {
-      wp_die(esc_html__('Security check failed.', MEDIA_OFFLOAD_TEXT_DOMAIN));
+      wp_die(esc_html__('Security check failed.', NIMBUS_TEXT_DOMAIN));
     }
   }
 
@@ -489,32 +518,32 @@ final class ActionsController
     $config = $this->settings->adapter_configuration();
     $details = [
       [
-        'label' => __('Provider', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'label' => __('Provider', NIMBUS_TEXT_DOMAIN),
         'value' => $this->settings->provider_profile()->label(),
       ],
       [
-        'label' => __('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN),
-        'value' => $config['bucket'] !== '' ? $config['bucket'] : __('Not set', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'label' => __('Bucket', NIMBUS_TEXT_DOMAIN),
+        'value' => $config['bucket'] !== '' ? $config['bucket'] : __('Not set', NIMBUS_TEXT_DOMAIN),
       ],
     ];
 
     if (!empty($config['region'])) {
       $details[] = [
-        'label' => __('Region', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'label' => __('Region', NIMBUS_TEXT_DOMAIN),
         'value' => (string) $config['region'],
       ];
     }
 
     if (!empty($config['endpoint'])) {
       $details[] = [
-        'label' => __('Endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN),
+        'label' => __('Endpoint', NIMBUS_TEXT_DOMAIN),
         'value' => (string) $config['endpoint'],
       ];
     }
 
     $details[] = [
-      'label' => __('Path style', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'value' => !empty($config['use_path_style_endpoint']) ? __('Enabled', MEDIA_OFFLOAD_TEXT_DOMAIN) : __('Disabled', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'label' => __('Path style', NIMBUS_TEXT_DOMAIN),
+      'value' => !empty($config['use_path_style_endpoint']) ? __('Enabled', NIMBUS_TEXT_DOMAIN) : __('Disabled', NIMBUS_TEXT_DOMAIN),
     ];
 
     return $details;
@@ -526,17 +555,17 @@ final class ActionsController
     $hints = [];
 
     if ($provider === 'r2') {
-      $hints[] = __('For Cloudflare R2, keep region set to auto and use the account endpoint without appending the bucket name.', MEDIA_OFFLOAD_TEXT_DOMAIN);
-      $hints[] = __('R2 typically requires path-style requests and API-token-derived access keys.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+      $hints[] = __('For Cloudflare R2, keep region set to auto and use the account endpoint without appending the bucket name.', NIMBUS_TEXT_DOMAIN);
+      $hints[] = __('R2 typically requires path-style requests and API-token-derived access keys.', NIMBUS_TEXT_DOMAIN);
     } elseif ($provider === 's3_compatible') {
-      $hints[] = __('For S3-compatible storage, confirm the custom endpoint is correct and includes the protocol.', MEDIA_OFFLOAD_TEXT_DOMAIN);
-      $hints[] = __('If requests are signed incorrectly, try enabling path-style URLs when your provider recommends it.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+      $hints[] = __('For S3-compatible storage, confirm the custom endpoint is correct and includes the protocol.', NIMBUS_TEXT_DOMAIN);
+      $hints[] = __('If requests are signed incorrectly, try enabling path-style URLs when your provider recommends it.', NIMBUS_TEXT_DOMAIN);
     } else {
-      $hints[] = __('For Amazon S3, confirm the region exactly matches the bucket region and that the IAM credentials allow list, read, and write access.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+      $hints[] = __('For Amazon S3, confirm the region exactly matches the bucket region and that the IAM credentials allow list, read, and write access.', NIMBUS_TEXT_DOMAIN);
     }
 
     if ($exception !== null && stripos($exception->getMessage(), 'signature') !== false) {
-      $hints[] = __('A signature error usually means the endpoint, region, or path-style setting does not match the provider requirements.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+      $hints[] = __('A signature error usually means the endpoint, region, or path-style setting does not match the provider requirements.', NIMBUS_TEXT_DOMAIN);
     }
 
     return array_values(array_unique($hints));
@@ -563,7 +592,7 @@ final class ActionsController
 
   private function missingSourceRetryBeforeTimestamp(): int
   {
-    $cooldown = max(300, (int) apply_filters('media_offload_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
+    $cooldown = max(300, (int) apply_filters('nimbus_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
     return time() - $cooldown;
   }
 }

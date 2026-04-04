@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Bootstrap;
+namespace Nimbus\Plugin\Bootstrap;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -11,7 +11,7 @@ final class DataMigration
 
   private const ATTACHMENT_BATCH_SIZE = 25;
 
-  private const CRON_HOOK = 'media_offload_data_migration_batch';
+  private const CRON_HOOK = 'nimbus_data_migration_batch';
 
   public static function register(): void
   {
@@ -20,7 +20,7 @@ final class DataMigration
 
   public static function status(): array
   {
-    $currentVersion = (int) get_option(MEDIA_OFFLOAD_DATA_VERSION_OPTION_KEY, 0);
+    $currentVersion = (int) get_option(NIMBUS_DATA_VERSION_OPTION_KEY, 0);
     $legacyMetaKeys = self::existingLegacyMetaKeys([
       '_pt_media_offload',
       '_pt_media_offload_ignore',
@@ -57,7 +57,7 @@ final class DataMigration
 
   public static function run(): void
   {
-    $currentVersion = (int) get_option(MEDIA_OFFLOAD_DATA_VERSION_OPTION_KEY, 0);
+    $currentVersion = (int) get_option(NIMBUS_DATA_VERSION_OPTION_KEY, 0);
     if ($currentVersion >= self::VERSION) {
       return;
     }
@@ -72,15 +72,15 @@ final class DataMigration
       return;
     }
 
-    update_option(MEDIA_OFFLOAD_DATA_VERSION_OPTION_KEY, self::VERSION, false);
+    update_option(NIMBUS_DATA_VERSION_OPTION_KEY, self::VERSION, false);
     self::clearScheduledFollowUp();
   }
 
   private static function migrateOptions(): void
   {
-    self::migrateOption('pt_media_offload_settings', MEDIA_OFFLOAD_OPTION_KEY);
-    self::migrateOption('pt_media_offload_logs', MEDIA_OFFLOAD_LOG_OPTION_KEY);
-    self::migrateOption('pt_media_offload_admin_notices', MEDIA_OFFLOAD_ADMIN_NOTICES_OPTION_KEY);
+    self::migrateOption('pt_media_offload_settings', NIMBUS_OPTION_KEY);
+    self::migrateOption('pt_media_offload_logs', NIMBUS_LOG_OPTION_KEY);
+    self::migrateOption('pt_media_offload_admin_notices', NIMBUS_ADMIN_NOTICES_OPTION_KEY);
   }
 
   private static function migrateOption(string $legacyKey, string $newKey): void
@@ -109,12 +109,12 @@ final class DataMigration
     }
 
     $mappings = [
-      '_pt_media_offload' => MEDIA_OFFLOAD_META_KEY,
-      '_pt_media_offload_ignore' => MEDIA_OFFLOAD_IGNORE_META_KEY,
-      '_pt_media_offload_pending_at' => MEDIA_OFFLOAD_PENDING_AT_META_KEY,
-      '_pt_media_offload_claimed_by' => MEDIA_OFFLOAD_CLAIMED_BY_META_KEY,
-      '_pt_media_offload_claimed_at' => MEDIA_OFFLOAD_CLAIMED_AT_META_KEY,
-      '_pt_media_offload_missing_source_at' => MEDIA_OFFLOAD_MISSING_SOURCE_AT_META_KEY,
+      '_pt_media_offload' => NIMBUS_META_KEY,
+      '_pt_media_offload_ignore' => NIMBUS_IGNORE_META_KEY,
+      '_pt_media_offload_pending_at' => NIMBUS_PENDING_AT_META_KEY,
+      '_pt_media_offload_claimed_by' => NIMBUS_CLAIMED_BY_META_KEY,
+      '_pt_media_offload_claimed_at' => NIMBUS_CLAIMED_AT_META_KEY,
+      '_pt_media_offload_missing_source_at' => NIMBUS_MISSING_SOURCE_AT_META_KEY,
     ];
 
     $legacyKeys = array_keys($mappings);
@@ -162,8 +162,8 @@ final class DataMigration
       }
 
       $updated = false;
-      if (isset($metadata['pt_media_offload']) && !isset($metadata['media_offload'])) {
-        $metadata['media_offload'] = $metadata['pt_media_offload'];
+      if (isset($metadata['pt_media_offload']) && !isset($metadata['nimbus'])) {
+        $metadata['nimbus'] = $metadata['pt_media_offload'];
         unset($metadata['pt_media_offload']);
         $updated = true;
       }
@@ -174,8 +174,8 @@ final class DataMigration
             continue;
           }
 
-          if (isset($data['pt_media_offload']) && !isset($data['media_offload'])) {
-            $metadata['sizes'][$size]['media_offload'] = $data['pt_media_offload'];
+          if (isset($data['pt_media_offload']) && !isset($data['nimbus'])) {
+            $metadata['sizes'][$size]['nimbus'] = $data['pt_media_offload'];
             unset($metadata['sizes'][$size]['pt_media_offload']);
             $updated = true;
           }

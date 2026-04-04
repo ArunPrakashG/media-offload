@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,27 +19,27 @@ final class S3CompatibleProviderProfile extends AbstractProviderProfile
 
   public function label(): string
   {
-    return __('S3-compatible', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('S3-compatible', NIMBUS_TEXT_DOMAIN);
   }
 
   public function title(): string
   {
-    return __('S3-compatible storage', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('S3-compatible storage', NIMBUS_TEXT_DOMAIN);
   }
 
   public function summary(): string
   {
-    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', MEDIA_OFFLOAD_TEXT_DOMAIN);
+    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', NIMBUS_TEXT_DOMAIN);
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'region' => __('Region', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'endpoint' => __('Custom Endpoint', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'access_key' => __('Access Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
-      'secret_key' => __('Secret Key', MEDIA_OFFLOAD_TEXT_DOMAIN),
+      'bucket' => __('Bucket', NIMBUS_TEXT_DOMAIN),
+      'region' => __('Region', NIMBUS_TEXT_DOMAIN),
+      'endpoint' => __('Custom Endpoint', NIMBUS_TEXT_DOMAIN),
+      'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
+      'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
     ];
   }
 

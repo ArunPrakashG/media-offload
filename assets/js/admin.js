@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  var adminConfig = window.mediaOffloadAdmin || window.pt_media_offload_vars || {};
+  var adminConfig = window.nimbusAdmin || window.nimbusAdmin || {};
   var optionKey = adminConfig.optionKey || 'pt_media_offload_settings';
   var previousProvider = null;
   var connectionAdvancedOpen = false;
@@ -81,7 +81,7 @@ jQuery(document).ready(function ($) {
   }
 
   function updateAdvancedToggle() {
-    var $toggle = $('#pt-mo-toggle-advanced');
+    var $toggle = $('#nmb-toggle-advanced');
     if (!$toggle.length) {
       return;
     }
@@ -99,9 +99,9 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    var $title = $('#pt-mo-provider-summary-title');
-    var $copy = $('#pt-mo-provider-summary-copy');
-    var $chips = $('#pt-mo-provider-required-fields');
+    var $title = $('#nmb-provider-summary-title');
+    var $copy = $('#nmb-provider-summary-copy');
+    var $chips = $('#nmb-provider-required-fields');
 
     $title.text(config.title || 'Storage provider');
     $copy.text(config.summary || '');
@@ -148,16 +148,16 @@ jQuery(document).ready(function ($) {
       ? (strings.shellLocalDebugMode || 'Local debug mode')
       : (serveFromStorage ? (strings.shellServingStorage || 'Serving from storage') : (strings.shellServingLocal || 'Serving from local URLs'));
 
-    setText('#pt-mo-settings-provider-label', providerLabel);
-    setText('#pt-mo-settings-provider-substat', providerSubstat);
-    setText('#pt-mo-settings-delivery-label', deliveryLabel);
-    setText('#pt-mo-settings-delivery-substat', deliverySubstat);
-    setText('#pt-mo-settings-rules-count', String(allowedCount + ignoredCount));
-    setText('#pt-mo-settings-rules-substat', rulesText);
-    setText('#pt-mo-settings-batch-label', offHoursEnabled ? (strings.batchOn || 'On') : (strings.batchOff || 'Off'));
-    setText('#pt-mo-settings-batch-substat', batchTimeValue || (strings.batchNoSchedule || 'No schedule set'));
-    setText('#pt-mo-shell-meta-provider', providerLabel);
-    setText('#pt-mo-shell-meta-delivery', shellDelivery);
+    setText('#nmb-settings-provider-label', providerLabel);
+    setText('#nmb-settings-provider-substat', providerSubstat);
+    setText('#nmb-settings-delivery-label', deliveryLabel);
+    setText('#nmb-settings-delivery-substat', deliverySubstat);
+    setText('#nmb-settings-rules-count', String(allowedCount + ignoredCount));
+    setText('#nmb-settings-rules-substat', rulesText);
+    setText('#nmb-settings-batch-label', offHoursEnabled ? (strings.batchOn || 'On') : (strings.batchOff || 'Off'));
+    setText('#nmb-settings-batch-substat', batchTimeValue || (strings.batchNoSchedule || 'No schedule set'));
+    setText('#nmb-shell-meta-provider', providerLabel);
+    setText('#nmb-shell-meta-delivery', shellDelivery);
   }
 
   function providerHasAdvancedValues($form, provider) {
@@ -198,7 +198,7 @@ jQuery(document).ready(function ($) {
   }
 
   function applyProviderVisibility() {
-    var $form = $('.media-offload-settings form[action="options.php"]');
+    var $form = $('.nimbus-settings form[action="options.php"]');
     if (!$form.length) {
       return;
     }
@@ -261,7 +261,7 @@ jQuery(document).ready(function ($) {
     renderProviderSummary(provider);
     updateSettingsSummary($form, provider);
     updateAdvancedToggle();
-    $('#pt-mo-toggle-advanced').prop('hidden', showLocal);
+    $('#nmb-toggle-advanced').prop('hidden', showLocal);
 
     setRowVisible($bucket, showStorage);
     setRowVisible($access, showStorage);
@@ -292,11 +292,15 @@ jQuery(document).ready(function ($) {
     setRowVisible($workerBatchSize, offHoursEnabled);
     setRowVisible($claimTtl, offHoursEnabled);
 
+    // Hide the entire delivery/path-filter cards when local provider is active (no fields apply)
+    $('.nmb-settings-section-card--media_offload_delivery').prop('hidden', showLocal);
+    $('.nmb-settings-section-card--media_offload_path_filters').prop('hidden', showLocal);
+
     previousProvider = provider;
   }
 
   (function initDynamicSettingsUi() {
-    var $form = $('.media-offload-settings form[action="options.php"]');
+    var $form = $('.nimbus-settings form[action="options.php"]');
     if (!$form.length) {
       return;
     }
@@ -308,7 +312,7 @@ jQuery(document).ready(function ($) {
   })();
 
   $(document).on('change', fieldSelector('provider'), function () {
-    var $form = $('.media-offload-settings form[action="options.php"]');
+    var $form = $('.nimbus-settings form[action="options.php"]');
     var provider = ($(this).val() || '').toLowerCase();
     normalizeProviderDefaults($form, provider);
     applyProviderVisibility();
@@ -328,16 +332,25 @@ jQuery(document).ready(function ($) {
     fieldSelector('proxy_cache_purge_all_urls')
   ].join(', '), applyProviderVisibility);
 
-  $(document).on('click', '#pt-mo-toggle-advanced', function (e) {
+  // Logs tab: toggle the collapsible logging-settings panel
+  $(document).on('click', '.nmb-log-settings-toggle', function () {
+    var $btn = $(this);
+    var $panel = $('#nmb-log-settings-panel');
+    var isOpen = $btn.attr('aria-expanded') === 'true';
+    $btn.attr('aria-expanded', isOpen ? 'false' : 'true');
+    $panel.prop('hidden', isOpen);
+  });
+
+  $(document).on('click', '#nmb-toggle-advanced', function (e) {
     e.preventDefault();
     connectionAdvancedOpen = !connectionAdvancedOpen;
     applyProviderVisibility();
   });
 
-  $('#pt-mo-test-connection').on('click', function (e) {
+  $('#nmb-test-connection').on('click', function (e) {
     e.preventDefault();
     var $btn = $(this);
-    var $status = $('#pt-mo-connection-status');
+    var $status = $('#nmb-connection-status');
     var $results = $('#mo-connection-results');
     var strings = adminConfig.strings || {};
     var actionName = (adminConfig.actions && adminConfig.actions.testConnection) || 'pt_media_offload_test_connection';
@@ -409,7 +422,7 @@ jQuery(document).ready(function ($) {
   });
 
   (function initOnboardingWizard() {
-    var $wizard = $('#pt-mo-onboarding-wizard');
+    var $wizard = $('#nmb-onboarding-wizard');
     if (!$wizard.length) {
       return;
     }
@@ -418,7 +431,7 @@ jQuery(document).ready(function ($) {
     var currentStep = parseInt($wizard.data('currentStep') || 0, 10);
     var $form = $wizard.find('form');
     var $notice = $('<div/>', {
-      'class': 'pt-mo-onboarding-inline-notice',
+      'class': 'nmb-onboarding-inline-notice',
       hidden: true
     });
 
@@ -434,7 +447,7 @@ jQuery(document).ready(function ($) {
 
     function fieldWrapper(name) {
       var $field = fieldByName(name);
-      return $field.closest('.pt-mo-onboarding-field, .pt-mo-onboarding-choice-card');
+      return $field.closest('.nmb-onboarding-field, .nmb-onboarding-choice-card');
     }
 
     function showNotice(message) {
@@ -524,7 +537,7 @@ jQuery(document).ready(function ($) {
     }
 
     function focusCurrentStep() {
-      var $current = $wizard.find('.pt-mo-onboarding-step[data-step="' + steps[currentStep] + '"]');
+      var $current = $wizard.find('.nmb-onboarding-step[data-step="' + steps[currentStep] + '"]');
       var $focusable = $current.find('input, select, textarea, button').filter(':visible').first();
 
       if ($focusable.length) {
@@ -536,8 +549,8 @@ jQuery(document).ready(function ($) {
       $.each(steps, function (index, step) {
         var isActive = index === currentStep;
         var isComplete = index < currentStep;
-        var $section = $wizard.find('.pt-mo-onboarding-step[data-step="' + step + '"]');
-        var $item = $wizard.find('.pt-mo-onboarding-step-item[data-step-item="' + step + '"]');
+        var $section = $wizard.find('.nmb-onboarding-step[data-step="' + step + '"]');
+        var $item = $wizard.find('.nmb-onboarding-step-item[data-step-item="' + step + '"]');
 
         $section.prop('hidden', !isActive);
         $item.toggleClass('is-active', isActive);
@@ -572,7 +585,7 @@ jQuery(document).ready(function ($) {
       goToStep(currentStep - 1);
     });
 
-    $wizard.on('click', '.pt-mo-onboarding-step-item', function () {
+    $wizard.on('click', '.nmb-onboarding-step-item', function () {
       var step = $(this).data('stepItem');
       var targetIndex = steps.indexOf(step);
 
@@ -619,22 +632,22 @@ jQuery(document).ready(function ($) {
   })();
 
   (function initBulkJobsUi() {
-    var $app = $('#pt-mo-bulk-job-app');
+    var $app = $('#nmb-bulk-job-app');
     if (!$app.length || !adminConfig.restBase || !adminConfig.restNonce) {
       return;
     }
 
     var strings = adminConfig.strings || {};
-    var $badge = $('#pt-mo-job-status-badge');
-    var $label = $('#pt-mo-job-label');
-    var $message = $('#pt-mo-job-message');
-    var $bar = $('#pt-mo-job-progress-bar');
-    var $progressText = $('#pt-mo-job-progress-text');
-    var $processed = $('#pt-mo-job-processed');
-    var $total = $('#pt-mo-job-total');
-    var $success = $('#pt-mo-job-success');
-    var $failed = $('#pt-mo-job-failed');
-    var $skipped = $('#pt-mo-job-skipped');
+    var $badge = $('#nmb-job-status-badge');
+    var $label = $('#nmb-job-label');
+    var $message = $('#nmb-job-message');
+    var $bar = $('#nmb-job-progress-bar');
+    var $progressText = $('#nmb-job-progress-text');
+    var $processed = $('#nmb-job-processed');
+    var $total = $('#nmb-job-total');
+    var $success = $('#nmb-job-success');
+    var $failed = $('#nmb-job-failed');
+    var $skipped = $('#nmb-job-skipped');
     var refreshFailures = 0;
     var refreshTimer = null;
 

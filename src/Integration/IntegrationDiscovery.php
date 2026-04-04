@@ -1,5 +1,5 @@
 <?php
-namespace ArunPrakash\MediaOffload\Integration;
+namespace Nimbus\Plugin\Integration;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -91,6 +91,7 @@ final class IntegrationDiscovery
     $baseDir = isset($uploads['basedir']) ? (string) $uploads['basedir'] : '';
     $knownDirectories = [];
     $results = [];
+    $disabledKeys = array_map('strval', (array) get_option(NIMBUS_DISABLED_INTEGRATIONS_KEY, []));
 
     foreach ($this->definitions() as $definition) {
       $pluginFiles = (array) ($definition['plugin_files'] ?? []);
@@ -126,10 +127,11 @@ final class IntegrationDiscovery
         'directories' => $directories,
         'rewrite_supported' => !empty($definition['rewrite_supported']),
         'rewrite_ready' => $this->isRewriteReady($definition, $tableCount),
-        'rewrite_action_label' => (string) ($definition['rewrite_action_label'] ?? __('Run rewrite', MEDIA_OFFLOAD_TEXT_DOMAIN)),
+        'rewrite_action_label' => (string) ($definition['rewrite_action_label'] ?? __('Run rewrite', NIMBUS_TEXT_DOMAIN)),
         'table_count' => $tableCount,
         'tables' => $tables,
         'notes' => (string) ($definition['notes'] ?? ''),
+        'enabled' => !in_array((string) ($definition['key'] ?? ''), $disabledKeys, true),
       ];
     }
 
@@ -145,6 +147,7 @@ final class IntegrationDiscovery
       'table_count' => 0,
       'tables' => [],
       'notes' => 'Top-level upload directories that do not look like standard year/month attachment paths.',
+      'enabled' => !in_array('custom_upload_roots', $disabledKeys, true),
     ];
 
     return $results;
@@ -207,7 +210,7 @@ final class IntegrationDiscovery
       return $definition;
     }, self::KNOWN_INTEGRATIONS);
 
-    $definitions = apply_filters('media_offload_integrations', $definitions);
+    $definitions = apply_filters('nimbus_integrations', $definitions);
 
     return is_array($definitions) ? array_values($definitions) : [];
   }

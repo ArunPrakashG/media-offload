@@ -1,9 +1,9 @@
 <?php
-namespace ArunPrakash\MediaOffload\Storage;
+namespace Nimbus\Plugin\Storage;
 
-use ArunPrakash\MediaOffload\Support\Logger;
+use Nimbus\Plugin\Support\Logger;
 
-use function ArunPrakash\MediaOffload\Support\ensureDirectory;
+use function Nimbus\Plugin\Support\ensureDirectory;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -18,8 +18,8 @@ final class LocalStorageAdapter implements StorageAdapter
   public function __construct(array $config, private Logger $logger)
   {
     $uploads = wp_upload_dir();
-    $defaultPath = trailingslashit($uploads['basedir']) . MEDIA_OFFLOAD_SLUG;
-    $defaultUrl = trailingslashit($uploads['baseurl']) . MEDIA_OFFLOAD_SLUG;
+    $defaultPath = trailingslashit($uploads['basedir']) . NIMBUS_SLUG;
+    $defaultUrl = trailingslashit($uploads['baseurl']) . NIMBUS_SLUG;
 
     $this->basePath = rtrim($config['root_path'] ?? $defaultPath, '/');
     $this->baseUrl = rtrim($config['root_url'] ?? $defaultUrl, '/');
