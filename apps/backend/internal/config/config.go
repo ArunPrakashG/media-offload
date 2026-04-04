@@ -72,12 +72,9 @@ func Load() (*Config, error) {
 		RazorpayKeySecret:     os.Getenv("RAZORPAY_KEY_SECRET"),
 		RazorpayWebhookSecret: os.Getenv("RAZORPAY_WEBHOOK_SECRET"),
 		RazorpayPlans: map[string]string{
-			"personal_monthly": os.Getenv("RAZORPAY_PLAN_PERSONAL_MONTHLY"),
-			"pro_monthly":      os.Getenv("RAZORPAY_PLAN_PRO_MONTHLY"),
-			"agency_monthly":   os.Getenv("RAZORPAY_PLAN_AGENCY_MONTHLY"),
-			"personal_annual":  os.Getenv("RAZORPAY_PLAN_PERSONAL_ANNUAL"),
-			"pro_annual":       os.Getenv("RAZORPAY_PLAN_PRO_ANNUAL"),
-			"agency_annual":    os.Getenv("RAZORPAY_PLAN_AGENCY_ANNUAL"),
+			"personal_annual": os.Getenv("RAZORPAY_PLAN_PERSONAL_ANNUAL"),
+			"pro_annual":      os.Getenv("RAZORPAY_PLAN_PRO_ANNUAL"),
+			"agency_annual":   os.Getenv("RAZORPAY_PLAN_AGENCY_ANNUAL"),
 		},
 	}, nil
 }

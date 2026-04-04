@@ -1,0 +1,898 @@
+---
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Base from "@layouts/Base.astro";
+---
+
+<Base
+  title="Documentation — Nimbus"
+  description="Complete guide to installing, configuring, and extending the Nimbus WordPress media offload plugin."
+>
+  <Navbar />
+  <main class="docs-page">
+    <div class="container docs-container">
+      <!-- Sidebar -->
+      <aside class="docs-sidebar" aria-label="Documentation navigation">
+        <a class="back-link" href="/">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 3L5 8l5 5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+          Back to Nimbus
+        </a>
+        <nav class="docs-nav">
+          <p class="docs-nav-label">On this page</p>
+          <ul>
+            <li><a href="#requirements">Requirements</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#providers">Storage providers</a></li>
+            <li><a href="#setup">First-time setup</a></li>
+            <li><a href="#settings">Settings reference</a></li>
+            <li><a href="#cli">WP-CLI</a></li>
+            <li><a href="#rest-api">REST API</a></li>
+            <li><a href="#hooks">WordPress hooks</a></li>
+            <li><a href="#cache">Cache integrations</a></li>
+            <li><a href="#extending">Extending Nimbus</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <article class="docs-content">
+        <header class="docs-header">
+          <p class="section-label">Nimbus</p>
+          <h1 class="docs-title">Documentation</h1>
+          <p class="docs-intro">
+            Nimbus offloads your WordPress media library to Amazon S3,
+            Cloudflare R2, or any S3-compatible storage provider — with
+            automatic URL rewriting, optional CDN delivery, and a clean admin UI
+            built for developers and site operators.
+          </p>
+        </header>
+
+        <!-- Requirements -->
+        <section id="requirements" class="docs-section">
+          <h2>Requirements</h2>
+          <ul>
+            <li>WordPress 6.0 or later</li>
+            <li>PHP 8.1 or later</li>
+            <li>Composer (for the AWS SDK dependency)</li>
+            <li>
+              Valid S3-compatible credentials with write access to your target
+              bucket
+            </li>
+            <li>
+              A Nimbus license key (free tier available — <a href="/#pricing"
+                >see pricing</a
+              >)
+            </li>
+          </ul>
+        </section>
+
+        <!-- Installation -->
+        <section id="installation" class="docs-section">
+          <h2>Installation</h2>
+          <p>
+            Nimbus is available on the
+            <a
+              href="https://wordpress.org/plugins/"
+              target="_blank"
+              rel="noopener noreferrer">WordPress Plugin Directory</a
+            >. Search for <strong>Nimbus</strong> in your WordPress admin under
+            <strong>Plugins → Add New</strong>, then click <strong
+              >Install Now</strong
+            > and
+            <strong>Activate</strong>.
+          </p>
+          <p>
+            On first activation you will be redirected to the <strong
+              >Onboarding</strong
+            > tab to enter your license key and bucket credentials.
+          </p>
+        </section>
+
+        <!-- Storage Providers -->
+        <section id="providers" class="docs-section">
+          <h2>Storage providers</h2>
+          <p>
+            Nimbus supports four storage provider types. Switch providers at any
+            time from
+            <strong>Settings → Storage</strong> — your existing offloads are not affected
+            until you run a new bulk operation.
+          </p>
+
+          <div class="docs-cards">
+            <div class="docs-card">
+              <h3>Amazon S3</h3>
+              <p>
+                Standard AWS S3 bucket. Supports all AWS regions, path-style
+                endpoints, and custom CloudFront or S3 domain aliases.
+              </p>
+              <dl>
+                <dt>Required settings</dt>
+                <dd>Access Key ID, Secret Access Key, Bucket name, Region</dd>
+                <dt>Optional</dt>
+                <dd>
+                  Custom domain / CloudFront URL, path prefix, path-style
+                  endpoint
+                </dd>
+              </dl>
+            </div>
+
+            <div class="docs-card">
+              <h3>Cloudflare R2</h3>
+              <p>
+                Zero egress fee object storage. Use R2's S3-compatible API
+                endpoint with your Cloudflare Account ID.
+              </p>
+              <dl>
+                <dt>Endpoint format</dt>
+                <dd>
+                  <code
+                    >https://&lt;account-id&gt;.r2.cloudflarestorage.com</code>
+                </dd>
+                <dt>Required settings</dt>
+                <dd>
+                  Access Key ID, Secret Access Key, Bucket name, Account ID
+                </dd>
+                <dt>Optional</dt>
+                <dd>
+                  Custom <code>r2.dev</code> public URL or a Workers-fronted domain
+                </dd>
+              </dl>
+            </div>
+
+            <div class="docs-card">
+              <h3>S3-compatible</h3>
+              <p>
+                Any storage service that implements the S3 API: Backblaze B2,
+                Wasabi, MinIO, DigitalOcean Spaces, Linode Object Storage, and
+                others.
+              </p>
+              <dl>
+                <dt>Required settings</dt>
+                <dd>
+                  Custom endpoint URL, Access Key, Secret Key, Bucket name,
+                  Region
+                </dd>
+                <dt>Optional</dt>
+                <dd>Force path-style endpoint (required for MinIO)</dd>
+              </dl>
+            </div>
+
+            <div class="docs-card">
+              <h3>Local</h3>
+              <p>
+                Keeps files on disk at a configurable path inside <code
+                  >wp-content/</code
+                >. Useful for local development and staging environments without
+                cloud credentials.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- First-time Setup -->
+        <section id="setup" class="docs-section">
+          <h2>First-time setup</h2>
+          <ol>
+            <li>
+              <strong>Enter your license key</strong> in the Onboarding tab. The plugin
+              validates the key with the Nimbus API and unlocks the relevant feature
+              set for your plan.
+            </li>
+            <li>
+              <strong>Choose a storage provider</strong> and fill in the bucket credentials.
+              Nimbus performs a connectivity check before saving.
+            </li>
+            <li>
+              Review any <strong>conflict warnings</strong> — if another media offload
+              plugin is active, Nimbus will flag the overlap so you can deactivate
+              it first.
+            </li>
+            <li>
+              Enable <strong>Serve From Storage</strong> to rewrite public attachment
+              URLs to your bucket or CDN domain.
+            </li>
+            <li>
+              Leave <strong>Remove Local Copies</strong> disabled until you have confirmed
+              that offloads and rewrites are working correctly.
+            </li>
+            <li>
+              Run the <strong>Bulk Offload</strong> action from the Media Library
+              to migrate your existing attachments.
+            </li>
+          </ol>
+        </section>
+
+        <!-- Settings Reference -->
+        <section id="settings" class="docs-section">
+          <h2>Settings reference</h2>
+
+          <h3>General</h3>
+          <div class="docs-table-wrap">
+            <table>
+              <thead>
+                <tr><th>Setting</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Serve From Storage</code></td>
+                  <td
+                    >Rewrite all attachment URLs to the remote bucket or CDN
+                    domain.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>Remove Local Copies</code></td>
+                  <td
+                    >Delete local files after a successful offload. Enable only
+                    when your setup is verified.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>Offload New Uploads</code></td>
+                  <td
+                    >Automatically offload attachments as they are uploaded.</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Path filters</h3>
+          <p>
+            Use the allow-list and deny-list to control which file paths are
+            eligible for offload. Both support glob placeholders (<code>*</code
+            >, <code>**</code>).
+          </p>
+          <div class="docs-table-wrap">
+            <table>
+              <thead>
+                <tr><th>Filter</th><th>Behaviour</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Allow-list</td>
+                  <td
+                    >Only paths matching the list are offloaded. Leave empty to
+                    allow all paths.</td
+                  >
+                </tr>
+                <tr>
+                  <td>Deny-list</td>
+                  <td
+                    >Paths matching the list are never offloaded. Takes priority
+                    over the allow-list.</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- WP-CLI -->
+        <section id="cli" class="docs-section">
+          <h2>WP-CLI</h2>
+          <p>
+            All commands live under the <code>nimbus</code> top-level namespace.
+          </p>
+          <div class="docs-table-wrap">
+            <table>
+              <thead>
+                <tr><th>Command</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>wp nimbus deploy</code></td>
+                  <td
+                    >Offload all local attachments that have not yet been pushed
+                    to the remote bucket.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>wp nimbus rewrite</code></td>
+                  <td
+                    >Scan post content and meta for local URLs and rewrite them
+                    to their remote equivalents.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>wp nimbus revert</code></td>
+                  <td
+                    >Restore attachments from the remote bucket back to local
+                    storage and rewrite URLs locally.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>wp nimbus config</code></td>
+                  <td
+                    >Read or update Nimbus settings from the command line
+                    without opening the admin UI.</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- REST API -->
+        <section id="rest-api" class="docs-section">
+          <h2>REST API</h2>
+          <p>
+            All endpoints are under <code>/wp-json/nimbus/v1/</code> and require a
+            logged-in user with the <code>manage_options</code> capability (i.e.,
+            an administrator).
+          </p>
+          <div class="docs-table-wrap">
+            <table>
+              <thead>
+                <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/status</code></td>
+                  <td
+                    >Plugin configuration, license status, and provider
+                    connectivity.</td
+                  >
+                </tr>
+                <tr>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/statistics</code></td>
+                  <td
+                    >Offload counts, media-type breakdown, monthly trend, and
+                    estimated provider cost.</td
+                  >
+                </tr>
+                <tr>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/integrations</code></td>
+                  <td
+                    >List of discovered third-party integrations and their
+                    rewrite status.</td
+                  >
+                </tr>
+                <tr>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/offload/pending</code></td>
+                  <td
+                    >Trigger a bulk offload of all not-yet-offloaded
+                    attachments.</td
+                  >
+                </tr>
+                <tr>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/offload/item/&lt;id&gt;</code></td>
+                  <td
+                    >Offload a single attachment by its WordPress attachment ID.</td
+                  >
+                </tr>
+                <tr>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/integrations/smart_slider/rewrite</code></td>
+                  <td>Trigger a Smart Slider 3 URL rewrite pass.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- WordPress Hooks -->
+        <section id="hooks" class="docs-section">
+          <h2>WordPress hooks</h2>
+          <p>
+            Nimbus fires a WordPress action for every major lifecycle event.
+            Each action receives a single associative array payload. Common
+            payload keys include <code>source</code>,
+            <code>scope</code>, <code>operation</code>, <code
+              >attachment_id</code
+            >,
+            <code>urls</code>, and <code>keys</code>.
+          </p>
+
+          <h3>Offload</h3>
+          <pre><code>nimbus_offload_started
+nimbus_offload_completed
+nimbus_offload_failed</code></pre>
+
+          <h3>Restore</h3>
+          <pre><code>nimbus_restore_started
+nimbus_restore_completed
+nimbus_restore_failed</code></pre>
+
+          <h3>URL rewrite</h3>
+          <pre><code>nimbus_rewrite_started
+nimbus_rewrite_completed
+nimbus_rewrite_failed</code></pre>
+
+          <h3>Remote delete</h3>
+          <pre><code>nimbus_remote_delete_started
+nimbus_remote_delete_completed
+nimbus_remote_delete_failed</code></pre>
+
+          <h3>Cache purge</h3>
+          <pre><code>nimbus_cache_purge_requested
+nimbus_cache_purge_started
+nimbus_cache_purge_completed
+nimbus_cache_purge_failed</code></pre>
+
+          <h3>Integration rewrite</h3>
+          <pre><code>nimbus_integration_rewrite_started
+nimbus_integration_rewrite_completed
+nimbus_integration_rewrite_failed</code></pre>
+        </section>
+
+        <!-- Cache Integrations -->
+        <section id="cache" class="docs-section">
+          <h2>Cache integrations</h2>
+          <p>
+            Nimbus automatically purges cached copies of offloaded or rewritten
+            URLs when it detects any of the following cache plugins or proxy
+            configurations:
+          </p>
+          <ul>
+            <li>
+              Cloudflare (via the Cloudflare WordPress plugin or API token)
+            </li>
+            <li>LiteSpeed Cache</li>
+            <li>WP Fastest Cache</li>
+            <li>Generic proxy / Nginx cache</li>
+          </ul>
+          <p>
+            You can suppress automatic purges selectively via the opt-out
+            filters:
+          </p>
+          <pre><code>nimbus_should_purge_cache_on_remote_delete      // return false to skip
+nimbus_should_purge_cache_on_rewrite             // return false to skip
+nimbus_should_purge_cache_on_integration_rewrite // return false to skip</code></pre>
+        </section>
+
+        <!-- Extending -->
+        <section id="extending" class="docs-section">
+          <h2>Extending Nimbus</h2>
+
+          <h3>Custom cache purge integration</h3>
+          <p>
+            Implement the <code>Nimbus\Plugin\Cache\PurgeIntegration</code> interface
+            and register it via the <code>nimbus_cache_purge_integrations</code> filter.
+            Your implementation receives a <code>$request</code> array with:
+          </p>
+          <ul>
+            <li><code>urls</code> — array of URLs to purge individually</li>
+            <li>
+              <code>purge_all</code> — boolean, true after a full rewrite pass
+            </li>
+            <li>
+              <code>reason</code> — string describing the operation that triggered
+              the purge
+            </li>
+            <li>
+              <code>context['auto_purge']</code> — false if the user triggered the
+              purge manually
+            </li>
+          </ul>
+
+          <h3>Custom third-party integration</h3>
+          <p>
+            Register a new integration via the <code>nimbus_integrations</code> filter.
+            The filter expects an array of integration definition arrays. Supported
+            fields:
+          </p>
+          <div class="docs-table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>key</code></td>
+                  <td>string</td>
+                  <td>Unique machine identifier for this integration.</td>
+                </tr>
+                <tr>
+                  <td><code>label</code></td>
+                  <td>string</td>
+                  <td
+                    >Human-readable display name shown in the admin Integrations
+                    tab.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>plugin_files</code></td>
+                  <td>string[]</td>
+                  <td
+                    >Plugin file paths used to detect whether the third-party
+                    plugin is active.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>directories</code></td>
+                  <td>string[]</td>
+                  <td>Asset root directories to scan for rewriteable URLs.</td>
+                </tr>
+                <tr>
+                  <td><code>rewrite_supported</code></td>
+                  <td>bool</td>
+                  <td
+                    >Set to <code>true</code> if a rewrite callback is provided.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>rewrite_action_label</code></td>
+                  <td>string</td>
+                  <td>Label for the rewrite button in the admin UI.</td>
+                </tr>
+                <tr>
+                  <td><code>table_callback</code></td>
+                  <td>callable</td>
+                  <td
+                    >Returns an array of database tables to target for the
+                    rewrite pass.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>rewrite_callback</code></td>
+                  <td>callable</td>
+                  <td
+                    >Performs the URL rewrite operation for this integration.</td
+                  >
+                </tr>
+                <tr>
+                  <td><code>rewrite_ready_callback</code></td>
+                  <td>callable</td>
+                  <td
+                    >Returns a boolean indicating whether the integration is
+                    ready to rewrite.</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="docs-callout">
+            <strong>Need help?</strong> Send a message to
+            <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a> — we are
+            happy to assist with custom integration development.
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* ── Layout ─────────────────────────────────────────────────────────────────── */
+  .docs-page {
+    padding: 3.5rem 0 7rem;
+  }
+
+  .docs-container {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .docs-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────────────────── */
+  .docs-sidebar {
+    position: sticky;
+    top: 5rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--nmb-text-muted);
+    text-decoration: none;
+    margin-bottom: 2rem;
+    transition: color var(--nmb-t);
+  }
+
+  .back-link:hover {
+    color: var(--nmb-text);
+  }
+
+  .docs-nav-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--nmb-text-subtle);
+    margin: 0 0 0.75rem;
+  }
+
+  .docs-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .docs-nav a {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--nmb-text-muted);
+    text-decoration: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--nmb-radius-xs);
+    transition:
+      color var(--nmb-t),
+      background var(--nmb-t);
+  }
+
+  .docs-nav a:hover {
+    color: var(--nmb-accent);
+    background: var(--nmb-accent-dim);
+  }
+
+  @media (max-width: 860px) {
+    .docs-sidebar {
+      position: static;
+    }
+
+    .docs-nav {
+      display: none;
+    }
+  }
+
+  /* ── Content ─────────────────────────────────────────────────────────────────── */
+  .docs-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--nmb-accent);
+    margin: 0 0 0.75rem;
+  }
+
+  .docs-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--nmb-text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+  }
+
+  .docs-intro {
+    font-size: 1.0625rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0;
+  }
+
+  /* ── Sections ─────────────────────────────────────────────────────────────────── */
+  .docs-section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: 6rem;
+  }
+
+  .docs-section h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  .docs-section h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--nmb-text-2);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .docs-section p {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.7;
+    margin: 0 0 0.875rem;
+  }
+
+  .docs-section ul,
+  .docs-section ol {
+    color: var(--nmb-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    padding-left: 1.25rem;
+    margin: 0 0 1rem;
+  }
+
+  .docs-section li {
+    margin-bottom: 0.375rem;
+  }
+
+  .docs-section a {
+    color: var(--nmb-accent);
+    text-decoration: none;
+  }
+
+  .docs-section a:hover {
+    text-decoration: underline;
+  }
+
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    background: var(--nmb-accent-dim);
+    color: var(--nmb-accent);
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--nmb-radius-xs);
+  }
+
+  pre {
+    background: var(--nmb-surface-muted);
+    border: 1px solid var(--nmb-border);
+    border-radius: var(--nmb-radius-sm);
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 0.75rem 0 1.25rem;
+  }
+
+  pre code {
+    background: none;
+    color: var(--nmb-text-2);
+    padding: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  /* ── Provider cards ───────────────────────────────────────────────────────────── */
+  .docs-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .docs-card {
+    border: 1px solid var(--nmb-border);
+    border-radius: var(--nmb-radius-md);
+    padding: 1.25rem 1.375rem;
+    background: var(--nmb-surface);
+  }
+
+  .docs-card h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--nmb-text);
+    margin: 0 0 0.5rem;
+  }
+
+  .docs-card p {
+    font-size: 0.875rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+
+  .docs-card dl {
+    margin: 0;
+  }
+
+  .docs-card dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--nmb-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.5rem;
+  }
+
+  .docs-card dd {
+    font-size: 0.8125rem;
+    color: var(--nmb-text-muted);
+    margin: 0.125rem 0 0;
+  }
+
+  /* ── Tables ───────────────────────────────────────────────────────────────────── */
+  .docs-table-wrap {
+    overflow-x: auto;
+    margin: 0.75rem 0 1.25rem;
+    border: 1px solid var(--nmb-border);
+    border-radius: var(--nmb-radius-sm);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  thead {
+    background: var(--nmb-surface-muted);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--nmb-text-2);
+    text-align: left;
+    padding: 0.625rem 1rem;
+    border-bottom: 1px solid var(--nmb-border);
+  }
+
+  td {
+    color: var(--nmb-text-muted);
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--nmb-border-light);
+    vertical-align: top;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ── Method badges ────────────────────────────────────────────────────────────── */
+  .method {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--nmb-radius-xs);
+  }
+
+  .method.get {
+    background: var(--nmb-green-light);
+    color: #15803d;
+  }
+
+  .method.post {
+    background: var(--nmb-accent-light);
+    color: var(--nmb-accent);
+  }
+
+  /* ── Callout ──────────────────────────────────────────────────────────────────── */
+  .docs-callout {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--nmb-accent-dim);
+    border-left: 3px solid var(--nmb-accent);
+    border-radius: 0 var(--nmb-radius-sm) var(--nmb-radius-sm) 0;
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.6;
+  }
+
+  .docs-callout a {
+    color: var(--nmb-accent);
+    text-decoration: none;
+  }
+
+  .docs-callout a:hover {
+    text-decoration: underline;
+  }
+</style>

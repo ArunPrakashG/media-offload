@@ -9,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	adminhandler "github.com/arunprakashg/nimbus-backend/internal/api/admin"
+	checkouthandler "github.com/arunprakashg/nimbus-backend/internal/api/checkout"
 	licenseshandler "github.com/arunprakashg/nimbus-backend/internal/api/licenses"
 	"github.com/arunprakashg/nimbus-backend/internal/api/middleware"
 	updateshandler "github.com/arunprakashg/nimbus-backend/internal/api/updates"
@@ -71,6 +72,14 @@ func NewRouter(
 	// Razorpay webhook — signature-verified, no Bearer auth.
 	wh := webhookshandler.New(cfg, svc, database)
 	r.Post("/webhooks/razorpay", wh.HandleRazorpay)
+
+	// Checkout — public endpoints used by the marketing site.
+	// Razorpay credentials live here; the frontend only holds BACKEND_URL.
+	ch := checkouthandler.New(cfg, svc)
+	r.Route("/v1/checkout", func(r chi.Router) {
+		r.Post("/create-subscription", ch.CreateSubscription)
+		r.Post("/verify-payment", ch.VerifyPayment)
+	})
 
 	// Health probe (used by Docker and load balancers).
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
