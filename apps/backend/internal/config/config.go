@@ -14,6 +14,20 @@ type Config struct {
 	LicensePrivateKey string // base64-encoded 64-byte Ed25519 private key
 	LicensePublicKey  string // base64-encoded 32-byte Ed25519 public key
 	TokenTTLDays      int
+	// AdminAPISecret protects the /admin/* routes. Required for license issuance.
+	AdminAPISecret string
+	// ProductSlug is the slug of the product in the database (default: "nimbus").
+	ProductSlug string
+
+	// Razorpay — credentials for subscription creation and webhook verification.
+	RazorpayKeyID         string
+	RazorpayKeySecret     string
+	RazorpayWebhookSecret string
+
+	// Razorpay plan IDs — created once in the Razorpay dashboard.
+	// Map: "<tier>_<billing_cycle>" → plan_id
+	// e.g. RazorpayPlans["personal_monthly"] = "plan_xxx"
+	RazorpayPlans map[string]string
 }
 
 // Load reads configuration from environment variables.
@@ -51,6 +65,20 @@ func Load() (*Config, error) {
 		LicensePrivateKey: privKey,
 		LicensePublicKey:  pubKey,
 		TokenTTLDays:      ttlDays,
+		AdminAPISecret:    os.Getenv("ADMIN_API_SECRET"),
+		ProductSlug:       getOr("PRODUCT_SLUG", "nimbus"),
+
+		RazorpayKeyID:         os.Getenv("RAZORPAY_KEY_ID"),
+		RazorpayKeySecret:     os.Getenv("RAZORPAY_KEY_SECRET"),
+		RazorpayWebhookSecret: os.Getenv("RAZORPAY_WEBHOOK_SECRET"),
+		RazorpayPlans: map[string]string{
+			"personal_monthly": os.Getenv("RAZORPAY_PLAN_PERSONAL_MONTHLY"),
+			"pro_monthly":      os.Getenv("RAZORPAY_PLAN_PRO_MONTHLY"),
+			"agency_monthly":   os.Getenv("RAZORPAY_PLAN_AGENCY_MONTHLY"),
+			"personal_annual":  os.Getenv("RAZORPAY_PLAN_PERSONAL_ANNUAL"),
+			"pro_annual":       os.Getenv("RAZORPAY_PLAN_PRO_ANNUAL"),
+			"agency_annual":    os.Getenv("RAZORPAY_PLAN_AGENCY_ANNUAL"),
+		},
 	}, nil
 }
 

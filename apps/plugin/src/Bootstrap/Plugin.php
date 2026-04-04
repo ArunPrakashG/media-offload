@@ -7,6 +7,7 @@ use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
 use Nimbus\Plugin\License\LicenseManager;
+use Nimbus\Plugin\License\UpdateChecker;
 use Nimbus\Plugin\Cli\Command;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Delivery\UrlRewriter;
@@ -56,10 +57,25 @@ final class Plugin
 
   public function onPluginsLoaded(): void
   {
-    $this->purgeManager()->register();
+    $lm = $this->licenseManager();
+
+    if ($lm->isActive() && $lm->hasFeature('cache_purge')) {
+      $this->purgeManager()->register();
+    }
+
     $this->uploadHandler()->register();
-    $this->cliCommand()->register();
-    $this->bulkJobManager()->register();
+
+    if ($lm->isActive() && $lm->hasFeature('nightly_batch')) {
+      $this->uploadHandler()->registerNightlyBatch();
+    }
+
+    if ($lm->isActive() && $lm->hasFeature('wpcli')) {
+      $this->cliCommand()->register();
+    }
+
+    if ($lm->isActive() && $lm->hasFeature('bulk_migration')) {
+      $this->bulkJobManager()->register();
+    }
     $this->apiController()->register();
   }
 
@@ -76,6 +92,7 @@ final class Plugin
     add_action('plugins_loaded', [$this, 'onPluginsLoaded'], 20);
 
     $this->settingsUi()->register();
+    $this->updateChecker()->register();
 
     $this->booted = true;
   }
@@ -102,7 +119,7 @@ final class Plugin
 
   private function uploadHandler(): UploadHandler
   {
-    return $this->container->get('upload_handler', fn (Container $container): UploadHandler => new UploadHandler($this->settings(), $this->adapterFactory(), $this->logger()));
+    return $this->container->get('upload_handler', fn (Container $container): UploadHandler => new UploadHandler($this->settings(), $this->adapterFactory(), $this->logger(), $this->licenseManager()));
   }
 
   private function urlRewriter(): UrlRewriter
@@ -140,6 +157,11 @@ final class Plugin
     return $this->container->get('license_manager', fn (Container $container): LicenseManager => new LicenseManager());
   }
 
+  private function updateChecker(): UpdateChecker
+  {
+    return $this->container->get('update_checker', fn (Container $container): UpdateChecker => new UpdateChecker($this->licenseManager()));
+  }
+
   private function onboardingManager(): OnboardingManager
   {
     return $this->container->get('onboarding_manager', fn (Container $container): OnboardingManager => new OnboardingManager($this->settings(), $this->licenseManager(), new ConflictDetector()));
@@ -151,6 +173,7 @@ final class Plugin
       $this->settings(),
       $this->uploadHandler(),
       $this->logger(),
+      $this->licenseManager(),
     ));
   }
 

@@ -47,9 +47,12 @@ final class Statistics
 
     $ignoreMetaKey = esc_sql((string) NIMBUS_IGNORE_META_KEY);
 
-    $totalAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'");
+    // All counts are per original upload (one WordPress attachment post = one
+    // original upload, regardless of how many image-size variants WP generated
+    // on disk or in the bucket).
+    $totalAttachments    = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'");
     $offloadedAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . NIMBUS_META_KEY . "'");
-    $ignoredAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . $ignoreMetaKey . "' AND meta_value = '1'");
+    $ignoredAttachments  = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . $ignoreMetaKey . "' AND meta_value = '1'");
 
     $pendingAttachments = max(0, $totalAttachments - $offloadedAttachments - $ignoredAttachments);
     $dailyUploads = $wpdb->get_results(
@@ -63,12 +66,14 @@ final class Statistics
     );
 
     return [
-      'total' => $totalAttachments,
-      'offloaded' => $offloadedAttachments,
-      'ignored' => $ignoredAttachments,
-      'pending' => $pendingAttachments,
-      'percent' => $totalAttachments > 0 ? round(($offloadedAttachments / $totalAttachments) * 100, 1) : 0,
-      'daily' => $dailyUploads,
+      'total'      => $totalAttachments,
+      'offloaded'  => $offloadedAttachments,
+      'ignored'    => $ignoredAttachments,
+      'pending'    => $pendingAttachments,
+      'percent'    => $totalAttachments > 0 ? round(($offloadedAttachments / $totalAttachments) * 100, 1) : 0,
+      'daily'      => $dailyUploads,
+      // Clarifies the counting unit for API consumers and the admin UI.
+      'count_unit' => 'original_upload',
     ];
   }
 
@@ -81,25 +86,67 @@ final class Statistics
   {
     global $wpdb;
 
-    $sampleMeta = $wpdb->get_col("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attachment_metadata' LIMIT 100");
-    $totalSizeSample = 0;
+    // Sample up to 200 attachment metadata rows.  For each attachment we sum
+    // the main file's filesize AND the filesize of every image-size variant
+    // that WordPress stored (WP 5.3+ includes 'filesize' per size).  This
+    // gives an accurate per-attachment total that reflects all the physical
+    // files that would have been — or have been — uploaded to the bucket.
+    $sampleMeta  = $wpdb->get_col("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attachment_metadata' LIMIT 200");
+    $totalBytes  = 0;
     $sampleCount = 0;
+    $totalVariantsObserved = 0;
+    $attachmentsWithVariants = 0;
 
-    foreach ($sampleMeta as $meta) {
-      $data = maybe_unserialize($meta);
-      if (isset($data['filesize'])) {
-        $totalSizeSample += $data['filesize'];
+    foreach ($sampleMeta as $raw) {
+      $data = maybe_unserialize($raw);
+      if (!is_array($data)) {
+        continue;
+      }
+
+      $attachmentBytes = isset($data['filesize']) ? (int) $data['filesize'] : 0;
+      $variantCount    = 0;
+
+      if (!empty($data['sizes']) && is_array($data['sizes'])) {
+        foreach ($data['sizes'] as $sizeData) {
+          if (!is_array($sizeData)) {
+            continue;
+          }
+          // WP 5.3+ stores filesize per size; fall back to 0 if absent.
+          $attachmentBytes += isset($sizeData['filesize']) ? (int) $sizeData['filesize'] : 0;
+          $variantCount++;
+        }
+      }
+
+      if ($attachmentBytes > 0) {
+        $totalBytes += $attachmentBytes;
         $sampleCount++;
+      }
+
+      if ($variantCount > 0) {
+        $totalVariantsObserved += $variantCount;
+        $attachmentsWithVariants++;
       }
     }
 
-    $avgSize = $sampleCount > 0 ? $totalSizeSample / $sampleCount : 200000;
+    // Average bytes across ALL physical files (original + all size variants)
+    // for a single original upload.
+    $avgBytesPerUpload = $sampleCount > 0 ? intdiv($totalBytes, $sampleCount) : 200000;
+
+    // Average number of size variants per upload (used informatively in UI).
+    $avgVariants = $attachmentsWithVariants > 0
+      ? round($totalVariantsObserved / $attachmentsWithVariants, 1)
+      : 0.0;
+
     $stats = $this->getStats();
 
     return [
-      'offloaded_size' => $stats['offloaded'] * $avgSize,
-      'pending_size' => $stats['pending'] * $avgSize,
-      'total_size' => $stats['total'] * $avgSize,
+      'offloaded_size'      => $stats['offloaded'] * $avgBytesPerUpload,
+      'pending_size'        => $stats['pending'] * $avgBytesPerUpload,
+      'total_size'          => $stats['total'] * $avgBytesPerUpload,
+      // Exposes both parts of the estimate so the UI can explain it clearly.
+      'avg_bytes_per_upload' => $avgBytesPerUpload,
+      'avg_size_variants'    => $avgVariants,
+      'sizes_included'       => true,
     ];
   }
 

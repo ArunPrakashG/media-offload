@@ -3,32 +3,47 @@ const features = [
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15.5C3 13 4.8 11 7.2 10.6A6.5 6.5 0 0 1 18 9a4 4 0 0 1 3 7"/><path d="M10 20l2.5-3 2.5 3"/><line x1="12.5" y1="17" x2="12.5" y2="22"/></svg>`,
     title: "Any S3-compatible provider",
-    desc: "Amazon S3, Cloudflare R2, Backblaze B2, MinIO, Wasabi, DigitalOcean Spaces — if it speaks S3, Nimbus supports it. No vendor lock-in.",
+    desc: "Amazon S3, Cloudflare R2, Backblaze B2, MinIO, Wasabi, DigitalOcean Spaces \u2014 if it speaks S3, Nimbus supports it. No vendor lock-in.",
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`,
     title: "Zero workflow disruption",
-    desc: "Upload images the same way you always have. Nimbus silently offloads every new file in the background — no plugin or theme changes needed.",
+    desc: "Upload images exactly as you always have. Every new upload is offloaded asynchronously by a background worker \u2014 zero response-time impact, no theme or plugin changes needed.",
   },
   {
-    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-    title: "CDN URL rewriting",
-    desc: "Serve every asset from your CDN edge network. All media URLs are automatically rewritten — your visitors get files from the nearest PoP.",
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+    title: "Custom URL rewriting",
+    desc: "Point every media URL to any domain \u2014 your CDN edge, a custom subdomain, or your storage bucket's public URL directly. No CDN configuration required.",
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
     title: "Bulk migration",
-    desc: "Move thousands of existing media files to the cloud in one click. Track progress in real time with a live progress bar — no timeouts, no memory limits.",
+    desc: "Move thousands of existing media files to the cloud in one click. Track progress in real time with a live progress bar \u2014 no timeouts, no memory limits.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+    title: "Nightly batch offloading",
+    desc: "Queue new uploads during the day and let Nimbus offload them in one quiet, low-impact run overnight \u2014 keeping peak-hour server resources free.",
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
     title: "WordPress Multisite",
-    desc: "Full Multisite network support. Each subsite connects its own bucket, or shares a single one — your choice. Managed under a single license.",
+    desc: "Full Multisite network support. Each subsite connects its own bucket, or shares a single one \u2014 your choice. Managed under a single license.",
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
     title: "Cache purge integration",
     desc: "Nimbus automatically purges Cloudflare, LiteSpeed, and WP Fastest Cache after offloading. Your visitors always get the latest version of your files.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+    title: "WP-CLI support",
+    desc: "Full command-line control with wp nimbus. Deploy, rewrite, revert, and sync from your terminal or CI pipeline \u2014 no admin panel needed.",
+  },
+  {
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+    title: "Database URL rewriting",
+    desc: "Batch-rewrite every hardcoded media URL inside post content, page builder fields, and widget data \u2014 so nothing in the database still points to your server after migration.",
   },
 ];
 ---

@@ -12,6 +12,7 @@ import (
 // TokenClaims is the payload embedded in a signed license token.
 // The token is stored by the WordPress plugin and verified locally on every boot.
 type TokenClaims struct {
+	LicenseID string   `json:"lid"`     // License UUID — used to identify the license in token-auth requests without exposing the raw key.
 	Domain    string   `json:"domain"`
 	Product   string   `json:"product"`
 	Tier      string   `json:"tier"`

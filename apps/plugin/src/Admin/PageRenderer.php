@@ -179,7 +179,7 @@ final class PageRenderer
           <div class="nmb-onboarding-step-header">
             <p class="nmb-eyebrow"><?php esc_html_e('Step 1', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Connect your account', NIMBUS_TEXT_DOMAIN); ?></h2>
-            <p><?php esc_html_e('Paste the Nimbus license key you received. This is required before the plugin dashboard becomes available.', NIMBUS_TEXT_DOMAIN); ?></p>
+            <p><?php esc_html_e('Paste your license key, or start with the Free tier to try Nimbus now — no registration required.', NIMBUS_TEXT_DOMAIN); ?></p>
           </div>
 
           <label class="nmb-onboarding-field nmb-onboarding-field--full">
@@ -190,12 +190,15 @@ final class PageRenderer
           <ul class="nmb-onboarding-tips">
             <li><?php esc_html_e('Copy the key exactly as shown in your account or email.', NIMBUS_TEXT_DOMAIN); ?></li>
             <li><?php esc_html_e('Avoid spaces before or after the value.', NIMBUS_TEXT_DOMAIN); ?></li>
-            <li><?php esc_html_e('If you do not have a key yet, pause here and get one before continuing.', NIMBUS_TEXT_DOMAIN); ?></li>
           </ul>
 
           <div class="nmb-onboarding-actions">
-            <span></span>
-            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to storage', NIMBUS_TEXT_DOMAIN); ?></button>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+              <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>
+              <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>">
+              <button type="submit" class="button button-secondary"><?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?></button>
+            </form>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue with license key', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
 
@@ -825,49 +828,188 @@ final class PageRenderer
 
   private function renderLicenseTab(): void
   {
-    $license = $this->licenseManager->all();
-    $hasKey  = $this->licenseManager->hasKey();
-    $status  = (string) ($license['status'] ?? 'inactive');
-    $isActive = $status === 'active';
+    $license   = $this->licenseManager->all();
+    $hasKey    = $this->licenseManager->hasKey();
+    $status    = (string) ($license['status'] ?? 'inactive');
+    $isActive  = $status === 'active';
+    $isPending = $status === 'pending'; // max_activations hit; key stored but not yet active here
+
+    /** @var \Nimbus\Plugin\License\LicenseClient $client */
+    $client = new \Nimbus\Plugin\License\LicenseClient();
+
+    // Fetch the sites list whenever we have a key.
+    $sitesData    = [];
+    $sitesError   = null;
+    $maxSites     = 0;
+    $tier         = (string) ($license['tier'] ?? '');
+    if ($hasKey) {
+      $token = $this->licenseManager->token();
+      $sitesResult = $token !== '' ? $client->listSites($token) : new \WP_Error('no_token', __('Activate this license to view connected sites.', 'nimbus'));
+      if (is_wp_error($sitesResult)) {
+        $sitesError = $sitesResult->get_error_message();
+      } else {
+        $sitesData = (array) ($sitesResult['activations'] ?? []);
+        $maxSites  = (int) ($sitesResult['max_activations'] ?? 0);
+        if (empty($tier)) {
+          $tier = (string) ($sitesResult['tier'] ?? '');
+        }
+      }
+    }
+
+    $currentDomain = wp_parse_url(home_url(), PHP_URL_HOST) ?: '';
+    $adminPostUrl  = esc_url(admin_url('admin-post.php'));
     ?>
     <div class="nmb-settings-shell">
       <div class="nmb-card" id="license-key-section">
         <h3><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></h3>
+
         <?php if ($hasKey) : ?>
+          <!-- Status row -->
           <dl style="margin:0 0 16px;">
             <div class="nmb-license-status-row">
               <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
               <dd class="<?php echo $isActive ? 'mo-license-status-active' : 'mo-license-status-inactive'; ?>">
-                <?php echo $isActive ? esc_html__('Active', NIMBUS_TEXT_DOMAIN) : esc_html(ucfirst($status)); ?>
+                <?php
+                if ($isActive) {
+                  esc_html_e('Active', NIMBUS_TEXT_DOMAIN);
+                } elseif ($isPending) {
+                  esc_html_e('Pending — activation limit reached', NIMBUS_TEXT_DOMAIN);
+                } else {
+                  echo esc_html(ucfirst($status));
+                }
+                ?>
               </dd>
             </div>
-            <div class="nmb-license-status-row">
-              <dt><?php esc_html_e('Plan', NIMBUS_TEXT_DOMAIN); ?></dt>
-              <dd><?php echo esc_html(ucfirst((string) ($license['plan'] ?? 'monthly'))); ?></dd>
-            </div>
-            <?php if (!empty($license['expires'])) : ?>
+            <?php if (!empty($tier)) : ?>
               <div class="nmb-license-status-row">
-                <dt><?php esc_html_e('Expires', NIMBUS_TEXT_DOMAIN); ?></dt>
-                <dd><?php echo esc_html((string) $license['expires']); ?></dd>
+                <dt><?php esc_html_e('Plan', NIMBUS_TEXT_DOMAIN); ?></dt>
+                <dd><?php echo esc_html(ucfirst($tier)); ?></dd>
+              </div>
+            <?php endif; ?>
+            <?php if ($maxSites > 0) : ?>
+              <div class="nmb-license-status-row">
+                <dt><?php esc_html_e('Sites', NIMBUS_TEXT_DOMAIN); ?></dt>
+                <dd>
+                  <?php echo esc_html(sprintf(
+                    /* translators: 1: used, 2: max */
+                    __('%1$d / %2$d used', NIMBUS_TEXT_DOMAIN),
+                    count($sitesData),
+                    $maxSites
+                  )); ?>
+                </dd>
               </div>
             <?php endif; ?>
           </dl>
-          <div class="nmb-actions nmb-actions-left">
-            <a class="button button-secondary" href="https://plugintree.com/account/" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Manage subscription', NIMBUS_TEXT_DOMAIN); ?></a>
+
+          <!-- Actions -->
+          <div class="nmb-actions nmb-actions-left" style="margin-bottom:16px;">
+            <a class="button button-secondary" href="https://usenimbus.dev/account/" target="_blank" rel="noopener noreferrer">
+              <?php esc_html_e('Manage subscription', NIMBUS_TEXT_DOMAIN); ?>
+            </a>
+            <!-- Deactivate this site -->
+            <?php if ($isActive) : ?>
+              <form method="post" action="<?php echo $adminPostUrl; ?>" style="display:inline;">
+                <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>
+                <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>">
+                <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
+                <input type="hidden" name="domain" value="<?php echo esc_attr($currentDomain); ?>">
+                <button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e('Deactivate Nimbus on this site?', NIMBUS_TEXT_DOMAIN); ?>')">
+                  <?php esc_html_e('Deactivate this site', NIMBUS_TEXT_DOMAIN); ?>
+                </button>
+              </form>
+            <?php endif; ?>
           </div>
+
+          <!-- Sites list -->
+          <?php if ($sitesError) : ?>
+            <p class="nmb-muted"><?php echo esc_html(sprintf(__('Could not load site list: %s', NIMBUS_TEXT_DOMAIN), $sitesError)); ?></p>
+          <?php elseif (!empty($sitesData)) : ?>
+            <h4 style="margin:0 0 10px;"><?php esc_html_e('Activated sites', NIMBUS_TEXT_DOMAIN); ?></h4>
+            <table class="widefat striped" style="margin-bottom:0;">
+              <thead>
+                <tr>
+                  <th><?php esc_html_e('Domain', NIMBUS_TEXT_DOMAIN); ?></th>
+                  <th><?php esc_html_e('Activated', NIMBUS_TEXT_DOMAIN); ?></th>
+                  <th><?php esc_html_e('Last seen', NIMBUS_TEXT_DOMAIN); ?></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($sitesData as $site) :
+                  $siteDomain    = (string) ($site['domain'] ?? '');
+                  $activatedAt   = !empty($site['activated_at']) ? wp_date(get_option('date_format'), strtotime($site['activated_at'])) : '—';
+                  $lastSeenAt    = !empty($site['last_seen_at']) ? wp_date(get_option('date_format'), strtotime($site['last_seen_at'])) : '—';
+                  $isCurrentSite = ($siteDomain === $currentDomain);
+                ?>
+                  <tr>
+                    <td>
+                      <?php echo esc_html($siteDomain); ?>
+                      <?php if ($isCurrentSite) : ?>
+                        <span class="nmb-badge nmb-badge--info"><?php esc_html_e('this site', NIMBUS_TEXT_DOMAIN); ?></span>
+                      <?php endif; ?>
+                    </td>
+                    <td><?php echo esc_html($activatedAt); ?></td>
+                    <td><?php echo esc_html($lastSeenAt); ?></td>
+                    <td>
+                      <form method="post" action="<?php echo $adminPostUrl; ?>" style="margin:0;">
+                        <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>
+                        <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>">
+                        <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
+                        <input type="hidden" name="domain" value="<?php echo esc_attr($siteDomain); ?>">
+                        <button type="submit" class="button button-small button-secondary"
+                          onclick="return confirm('<?php echo esc_attr(sprintf(
+                            /* translators: %s: domain */
+                            __('Remove %s from this license?', NIMBUS_TEXT_DOMAIN),
+                            $siteDomain
+                          )); ?>')">
+                          <?php esc_html_e('Remove', NIMBUS_TEXT_DOMAIN); ?>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+
+            <?php if ($isPending) : ?>
+              <p style="margin:12px 0 0;" class="nmb-muted">
+                <?php esc_html_e('Remove a site above to free a slot, then enter your key again to activate on this site.', NIMBUS_TEXT_DOMAIN); ?>
+              </p>
+              <!-- Re-enter key to re-activate after freeing a slot -->
+              <form method="post" action="<?php echo $adminPostUrl; ?>" style="margin-top:12px;" autocomplete="off">
+                <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>
+                <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>">
+                <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
+                <button type="submit" class="button button-primary"><?php esc_html_e('Retry activation', NIMBUS_TEXT_DOMAIN); ?></button>
+              </form>
+            <?php endif; ?>
+          <?php endif; ?>
+
         <?php else : ?>
-          <p class="nmb-muted"><?php esc_html_e('Enter your license key to activate Nimbus. You can find your key in your account dashboard after purchase.', NIMBUS_TEXT_DOMAIN); ?></p>
-          <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" autocomplete="off">
-            <?php wp_nonce_field('nimbus_save_license'); ?>
-            <input type="hidden" name="action" value="nimbus_save_license" />
+          <!-- No key yet — show the activation form -->
+          <p class="nmb-muted"><?php esc_html_e('Enter your license key to activate Nimbus. You can find your key in your account dashboard after subscribing.', NIMBUS_TEXT_DOMAIN); ?></p>
+          <form method="post" action="<?php echo $adminPostUrl; ?>" autocomplete="off">
+            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>">
             <div class="nmb-license-key-field">
               <label for="mo-license-key"><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></label>
-              <input type="text" id="mo-license-key" name="license_key" class="regular-text" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" />
+              <input type="text" id="mo-license-key" name="license_key" class="regular-text" placeholder="nmb_live_XXXX-XXXX-XXXX-XXXX" autocomplete="off">
             </div>
             <div class="nmb-actions nmb-actions-left" style="margin-top:12px;">
               <button type="submit" class="button button-primary"><?php esc_html_e('Activate license', NIMBUS_TEXT_DOMAIN); ?></button>
-              <a href="https://plugintree.com/nimbus/" target="_blank" rel="noopener noreferrer" class="button button-secondary"><?php esc_html_e('Purchase a license', NIMBUS_TEXT_DOMAIN); ?></a>
+              <a href="https://usenimbus.dev/#pricing" target="_blank" rel="noopener noreferrer" class="button button-secondary"><?php esc_html_e('Get a license', NIMBUS_TEXT_DOMAIN); ?></a>
             </div>
+          </form>
+
+          <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+
+          <p class="nmb-muted" style="font-size:13px;"><?php esc_html_e('No license yet? You can activate the Free tier instantly — no registration or credit card required.', NIMBUS_TEXT_DOMAIN); ?></p>
+          <form method="post" action="<?php echo $adminPostUrl; ?>">
+            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>">
+            <button type="submit" class="button button-secondary">
+              <?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?>
+            </button>
           </form>
         <?php endif; ?>
       </div>

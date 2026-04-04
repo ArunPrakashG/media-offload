@@ -1,0 +1,117 @@
+# Nimbus – production infrastructure
+#
+# All containers are named nimbus-* and share the internal nimbus_net network.
+# Only nimbus-web is exposed to the host (127.0.0.1) so your server's reverse
+# proxy (nginx / Caddy / Traefik / etc.) can route traffic to it.  The API,
+# database, and Redis are never reachable from outside the Docker network.
+#
+# First-time setup:
+#   1. cp .env.example .env  and fill in every value.
+#   2. docker compose up -d
+#   3. docker compose exec nimbus-api ./server migrate  (if migrations are manual)
+#
+# Rebuild after code changes:
+#   docker compose build nimbus-web nimbus-api
+#   docker compose up -d --no-deps nimbus-web nimbus-api
+
+name: nimbus
+
+services:
+  # ── Marketing / web frontend (Astro SSR) ─────────────────────────────────
+  nimbus-web:
+    container_name: nimbus-web
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Bound to loopback only — route via your reverse proxy to port 4321.
+    ports:
+      - "127.0.0.1:4321:4321"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "4321"
+      # Internal URL — the SSR Node server calls the API directly over Docker networking.
+      BACKEND_URL: "http://nimbus-api:8090"
+    env_file:
+      - .env
+    depends_on:
+      nimbus-api:
+        condition: service_healthy
+    networks:
+      - nimbus_net
+
+  # ── License / payment backend (Go) ───────────────────────────────────────
+  nimbus-api:
+    container_name: nimbus-api
+    build:
+      context: ../apps/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Not exposed publicly — only nimbus-web reaches it via the internal network.
+    expose:
+      - "8090"
+    environment:
+      PORT: "8090"
+      DATABASE_URL: "postgres://nimbus:${DB_PASSWORD}@nimbus-db:5432/nimbus_backend"
+      REDIS_URL: "redis://nimbus-redis:6379"
+    env_file:
+      - .env
+    depends_on:
+      nimbus-db:
+        condition: service_healthy
+      nimbus-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8090/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    networks:
+      - nimbus_net
+
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
+  nimbus-db:
+    container_name: nimbus-db
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nimbus
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: nimbus_backend
+    volumes:
+      - nimbus_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nimbus -d nimbus_backend"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - nimbus_net
+
+  # ── Redis (rate limiting) ─────────────────────────────────────────────────
+  nimbus-redis:
+    container_name: nimbus-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - nimbus_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - nimbus_net
+
+volumes:
+  nimbus_db_data:
+  nimbus_redis_data:
+
+networks:
+  nimbus_net:
+    name: nimbus_net
+    driver: bridge

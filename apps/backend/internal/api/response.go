@@ -1,23 +1,17 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/arunprakashg/nimbus-backend/internal/apiutil"
 )
 
-type errorBody struct {
-	Error string `json:"error"`
-	Code  string `json:"code"`
-}
-
 // JSON writes a JSON response with the given status code.
-func JSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v)
-}
+// Delegates to apiutil.JSON so handler sub-packages can use apiutil directly
+// without creating an import cycle back to this package.
+func JSON(w http.ResponseWriter, status int, v any) { apiutil.JSON(w, status, v) }
 
 // Error writes a standardised JSON error response.
 func Error(w http.ResponseWriter, status int, code, message string) {
-	JSON(w, status, errorBody{Error: message, Code: code})
+	apiutil.Error(w, status, code, message)
 }

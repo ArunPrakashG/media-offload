@@ -127,12 +127,20 @@ final class ApiController
       'onboarding' => $this->onboardingManager->state(),
       'jobs' => $this->bulkJobManager->state(),
       'integrations' => $this->integrationDiscovery->summary(),
-      'statistics' => $this->statistics->get_deep_stats(),
+      'statistics' => $this->licenseManager->hasFeature('storage_analytics')
+        ? $this->statistics->get_deep_stats()
+        : array_merge($this->statistics->get_stats(), ['_upgrade_required' => 'storage_analytics']),
     ]);
   }
 
   public function getStatistics(): \WP_REST_Response
   {
+    if (!$this->licenseManager->hasFeature('storage_analytics')) {
+      return new \WP_REST_Response(
+        array_merge($this->statistics->get_stats(), ['_upgrade_required' => 'storage_analytics'])
+      );
+    }
+
     return new \WP_REST_Response($this->statistics->get_deep_stats());
   }
 

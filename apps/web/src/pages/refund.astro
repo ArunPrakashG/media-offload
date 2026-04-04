@@ -1,0 +1,266 @@
+---
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Base from "@layouts/Base.astro";
+import "@styles/global.css";
+import "@styles/tokens.css";
+---
+
+<Base
+  title="Cancellation & Refund Policy — Nimbus"
+  description="How to cancel your Nimbus subscription and request a refund."
+>
+  <Navbar />
+  <main class="legal-page">
+    <div class="container">
+      <a class="back-link" href="/">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 3L5 8l5 5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        Back to Nimbus
+      </a>
+
+      <article class="legal-article">
+        <header class="legal-header">
+          <p class="section-label">Legal</p>
+          <h1 class="legal-title">Cancellation &amp; Refund Policy</h1>
+          <p class="legal-date">Last updated: 4 April 2026</p>
+        </header>
+
+        <div class="legal-body">
+          <h2>1. Overview</h2>
+          <p>
+            Nimbus sells annual software subscription licenses. This policy
+            explains how to cancel a subscription, when refunds are issued, and
+            how long refunds take to process. Payments are collected by
+            <strong>Razorpay</strong> (razorpay.com) on behalf of Nimbus.
+          </p>
+
+          <h2>2. What you are purchasing</h2>
+          <p>
+            When you purchase a Nimbus plan you receive a software license for
+            the Nimbus WordPress plugin. This is a <strong
+              >digital product delivered immediately</strong
+            > upon successful payment — no physical goods are shipped. The license
+            is valid for one annual billing period and renews automatically unless
+            cancelled.
+          </p>
+
+          <h2>3. Cancellation</h2>
+          <p>
+            You may cancel your subscription at any time before the next renewal
+            date. To cancel:
+          </p>
+          <ol>
+            <li>
+              Email <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a>
+              with the subject line <strong>"Cancel subscription"</strong>.
+            </li>
+            <li>
+              Include the email address you used at checkout and, if available,
+              your Razorpay subscription ID (shown in your payment confirmation
+              email).
+            </li>
+            <li>
+              We will confirm cancellation by email within 1 business day and
+              cancel the subscription in Razorpay so no future charges occur.
+            </li>
+          </ol>
+          <p>
+            <strong>Effect of cancellation:</strong> Your license remains active until
+            the last day of your current paid billing period. After that date, the
+            plugin will revert to the free tier automatically — your media files already
+            offloaded to your storage provider are not affected and remain accessible.
+          </p>
+          <p>
+            We send a renewal reminder email at least 7 days before each renewal
+            date. If you wish to avoid the next renewal charge, cancel before
+            that date.
+          </p>
+
+          <h2>4. Refunds</h2>
+
+          <h3>14-day money-back guarantee</h3>
+          <p>
+            We offer a <strong>full refund within 14 days</strong> of your initial
+            purchase, no questions asked, as long as the license has not been used
+            to offload substantial production data. To request a refund under this
+            guarantee:
+          </p>
+          <ul>
+            <li>
+              Email <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a>
+              within 14 days of your payment date.
+            </li>
+            <li>Use the subject line <strong>"Refund request"</strong>.</li>
+            <li>
+              Include the email address used at checkout and a brief description
+              of the issue (optional, but helpful for us to improve).
+            </li>
+          </ul>
+          <p>
+            We will initiate the refund within 2 business days. The amount will
+            be credited to your original payment method, subject to Razorpay's
+            processing timelines (typically 5–10 business days).
+          </p>
+
+          <h3>Situations where refunds are not available</h3>
+          <ul>
+            <li>
+              Requests made more than 14 days after the original purchase date.
+            </li>
+            <li>
+              Subscription renewal charges. You are responsible for cancelling
+              before the renewal date if you do not wish to be charged.
+            </li>
+            <li>
+              Licenses that have been used to offload production data at
+              significant volume during the refund window.
+            </li>
+          </ul>
+
+          <h2>5. Partial-period refunds</h2>
+          <p>
+            Because Nimbus plans are prepaid annual subscriptions, we do not
+            issue pro-rated refunds for the unused portion of a billing period
+            after the 14-day guarantee window has elapsed, except where required
+            by applicable law.
+          </p>
+
+          <h2>6. Failed or disputed payments</h2>
+          <p>
+            If a payment fails, Razorpay will retry according to its standard
+            schedule. If your subscription lapses due to a failed payment, your
+            license will be suspended until payment is resolved. Contact
+            <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a> if you need
+            assistance.
+          </p>
+          <p>
+            If you believe a charge was made in error, please contact us at
+            <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a> before filing
+            a chargeback with your bank. We will resolve legitimate billing errors
+            promptly.
+          </p>
+
+          <h2>7. Contact</h2>
+          <p>
+            For all cancellation and refund requests, or any billing questions:
+          </p>
+          <ul>
+            <li>
+              Email: <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
+              >
+            </li>
+            <li>We aim to respond within 1 business day.</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .legal-page {
+    padding: 3.5rem 0 7rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--nmb-text-muted);
+    text-decoration: none;
+    margin-bottom: 3rem;
+    transition: color var(--nmb-t);
+  }
+
+  .back-link:hover {
+    color: var(--nmb-text);
+  }
+
+  .legal-article {
+    max-width: 720px;
+  }
+
+  .legal-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  .legal-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 750;
+    letter-spacing: -0.028em;
+    color: var(--nmb-text);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .legal-date {
+    font-size: 0.875rem;
+    color: var(--nmb-text-subtle);
+    margin: 0;
+  }
+
+  .legal-body h2 {
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    letter-spacing: -0.015em;
+    margin: 2.25rem 0 0.625rem;
+  }
+
+  .legal-body h3 {
+    font-size: 0.9375rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .legal-body p {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.75;
+    margin: 0 0 0.875rem;
+  }
+
+  .legal-body ul,
+  .legal-body ol {
+    margin: 0 0 0.875rem 1.25rem;
+    padding: 0;
+  }
+
+  .legal-body li {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.75;
+    margin-bottom: 0.3rem;
+  }
+
+  .legal-body strong {
+    color: var(--nmb-text-2);
+    font-weight: 600;
+  }
+
+  .legal-body a {
+    color: var(--nmb-accent);
+    text-decoration: none;
+  }
+
+  .legal-body a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,11 +1,35 @@
 ---
 const providers = [
-  "Amazon S3",
-  "Cloudflare R2",
-  "Backblaze B2",
-  "MinIO",
-  "Wasabi",
-  "DigitalOcean Spaces",
+  {
+    name: "Amazon S3",
+    color: "#FF9900",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><ellipse cx="11" cy="5.5" rx="7.5" ry="2.8" fill="currentColor"/><path d="M3.5 5.5v11c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-11" fill="currentColor" opacity=".8"/><ellipse cx="11" cy="16.5" rx="7.5" ry="2.8" fill="currentColor" opacity=".9"/></svg>`,
+  },
+  {
+    name: "Cloudflare R2",
+    color: "#F6821F",
+    logo: `<svg width="26" height="22" viewBox="0 0 26 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M22.5 13.4a4 4 0 00-3.8-2.7 4 4 0 00-3.7 2.4 2.6 2.6 0 00-1-.18 2.6 2.6 0 00-2.6 2.6 2.6 2.6 0 002.6 2.6h11a2 2 0 002-2 2 2 0 00-1.7-2l-.2.02z"/><path fill="currentColor" opacity=".4" d="M1.5 15A4 4 0 015.5 11c.4 0 .8.05 1.2.14"/></svg>`,
+  },
+  {
+    name: "Backblaze B2",
+    color: "#2564b8",
+    logo: `<svg width="16" height="22" viewBox="0 0 16 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M8 2C8 2 3 7.5 3 13.5a5 5 0 0010 0c0-2.8-1.4-5-2.6-6.4.1 1.7-.5 3.2-1.5 3.4-1.1.3-1.9-.8-1.6-2.1C7.6 6.1 8 2 8 2z"/></svg>`,
+  },
+  {
+    name: "MinIO",
+    color: "#C72C48",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M19 7L11 2 3 7v8l8 5 8-5V7z" opacity=".9"/><path stroke="rgba(255,255,255,.3)" stroke-width=".75" fill="none" d="M11 2v18M3 7l8 4.5 8-4.5"/></svg>`,
+  },
+  {
+    name: "Wasabi",
+    color: "#3AB54A",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="currentColor"/><path d="M6 11q2.5-3.5 5 0t5 0" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>`,
+  },
+  {
+    name: "DigitalOcean",
+    color: "#0080FF",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="currentColor"/><path d="M11 5.5a5.5 5.5 0 010 11V13a2.5 2.5 0 000-5V5.5z" fill="rgba(255,255,255,.95)"/><rect x="8.5" y="13.5" width="2.5" height="2" rx=".4" fill="rgba(255,255,255,.95)"/><rect x="8.5" y="16.2" width="1.8" height="1.6" rx=".4" fill="rgba(255,255,255,.95)"/></svg>`,
+  },
 ];
 ---
 
@@ -185,20 +209,16 @@ const providers = [
   <div class="providers-strip">
     <div class="container providers-inner">
       <span class="providers-label">Compatible with</span>
-      <span class="providers-list">
+      <div class="providers-logos">
         {
-          providers.map((p, i) => (
-            <>
-              <span class="provider">{p}</span>
-              {i < providers.length - 1 && (
-                <span class="providers-dot" aria-hidden="true">
-                  ·
-                </span>
-              )}
-            </>
+          providers.map((p) => (
+            <div class="provider-item" style={`--brand: ${p.color}`}>
+              <span class="provider-icon" set:html={p.logo} />
+              <span class="provider-name">{p.name}</span>
+            </div>
           ))
         }
-      </span>
+      </div>
     </div>
   </div>
 </section>
@@ -529,7 +549,7 @@ const providers = [
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem 0.875rem;
+    gap: 0.5rem 1rem;
   }
 
   .providers-label {
@@ -539,23 +559,41 @@ const providers = [
     white-space: nowrap;
   }
 
-  .providers-list {
+  .providers-logos {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 0.625rem;
+    gap: 0.125rem;
   }
 
-  .provider {
+  .provider-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.625rem;
+    border-radius: var(--nmb-radius-sm);
+    color: var(--nmb-text-subtle);
+    transition:
+      background var(--nmb-t),
+      color var(--nmb-t);
+    cursor: default;
+  }
+
+  .provider-item:hover {
+    background: var(--nmb-border-light);
+    color: var(--brand);
+  }
+
+  .provider-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .provider-name {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--nmb-text-muted);
-    transition: color var(--nmb-t);
-  }
-
-  .providers-dot {
-    color: var(--nmb-border);
-    font-size: 0.875rem;
+    white-space: nowrap;
   }
 
   /* ── Responsive ─────────────────────────────────────────────────────────── */

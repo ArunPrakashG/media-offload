@@ -58,7 +58,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	router := api.NewRouter(svc, rdb, logger)
+	router := api.NewRouter(cfg, svc, database, rdb, logger)
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,

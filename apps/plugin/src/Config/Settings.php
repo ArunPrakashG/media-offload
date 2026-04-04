@@ -48,6 +48,8 @@ final class Settings
     'log_to_error_log' => true,
     'allowed_path_patterns' => '',
     'ignored_path_patterns' => '',
+    'offload_min_size_kb' => 0,
+    'offload_allowed_mime_types' => '',
     'storage_class' => 'STANDARD',
     'visibility' => 'public-read',
   ];
@@ -151,6 +153,32 @@ final class Settings
   public function proxy_cache_purge_method(): string
   {
     return $this->proxyCachePurgeMethod();
+  }
+
+  /**
+   * Minimum file size in KB to offload. 0 = no minimum (all sizes allowed).
+   * Requires the selective_offload license feature.
+   */
+  public function offload_min_size_kb(): int
+  {
+    return max(0, (int) $this->get('offload_min_size_kb', 0));
+  }
+
+  /**
+   * Comma-separated list of allowed MIME type patterns (e.g. "image/*,video/*").
+   * Empty = all MIME types are allowed.
+   * Requires the selective_offload license feature.
+   *
+   * @return list<string>
+   */
+  public function offload_allowed_mime_types(): array
+  {
+    $raw = trim((string) $this->get('offload_allowed_mime_types', ''));
+    if ($raw === '') {
+      return [];
+    }
+
+    return array_values(array_filter(array_map('trim', explode(',', $raw))));
   }
 
   public function should_offload_relative_path(string $relativePath): bool
@@ -451,6 +479,12 @@ final class Settings
         case 'allowed_path_patterns':
         case 'ignored_path_patterns':
           $clean[$key] = $this->sanitizePathPatterns($value);
+          break;
+        case 'offload_min_size_kb':
+          $clean[$key] = max(0, (int) $value);
+          break;
+        case 'offload_allowed_mime_types':
+          $clean[$key] = $this->sanitizeLineList($value);
           break;
         case 'proxy_cache_purge_urls':
         case 'proxy_cache_purge_all_urls':

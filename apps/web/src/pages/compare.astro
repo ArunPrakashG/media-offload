@@ -1,0 +1,602 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Nimbus vs Per-File Pricing Plugins — Side-by-Side Comparison"
+  description="See how Nimbus compares to media offload plugins that charge by file count. No per-file quotas. Pay for sites, not storage."
+>
+  <Navbar />
+
+  <main class="compare-page">
+    <!-- Hero -->
+    <section class="compare-hero">
+      <div class="container">
+        <p class="section-label">Comparison</p>
+        <h1 class="compare-headline">Nimbus vs Per-File Pricing</h1>
+        <p class="compare-sub">
+          Most media offload plugins charge you based on how many files you’ve
+          offloaded. Nimbus charges based on how many sites you run — unlimited
+          files, always.
+        </p>
+      </div>
+    </section>
+
+    <!-- Key differentiator banner -->
+    <section class="diff-banner">
+      <div class="container diff-banner-inner">
+        <div class="diff-item diff-item--us">
+          <span class="diff-label">Nimbus</span>
+          <p class="diff-heading">Pay per site, unlimited media</p>
+          <p class="diff-body">
+            Upload 1 file or 1 million — your annual price never changes. You're
+            billed by the number of WordPress sites you run.
+          </p>
+        </div>
+        <div class="diff-vs">vs</div>
+        <div class="diff-item diff-item--them">
+          <span class="diff-label">Per-file pricing plugins</span>
+          <p class="diff-heading">Pay per media item, unlimited sites</p>
+          <p class="diff-body">
+            Every license has a hard cap on total offloaded files. Exceed it and
+            non-essential features are disabled until you upgrade your plan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing table -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-headline" style="margin-bottom:0.5rem">
+          Pricing at a glance
+        </h2>
+        <p class="section-sub" style="margin-bottom:2.5rem">
+          All prices are annual. Competitor prices are representative of the
+          leading per-file pricing plugins at regular (non-promo) rates.
+        </p>
+
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th class="col-feature">Plan</th>
+                <th class="col-nimbus">
+                  <span class="th-brand th-brand--nimbus">Nimbus</span>
+                </th>
+                <th class="col-them">
+                  <span class="th-brand th-brand--them">Other plugins</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Free tier</td>
+                <td class="col-nimbus winner">
+                  <strong>$0 / forever</strong>
+                  <span class="td-note"
+                    >1 site · unlimited media · new uploads</span
+                  >
+                </td>
+                <td class="col-them">
+                  <span class="dash">—</span>
+                  <span class="td-note">No free tier available</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Entry tier</td>
+                <td class="col-nimbus">
+                  <strong>$69 / yr</strong>
+                  <span class="td-note">1 site · unlimited media</span>
+                </td>
+                <td class="col-them">
+                  <strong>$99 / yr</strong>
+                  <span class="td-note"
+                    >Unlimited sites · up to 6,000 files</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Mid tier</td>
+                <td class="col-nimbus">
+                  <strong>$169 / yr</strong>
+                  <span class="td-note">5 sites · unlimited media</span>
+                </td>
+                <td class="col-them">
+                  <strong>$249 / yr</strong>
+                  <span class="td-note"
+                    >Unlimited sites · up to 40,000 files</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Top tier</td>
+                <td class="col-nimbus">
+                  <strong>$449 / yr</strong>
+                  <span class="td-note">Unlimited sites · unlimited media</span>
+                </td>
+                <td class="col-them">
+                  <strong>$799 / yr</strong>
+                  <span class="td-note"
+                    >Unlimited sites · up to 500,000 files</span
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td>Truly unlimited</td>
+                <td class="col-nimbus winner">
+                  <strong>$449 / yr</strong>
+                  <span class="td-note">No file cap at any tier</span>
+                </td>
+                <td class="col-them">
+                  <strong>$1,199 / yr</strong>
+                  <span class="td-note">Unlimited file plan</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature matrix -->
+    <section class="section section--alt">
+      <div class="container">
+        <h2 class="section-headline" style="margin-bottom:2.5rem">
+          Feature comparison
+        </h2>
+
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th class="col-feature">Feature</th>
+                <th class="col-nimbus">
+                  <span class="th-brand th-brand--nimbus">Nimbus</span>
+                </th>
+                <th class="col-them">
+                  <span class="th-brand th-brand--them">Other plugins</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Media file cap</td>
+                <td class="col-nimbus winner">None — unlimited on all plans</td>
+                <td class="col-them"
+                  >Hard cap per plan (2K → 500K → $1,199 for unlimited)</td
+                >
+              </tr>
+              <tr>
+                <td>Amazon S3</td>
+                <td class="col-nimbus"><span class="check">✓</span></td>
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Cloudflare R2</td>
+                <td class="col-nimbus"><span class="check">✓</span></td>
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>DigitalOcean Spaces</td>
+                <td class="col-nimbus"
+                  ><span class="check">✓</span> (S3-compatible)</td
+                >
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Any S3-compatible provider</td>
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> All plans</td
+                >
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Bulk migration tool</td>
+                <td class="col-nimbus"
+                  ><span class="check">✓</span> Personal &amp; above</td
+                >
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>WP-CLI support</td>
+                <td class="col-nimbus"
+                  ><span class="check">✓</span> Pro &amp; Agency</td
+                >
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>WordPress Multisite</td>
+                <td class="col-nimbus"
+                  ><span class="check">✓</span> Pro &amp; Agency</td
+                >
+                <td class="col-them"
+                  ><span class="check">✓</span> All paid plans</td
+                >
+              </tr>
+              <tr>
+                <td>Database URL rewriting</td>
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> All plans</td
+                >
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Cache purge integration</td>
+                <td class="col-nimbus"><span class="check">✓</span> Agency</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Nightly batch offloading</td>
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> Personal &amp; above</td
+                >
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Priority email support</td>
+                <td class="col-nimbus"
+                  ><span class="check">✓</span> Pro &amp; Agency</td
+                >
+                <td class="col-them"
+                  ><span class="check">✓</span> Gold tier and above</td
+                >
+              </tr>
+              <tr>
+                <td>License pricing model</td>
+                <td class="col-nimbus winner">Per site · no media cap</td>
+                <td class="col-them">Per media item count · unlimited sites</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="container compare-faq">
+        <h2 class="section-headline" style="margin-bottom:2.5rem">
+          Frequently asked questions
+        </h2>
+
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3>Why does Nimbus limit by sites instead of media files?</h3>
+            <p>
+              Media file caps punish growth. A photography portfolio site might
+              have 50,000 images on a single install, while an agency running 20
+              small business sites might have 500 total. Limiting by media count
+              charges the small photographer more than the agency — that's
+              backwards. We charge by the number of WordPress installations you
+              manage, so your cost reflects your operational footprint, not how
+              many photos your clients shot this year.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What happens if I go over my site limit?</h3>
+            <p>
+              You'll see a notice in your dashboard when you approach your
+              activation limit. Existing sites continue working normally. To add
+              another site you simply upgrade your plan. There's no sudden
+              feature cutoff — unlike media-count models where hitting the cap
+              disables functionality on sites you've already configured.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Is there a free version of Nimbus?</h3>
+            <p>
+              Yes. The free tier includes new-upload offloading, database URL
+              rewriting, and any S3-compatible provider — on 1 site with
+              unlimited media files. No credit card required. Bulk migration of
+              existing media and nightly background offloading are available on
+              paid plans from $69/yr.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How does annual billing work?</h3>
+            <p>
+              You're charged once per year. Your license is valid for 12 months
+              from the payment date and auto-renews unless cancelled. Cancelling
+              is instant from your account dashboard — no hoops to jump through.
+              If you cancel, your license stays active until the end of the
+              billing period.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Do I get updates and support after my license expires?</h3>
+            <p>
+              Plugin updates and support require an active license. The plugin
+              itself will continue to function — your media will keep serving
+              from your storage provider — but you won't receive new features or
+              security patches until you renew. We recommend staying current for
+              security reasons.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Which storage providers does Nimbus support?</h3>
+            <p>
+              Any provider with an S3-compatible API: Amazon S3, Cloudflare R2,
+              DigitalOcean Spaces, Backblaze B2, MinIO, Wasabi, Vultr Object
+              Storage, and more. If it speaks S3, Nimbus works with it. You're
+              never locked into a single provider.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section compare-cta-section">
+      <div class="container compare-cta">
+        <h2>Ready to switch?</h2>
+        <p>
+          Start with the plan that fits your sites. Upgrade or cancel any time.
+        </p>
+        <a class="btn btn-primary" href="/#pricing">See pricing →</a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  /* ── Page layout ─────────────────────────────────────────────────────────── */
+  .compare-page {
+    padding-top: 0;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────────────────── */
+  .compare-hero {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+
+  .compare-headline {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    color: var(--nmb-text);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .compare-sub {
+    font-size: 1.125rem;
+    color: var(--nmb-text-subtle);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Differentiator banner ───────────────────────────────────────────────── */
+  .diff-banner {
+    background: var(--nmb-bg-subtle, #f8f9fb);
+    border-top: 1px solid var(--nmb-border-light);
+    border-bottom: 1px solid var(--nmb-border-light);
+    padding: 3rem 0;
+  }
+
+  .diff-banner-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .diff-item {
+    padding: 1.75rem;
+    border-radius: var(--nmb-radius-lg);
+    border: 1px solid var(--nmb-border);
+    background: var(--nmb-surface);
+  }
+
+  .diff-item--us {
+    border-color: rgba(79, 99, 245, 0.35);
+    background: rgba(79, 99, 245, 0.04);
+  }
+
+  .diff-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--nmb-accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .diff-item--them .diff-label {
+    color: var(--nmb-text-subtle);
+  }
+
+  .diff-heading {
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .diff-body {
+    font-size: 0.9rem;
+    color: var(--nmb-text-subtle);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .diff-vs {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--nmb-text-subtle);
+    text-align: center;
+  }
+
+  /* ── Comparison table ────────────────────────────────────────────────────── */
+  .compare-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--nmb-radius-lg);
+    border: 1px solid var(--nmb-border);
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .compare-table thead {
+    background: var(--nmb-bg-subtle, #f8f9fb);
+    border-bottom: 1px solid var(--nmb-border);
+  }
+
+  .compare-table th,
+  .compare-table td {
+    padding: 0.875rem 1.25rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  .compare-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .compare-table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--nmb-text-subtle);
+  }
+
+  .col-feature {
+    width: 36%;
+  }
+  .col-nimbus {
+    width: 32%;
+    background: rgba(79, 99, 245, 0.03);
+  }
+  .col-them {
+    width: 32%;
+  }
+
+  .th-brand {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--nmb-radius-full);
+  }
+
+  .th-brand--nimbus {
+    background: rgba(79, 99, 245, 0.1);
+    color: var(--nmb-accent);
+  }
+
+  .th-brand--them {
+    background: var(--nmb-bg-subtle, #f0f0f0);
+    color: var(--nmb-text-subtle);
+  }
+
+  .td-note {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--nmb-text-subtle);
+    margin-top: 0.2rem;
+    font-weight: 400;
+  }
+
+  .winner {
+    color: var(--nmb-accent);
+    font-weight: 600;
+  }
+
+  .check {
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  .dash {
+    color: var(--nmb-text-subtle);
+  }
+
+  /* ── Alternate section background ────────────────────────────────────────── */
+  .section--alt {
+    background: var(--nmb-bg-subtle, #f8f9fb);
+    border-top: 1px solid var(--nmb-border-light);
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  /* ── FAQ ─────────────────────────────────────────────────────────────────── */
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .faq-item h3 {
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    margin-bottom: 0.625rem;
+  }
+
+  .faq-item p {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-subtle);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── CTA ─────────────────────────────────────────────────────────────────── */
+  .compare-cta-section {
+    text-align: center;
+  }
+
+  .compare-cta h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .compare-cta p {
+    color: var(--nmb-text-subtle);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Responsive ──────────────────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .diff-banner-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .diff-vs {
+      text-align: center;
+      padding: 0.25rem 0;
+    }
+
+    .faq-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .col-feature {
+      width: 40%;
+    }
+    .col-nimbus {
+      width: 30%;
+    }
+    .col-them {
+      width: 30%;
+    }
+  }
+</style>

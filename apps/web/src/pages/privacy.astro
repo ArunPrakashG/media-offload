@@ -1,0 +1,260 @@
+---
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Base from "@layouts/Base.astro";
+import "@styles/global.css";
+import "@styles/tokens.css";
+---
+
+<Base
+  title="Privacy Policy — Nimbus"
+  description="How Nimbus collects, uses, and protects your information."
+>
+  <Navbar />
+  <main class="legal-page">
+    <div class="container">
+      <a class="back-link" href="/">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 3L5 8l5 5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        Back to Nimbus
+      </a>
+
+      <article class="legal-article">
+        <header class="legal-header">
+          <p class="section-label">Legal</p>
+          <h1 class="legal-title">Privacy Policy</h1>
+          <p class="legal-date">Last updated: 4 April 2026</p>
+        </header>
+
+        <div class="legal-body">
+          <h2>1. Who we are</h2>
+          <p>
+            Nimbus is a WordPress plugin for cloud media offloading. We are an
+            independent software product reachable at <a
+              href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
+            >. When this policy says "Nimbus", "we", "us", or "our" it refers to
+            the operator of the Nimbus plugin and the website usenimbus.dev.
+          </p>
+
+          <h2>2. Information we collect</h2>
+          <p>We collect only what is necessary to operate the product:</p>
+          <ul>
+            <li>
+              <strong>Purchase information.</strong> When you buy a license, our payment
+              processor collects your email address and payment details. We receive
+              your email address and the tier of license purchased. We do not store
+              full card numbers.
+            </li>
+            <li>
+              <strong>License validation.</strong> When the plugin is active on a
+              WordPress site, it periodically sends your license key and the WordPress
+              installation's site URL to our license API (<code
+                >api.usenimbus.dev</code
+              >) to verify that the license is valid. No data about your site
+              visitors is transmitted.
+            </li>
+            <li>
+              <strong>Website logs.</strong> Our web server temporarily records standard
+              HTTP logs (IP address, browser, page requested, timestamp). These are
+              used for debugging and security and are not retained beyond 30 days.
+            </li>
+          </ul>
+
+          <h2>3. How we use your information</h2>
+          <ul>
+            <li>To issue and validate your software license.</li>
+            <li>
+              To contact you about significant product updates or security
+              notices (not marketing without consent).
+            </li>
+            <li>To maintain the security and integrity of our services.</li>
+          </ul>
+
+          <h2>4. Data sharing</h2>
+          <p>
+            We do not sell, rent, or trade your personal data. We may share data
+            only with:
+          </p>
+          <ul>
+            <li>
+              <strong>Razorpay</strong> (razorpay.com) to process your payment securely.
+              Razorpay's privacy policy governs their use of your payment data.
+            </li>
+            <li>
+              <strong>Infrastructure providers</strong> for hosting the license API.
+              These operate under data processing agreements.
+            </li>
+          </ul>
+          <p>
+            We have no advertising or analytics partners that receive personal
+            data.
+          </p>
+
+          <h2>5. Cookies and tracking</h2>
+          <p>
+            The Nimbus website does not use advertising or analytics tracking
+            cookies. Your browser may store a functional session cookie if you
+            visit a page that requires authentication, but this is not used for
+            cross-site tracking.
+          </p>
+
+          <h2>6. Data security</h2>
+          <p>
+            All data transmitted between the plugin and our license API uses TLS
+            (HTTPS) encryption. License keys are stored using secure hashing
+            practices. We apply security best-practices to our infrastructure,
+            but no system is 100% immune to all threats.
+          </p>
+
+          <h2>7. Data retention</h2>
+          <p>
+            Your email address and license record are retained for as long as
+            your license is active plus a short period after for dispute
+            resolution. You may request deletion at any time (see Your Rights
+            below). Server log data is purged automatically after 30 days.
+          </p>
+
+          <h2>8. Your rights</h2>
+          <p>
+            Depending on your jurisdiction, you may have rights to access,
+            correct, delete, or export the personal data we hold about you. To
+            exercise any of these rights, email us at <a
+              href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
+            > and we will respond within 30 days.
+          </p>
+
+          <h2>9. Children's privacy</h2>
+          <p>
+            Nimbus is a developer tool and is not directed at children under the
+            age of 16. We do not knowingly collect personal data from children.
+          </p>
+
+          <h2>10. Changes to this policy</h2>
+          <p>
+            We may update this policy to reflect changes in our practices or for
+            legal reasons. When we do, we will update the "last updated" date at
+            the top of this page. Material changes will be communicated via
+            email to active license holders.
+          </p>
+
+          <h2>11. Contact</h2>
+          <p>
+            Questions about this policy? Email <a
+              href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
+            >.
+          </p>
+        </div>
+      </article>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .legal-page {
+    padding: 3.5rem 0 7rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--nmb-text-muted);
+    text-decoration: none;
+    margin-bottom: 3rem;
+    transition: color var(--nmb-t);
+  }
+
+  .back-link:hover {
+    color: var(--nmb-text);
+  }
+
+  /* ── Article ─────────────────────────────────────────────────────────────── */
+  .legal-article {
+    max-width: 720px;
+  }
+
+  .legal-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--nmb-border-light);
+  }
+
+  .legal-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 750;
+    letter-spacing: -0.028em;
+    color: var(--nmb-text);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .legal-date {
+    font-size: 0.875rem;
+    color: var(--nmb-text-subtle);
+    margin: 0;
+  }
+
+  /* ── Body typography ─────────────────────────────────────────────────────── */
+  .legal-body h2 {
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    letter-spacing: -0.015em;
+    margin: 2.25rem 0 0.625rem;
+  }
+
+  .legal-body p {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.75;
+    margin: 0 0 0.875rem;
+  }
+
+  .legal-body ul {
+    margin: 0 0 0.875rem 1.25rem;
+    padding: 0;
+  }
+
+  .legal-body li {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.75;
+    margin-bottom: 0.3rem;
+  }
+
+  .legal-body strong {
+    color: var(--nmb-text-2);
+    font-weight: 600;
+  }
+
+  .legal-body code {
+    font-family: var(--nmb-font-mono);
+    font-size: 0.875em;
+    color: var(--nmb-accent);
+    background: var(--nmb-accent-dim);
+    padding: 0.1em 0.35em;
+    border-radius: var(--nmb-radius-xs);
+  }
+
+  .legal-body a {
+    color: var(--nmb-accent);
+    text-decoration: none;
+  }
+
+  .legal-body a:hover {
+    text-decoration: underline;
+  }
+</style>

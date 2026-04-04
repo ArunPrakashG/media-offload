@@ -28,7 +28,9 @@ type License struct {
 	Tier           string     // "personal" | "pro" | "agency"
 	Status         string     // "active" | "expired" | "revoked" | "suspended"
 	MaxActivations int        // -1 = unlimited
-	ExpiresAt      *time.Time // nil = never expires
+	SubscriptionID *string    // Razorpay subscription ID (nil for one-time/legacy)
+	BillingCycle   string     // "monthly" | "annual"
+	ExpiresAt      *time.Time // nil = never expires (perpetual)
 	CreatedAt      time.Time
 }
 
@@ -64,7 +66,37 @@ type CreateLicenseParams struct {
 	Key            string
 	Tier           string
 	MaxActivations int
+	SubscriptionID *string
+	BillingCycle   string
 	ExpiresAt      *time.Time
+}
+
+// RazorpaySubscription tracks a Razorpay subscription linked to a license.
+type RazorpaySubscription struct {
+	ID            string
+	LicenseID     *string
+	RzpSubID      string
+	PlanID        string
+	Tier          string
+	BillingCycle  string
+	CustomerEmail string
+	Status        string
+	CurrentStart  *time.Time
+	CurrentEnd    *time.Time
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}
+
+// UpsertRazorpaySubscriptionParams is used to create or update a subscription record.
+type UpsertRazorpaySubscriptionParams struct {
+	RzpSubID      string
+	PlanID        string
+	Tier          string
+	BillingCycle  string
+	CustomerEmail string
+	Status        string
+	CurrentStart  *time.Time
+	CurrentEnd    *time.Time
 }
 
 // LicenseForActivation is a slim projection fetched and locked during activation.
@@ -75,4 +107,26 @@ type LicenseForActivation struct {
 	Status         string
 	MaxActivations int
 	ExpiresAt      *time.Time
+}
+// PluginRelease is a published version of a product plugin.
+type PluginRelease struct {
+        ID             string
+        Version        string
+        DownloadURL    string
+        Changelog      string
+        MinWPVersion   string
+        MinPHPVersion  string
+        TestedUpTo     string
+        ReleasedAt     time.Time
+}
+
+// CreateReleaseParams holds the fields required to register a new plugin release.
+type CreateReleaseParams struct {
+        ProductID      string
+        Version        string
+        DownloadURL    string
+        Changelog      string
+        MinWPVersion   string
+        MinPHPVersion  string
+        TestedUpTo     string
 }

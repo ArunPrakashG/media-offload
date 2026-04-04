@@ -53,6 +53,24 @@ define('NIMBUS_NIGHTLY_WORKER_HOOK', 'nimbus_nightly_worker');
 define('NIMBUS_CLEANUP_HOOK', 'nimbus_cleanup_attachment');
 define('NIMBUS_CACHE_PURGE_HOOK', 'nimbus_cache_purge_worker');
 
+// ── License backend ────────────────────────────────────────────────────────
+// Override in wp-config.php for staging / local dev.
+if (!defined('NIMBUS_BACKEND_URL')) {
+  define('NIMBUS_BACKEND_URL', 'https://api.usenimbus.dev');
+}
+
+// Ed25519 public key (base64, standard encoding) used to verify activation
+// tokens offline. Must match the key pair used by the license backend.
+// Set NIMBUS_LICENSE_PUBLIC_KEY in wp-config.php to override (e.g. for staging).
+if (!defined('NIMBUS_LICENSE_PUBLIC_KEY')) {
+  define('NIMBUS_LICENSE_PUBLIC_KEY', 'REPLACE_WITH_BASE64_ED25519_PUBLIC_KEY');
+}
+
+// Admin-post action constants for license management.
+define('NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE', 'nimbus_license_activate');
+define('NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE', 'nimbus_license_activate_free');
+define('NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE', 'nimbus_license_deactivate_site');
+
 if (file_exists(NIMBUS_PATH . 'vendor/autoload.php')) {
   require_once NIMBUS_PATH . 'vendor/autoload.php';
 }

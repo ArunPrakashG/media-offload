@@ -72,6 +72,9 @@ final class SettingsUi
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING, [$this, 'handle_complete_onboarding']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION, [$this, 'handle_rewrite_integration']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE, [$this, 'handle_license_activate']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE, [$this, 'handle_license_activate_free']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE, [$this, 'handle_license_deactivate_site']);
     $this->mediaLibraryController->register();
   }
 
@@ -193,6 +196,21 @@ final class SettingsUi
   public function handle_toggle_integration(): void
   {
     $this->actionsController->handleToggleIntegration();
+  }
+
+  public function handle_license_activate(): void
+  {
+    $this->actionsController->handleLicenseActivate();
+  }
+
+  public function handle_license_activate_free(): void
+  {
+    $this->actionsController->handleLicenseActivateFree();
+  }
+
+  public function handle_license_deactivate_site(): void
+  {
+    $this->actionsController->handleLicenseDeactivateSite();
   }
 
   public function handle_onboarding_redirect(): void

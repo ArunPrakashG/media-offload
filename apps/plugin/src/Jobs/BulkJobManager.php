@@ -2,6 +2,7 @@
 namespace Nimbus\Plugin\Jobs;
 
 use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Support\Logger;
 
@@ -46,6 +47,7 @@ final class BulkJobManager
     private Settings $settings,
     private UploadHandler $uploadHandler,
     private Logger $logger,
+    private LicenseManager $licenseManager,
   ) {
   }
 
@@ -95,6 +97,14 @@ final class BulkJobManager
       return new \WP_Error('nimbus_job_active', __('A bulk media job is already running. Pause or wait for it to finish first.', NIMBUS_TEXT_DOMAIN), ['status' => 409]);
     }
 
+    if ($type === 'restore_local' && !$this->licenseManager->hasFeature('restore_local')) {
+      return new \WP_Error(
+        'nimbus_feature_unavailable',
+        __('Restoring local copies requires Personal plan or above. Upgrade your license to use this feature.', NIMBUS_TEXT_DOMAIN),
+        ['status' => 403]
+      );
+    }
+
     if ($type === 'offload_existing' || $type === 'retry_failed') {
       if (!$this->settings->is_enabled() || !$this->settings->has_valid_credentials()) {
         return new \WP_Error('nimbus_not_ready', __('Storage credentials and enabled offloading are required before starting an offload job.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
@@ -105,7 +115,14 @@ final class BulkJobManager
       return new \WP_Error('nimbus_restore_not_ready', __('Storage credentials are required before restoring local copies from remote storage.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
     }
 
-    $batchSize = max(1, min(100, (int) ($args['batch_size'] ?? 25)));
+    // Cap batch_size to the tier allowance — migration speed scales with plan tier.
+    $tierBatchCap = match ($this->licenseManager->tier()) {
+      'agency'   => 100,
+      'pro'      => 75,
+      'personal' => 25,
+      default    => 10,   // free or unrecognised tier
+    };
+    $batchSize = max(1, min($tierBatchCap, (int) ($args['batch_size'] ?? $tierBatchCap)));
     $retryIds = [];
     $totalItems = 0;
 

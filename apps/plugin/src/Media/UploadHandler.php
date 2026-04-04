@@ -2,6 +2,7 @@
 namespace Nimbus\Plugin\Media;
 
 use Nimbus\Plugin\Config\Settings;
+use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Storage\StorageAdapter;
 use Nimbus\Plugin\Storage\StorageAdapterFactory;
 use Nimbus\Plugin\Support\Events;
@@ -18,10 +19,13 @@ final class UploadHandler
 {
   private const NIGHTLY_BATCH_LOCK_TRANSIENT = 'nimbus_nightly_batch_lock';
 
+  private bool $nightlyBatchEnabled = false;
+
   public function __construct(
     private Settings $settings,
     private StorageAdapterFactory $factory,
     private Logger $logger,
+    private LicenseManager $licenseManager,
   ) {
   }
 
@@ -33,6 +37,15 @@ final class UploadHandler
     add_filter('wp_get_attachment_metadata', [$this, 'inject_remote_metadata'], 20, 2);
     add_action('delete_attachment', [$this, 'delete_remote_files'], 20, 1);
     add_action(NIMBUS_CLEANUP_HOOK, [$this, 'cleanup_local_files'], 20, 1);
+  }
+
+  /**
+   * Register nightly batch hooks and set up the initial cron schedule.
+   * Only called for paid-tier licenses that include the nightly_batch feature.
+   */
+  public function registerNightlyBatch(): void
+  {
+    $this->nightlyBatchEnabled = true;
     add_action(NIMBUS_NIGHTLY_BATCH_HOOK, [$this, 'run_nightly_pending_batch'], 20, 0);
     add_action(NIMBUS_NIGHTLY_WORKER_HOOK, [$this, 'run_nightly_worker'], 20, 4);
 
@@ -96,7 +109,22 @@ final class UploadHandler
       return false;
     }
 
-    return !$this->is_attachment_excluded_by_path_rules($attachment_id);
+    if ($this->is_attachment_excluded_by_path_rules($attachment_id)) {
+      return false;
+    }
+
+    // Selective offload rules (MIME type + file size) are gated on the selective_offload feature.
+    if ($this->licenseManager->hasFeature('selective_offload')) {
+      if ($this->is_attachment_excluded_by_size_rules($attachment_id)) {
+        return false;
+      }
+
+      if ($this->is_attachment_excluded_by_mime_rules($attachment_id)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public function filter_eligible_attachment_ids(array $attachment_ids): array
@@ -181,6 +209,14 @@ final class UploadHandler
       $hours = max(1, (int) apply_filters('nimbus_nightly_hours', 24));
       $workerBatchSize = max(1, (int) apply_filters('nimbus_nightly_limit', $this->settings->off_hours_worker_batch_size()));
       $workerCount = $this->settings->off_hours_worker_count();
+
+      // Cap to the tier worker allowance — more workers = faster overnight processing.
+      $tierWorkerCap = match ($this->licenseManager->tier()) {
+        'agency' => 8,
+        'pro'    => 5,
+        default  => 2,  // personal (free is gated from nightly_batch entirely)
+      };
+      $workerCount = min($workerCount, $tierWorkerCap);
 
       if ($workerCount <= 1) {
         $result = $this->process_pending_offloads($hours, $workerBatchSize, 'nightly-main');
@@ -729,6 +765,7 @@ final class UploadHandler
 
     if (file_exists($file)) {
       if (($existingOffloadMeta['key'] ?? '') !== $key) {
+        $key = $this->dedup_key($adapter, $key);
         $uploadedKey = $adapter->upload($file, $key, ['content_type' => get_post_mime_type($attachment_id)]);
       } elseif (!empty($existingOffloadMeta['key']) && is_string($existingOffloadMeta['key'])) {
         $uploadedKey = $existingOffloadMeta['key'];
@@ -751,6 +788,42 @@ final class UploadHandler
     }
 
     return $offloadMeta;
+  }
+
+  /**
+   * Returns $key unchanged if it does not exist in the bucket, or a new key
+   * with a random 8-hex-char suffix inserted before the extension to avoid
+   * overwriting an unrelated file that happens to share the same path.
+   */
+  private function dedup_key(StorageAdapter $adapter, string $key): string
+  {
+    if (!$adapter->exists($key)) {
+      return $key;
+    }
+
+    $ext  = pathinfo($key, PATHINFO_EXTENSION);
+    $base = $ext !== '' ? substr($key, 0, -(strlen($ext) + 1)) : $key;
+
+    for ($attempt = 0; $attempt < 10; $attempt++) {
+      $suffix    = bin2hex(random_bytes(4)); // 8 hex chars
+      $candidate = $ext !== '' ? "{$base}-{$suffix}.{$ext}" : "{$base}-{$suffix}";
+      if (!$adapter->exists($candidate)) {
+        $this->logger->info('Remote key collision on "{key}", using "{candidate}" instead.', [
+          'key'       => $key,
+          'candidate' => $candidate,
+        ]);
+        return $candidate;
+      }
+    }
+
+    // Fallback for the pathological case where 10 random suffixes all collide.
+    $suffix   = time() . '-' . bin2hex(random_bytes(4));
+    $fallback = $ext !== '' ? "{$base}-{$suffix}.{$ext}" : "{$base}-{$suffix}";
+    $this->logger->warning('Key dedup exhausted retries for "{key}", falling back to "{fallback}".', [
+      'key'      => $key,
+      'fallback' => $fallback,
+    ]);
+    return $fallback;
   }
 
   private function offload_sizes(int $attachment_id, string $base_file, array &$metadata, StorageAdapter $adapter, array $existing_sizes = []): array
@@ -784,6 +857,7 @@ final class UploadHandler
       }
 
       $sizeKey = buildStorageKey($relativePath, (string) $this->settings->get('prefix', ''));
+      $sizeKey = $this->dedup_key($adapter, $sizeKey);
 
       try {
         $uploadedSizeKey = $adapter->upload($sizePath, $sizeKey, [
@@ -993,6 +1067,10 @@ final class UploadHandler
 
   private function reconcile_nightly_batch_schedule(): void
   {
+    if (!$this->nightlyBatchEnabled) {
+      return;
+    }
+
     if (!$this->settings->should_process_off_hours_batch()) {
       $this->clear_nightly_schedule();
       return;
@@ -1166,6 +1244,40 @@ final class UploadHandler
   private function missing_source_retry_cooldown_seconds(): int
   {
     return max(300, (int) apply_filters('nimbus_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
+  }
+
+  private function is_attachment_excluded_by_size_rules(int $attachment_id): bool
+  {
+    $minSizeKb = $this->settings->offload_min_size_kb();
+    if ($minSizeKb <= 0) {
+      return false;
+    }
+
+    $file = get_attached_file($attachment_id);
+    if (!$file || !file_exists($file)) {
+      return false; // can't determine size; let it through
+    }
+
+    return (filesize($file) / 1024) < $minSizeKb;
+  }
+
+  private function is_attachment_excluded_by_mime_rules(int $attachment_id): bool
+  {
+    $allowed = $this->settings->offload_allowed_mime_types();
+    if (empty($allowed)) {
+      return false; // empty allowlist = all MIME types permitted
+    }
+
+    $mime = (string) get_post_mime_type($attachment_id);
+    foreach ($allowed as $pattern) {
+      // Support wildcards like "image/*" or exact types like "video/mp4".
+      $regex = '#^' . str_replace('\*', '[^/]*', preg_quote($pattern, '#')) . '$#i';
+      if (preg_match($regex, $mime)) {
+        return false; // in allowed list
+      }
+    }
+
+    return true; // not in allowed list — exclude from offloading
   }
 
   private function is_attachment_excluded_by_path_rules(int $attachment_id, ?array $metadata = null): bool
