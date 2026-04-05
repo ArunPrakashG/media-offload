@@ -1,0 +1,21 @@
+meta {
+  name: Get Statistics
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/statistics
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}
+
+docs {
+  Returns storage statistics. Deep stats (breakdown by provider, folder, mime type)
+  require the storage_analytics license feature. Without it, basic counts are returned
+  along with _upgrade_required: "storage_analytics".
+}

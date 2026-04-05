@@ -1,0 +1,29 @@
+meta {
+  name: Start Job
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/jobs/start
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-WP-Nonce: {{wpNonce}}
+}
+
+body:json {
+  {
+    "type": "offload",
+    "batch_size": 20
+  }
+}
+
+docs {
+  type: job type identifier (e.g. "offload")
+  batch_size: number of items to process per batch (optional)
+  Returns 202 Accepted with the new job state.
+}

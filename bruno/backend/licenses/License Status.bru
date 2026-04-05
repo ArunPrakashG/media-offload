@@ -1,0 +1,15 @@
+meta {
+  name: License Status
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{backendUrl}}/v1/licenses/status
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{activationToken}}
+}

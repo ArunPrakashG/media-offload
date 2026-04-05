@@ -1,0 +1,35 @@
+meta {
+  name: Process Pending Offload
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/offload/pending
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-WP-Nonce: {{wpNonce}}
+}
+
+body:json {
+  {
+    "hours": 24,
+    "limit": 100,
+    "background": true
+  }
+}
+
+docs {
+  Offloads media that has been waiting for more than `hours` hours, up to `limit` items.
+
+  hours: minimum age of pending items (default: 1, min: 1)
+  limit: max items to process (default/max: 1000)
+  background: if true (default), schedules via WP-Cron and returns 202 immediately.
+              if false, runs synchronously and returns results inline.
+
+  Requires storage credentials to be configured first.
+}

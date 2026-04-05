@@ -1,0 +1,23 @@
+meta {
+  name: Get Status
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/status
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}
+
+docs {
+  Returns plugin configuration, license state, onboarding progress, active jobs,
+  integration summaries and statistics in a single response.
+
+  Requires manage_options capability. Authenticate via WordPress admin cookie +
+  X-WP-Nonce header, or use HTTP Basic Auth with an Application Password.
+}

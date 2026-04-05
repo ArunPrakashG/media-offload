@@ -1,0 +1,30 @@
+meta {
+  name: Offload Single Item
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/offload/item/123
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-WP-Nonce: {{wpNonce}}
+}
+
+body:json {
+  {
+    "background": false
+  }
+}
+
+docs {
+  Offloads a single media attachment by its WordPress attachment ID.
+  Replace 123 in the URL with the actual attachment ID.
+
+  background: if true, schedules via WP-Cron and returns 202.
+              if false (default), runs synchronously and returns {success: true/false}.
+}

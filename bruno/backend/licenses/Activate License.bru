@@ -1,0 +1,44 @@
+meta {
+  name: Activate License
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{backendUrl}}/v1/licenses/activate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Nimbus-Timestamp: 0
+  X-Nimbus-Nonce: 00000000000000000000000000000000
+  X-Nimbus-Signature: change-me
+}
+
+body:json {
+  {
+    "key": "NIMBUS-XXXX-XXXX-XXXX",
+    "domain": "example.com",
+    "product": "nimbus",
+    "plugin_version": "1.0.0"
+  }
+}
+
+docs {
+  The activate endpoint requires HMAC-SHA256 request signing.
+
+  Canonical string (joined with \n):
+    NIMBUS-HMAC-V1
+    POST
+    /v1/licenses/activate
+    <unix-timestamp>
+    <random-hex-nonce-16-64-chars>
+    <hex(sha256(request-body))>
+
+  Sign with HMAC-SHA256 using the license key as the secret, then hex-encode the result.
+  Set X-Nimbus-Timestamp to the current Unix timestamp (seconds).
+  Set X-Nimbus-Nonce to a fresh random hex string (32 chars recommended).
+  Set X-Nimbus-Signature to the computed HMAC hex string.
+}

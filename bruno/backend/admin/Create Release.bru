@@ -1,0 +1,38 @@
+meta {
+  name: Create Release
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{backendUrl}}/admin/v1/releases
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "version": "1.2.3",
+    "download_url": "https://your-bucket.s3.amazonaws.com/nimbus-1.2.3.zip",
+    "changelog": "Bug fixes and performance improvements.",
+    "min_wp_version": "6.0",
+    "min_php_version": "8.0",
+    "tested_up_to": "6.5"
+  }
+}
+
+docs {
+  Registers a new plugin release so licensed WordPress sites discover it on their
+  next update cycle (~12 hours). Typical workflow:
+    1. Build the plugin zip locally.
+    2. Upload to your S3/R2 bucket and copy the public URL.
+    3. POST this endpoint with version and download_url.
+}

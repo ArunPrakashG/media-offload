@@ -1,0 +1,56 @@
+meta {
+  name: Razorpay Webhook
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{backendUrl}}/webhooks/razorpay
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  X-Razorpay-Signature: change-me-hmac-sha256-signature
+}
+
+body:json {
+  {
+    "event": "subscription.activated",
+    "payload": {
+      "subscription": {
+        "entity": {
+          "id": "sub_XXXXXXXXXXXX",
+          "plan_id": "plan_XXXXXXXXXXXX",
+          "status": "active",
+          "current_start": 1700000000,
+          "current_end": 1702592000,
+          "notes": {
+            "email": "customer@example.com",
+            "tier": "personal",
+            "billing_cycle": "monthly"
+          }
+        }
+      },
+      "payment": {
+        "entity": {
+          "id": "pay_XXXXXXXXXXXX",
+          "email": "customer@example.com"
+        }
+      }
+    }
+  }
+}
+
+docs {
+  This endpoint is called by Razorpay and verifies HMAC-SHA256(body, webhook_secret).
+  The X-Razorpay-Signature header must contain the valid signature.
+
+  Handled events:
+    subscription.activated  — provisions/renews a license
+    subscription.charged    — provisions/renews a license
+    subscription.cancelled  — marks license inactive
+    subscription.completed  — marks license inactive
+    subscription.expired    — marks license inactive
+}

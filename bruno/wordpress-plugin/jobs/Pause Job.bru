@@ -1,0 +1,15 @@
+meta {
+  name: Pause Job
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/jobs/pause
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}

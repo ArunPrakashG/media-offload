@@ -1,0 +1,20 @@
+meta {
+  name: Retry Failed Job
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/jobs/retry-failed
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}
+
+docs {
+  Re-queues all failed items in the current bulk job for another attempt.
+  Returns 202 Accepted with the updated job state.
+}
