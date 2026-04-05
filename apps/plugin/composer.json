@@ -20,5 +20,8 @@
   "support": {
     "email": "contact@arunprakashg.com"
   },
-  "type": "wordpress-plugin"
+  "type": "wordpress-plugin",
+  "config": {
+    "autoloader-suffix": "NimbusMediaOffload"
+  }
 }
