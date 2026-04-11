@@ -114,6 +114,9 @@ final class ApiController
 
   public function getStatus(): \WP_REST_Response
   {
+    $licenseData = $this->licenseManager->all();
+    unset($licenseData['token'], $licenseData['key']);
+
     return new \WP_REST_Response([
       'plugin' => [
         'version' => NIMBUS_VERSION,
@@ -123,7 +126,7 @@ final class ApiController
         'serve_from_storage' => $this->settings->should_serve_from_storage(),
         'credentials_ready' => $this->settings->has_valid_credentials(),
       ],
-      'license' => $this->licenseManager->all(),
+      'license' => $licenseData,
       'onboarding' => $this->onboardingManager->state(),
       'jobs' => $this->bulkJobManager->state(),
       'integrations' => $this->integrationDiscovery->summary(),

@@ -193,11 +193,10 @@ final class PageRenderer
           </ul>
 
           <div class="nmb-onboarding-actions">
-            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-              <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>
-              <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>">
-              <button type="submit" class="button button-secondary"><?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?></button>
-            </form>
+            <button type="button" class="button button-secondary" data-free-tier
+              data-action="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>"
+              data-nonce="<?php echo esc_attr(wp_create_nonce(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE)); ?>"
+              data-url="<?php echo esc_url(admin_url('admin-post.php')); ?>"><?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?></button>
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue with license key', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
@@ -377,6 +376,12 @@ final class PageRenderer
             <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup and unlock dashboard', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
+      </form>
+
+      <?php /* Standalone free-tier form — outside the main wizard form to avoid nesting */ ?>
+      <form id="nmb-free-tier-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" hidden>
+        <input type="hidden" name="_wpnonce" id="nmb-free-tier-nonce">
+        <input type="hidden" name="action" id="nmb-free-tier-action">
       </form>
     </div>
     <?php

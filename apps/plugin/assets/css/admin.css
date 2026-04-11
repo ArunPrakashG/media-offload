@@ -1620,7 +1620,7 @@ body.upload_page_media-offload #wpcontent {
 }
 
 .nmb-onboarding-step-item strong,
-.nmb-onboarding-step-item span {
+.nmb-onboarding-step-item > div span {
   display: block;
 }
 
@@ -1631,7 +1631,7 @@ body.upload_page_media-offload #wpcontent {
 }
 
 .nmb-onboarding-step-index {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
@@ -1641,6 +1641,7 @@ body.upload_page_media-offload #wpcontent {
   border: 2px solid var(--nmb-border);
   font-size: 12px;
   font-weight: 700;
+  line-height: 1;
   color: var(--nmb-text-2);
   flex-shrink: 0;
   /* Optically align circle top with the title text baseline */

@@ -60,10 +60,10 @@ if (!defined('NIMBUS_BACKEND_URL')) {
 }
 
 // Ed25519 public key (base64, standard encoding) used to verify activation
-// tokens offline. Must match the key pair used by the license backend.
-// Set NIMBUS_LICENSE_PUBLIC_KEY in wp-config.php to override (e.g. for staging).
+// tokens offline. Bundled here so the plugin works out of the box.
+// Override via wp-config.php only when pointing at a staging/custom backend.
 if (!defined('NIMBUS_LICENSE_PUBLIC_KEY')) {
-  define('NIMBUS_LICENSE_PUBLIC_KEY', 'REPLACE_WITH_BASE64_ED25519_PUBLIC_KEY');
+  define('NIMBUS_LICENSE_PUBLIC_KEY', 'YVhjWaVmotVf2zQMC/NxlkFMElG8OVmrEUGY5c367gc=');
 }
 
 // Admin-post action constants for license management.

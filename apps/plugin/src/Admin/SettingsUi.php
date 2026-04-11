@@ -45,7 +45,7 @@ final class SettingsUi
     $this->licenseManager = new LicenseManager();
     $this->conflictDetector = new ConflictDetector();
     $this->onboardingManager = new OnboardingManager($settings, $this->licenseManager, $this->conflictDetector);
-    $this->bulkJobManager = new BulkJobManager($settings, $uploadHandler, $logger);
+    $this->bulkJobManager = new BulkJobManager($settings, $uploadHandler, $logger, $this->licenseManager);
     $this->smartSliderAssetRewriter = new SmartSliderAssetRewriter($settings, $logger);
     $this->databaseIntegrationRewriter = new DatabaseIntegrationRewriter($settings, $logger);
     $this->integrationDiscovery = new IntegrationDiscovery($this->smartSliderAssetRewriter, $this->databaseIntegrationRewriter);
@@ -64,6 +64,7 @@ final class SettingsUi
     add_action('admin_init', [$this, 'handle_onboarding_redirect'], 5);
     add_action('admin_notices', [$this, 'render_admin_notices']);
     add_action('admin_notices', [$this, 'render_license_banner']);
+    add_action('admin_notices', [$this, 'render_pubkey_warning']);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
@@ -229,6 +230,26 @@ final class SettingsUi
       $class = 'notice notice-' . esc_attr($notice['type']);
       printf('<div class="%1$s"><p>%2$s</p></div>', $class, esc_html($notice['message']));
     }
+  }
+
+  public function render_pubkey_warning(): void
+  {
+    if (!current_user_can('manage_options')) {
+      return;
+    }
+
+    if ($this->licenseManager->isPublicKeyConfigured()) {
+      return;
+    }
+
+    ?>
+    <div class="notice notice-error">
+      <p>
+        <strong><?php esc_html_e('Nimbus – Configuration error', NIMBUS_TEXT_DOMAIN); ?></strong>
+        <?php esc_html_e('NIMBUS_LICENSE_PUBLIC_KEY is not defined. License token signatures cannot be verified. Define it in wp-config.php before going live.', NIMBUS_TEXT_DOMAIN); ?>
+      </p>
+    </div>
+    <?php
   }
 
   public function render_license_banner(): void

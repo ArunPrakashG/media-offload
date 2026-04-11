@@ -17,12 +17,17 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w" \
     -o /migrate ./scripts/migrate
 
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-s -w" \
+    -o /nimbus-admin ./cmd/admin
+
 # ── Final stage — alpine (small, has sh + wget for health checks) ──────────────
 FROM alpine:3
 
 # No extra packages needed; Go binaries are statically linked (CGO_ENABLED=0).
 COPY --from=builder /server /server
 COPY --from=builder /migrate /migrate
+COPY --from=builder /nimbus-admin /nimbus-admin
 COPY --from=builder /app/migrations /migrations
 
 EXPOSE 8090

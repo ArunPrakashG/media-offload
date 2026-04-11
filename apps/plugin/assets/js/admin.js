@@ -585,6 +585,21 @@ jQuery(document).ready(function ($) {
       goToStep(currentStep - 1);
     });
 
+    $wizard.on('click', '[data-free-tier]', function () {
+      var $btn = $(this);
+
+      if ($btn.prop('disabled')) {
+        return;
+      }
+
+      $btn.prop('disabled', true)
+        .html('<span class="nmb-spinner"></span> Registering&hellip;');
+
+      $('#nmb-free-tier-nonce').val($btn.data('nonce'));
+      $('#nmb-free-tier-action').val($btn.data('action'));
+      $('#nmb-free-tier-form').attr('action', $btn.data('url')).get(0).submit();
+    });
+
     $wizard.on('click', '.nmb-onboarding-step-item', function () {
       var step = $(this).data('stepItem');
       var targetIndex = steps.indexOf(step);

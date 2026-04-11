@@ -7,7 +7,7 @@ SITE_TITLE="${SITE_TITLE:-Media Offload Lab}"
 ADMIN_USER="${ADMIN_USER:-admin}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-password}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@example.com}"
-PLUGIN_SLUG="media-offload"
+PLUGIN_SLUG="nimbus"
 
 wp_cmd() {
   wp --allow-root --path="$WP_PATH" "$@"
@@ -24,7 +24,7 @@ until [ -f "$WP_PATH/wp-load.php" ] && [ -f "$WP_PATH/wp-config.php" ]; do
 done
 
 log 'Waiting for database connectivity...'
-until wp --allow-root --skip-plugins --skip-themes --path="$WP_PATH" eval 'global $wpdb; exit($wpdb->check_connection(false) ? 0 : 1);' >/dev/null 2>&1; do
+until wp --allow-root --path="$WP_PATH" db query "SELECT 1" >/dev/null 2>&1; do
   sleep 2
   log 'Database not ready yet...'
 done
@@ -55,7 +55,7 @@ fi
 
 log 'Configuring Media Offload for local debug storage and completing onboarding...'
 wp_cmd eval '
-$settings = get_option("media_offload_settings", []);
+$settings = get_option("nimbus_settings", []);
 $settings = is_array($settings) ? $settings : [];
 $settings["enabled"] = true;
 $settings["provider"] = "local";
@@ -64,26 +64,30 @@ $settings["remove_local_copies"] = false;
 $settings["logging_enabled"] = true;
 $settings["log_level"] = "debug";
 $settings["log_to_error_log"] = true;
-update_option("media_offload_settings", $settings, false);
+update_option("nimbus_settings", $settings, false);
 
-update_option("media_offload_license", [
+update_option("nimbus_license", [
   "key" => "local-dev-license",
   "status" => "active",
-  "plan" => "dev",
+  "tier" => "agency",
+  "billing_cycle" => "monthly",
+  "subscription_id" => "",
+  "token" => "",
+  "token_expires_at" => 0,
   "last_validated_at" => time(),
 ], false);
 
-update_option("media_offload_onboarding", [
+update_option("nimbus_onboarding", [
   "completed" => true,
   "completed_at" => time(),
 ], false);
 
-delete_option("media_offload_onboarding_redirect");
+delete_option("nimbus_onboarding_redirect");
 ' >/dev/null
 
 log 'Creating a sample attachment and demo page...'
 wp_cmd eval '
-$optionKey = "media_offload_local_test_attachment_id";
+$optionKey = "nimbus_local_test_attachment_id";
 $attachmentId = (int) get_option($optionKey, 0);
 if ($attachmentId > 0 && get_post($attachmentId) instanceof WP_Post) {
   $attachmentId = (int) get_post($attachmentId)->ID;
@@ -134,7 +138,7 @@ $content .= "</ul>";
 if ($attachmentId > 0) {
   $content .= "<p>Sample media item:</p>" . wp_get_attachment_image($attachmentId, "full");
 }
-$content .= "<p>Next stop: <a href=\"/wp-admin/upload.php?page=media-offload\">Media Offload admin</a>.</p>";
+$content .= "<p>Next stop: <a href=\"/wp-admin/upload.php?page=nimbus\">Nimbus admin</a>.</p>";
 
 $postarr = [
   "post_type" => "page",

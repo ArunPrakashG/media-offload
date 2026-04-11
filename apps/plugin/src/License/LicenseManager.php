@@ -66,12 +66,18 @@ final class LicenseManager
    * Requires the PHP sodium extension (bundled in PHP 7.2+ and WordPress itself
    * ships a polyfill via `sodium_compat` for hosts that lack the native ext).
    */
+  public function isPublicKeyConfigured(): bool
+  {
+    $key = defined('NIMBUS_LICENSE_PUBLIC_KEY') ? NIMBUS_LICENSE_PUBLIC_KEY : '';
+    return $key !== '';
+  }
+
   private function verifyTokenSignature(string $token): bool
   {
     $pubKeyB64 = defined('NIMBUS_LICENSE_PUBLIC_KEY') ? NIMBUS_LICENSE_PUBLIC_KEY : '';
-    if ($pubKeyB64 === '' || $pubKeyB64 === 'REPLACE_WITH_BASE64_ED25519_PUBLIC_KEY') {
-      // Public key not yet configured (dev environment). Skip verification
-      // so the plugin stays usable during local development.
+    if ($pubKeyB64 === '') {
+      // NIMBUS_LICENSE_PUBLIC_KEY is not defined — signature verification is
+      // disabled. An admin notice is shown until the key is configured.
       return true;
     }
 
