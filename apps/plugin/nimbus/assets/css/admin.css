@@ -1,0 +1,2297 @@
+/* ==========================================================================
+   Nimbus — Admin Stylesheet
+   Design tokens are loaded from tokens.css (enqueued first as a dependency).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Page root
+   -------------------------------------------------------------------------- */
+
+body.media_page_media-offload #wpcontent,
+body.upload_page_media-offload #wpcontent {
+  background: var(--nmb-bg);
+}
+
+.nimbus-settings {
+  max-width: 1200px;
+  padding-bottom: var(--nmb-space-8);
+  color: var(--nmb-text);
+  font-family: var(--nmb-font);
+}
+
+/* Universal element font-family reset */
+.nimbus-settings h1,
+.nimbus-settings h2,
+.nimbus-settings h3,
+.nimbus-settings h4,
+.nimbus-settings p,
+.nimbus-settings li,
+.nimbus-settings label,
+.nimbus-settings input,
+.nimbus-settings select,
+.nimbus-settings textarea,
+.nimbus-settings button {
+  font-family: var(--nmb-font);
+}
+
+/* WordPress notice positioning */
+.nimbus-settings .notice,
+.nimbus-settings .update-nag,
+.nimbus-settings div.updated,
+.nimbus-settings div.error {
+  margin: 0 0 var(--nmb-space-4);
+}
+
+/* Hide the WP h1 we inject — we use our own header */
+.nimbus-settings > h1 {
+  display: none;
+}
+
+.nimbus-settings a {
+  color: var(--nmb-accent);
+}
+.nimbus-settings a:hover {
+  color: var(--nmb-accent-hover);
+}
+
+/* --------------------------------------------------------------------------
+   2. Page header
+   -------------------------------------------------------------------------- */
+
+.nmb-shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+  padding: var(--nmb-space-5) var(--nmb-space-6);
+  margin-bottom: var(--nmb-space-4);
+  background: var(--nmb-surface);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+}
+
+.nmb-shell-header__content {
+  min-width: 0;
+}
+
+.nmb-shell-kicker {
+  margin: 0 0 var(--nmb-space-1);
+  color: var(--nmb-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nmb-shell-header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--nmb-text);
+}
+
+.nmb-shell-lede {
+  margin: var(--nmb-space-1) 0 0;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nmb-shell-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nmb-space-2);
+  align-items: flex-start;
+}
+
+.nmb-shell-meta-card {
+  display: grid;
+  gap: 2px;
+  padding: var(--nmb-space-2) var(--nmb-space-3);
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+}
+
+.nmb-shell-meta-card__label {
+  color: var(--nmb-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nmb-shell-meta-card strong {
+  color: var(--nmb-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   3. Tab navigation (WordPress standard style)
+   -------------------------------------------------------------------------- */
+
+.nimbus-settings .nav-tab-wrapper.nmb-shell-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  margin: 0 0 var(--nmb-space-5);
+  padding: 0;
+  border-bottom: 1px solid var(--nmb-border);
+  background: transparent;
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab {
+  flex: 0 0 auto;
+  margin: 0 4px -1px 0;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--nmb-radius) var(--nmb-radius) 0 0;
+  background: transparent;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab:hover,
+.nimbus-settings .nmb-shell-tabs .nav-tab:focus {
+  background: var(--nmb-surface-alt);
+  border-color: var(--nmb-border);
+  border-bottom: none;
+  color: var(--nmb-text);
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab-active,
+.nimbus-settings .nmb-shell-tabs .nav-tab-active:hover,
+.nimbus-settings .nmb-shell-tabs .nav-tab-active:focus {
+  background: var(--nmb-surface);
+  border-color: var(--nmb-border);
+  border-bottom-color: var(--nmb-surface);
+  color: var(--nmb-text);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout containers
+   -------------------------------------------------------------------------- */
+
+.nmb-settings-shell {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-dashboard {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+/* 4-column stat row */
+.nmb-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  overflow: hidden;
+  background: var(--nmb-border); /* gap color between cells */
+  gap: 1px;
+}
+
+.nmb-stat-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--nmb-space-5) var(--nmb-space-6);
+  background: var(--nmb-surface);
+  min-height: 112px;
+}
+
+.nmb-stat-cell__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--nmb-text-3);
+  margin-bottom: var(--nmb-space-2);
+}
+
+.nmb-stat-cell__value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--nmb-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--nmb-space-2);
+  overflow-wrap: anywhere;
+}
+
+.nmb-stat-cell__sub {
+  display: block;
+  font-size: 12px;
+  color: var(--nmb-text-2);
+  line-height: 1.5;
+  margin-top: auto;
+}
+
+.nmb-stat-cell__bar {
+  margin: var(--nmb-space-2) 0;
+  height: 4px;
+  background: #edf1f4;
+  border-radius: var(--nmb-pill);
+  overflow: hidden;
+}
+
+.nmb-stat-cell__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--nmb-accent);
+  transition: width 0.25s ease;
+}
+
+/* 2-column grid */
+.nmb-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--nmb-space-4);
+  align-items: stretch;
+}
+
+/* 4-column auto grid (for smaller stat cards) */
+.nmb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--nmb-space-4);
+  align-items: stretch;
+}
+
+/* Uniform grid spacers */
+.nmb-settings-hero,
+.nmb-overview-actions-grid,
+.nmb-integrations-grid,
+.nmb-secondary-surface-grid,
+.nmb-log-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--nmb-space-4);
+  align-items: stretch;
+}
+
+.nmb-bulk-job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--nmb-space-4);
+  align-items: stretch;
+}
+
+/* Settings two-pane layout */
+.nmb-settings-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--nmb-space-5);
+  align-items: start;
+}
+
+.nmb-settings-sidebar {
+  position: sticky;
+  top: 32px;
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-settings-main {
+  min-width: 0;
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   5. Card
+   -------------------------------------------------------------------------- */
+
+.nmb-card {
+  background: var(--nmb-surface);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  padding: var(--nmb-space-5) var(--nmb-space-6);
+}
+
+/* Compact variant */
+.nmb-card--compact {
+  padding: var(--nmb-space-4) var(--nmb-space-5);
+}
+
+.nmb-card h2 {
+  margin: 0 0 var(--nmb-space-4);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--nmb-text);
+  line-height: 1.3;
+}
+
+.nmb-card h3 {
+  margin: 0 0 var(--nmb-space-3);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nmb-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nmb-card > p,
+.nmb-muted {
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* Settings section card (header + body) */
+.nmb-settings-section-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.nmb-settings-section-header {
+  padding: var(--nmb-space-4) var(--nmb-space-6);
+  background: var(--nmb-surface-alt);
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-settings-section-header h2 {
+  margin: 0 0 var(--nmb-space-1);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nmb-text);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nmb-settings-section-description p {
+  margin: var(--nmb-space-1) 0 0;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nmb-settings-section-body {
+  padding: var(--nmb-space-2) var(--nmb-space-6) var(--nmb-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   6. Buttons
+   -------------------------------------------------------------------------- */
+
+.nimbus-settings .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--nmb-radius);
+  font-family: var(--nmb-font);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  min-height: 36px;
+  box-shadow: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.nimbus-settings .button.button-primary {
+  background: var(--nmb-accent);
+  border-color: var(--nmb-accent);
+  color: #fff;
+}
+
+.nimbus-settings .button.button-primary:hover,
+.nimbus-settings .button.button-primary:focus {
+  background: var(--nmb-accent-hover);
+  border-color: var(--nmb-accent-hover);
+  color: #fff;
+  box-shadow: none;
+}
+
+.nimbus-settings .button:not(.button-primary):not(.button-link) {
+  background: var(--nmb-surface);
+  border-color: var(--nmb-border-strong);
+  color: var(--nmb-text);
+}
+
+.nimbus-settings .button:not(.button-primary):not(.button-link):hover {
+  background: var(--nmb-surface-alt);
+  border-color: var(--nmb-text-2);
+  color: var(--nmb-text);
+}
+
+.nimbus-settings .button.button-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--nmb-accent);
+  font-weight: 600;
+  min-height: auto;
+  box-shadow: none;
+}
+
+.nimbus-settings .button.button-link:hover {
+  color: var(--nmb-accent-hover);
+  text-decoration: underline;
+}
+
+.nimbus-settings .button[disabled],
+.nimbus-settings .button.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.nimbus-settings .button.button-small {
+  padding: 4px 10px;
+  font-size: 12px;
+  min-height: 30px;
+}
+
+/* Action groups */
+.nmb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nmb-space-2);
+  margin-top: var(--nmb-space-4);
+}
+
+.nmb-actions-left {
+  justify-content: flex-start;
+}
+
+.nmb-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nmb-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   7. Forms & Inputs
+   -------------------------------------------------------------------------- */
+
+.nimbus-settings input[type="text"],
+.nimbus-settings input[type="password"],
+.nimbus-settings input[type="url"],
+.nimbus-settings input[type="search"],
+.nimbus-settings input[type="number"],
+.nimbus-settings input[type="time"],
+.nimbus-settings select,
+.nimbus-settings textarea {
+  background: var(--nmb-surface);
+  border: 1px solid var(--nmb-border-strong);
+  border-radius: var(--nmb-radius);
+  color: var(--nmb-text);
+  font-family: var(--nmb-font);
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 40px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: none;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.nimbus-settings textarea {
+  min-height: 120px;
+  max-width: 100%;
+  resize: vertical;
+}
+
+.nimbus-settings input[type="text"]:focus,
+.nimbus-settings input[type="password"]:focus,
+.nimbus-settings input[type="url"]:focus,
+.nimbus-settings input[type="search"]:focus,
+.nimbus-settings input[type="number"]:focus,
+.nimbus-settings input[type="time"]:focus,
+.nimbus-settings select:focus,
+.nimbus-settings textarea:focus {
+  border-color: var(--nmb-accent);
+  box-shadow: 0 0 0 1px var(--nmb-accent);
+  outline: none;
+}
+
+/* Regular standalone checkboxes (not inside a toggle) */
+.nimbus-settings input[type="checkbox"]:not(.nmb-toggle-switch input) {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border-color: var(--nmb-border-strong);
+}
+
+.nimbus-settings input[type="checkbox"]:not(.nmb-toggle-switch input):checked {
+  background-color: var(--nmb-accent);
+  border-color: var(--nmb-accent);
+}
+
+/* Settings form (WP form-table layout) */
+.nmb-settings-form .form-table,
+.nmb-settings-form .form-table tbody {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.nmb-settings-form .form-table tr {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--nmb-space-5);
+  align-items: start;
+  padding: var(--nmb-space-5) 0;
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-settings-form .form-table tr:last-child {
+  border-bottom: 0;
+}
+
+.nmb-settings-form .form-table th,
+.nmb-settings-form .form-table td {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.nmb-settings-form .form-table th {
+  color: var(--nmb-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  padding-top: 10px; /* vertically align with input */
+}
+
+.nmb-settings-form p.description {
+  max-width: 640px;
+  margin: var(--nmb-space-2) 0 0;
+  color: var(--nmb-text-2);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.nmb-settings-submit {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.nmb-settings-submit .submit {
+  margin: 0;
+  padding: 0;
+}
+
+/* Provider picker */
+.nmb-provider-field {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-provider-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nmb-space-3);
+}
+
+.nmb-provider-picker select {
+  max-width: 280px;
+}
+
+.nmb-provider-summary {
+  display: grid;
+  gap: var(--nmb-space-3);
+  padding: var(--nmb-space-4);
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+}
+
+.nmb-provider-summary-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-provider-summary h3 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--nmb-text);
+  margin: 0 0 var(--nmb-space-1);
+}
+
+.nmb-provider-summary-header p,
+.nmb-provider-summary p {
+  margin: 0;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Advanced toggle */
+.nmb-advanced-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--nmb-accent);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.nmb-advanced-toggle:hover {
+  color: var(--nmb-accent-hover);
+  text-decoration: underline;
+}
+
+.nmb-hidden-row,
+.nmb-hidden-row[hidden] {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. Status list
+   -------------------------------------------------------------------------- */
+
+.nmb-status-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nmb-status-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--nmb-space-2);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--nmb-border);
+  font-size: 13px;
+  color: var(--nmb-text);
+  line-height: 1.5;
+}
+
+.nmb-status-list li:first-child {
+  padding-top: 0;
+}
+
+.nmb-status-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.nmb-spacer {
+  flex: 1;
+}
+
+.status-ok {
+  color: var(--nmb-ok);
+}
+.status-warning {
+  color: var(--nmb-warn);
+}
+.status-error {
+  color: var(--nmb-error);
+}
+
+.nimbus-settings .dashicons {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   9. Badges & Chips
+   -------------------------------------------------------------------------- */
+
+.nmb-chip,
+.nmb-inline-badge,
+.nmb-int-state-badge,
+.nmb-log-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--nmb-pill);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* Default neutral style */
+.nmb-chip,
+.nmb-inline-badge {
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  color: var(--nmb-text-2);
+}
+
+.nmb-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nmb-space-2);
+}
+
+/* State modifiers */
+.nmb-inline-badge.is-success,
+.nmb-log-level-badge.is-success,
+.nmb-int-state-badge.is-active {
+  background: var(--nmb-ok-bg);
+  border: 1px solid rgba(0, 163, 42, 0.2);
+  color: var(--nmb-ok);
+}
+
+.nmb-inline-badge.is-warning,
+.nmb-log-level-badge.is-warning {
+  background: var(--nmb-warn-bg);
+  border: 1px solid rgba(181, 105, 0, 0.2);
+  color: var(--nmb-warn);
+}
+
+.nmb-inline-badge.is-error,
+.nmb-log-level-badge.is-error,
+.nmb-log-level-badge.is-critical {
+  background: var(--nmb-error-bg);
+  border: 1px solid rgba(214, 54, 56, 0.2);
+  color: var(--nmb-error);
+}
+
+.nmb-log-level-badge.is-info {
+  background: var(--nmb-info-bg);
+  border: 1px solid rgba(34, 113, 177, 0.2);
+  color: var(--nmb-info);
+}
+
+.nmb-int-state-badge {
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  color: var(--nmb-text-3);
+}
+
+.nmb-int-state-badge.is-installed {
+  background: var(--nmb-surface-alt);
+  color: var(--nmb-text-2);
+}
+
+.nmb-int-state-badge.is-disabled {
+  background: var(--nmb-surface-alt);
+  color: var(--nmb-text-3);
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+/* --------------------------------------------------------------------------
+   10. Code & link lists
+   -------------------------------------------------------------------------- */
+
+.nmb-code-list {
+  display: grid;
+  gap: var(--nmb-space-2);
+  margin-top: var(--nmb-space-3);
+}
+
+.nmb-code-list code,
+.nmb-link-list a {
+  display: block;
+  padding: var(--nmb-space-2) var(--nmb-space-3);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  background: var(--nmb-surface-alt);
+  font-size: 12px;
+  color: var(--nmb-text);
+  line-height: 1.55;
+}
+
+.nmb-code-list code {
+  font-family: var(--nmb-mono);
+  overflow-wrap: anywhere;
+}
+
+.nmb-link-list a {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nmb-link-list a:hover {
+  background: #fff;
+  border-color: var(--nmb-border-strong);
+}
+
+/* --------------------------------------------------------------------------
+   11. Progress bar (generic)
+   -------------------------------------------------------------------------- */
+
+.nmb-progress {
+  overflow: hidden;
+  height: 4px;
+  background: #edf1f4;
+  border-radius: var(--nmb-pill);
+  margin: var(--nmb-space-3) 0;
+}
+
+.nmb-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--nmb-accent);
+  transition: width 0.25s ease;
+}
+
+/* Stat numbers (legacy usage) */
+.nmb-stat {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--nmb-text);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: var(--nmb-space-2) 0;
+  overflow-wrap: anywhere;
+}
+
+.nmb-stat--label {
+  font-size: 22px;
+}
+
+.nmb-substat {
+  font-size: 12px;
+  color: var(--nmb-text-2);
+  line-height: 1.5;
+}
+
+.nmb-eyebrow {
+  margin: 0 0 var(--nmb-space-2);
+  color: var(--nmb-text-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   12. Summary strip
+   -------------------------------------------------------------------------- */
+
+.nmb-summary-strip {
+  padding: var(--nmb-space-4) var(--nmb-space-5);
+}
+
+.nmb-summary-strip__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--nmb-border);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  overflow: hidden;
+}
+
+.nmb-summary-item {
+  display: grid;
+  gap: var(--nmb-space-1);
+  padding: var(--nmb-space-4) var(--nmb-space-5);
+  background: var(--nmb-surface);
+}
+
+.nmb-summary-item__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--nmb-text-3);
+}
+
+.nmb-summary-item strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--nmb-text);
+  line-height: 1.1;
+}
+
+.nmb-summary-item__meta {
+  font-size: 12px;
+  color: var(--nmb-text-2);
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   13. Settings sidebar jump-nav
+   -------------------------------------------------------------------------- */
+
+.nmb-settings-nav-card {
+  display: grid;
+  gap: var(--nmb-space-3);
+}
+
+.nmb-settings-jumpnav {
+  display: grid;
+  gap: var(--nmb-space-2);
+}
+
+.nmb-settings-jumpnav a {
+  display: grid;
+  gap: 3px;
+  padding: var(--nmb-space-3) var(--nmb-space-3);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  background: var(--nmb-surface-alt);
+  color: var(--nmb-text);
+  text-decoration: none;
+}
+
+.nmb-settings-jumpnav a:hover {
+  border-color: var(--nmb-accent);
+  background: var(--nmb-accent-bg);
+}
+
+.nmb-settings-jumpnav a strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nmb-settings-jumpnav a span {
+  font-size: 12px;
+  color: var(--nmb-text-2);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   14. Settings cluster headers
+   -------------------------------------------------------------------------- */
+
+.nmb-settings-cluster {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-settings-cluster-header {
+  display: grid;
+  gap: var(--nmb-space-1);
+}
+
+.nmb-settings-cluster-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--nmb-text);
+  line-height: 1.3;
+}
+
+.nmb-settings-cluster-header p {
+  margin: 0;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* --------------------------------------------------------------------------
+   15. Chart
+   -------------------------------------------------------------------------- */
+
+.nmb-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--nmb-space-2);
+  min-height: 180px;
+  padding-top: var(--nmb-space-4);
+}
+
+.nmb-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.nmb-chart-bar {
+  width: 100%;
+  min-height: 4px;
+  border-radius: var(--nmb-radius) var(--nmb-radius) 0 0;
+  background: #d2e4f5;
+}
+
+.nmb-bar-group:hover .nmb-chart-bar {
+  background: var(--nmb-accent);
+}
+
+.nmb-chart-label {
+  margin-top: var(--nmb-space-2);
+  color: var(--nmb-text-3);
+  font-size: 11px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   16. Bulk jobs panel
+   -------------------------------------------------------------------------- */
+
+.nmb-bulk-job-shell,
+.nmb-attachment-inspector,
+.nmb-activation-recovery-shell,
+.nmb-log-viewer-card,
+.nmb-embedded-surface {
+  margin: 0;
+}
+
+.nmb-bulk-job-header,
+.nmb-integration-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+  margin-bottom: var(--nmb-space-4);
+}
+
+.nmb-bulk-job-card,
+.nmb-integration-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nmb-space-3);
+  height: 100%;
+}
+
+.nmb-bulk-job-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nmb-space-3);
+  min-width: 0;
+}
+
+.nmb-bulk-job-pane + .nmb-bulk-job-pane {
+  border-top: 1px solid var(--nmb-border);
+  padding-top: var(--nmb-space-4);
+}
+
+.nmb-bulk-job-actions {
+  display: grid;
+  gap: var(--nmb-space-2);
+  margin-top: auto;
+}
+
+.nmb-bulk-job-actions .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.nmb-inline-form {
+  margin-top: auto;
+}
+
+.nmb-library-note {
+  color: var(--nmb-text-2);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   17. Panel toolbar
+   -------------------------------------------------------------------------- */
+
+.nmb-panel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nmb-space-3);
+}
+
+/* --------------------------------------------------------------------------
+   18. Logs
+   -------------------------------------------------------------------------- */
+
+/* ── Page header ─────────────────────────────────────────────────────── */
+
+.nmb-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--nmb-space-4);
+}
+
+.nmb-log-header-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--nmb-space-2);
+}
+
+.nmb-log-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nmb-space-3);
+  flex-shrink: 0;
+}
+
+/* ── Stat chips ──────────────────────────────────────────────────────── */
+
+.nmb-log-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 4px var(--nmb-space-3);
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-pill);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--nmb-text-2);
+}
+
+.nmb-log-chip-value {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--nmb-text);
+}
+
+.nmb-log-chip-label {
+  color: var(--nmb-text-2);
+}
+
+.nmb-log-chip.is-ok {
+  background: var(--nmb-ok-bg);
+  border-color: var(--nmb-ok);
+  color: var(--nmb-ok);
+}
+
+.nmb-log-chip.is-ok .nmb-log-chip-value {
+  color: var(--nmb-ok);
+}
+
+.nmb-log-chip.is-warn {
+  background: var(--nmb-warn-bg);
+  border-color: var(--nmb-warn);
+  color: var(--nmb-warn);
+}
+
+.nmb-log-chip.is-warn .nmb-log-chip-value {
+  color: var(--nmb-warn);
+}
+
+.nmb-log-chip.is-error {
+  background: var(--nmb-error-bg);
+  border-color: var(--nmb-error);
+  color: var(--nmb-error);
+}
+
+.nmb-log-chip.is-error .nmb-log-chip-value {
+  color: var(--nmb-error);
+}
+
+.nmb-log-chip.is-muted {
+  opacity: 0.6;
+}
+
+/* ── Clear logs danger button ────────────────────────────────────────── */
+
+.nmb-log-clear-btn {
+  color: var(--nmb-error) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  text-decoration: none;
+}
+
+.nmb-log-clear-btn:hover,
+.nmb-log-clear-btn:focus {
+  color: var(--nmb-error) !important;
+  text-decoration: underline;
+}
+
+/* ── Collapsible settings panel ──────────────────────────────────────── */
+
+.nmb-log-settings-panel {
+  margin-bottom: var(--nmb-space-4);
+}
+
+.nmb-log-settings-panel[hidden] {
+  display: none !important;
+}
+
+/* ── Filter toolbar ──────────────────────────────────────────────────── */
+
+.nmb-log-filter-card {
+  padding: var(--nmb-space-3) var(--nmb-space-4);
+}
+
+.nmb-log-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--nmb-space-2) var(--nmb-space-4);
+}
+
+.nmb-log-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nmb-space-1);
+  min-width: 0;
+}
+
+.nmb-log-filter-item--search {
+  flex: 1 1 180px;
+}
+
+.nmb-log-filter-item > span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--nmb-text-2);
+  white-space: nowrap;
+}
+
+.nmb-log-filter-item > select {
+  min-width: 110px;
+}
+
+.nmb-log-filter-item > input[type="search"] {
+  min-width: 180px;
+}
+
+.nmb-log-filter-btns > div {
+  display: flex;
+  gap: var(--nmb-space-2);
+}
+
+/* ── Log table ───────────────────────────────────────────────────────── */
+
+.nmb-log-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+}
+
+.nmb-log-table {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: var(--nmb-surface);
+}
+
+.nmb-log-table th,
+.nmb-log-table td {
+  padding: 10px var(--nmb-space-4);
+  border-bottom: 1px solid var(--nmb-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.nmb-log-table th {
+  background: var(--nmb-surface-alt);
+  color: var(--nmb-text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nmb-log-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.nmb-log-context-details {
+  color: var(--nmb-text-2);
+}
+
+.nmb-log-context-details summary {
+  cursor: pointer;
+  color: var(--nmb-accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nmb-log-context-details pre {
+  margin: var(--nmb-space-2) 0 0;
+  padding: var(--nmb-space-3);
+  overflow: auto;
+  border-radius: var(--nmb-radius);
+  background: #1e2530;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.6;
+  font-family: var(--nmb-mono);
+}
+
+.nmb-link-list--compact {
+  display: grid;
+  gap: var(--nmb-space-2);
+}
+
+/* Connection results */
+#nmb-connection-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nmb-space-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#mo-connection-results {
+  margin-top: var(--nmb-space-3);
+  padding: var(--nmb-space-4);
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+}
+
+#mo-connection-results[hidden] {
+  display: none !important;
+}
+
+#mo-connection-results h4 {
+  margin: 0 0 var(--nmb-space-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nmb-text-2);
+}
+
+.nmb-connection-detail-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--nmb-space-2) var(--nmb-space-4);
+  margin: 0 0 var(--nmb-space-4);
+}
+
+.nmb-connection-detail-list dt {
+  font-weight: 600;
+  color: var(--nmb-text);
+}
+
+.nmb-connection-detail-list dd {
+  margin: 0;
+  color: var(--nmb-text-2);
+}
+
+.nmb-connection-hints {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   19. Toggle switch
+   -------------------------------------------------------------------------- */
+
+.nimbus-settings .nmb-toggle-switch,
+.nmb-license-overlay .nmb-toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nmb-space-3);
+  cursor: pointer;
+}
+
+/* Use .nimbus-settings prefix on every rule to guarantee specificity
+   beats WordPress admin's own input[type=checkbox] styles. */
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"],
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+  min-width: 40px; /* prevent grid/flex from squashing it */
+  margin: 0;
+  padding: 0;
+  background: var(--nmb-border-strong);
+  background-image: none !important; /* block WP admin's SVG checkmark */
+  border: 0;
+  border-radius: var(--nmb-pill);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  vertical-align: middle;
+}
+
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"]::before,
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"]::before {
+  display: none; /* WP sometimes injects ::before content */
+}
+
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"]::after,
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"]:checked,
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"]:checked {
+  background: var(--nmb-accent);
+  background-image: none !important;
+}
+
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"]:checked::after,
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"]:checked::after {
+  transform: translateX(18px);
+}
+
+.nimbus-settings .nmb-toggle-switch input[type="checkbox"]:focus,
+.nmb-license-overlay .nmb-toggle-switch input[type="checkbox"]:focus {
+  box-shadow:
+    0 0 0 2px var(--nmb-accent-bg),
+    0 0 0 3px var(--nmb-accent);
+  outline: none;
+}
+
+.nimbus-settings .nmb-toggle-label,
+.nmb-license-overlay .nmb-toggle-label {
+  font-size: 13px;
+  color: var(--nmb-text);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   20. Spinner
+   -------------------------------------------------------------------------- */
+
+@keyframes mo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.nmb-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-left-color: #fff;
+  border-radius: 50%;
+  animation: mo-spin 0.7s linear infinite;
+  vertical-align: -2px;
+  flex-shrink: 0;
+}
+
+.button:not(.button-primary) .nmb-spinner {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-left-color: var(--nmb-accent);
+}
+
+/* --------------------------------------------------------------------------
+   21. Onboarding wizard
+   -------------------------------------------------------------------------- */
+
+.nimbus-settings--onboarding {
+  max-width: 1100px;
+}
+
+.nmb-onboarding-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: var(--nmb-space-5);
+  margin-top: var(--nmb-space-4);
+  align-items: stretch;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+
+.nmb-onboarding-sidebar {
+  position: sticky;
+  top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nmb-space-4);
+}
+
+/* Brand panel — gradient header */
+.nmb-onboarding-brand-panel {
+  background: linear-gradient(145deg, var(--nmb-accent) 0%, #6577f8 100%);
+  border-radius: var(--nmb-radius-lg);
+  padding: 28px 24px 24px;
+  text-align: center;
+  display: grid;
+  gap: var(--nmb-space-2);
+  justify-items: center;
+}
+
+.nmb-onboarding-brand-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--nmb-space-1);
+  font-size: 26px;
+  color: #fff;
+}
+
+.nmb-onboarding-brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.nmb-onboarding-brand-tagline {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.5;
+}
+
+/* Step navigator card — grows to fill remaining sidebar height */
+.nmb-onboarding-step-nav {
+  padding: var(--nmb-space-4);
+  flex: 1;
+}
+
+/* ── Step list ───────────────────────────────────────────────────────────── */
+
+.nmb-onboarding-step-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+  position: relative;
+}
+
+/* Vertical connector line through the step index circles */
+.nmb-onboarding-step-list::before {
+  content: "";
+  position: absolute;
+  left: calc(
+    12px + 16px - 1px
+  ); /* item padding-left + half circle - half line-width */
+  top: 45px; /* below first circle center (12+1+16=29px + 16 = ~45px) */
+  bottom: 45px;
+  width: 2px;
+  background: var(--nmb-border);
+  z-index: 0;
+}
+
+.nmb-onboarding-step-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--nmb-space-3);
+  align-items: start;
+  padding: var(--nmb-space-3) var(--nmb-space-3);
+  border-radius: var(--nmb-radius);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: background 0.1s;
+}
+
+.nmb-onboarding-step-item:hover {
+  background: var(--nmb-surface-alt);
+}
+
+.nmb-onboarding-step-item strong,
+.nmb-onboarding-step-item > div span {
+  display: block;
+}
+
+.nmb-onboarding-step-item span:last-child {
+  color: var(--nmb-text-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.nmb-onboarding-step-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--nmb-surface);
+  border: 2px solid var(--nmb-border);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--nmb-text-2);
+  flex-shrink: 0;
+  /* Optically align circle top with the title text baseline */
+  margin-top: 1px;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+/* Active step */
+.nmb-onboarding-step-item.is-active {
+  background: var(--nmb-accent-bg);
+}
+
+.nmb-onboarding-step-item.is-active strong {
+  color: var(--nmb-accent);
+}
+
+.nmb-onboarding-step-item.is-active .nmb-onboarding-step-index {
+  background: var(--nmb-accent);
+  border-color: var(--nmb-accent);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.18);
+}
+
+/* Completed step — locked, not interactive */
+.nmb-onboarding-step-item.is-complete {
+  cursor: default;
+}
+
+.nmb-onboarding-step-item.is-complete:hover {
+  background: transparent;
+}
+
+.nmb-onboarding-step-item.is-complete .nmb-onboarding-step-index {
+  background: var(--nmb-ok);
+  border-color: var(--nmb-ok);
+  color: #fff;
+}
+
+.nmb-onboarding-step-item.is-complete strong {
+  color: var(--nmb-text-2);
+  font-weight: 400;
+}
+
+/* ── Main area ───────────────────────────────────────────────────────────── */
+
+.nmb-onboarding-main {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-onboarding-step {
+  display: grid;
+  gap: var(--nmb-space-5);
+}
+
+.nmb-onboarding-step[hidden] {
+  display: none;
+}
+
+.nmb-onboarding-step-header {
+  display: grid;
+  gap: var(--nmb-space-2);
+  padding-bottom: var(--nmb-space-4);
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-onboarding-step-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--nmb-text);
+}
+
+.nmb-onboarding-step-header p:last-child {
+  margin: 0;
+  color: var(--nmb-text-2);
+  line-height: 1.6;
+}
+
+/* ── Form fields ─────────────────────────────────────────────────────────── */
+
+.nmb-onboarding-field-grid,
+.nmb-onboarding-review-grid,
+.nmb-onboarding-preference-grid {
+  display: grid;
+  gap: var(--nmb-space-4);
+}
+
+.nmb-onboarding-field-grid--two-up,
+.nmb-onboarding-review-grid,
+.nmb-onboarding-preference-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.nmb-onboarding-field {
+  display: grid;
+  gap: var(--nmb-space-2);
+  align-content: start;
+}
+
+.nmb-onboarding-field--full {
+  grid-column: 1 / -1;
+}
+
+.nmb-onboarding-field span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nmb-text);
+}
+
+#nmb-onboarding-wizard .nmb-onboarding-field input,
+#nmb-onboarding-wizard .nmb-onboarding-field select,
+#nmb-onboarding-wizard .nmb-onboarding-field textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+  padding: 5px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+/* Exclude checkboxes and radio buttons from the size reset */
+#nmb-onboarding-wizard .nmb-onboarding-field input[type="checkbox"],
+#nmb-onboarding-wizard .nmb-onboarding-field input[type="radio"] {
+  height: auto;
+  min-height: 0;
+  width: auto;
+  padding: 0;
+}
+
+/* Textareas are free-height */
+#nmb-onboarding-wizard .nmb-onboarding-field textarea {
+  height: auto;
+  min-height: 80px;
+  padding: 8px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* Small descriptive hint under each field */
+.nmb-field-hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--nmb-text-3);
+  line-height: 1.55;
+}
+
+/* "(optional)" / "(alternative)" inline label tag */
+.nmb-optional {
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--nmb-text-3);
+}
+
+/* Storage step: grouped sections separated by a light divider */
+.nmb-storage-group {
+  display: grid;
+  gap: var(--nmb-space-4);
+  padding-top: var(--nmb-space-5);
+  border-top: 1px solid var(--nmb-border);
+}
+
+.nmb-storage-group[hidden] {
+  display: none;
+}
+
+.nmb-storage-group:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.nmb-storage-group__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nmb-text-3);
+}
+
+/* Provider tip — dynamic one-liner hint that changes per-provider */
+.nmb-provider-tip {
+  margin: 0;
+  padding: var(--nmb-space-3) var(--nmb-space-4);
+  background: var(--nmb-surface-alt);
+  border: 1px solid rgba(79, 99, 245, 0.15);
+  border-left: 3px solid var(--nmb-accent);
+  border-radius: var(--nmb-radius);
+  font-size: 13px;
+  color: var(--nmb-text-2);
+  line-height: 1.55;
+}
+
+/* Monospace license key input */
+.nmb-key-input {
+  font-family: var(--nmb-mono) !important;
+  font-size: 14px !important;
+  letter-spacing: 0.04em;
+  color: var(--nmb-text) !important;
+  border-color: var(--nmb-border) !important;
+  padding: 10px 14px !important;
+  height: auto !important;
+}
+
+.nmb-key-input:focus {
+  border-color: var(--nmb-accent) !important;
+  box-shadow: 0 0 0 2px rgba(79, 99, 245, 0.15) !important;
+}
+
+/* Inline tips list (replaces nested helper card in simple steps) */
+.nmb-onboarding-tips {
+  margin: 0;
+  padding: var(--nmb-space-4) var(--nmb-space-5);
+  list-style: none;
+  background: var(--nmb-surface-alt);
+  border: 1px solid rgba(79, 99, 245, 0.12);
+  border-radius: var(--nmb-radius);
+  display: grid;
+  gap: var(--nmb-space-2);
+}
+
+.nmb-onboarding-tips li {
+  font-size: 13px;
+  color: var(--nmb-text-2);
+  line-height: 1.65;
+  padding-left: 18px;
+  position: relative;
+}
+
+.nmb-onboarding-tips li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--nmb-accent);
+  opacity: 0.45;
+}
+
+/* Helper card (used in storage, delivery, review steps) */
+.nmb-onboarding-helper-card {
+  background: var(--nmb-surface-alt);
+}
+
+.nmb-onboarding-helper-card h3 {
+  margin: 0 0 var(--nmb-space-3);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--nmb-text-2);
+}
+
+/* Choice cards (delivery step) */
+.nmb-onboarding-choice-card,
+.nmb-onboarding-checkbox-note {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: var(--nmb-space-3);
+  align-items: start;
+}
+
+/* Remove WordPress admin's default margins so the checkbox sits flush */
+.nmb-onboarding-choice-card input[type="checkbox"],
+.nmb-onboarding-checkbox-note input[type="checkbox"] {
+  display: block;
+  margin: 2px 0 0;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.nmb-onboarding-choice-card {
+  cursor: pointer;
+}
+
+.nmb-onboarding-choice-card p {
+  margin: var(--nmb-space-1) 0 0;
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.nmb-onboarding-checkbox-note {
+  margin-top: var(--nmb-space-3);
+}
+
+.nmb-onboarding-checkbox-note span {
+  font-size: 13px;
+  color: var(--nmb-text);
+  line-height: 1.65;
+}
+
+/* Actions row */
+.nmb-onboarding-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--nmb-space-3);
+  padding-top: var(--nmb-space-4);
+  border-top: 1px solid var(--nmb-border);
+}
+
+.nmb-onboarding-actions .button {
+  min-width: 160px;
+  justify-content: center;
+}
+
+/* Validation notice */
+.nmb-onboarding-inline-notice {
+  padding: var(--nmb-space-3) var(--nmb-space-4);
+  border-radius: var(--nmb-radius);
+  border: 1px solid rgba(214, 54, 56, 0.2);
+  background: var(--nmb-error-bg);
+  color: var(--nmb-error);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   22. Bullet list
+   -------------------------------------------------------------------------- */
+
+.nmb-bullet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--nmb-space-2);
+}
+
+.nmb-bullet-list li {
+  position: relative;
+  padding-left: var(--nmb-space-4);
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.nmb-bullet-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  left: var(--nmb-space-1);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--nmb-accent);
+}
+
+/* --------------------------------------------------------------------------
+   23. Integration table
+   -------------------------------------------------------------------------- */
+
+.nmb-integrations-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.nmb-integrations-table th {
+  padding: 10px var(--nmb-space-3);
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nmb-text-3);
+  border-bottom: 1px solid var(--nmb-border);
+  background: var(--nmb-surface-alt);
+}
+
+.nmb-integrations-table td {
+  padding: 12px var(--nmb-space-3);
+  border-bottom: 1px solid var(--nmb-border);
+  vertical-align: middle;
+  color: var(--nmb-text);
+}
+
+.nmb-integrations-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.nmb-integrations-table .nmb-int-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.nmb-integrations-table .nmb-int-notes {
+  font-size: 12px;
+  color: var(--nmb-text-3);
+  margin: 2px 0 0;
+}
+
+.nmb-integrations-table .nmb-int-dirs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nmb-space-1);
+}
+
+.nmb-integrations-table .nmb-int-dirs code {
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: var(--nmb-mono);
+  background: var(--nmb-surface-alt);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  color: var(--nmb-text-2);
+}
+
+/* --------------------------------------------------------------------------
+   24. License overlay
+   -------------------------------------------------------------------------- */
+
+.nmb-license-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.nmb-license-overlay__box {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--nmb-space-8);
+  background: var(--nmb-surface);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.nmb-license-overlay__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--nmb-space-4);
+  border-radius: 50%;
+  background: var(--nmb-warn-bg);
+}
+
+.nmb-license-overlay__icon .dashicons {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: var(--nmb-warn);
+}
+
+.nmb-license-overlay__box h2 {
+  margin: 0 0 var(--nmb-space-2);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--nmb-text);
+}
+
+.nmb-license-overlay__box p {
+  margin: 0 0 var(--nmb-space-5);
+  font-size: 13px;
+  color: var(--nmb-text-2);
+  line-height: 1.65;
+}
+
+.nmb-license-overlay__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nmb-space-2);
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   25. License tab
+   -------------------------------------------------------------------------- */
+
+.nmb-license-status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--nmb-space-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--nmb-border);
+  font-size: 13px;
+}
+
+.nmb-license-status-row:last-child {
+  border-bottom: 0;
+}
+
+.nmb-license-status-row dt {
+  font-weight: 600;
+  min-width: 100px;
+  color: var(--nmb-text);
+}
+
+.nmb-license-status-active {
+  color: var(--nmb-ok);
+  font-weight: 600;
+}
+.nmb-license-status-inactive {
+  color: var(--nmb-warn);
+  font-weight: 600;
+}
+
+.nmb-license-key-field {
+  display: grid;
+  gap: var(--nmb-space-2);
+  max-width: 480px;
+  margin: var(--nmb-space-4) 0;
+}
+
+.nmb-license-key-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nmb-text);
+}
+
+.nmb-license-key-field input[type="text"] {
+  max-width: none;
+}
+
+/* --------------------------------------------------------------------------
+   26. Inline badge (media library column)
+   -------------------------------------------------------------------------- */
+
+.column-media_offload_status .nmb-inline-badge,
+.compat-field-media_offload_status .nmb-inline-badge {
+  margin-left: 0;
+}
+
+/* --------------------------------------------------------------------------
+   27. Tooltip
+   -------------------------------------------------------------------------- */
+
+[data-tooltip] {
+  position: relative;
+  cursor: default;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 6px 10px;
+  border-radius: var(--nmb-radius);
+  background: var(--nmb-text);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: normal;
+  max-width: 220px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   28. Responsive
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .nimbus-settings {
+    max-width: none;
+  }
+  .nmb-shell-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 960px) {
+  .nmb-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .nmb-settings-layout,
+  .nmb-onboarding-shell {
+    grid-template-columns: 1fr;
+  }
+  .nmb-settings-sidebar,
+  .nmb-onboarding-sidebar {
+    position: static;
+  }
+  .nmb-grid-2,
+  .nmb-overview-actions-grid,
+  .nmb-integrations-grid,
+  .nmb-secondary-surface-grid {
+    grid-template-columns: 1fr;
+  }
+  .nmb-bulk-job-pane + .nmb-bulk-job-pane {
+    border-top: 1px solid var(--nmb-border);
+    border-left: 0;
+    padding-top: var(--nmb-space-4);
+  }
+}
+
+@media (max-width: 782px) {
+  .nmb-stats-bar {
+    grid-template-columns: 1fr;
+  }
+  .nmb-settings-form .form-table tr {
+    grid-template-columns: 1fr;
+    gap: var(--nmb-space-2);
+  }
+  .nmb-settings-form .form-table th {
+    padding-top: 0;
+  }
+  .nmb-log-filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .nmb-onboarding-field-grid--two-up,
+  .nmb-onboarding-review-grid,
+  .nmb-onboarding-preference-grid {
+    grid-template-columns: 1fr;
+  }
+  .nimbus-settings .nav-tab-wrapper.nmb-shell-tabs {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .nmb-onboarding-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .nmb-onboarding-actions .button {
+    width: 100%;
+    min-width: 0;
+  }
+  .nmb-license-overlay__actions {
+    flex-direction: column;
+  }
+  .nmb-license-overlay__actions .button {
+    width: 100%;
+  }
+}

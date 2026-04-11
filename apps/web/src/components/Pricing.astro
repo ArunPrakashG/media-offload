@@ -13,9 +13,14 @@ const plans = [
       "Unlimited media files",
       "1 WordPress installation",
       "Any S3-compatible provider",
-      "Database URL rewriting",
-      "Bulk migration tool",
-      "Nightly batch offloading",
+      "Pauseable bulk migration jobs",
+      "Nightly off-hours batch processing (2 workers)",
+      "Selective offload rules (MIME type, file size, path)",
+      "Automatic cache purging (Cloudflare, LiteSpeed, Nginx)",
+      "Deep storage analytics + S3 vs R2 cost comparison",
+      "Page-builder integration rewriting (Elementor, etc.)",
+      "WP-CLI + REST API",
+      "Automatic plugin updates",
       "Email support",
     ],
     cta: "Get started",
@@ -31,8 +36,8 @@ const plans = [
     features: [
       "Everything in Personal",
       "5 WordPress installations",
-      "WordPress Multisite support",
-      "WP-CLI support",
+      "75 files per batch tick (vs 25 in Personal)",
+      "Nightly batch with 5 parallel workers",
       "Priority email support",
     ],
     cta: "Get started",
@@ -48,7 +53,8 @@ const plans = [
     features: [
       "Everything in Pro",
       "Unlimited installations",
-      "Cache purge integration",
+      "100 files per batch tick (maximum throughput)",
+      "Nightly batch with 8 parallel workers",
       "Priority support + onboarding",
     ],
     cta: "Get started",
@@ -78,9 +84,9 @@ const plans = [
       <div class="free-strip-body">
         <p class="free-strip-headline">Free tier included</p>
         <p class="free-strip-sub">
-          Every install ships with a free tier — new-upload offloading, database
-          URL rewriting, and any S3-compatible provider on 1 site with unlimited
-          media. No credit card. No time limit. <strong
+          Every install ships with a free tier — new-upload offloading,
+          hook-based URL delivery, and any S3-compatible provider on 1 site
+          with unlimited media. No credit card. No time limit. <strong
             >Activated automatically when you install the plugin.</strong
           >
         </p>
@@ -214,7 +220,8 @@ const plans = [
           hidden></span>
       </button>
     </div>
-    <p class="email-dialog-error" id="email-dialog-error" hidden></p>
+    <p class="email-dialog-error" id="email-dialog-error" role="alert" hidden>
+    </p>
   </form>
 </dialog>
 
@@ -473,7 +480,7 @@ const plans = [
 
   .plan-sites {
     font-size: 0.8125rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     font-weight: 450;
   }
 
@@ -501,12 +508,12 @@ const plans = [
 
   .plan-period {
     font-size: 0.8125rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
   }
 
   .plan-annual-note {
     font-size: 0.75rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
   }
 
   /* ── Divider ─────────────────────────────────────────────────────────────── */
@@ -581,7 +588,7 @@ const plans = [
     justify-content: center;
     margin-top: 2.25rem;
     font-size: 0.8125rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
   }
 
   /* ── Email dialog ────────────────────────────────────────────────────────── */
@@ -618,7 +625,7 @@ const plans = [
 
   .email-dialog-sub {
     font-size: 0.9rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     margin: 0;
   }
 
@@ -786,12 +793,16 @@ const plans = [
     (document.getElementById("pay-overlay-msg") as HTMLElement).textContent =
       msg;
     (document.getElementById("pay-overlay") as HTMLElement).hidden = false;
+    // Move focus into the dialog for keyboard users
+    (document.getElementById("pay-overlay-close") as HTMLElement).focus();
   }
 
   (
     document.getElementById("pay-overlay-close") as HTMLElement
   ).addEventListener("click", () => {
     (document.getElementById("pay-overlay") as HTMLElement).hidden = true;
+    // Return focus to the plan button that initiated checkout
+    triggerBtn?.focus();
   });
 
   // ── Email dialog ──────────────────────────────────────────────────────────
@@ -832,11 +843,13 @@ const plans = [
   });
 
   let pendingPlan: string | null = null;
+  let triggerBtn: HTMLElement | null = null;
 
   // Collect email then proceed to payment (paid plans only).
   document.querySelectorAll<HTMLElement>("[data-plan]").forEach((btn) => {
     btn.addEventListener("click", () => {
       pendingPlan = btn.dataset.plan ?? null;
+      triggerBtn = btn;
       emailInput.value = "";
       emailError.hidden = true;
       emailDialog.showModal();

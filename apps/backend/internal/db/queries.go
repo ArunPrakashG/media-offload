@@ -553,7 +553,7 @@ func UpdateLicenseExpiry(ctx context.Context, q DBTX, licenseID string, expiresA
 // Returns ErrNotFound if no release has been registered yet.
 func GetLatestRelease(ctx context.Context, q DBTX, productSlug string) (*PluginRelease, error) {
 	const sql = `
-                SELECT r.id::text, r.version, r.download_url, r.changelog,
+                SELECT r.id::text, r.version, r.r2_object_key, r.changelog,
                        r.min_wp_version, r.min_php_version, r.tested_up_to, r.released_at
                 FROM plugin_releases r
                 JOIN products p ON p.id = r.product_id
@@ -563,7 +563,7 @@ func GetLatestRelease(ctx context.Context, q DBTX, productSlug string) (*PluginR
 
 	var rel PluginRelease
 	err := q.QueryRow(ctx, sql, productSlug).Scan(
-		&rel.ID, &rel.Version, &rel.DownloadURL, &rel.Changelog,
+		&rel.ID, &rel.Version, &rel.R2ObjectKey, &rel.Changelog,
 		&rel.MinWPVersion, &rel.MinPHPVersion, &rel.TestedUpTo, &rel.ReleasedAt,
 	)
 	if err != nil {
@@ -580,18 +580,18 @@ func GetLatestRelease(ctx context.Context, q DBTX, productSlug string) (*PluginR
 func CreateRelease(ctx context.Context, q DBTX, p CreateReleaseParams) (*PluginRelease, error) {
 	const sql = `
                 INSERT INTO plugin_releases
-                            (product_id, version, download_url, changelog,
+                            (product_id, version, r2_object_key, changelog,
                              min_wp_version, min_php_version, tested_up_to)
                 VALUES ($1::uuid, $2, $3, $4, $5, $6, $7)
-                RETURNING id::text, version, download_url, changelog,
+                RETURNING id::text, version, r2_object_key, changelog,
                           min_wp_version, min_php_version, tested_up_to, released_at`
 
 	var rel PluginRelease
 	err := q.QueryRow(ctx, sql,
-		p.ProductID, p.Version, p.DownloadURL, p.Changelog,
+		p.ProductID, p.Version, p.R2ObjectKey, p.Changelog,
 		p.MinWPVersion, p.MinPHPVersion, p.TestedUpTo,
 	).Scan(
-		&rel.ID, &rel.Version, &rel.DownloadURL, &rel.Changelog,
+		&rel.ID, &rel.Version, &rel.R2ObjectKey, &rel.Changelog,
 		&rel.MinWPVersion, &rel.MinPHPVersion, &rel.TestedUpTo, &rel.ReleasedAt,
 	)
 	if err != nil {

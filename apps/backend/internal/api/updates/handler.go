@@ -10,9 +10,11 @@
 //	                           downloads the zip from download_url automatically.
 //	update_available = false → the plugin is current or the license is inactive.
 //	reason = "license_inactive" → surface a "renew to get updates" admin notice.
+//	reason = "r2_not_configured" → R2 env vars not set; admin must configure them.
 package updates
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -23,15 +25,24 @@ import (
 	"github.com/arunprakashg/nimbus-backend/internal/db"
 )
 
+// r2Presigner is the minimal interface the Handler needs from the R2 client.
+// Using an interface keeps the handler testable without a live R2 connection.
+type r2Presigner interface {
+	PresignGet(ctx context.Context, objectKey string) (string, error)
+}
+
 // Handler serves the plugin update API.
 type Handler struct {
 	database    *db.DB
 	productSlug string
+	r2          r2Presigner // nil when R2 is not configured
 }
 
 // New creates a Handler.
-func New(database *db.DB, productSlug string) *Handler {
-	return &Handler{database: database, productSlug: productSlug}
+// Pass a nil r2Client when R2 env vars are not configured; the handler will
+// return update_available=false with reason="r2_not_configured" in that case.
+func New(database *db.DB, productSlug string, r2Client r2Presigner) *Handler {
+	return &Handler{database: database, productSlug: productSlug, r2: r2Client}
 }
 
 // ── GET /v1/updates/check ─────────────────────────────────────────────────────
@@ -61,6 +72,15 @@ func (h *Handler) Check(w http.ResponseWriter, r *http.Request) {
 	if claims == nil {
 		// Should not happen — middleware guards this route — but be explicit.
 		apiutil.Error(w, http.StatusUnauthorized, "unauthorized", "missing token claims")
+		return
+	}
+
+	// Fail fast if R2 is not configured — no point querying the DB.
+	if h.r2 == nil {
+		apiutil.JSON(w, http.StatusOK, checkResponse{
+			UpdateAvailable: false,
+			Reason:          "r2_not_configured",
+		})
 		return
 	}
 
@@ -110,10 +130,20 @@ func (h *Handler) Check(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ── Generate presigned R2 download URL ───────────────────────────────────
+	// The bucket is private; we sign a 24-hour GET URL so WordPress can
+	// download the zip via its built-in update mechanism. Each update check
+	// cycle (~12 h) produces a fresh URL.
+	downloadURL, err := h.r2.PresignGet(r.Context(), latest.R2ObjectKey)
+	if err != nil {
+		apiutil.Error(w, http.StatusInternalServerError, "internal_error", "could not generate download URL")
+		return
+	}
+
 	apiutil.JSON(w, http.StatusOK, checkResponse{
 		UpdateAvailable: true,
 		Version:         latest.Version,
-		DownloadURL:     latest.DownloadURL,
+		DownloadURL:     downloadURL,
 		Changelog:       latest.Changelog,
 		MinWPVersion:    latest.MinWPVersion,
 		MinPHPVersion:   latest.MinPHPVersion,

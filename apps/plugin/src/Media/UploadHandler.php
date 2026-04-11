@@ -113,8 +113,9 @@ final class UploadHandler
       return false;
     }
 
-    // Selective offload rules (MIME type + file size) are gated on the selective_offload feature.
-    if ($this->licenseManager->hasFeature('selective_offload')) {
+    // Selective offload rules (MIME type + file size) are available when
+    // the nimbus-pro extension enables them via nimbus/upload/selective_offload_enabled.
+    if (apply_filters('nimbus/upload/selective_offload_enabled', false)) {
       if ($this->is_attachment_excluded_by_size_rules($attachment_id)) {
         return false;
       }

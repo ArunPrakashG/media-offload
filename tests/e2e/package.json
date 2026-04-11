@@ -1,0 +1,15 @@
+{
+  "name": "nimbus-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "End-to-end tests for the Nimbus WordPress plugin using Playwright",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "codegen": "playwright codegen http://localhost:8080/wp-admin/"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}

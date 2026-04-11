@@ -24,7 +24,7 @@
   /* Text */
   --nmb-text: #0f172a;
   --nmb-text-2: #334155;
-  --nmb-text-muted: #64748b;
+  --nmb-text-muted: #5e6e82; /* was #64748b — darkened for ≥4.5:1 on all site backgrounds */
   --nmb-text-subtle: #94a3b8;
   --nmb-text-invert: #ffffff;
 

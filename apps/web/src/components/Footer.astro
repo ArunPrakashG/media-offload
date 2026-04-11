@@ -80,7 +80,7 @@ const links = [
     {
       links.map((col) => (
         <div class="footer-col">
-          <h4 class="footer-col-heading">{col.heading}</h4>
+          <h3 class="footer-col-heading">{col.heading}</h3>
           <ul class="footer-col-links">
             {col.items.map((item) => (
               <li>
@@ -112,6 +112,7 @@ const links = [
           viewBox="0 0 16 16"
           fill="none"
           aria-label="love"
+          role="img"
         >
           <path
             d="M8 13.5S2 9.8 2 5.8A3.5 3.5 0 0 1 8 3.4a3.5 3.5 0 0 1 6 2.4c0 4-6 7.7-6 7.7z"
@@ -217,7 +218,7 @@ const links = [
   .footer-copy,
   .footer-built {
     font-size: 0.8125rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     display: flex;
     align-items: center;
     gap: 0.3rem;

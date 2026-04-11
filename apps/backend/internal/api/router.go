@@ -3,6 +3,7 @@ package api
 import (
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -17,6 +18,7 @@ import (
 	"github.com/arunprakashg/nimbus-backend/internal/config"
 	"github.com/arunprakashg/nimbus-backend/internal/db"
 	"github.com/arunprakashg/nimbus-backend/internal/license"
+	"github.com/arunprakashg/nimbus-backend/internal/storage"
 )
 
 // NewRouter builds the chi router with all routes and middleware wired up.
@@ -63,7 +65,18 @@ func NewRouter(
 	})
 
 	// Plugin update check — requires a valid activation token (Bearer auth).
-	uh := updateshandler.New(database, cfg.ProductSlug)
+	// If R2 is configured, the handler generates a presigned download URL on the fly.
+	var r2Client *storage.R2Client
+	if cfg.R2AccountID != "" && cfg.R2AccessKeyID != "" && cfg.R2BucketName != "" {
+		r2Client = storage.NewR2Client(
+			cfg.R2AccountID,
+			cfg.R2AccessKeyID,
+			cfg.R2AccessKeySecret,
+			cfg.R2BucketName,
+			time.Duration(cfg.R2PresignTTLHours)*time.Hour,
+		)
+	}
+	uh := updateshandler.New(database, cfg.ProductSlug, r2Client)
 	r.Route("/v1/updates", func(r chi.Router) {
 		r.Use(middleware.RequireActivationToken(svc.PublicKey()))
 		r.Get("/check", uh.Check)

@@ -82,12 +82,12 @@ func (h *Handler) IssueLicense(w http.ResponseWriter, r *http.Request) {
 // ── POST /admin/v1/releases ───────────────────────────────────────────────────
 
 type createReleaseRequest struct {
-	Version        string `json:"version"`
-	DownloadURL    string `json:"download_url"`
-	Changelog      string `json:"changelog"`
-	MinWPVersion   string `json:"min_wp_version"`
-	MinPHPVersion  string `json:"min_php_version"`
-	TestedUpTo     string `json:"tested_up_to"`
+	Version       string `json:"version"`
+	R2ObjectKey   string `json:"r2_object_key"` // e.g. "releases/nimbus-pro/0.2.0/nimbus-pro.zip"
+	Changelog     string `json:"changelog"`
+	MinWPVersion  string `json:"min_wp_version"`
+	MinPHPVersion string `json:"min_php_version"`
+	TestedUpTo    string `json:"tested_up_to"`
 }
 
 type createReleaseResponse struct {
@@ -111,8 +111,8 @@ func (h *Handler) CreateRelease(w http.ResponseWriter, r *http.Request) {
 		apiutil.Error(w, http.StatusBadRequest, "invalid_request", "request body must be valid JSON")
 		return
 	}
-	if body.Version == "" || body.DownloadURL == "" {
-		apiutil.Error(w, http.StatusBadRequest, "invalid_request", "version and download_url are required")
+	if body.Version == "" || body.R2ObjectKey == "" {
+		apiutil.Error(w, http.StatusBadRequest, "invalid_request", "version and r2_object_key are required")
 		return
 	}
 
@@ -140,7 +140,7 @@ func (h *Handler) CreateRelease(w http.ResponseWriter, r *http.Request) {
 	rel, err := db.CreateRelease(r.Context(), h.database.Pool(), db.CreateReleaseParams{
 		ProductID:     product.ID,
 		Version:       body.Version,
-		DownloadURL:   body.DownloadURL,
+		R2ObjectKey:   body.R2ObjectKey,
 		Changelog:     body.Changelog,
 		MinWPVersion:  minWP,
 		MinPHPVersion: minPHP,

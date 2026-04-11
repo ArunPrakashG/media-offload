@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Config\Settings;
-use Nimbus\Plugin\Jobs\BulkJobManager;
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
 use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
@@ -33,7 +32,6 @@ final class SettingsUi
   private SmartSliderAssetRewriter $smartSliderAssetRewriter;
   private DatabaseIntegrationRewriter $databaseIntegrationRewriter;
   private IntegrationDiscovery $integrationDiscovery;
-  private BulkJobManager $bulkJobManager;
   private string $pageHook = '';
 
   public function __construct(
@@ -45,14 +43,13 @@ final class SettingsUi
     $this->licenseManager = new LicenseManager();
     $this->conflictDetector = new ConflictDetector();
     $this->onboardingManager = new OnboardingManager($settings, $this->licenseManager, $this->conflictDetector);
-    $this->bulkJobManager = new BulkJobManager($settings, $uploadHandler, $logger, $this->licenseManager);
     $this->smartSliderAssetRewriter = new SmartSliderAssetRewriter($settings, $logger);
     $this->databaseIntegrationRewriter = new DatabaseIntegrationRewriter($settings, $logger);
     $this->integrationDiscovery = new IntegrationDiscovery($this->smartSliderAssetRewriter, $this->databaseIntegrationRewriter);
     $this->providerCatalog = new ProviderCatalog();
     $this->fieldRenderer = new FieldRenderer($settings, $this->providerCatalog);
     $this->settingsRegistrar = new SettingsRegistrar($settings, $this->fieldRenderer);
-    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $this->licenseManager, $this->onboardingManager, $this->integrationDiscovery, $this->bulkJobManager);
+    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $this->licenseManager, $this->onboardingManager, $this->integrationDiscovery);
     $this->actionsController = new ActionsController($settings, $logger, $uploadHandler, $this->licenseManager, $this->onboardingManager, $this->integrationDiscovery);
     $this->mediaLibraryController = new MediaLibraryController($settings, $uploadHandler, $logger);
   }
@@ -68,6 +65,7 @@ final class SettingsUi
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
+    add_action('wp_ajax_' . NIMBUS_AJAX_ONBOARDING_SAVE_STEP, [$this, 'handle_save_onboarding_step']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RESUME_MIGRATION, [$this, 'handle_resume_migration']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
@@ -129,6 +127,10 @@ final class SettingsUi
         'jobRetryError' => __('Unable to retry failed items right now.', NIMBUS_TEXT_DOMAIN),
       ],
       'providers' => $this->providerCatalog->scriptData(),
+      'onboarding' => [
+        'saveStepAction' => NIMBUS_AJAX_ONBOARDING_SAVE_STEP,
+        'saveStepNonce'  => wp_create_nonce(NIMBUS_AJAX_ONBOARDING_SAVE_STEP),
+      ],
     ];
 
     wp_localize_script(NIMBUS_SCRIPT_HANDLE, NIMBUS_SCRIPT_OBJECT, $scriptData);
@@ -137,6 +139,11 @@ final class SettingsUi
   public function handle_test_connection(): void
   {
     $this->actionsController->handleTestConnection();
+  }
+
+  public function handle_save_onboarding_step(): void
+  {
+    $this->actionsController->handleSaveOnboardingStep();
   }
 
   public function add_menu(): void

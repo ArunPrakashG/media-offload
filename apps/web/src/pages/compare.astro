@@ -5,21 +5,21 @@ import Base from "../layouts/Base.astro";
 ---
 
 <Base
-  title="Nimbus vs Per-File Pricing Plugins — Side-by-Side Comparison"
-  description="See how Nimbus compares to media offload plugins that charge by file count. No per-file quotas. Pay for sites, not storage."
+  title="Nimbus vs Other Media Offload Plugins — Side-by-Side Comparison"
+  description="See how Nimbus compares to WP Offload Media and per-file pricing plugins. No provider lock-in, pauseable bulk jobs, built-in cache purge and cost analytics."
 >
   <Navbar />
 
-  <main class="compare-page">
+  <main id="main-content" class="compare-page">
     <!-- Hero -->
     <section class="compare-hero">
       <div class="container">
         <p class="section-label">Comparison</p>
-        <h1 class="compare-headline">Nimbus vs Per-File Pricing</h1>
+        <h1 class="compare-headline">How Nimbus stacks up</h1>
         <p class="compare-sub">
-          Most media offload plugins charge you based on how many files you’ve
-          offloaded. Nimbus charges based on how many sites you run — unlimited
-          files, always.
+          No per-file caps, no provider lock-in, no missing cache purge. See
+          how Nimbus compares to other media offload plugins — on pricing and
+          features.
         </p>
       </div>
     </section>
@@ -194,46 +194,60 @@ import Base from "../layouts/Base.astro";
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
-                <td>Bulk migration tool</td>
-                <td class="col-nimbus"
+                <td>Pauseable bulk migration</td>
+                <td class="col-nimbus winner"
                   ><span class="check">✓</span> Personal &amp; above</td
                 >
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
                 <td>WP-CLI support</td>
-                <td class="col-nimbus"
-                  ><span class="check">✓</span> Pro &amp; Agency</td
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> Personal &amp; above</td
                 >
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
-                <td>WordPress Multisite</td>
+                <td>WordPress Multisite (per-site)</td>
                 <td class="col-nimbus"
-                  ><span class="check">✓</span> Pro &amp; Agency</td
+                  ><span class="check">✓</span> All plans</td
                 >
                 <td class="col-them"
                   ><span class="check">✓</span> All paid plans</td
                 >
               </tr>
               <tr>
-                <td>Database URL rewriting</td>
+                <td>Hook-based URL delivery (no provider URL stored in DB)</td>
                 <td class="col-nimbus winner"
                   ><span class="check">✓</span> All plans</td
                 >
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
-                <td>Cache purge integration</td>
-                <td class="col-nimbus"><span class="check">✓</span> Agency</td>
+                <td>Automatic cache purge (Cloudflare, LiteSpeed, Nginx)</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
                 <td class="col-them"><span class="dash">—</span></td>
               </tr>
               <tr>
-                <td>Nightly batch offloading</td>
+                <td>Nightly off-hours batch processing</td>
                 <td class="col-nimbus winner"
                   ><span class="check">✓</span> Personal &amp; above</td
                 >
                 <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Storage cost analytics (S3 vs R2 comparison)</td>
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> Personal &amp; above</td
+                >
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Page-builder integration rewriting (Elementor, etc.)</td>
+                <td class="col-nimbus winner"
+                  ><span class="check">✓</span> Personal &amp; above</td
+                >
+                <td class="col-them">Add-on / paid extra</td>
               </tr>
               <tr>
                 <td>Priority email support</td>
@@ -248,6 +262,106 @@ import Base from "../layouts/Base.astro";
                 <td>License pricing model</td>
                 <td class="col-nimbus winner">Per site · no media cap</td>
                 <td class="col-them">Per media item count · unlimited sites</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- WP Offload Media comparison section -->
+    <section class="section section--alt">
+      <div class="container">
+        <h2 class="section-headline" style="margin-bottom:0.75rem">
+          How Nimbus compares to WP Offload Media
+        </h2>
+        <p class="section-sub" style="margin-bottom:2.5rem">
+          WP Offload Media is the market leader. Here's where Nimbus wins outright.
+        </p>
+
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th class="col-feature">Capability</th>
+                <th class="col-nimbus">
+                  <span class="th-brand th-brand--nimbus">Nimbus</span>
+                </th>
+                <th class="col-them">
+                  <span class="th-brand th-brand--them">WP Offload Media</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cloudflare R2 — dedicated profile</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Enter Account ID — everything else is automatic
+                </td>
+                <td class="col-them">Manual S3-compatible setup, no R2-specific guidance</td>
+              </tr>
+              <tr>
+                <td>What gets stored in the database per file</td>
+                <td class="col-nimbus winner">
+                  A neutral bucket path only — no provider URL stored. CDN URLs generated at render time from current settings.
+                </td>
+                <td class="col-them">
+                  Full S3/CDN URL written into <code>_wp_attached_file</code> on every offload — DB is provider-coupled, switching requires a full DB find-and-replace
+                </td>
+              </tr>
+              <tr>
+                <td>Switching providers</td>
+                <td class="col-nimbus winner">Change a setting — done</td>
+                <td class="col-them">Full database search-replace required</td>
+              </tr>
+              <tr>
+                <td>Automatic cache purging</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Cloudflare, LiteSpeed, WP Fastest Cache, Nginx — built-in
+                </td>
+                <td class="col-them"><span class="dash">—</span> Not available</td>
+              </tr>
+              <tr>
+                <td>Pauseable bulk migration</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Pause, resume, auto-retry, real-time progress
+                </td>
+                <td class="col-them">Simple background process, no pause/resume</td>
+              </tr>
+              <tr>
+                <td>Nightly off-hours scheduling</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Configurable time · up to 8 parallel workers
+                </td>
+                <td class="col-them"><span class="dash">—</span> Not available</td>
+              </tr>
+              <tr>
+                <td>Storage cost analytics</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Live S3 vs R2 cost comparison by your actual library size
+                </td>
+                <td class="col-them"><span class="dash">—</span> No cost analytics</td>
+              </tr>
+              <tr>
+                <td>Page-builder integration rewriting</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Elementor, Slider Revolution, Smart Slider 3, NextGEN — included
+                </td>
+                <td class="col-them">Separate paid add-ons required</td>
+              </tr>
+              <tr>
+                <td>REST API</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Full read + job control endpoints
+                </td>
+                <td class="col-them">No formal REST API</td>
+              </tr>
+              <tr>
+                <td>Free tier</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Unlimited media, 1 site, no time limit
+                </td>
+                <td class="col-them"><span class="dash">—</span> Paid only</td>
               </tr>
             </tbody>
           </table>
@@ -290,11 +404,11 @@ import Base from "../layouts/Base.astro";
           <div class="faq-item">
             <h3>Is there a free version of Nimbus?</h3>
             <p>
-              Yes. The free tier includes new-upload offloading, database URL
-              rewriting, and any S3-compatible provider — on 1 site with
-              unlimited media files. No credit card required. Bulk migration of
-              existing media and nightly background offloading are available on
-              paid plans from $69/yr.
+              Yes. The free tier includes new-upload offloading, hook-based URL
+              delivery, and any S3-compatible provider — on 1 site with unlimited
+              media files. No credit card required. Bulk migration, nightly
+              scheduling, cache purge, and analytics are available on paid plans
+              from $69/yr.
             </p>
           </div>
 
@@ -321,12 +435,32 @@ import Base from "../layouts/Base.astro";
           </div>
 
           <div class="faq-item">
+            <h3>Does Nimbus store URLs in my database?</h3>
+            <p>
+              No. After offload, Nimbus records only a neutral bucket path
+              (e.g. <code>wp-uploads/2024/01/photo.jpg</code>) per file — never
+              a provider URL like <code>https://s3.amazonaws.com/…</code>.
+              CDN delivery URLs are assembled at render time from your current
+              settings. That means switching providers, changing your CDN domain,
+              or toggling local vs remote serving is always a settings-page
+              change — no database find-and-replace required.
+            </p>
+            <p>
+              This contrasts with WP Offload Media, which writes the full S3 URL
+              into <code>_wp_attached_file</code> on every offload, permanently
+              coupling your database to that specific provider and URL.
+            </p>
+          </div>
+
+          <div class="faq-item">
             <h3>Which storage providers does Nimbus support?</h3>
             <p>
               Any provider with an S3-compatible API: Amazon S3, Cloudflare R2,
-              DigitalOcean Spaces, Backblaze B2, MinIO, Wasabi, Vultr Object
-              Storage, and more. If it speaks S3, Nimbus works with it. You're
-              never locked into a single provider.
+              Backblaze B2, MinIO, Wasabi, Vultr Object Storage, and more.
+              Cloudflare R2 has a dedicated provider profile — just enter your
+              Account ID and Nimbus configures the endpoint, region, and
+              path-style settings automatically. If it speaks S3, Nimbus works
+              with it.
             </p>
           </div>
         </div>

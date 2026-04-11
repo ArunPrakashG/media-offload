@@ -37,7 +37,8 @@ services:
       WORDPRESS_DEBUG: "1"
     volumes:
       - wp_data:/var/www/html
-      - ../../apps/plugin:/var/www/html/wp-content/plugins/nimbus
+      - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
+      - ../../apps/plugin/nimbus-pro:/var/www/html/wp-content/plugins/nimbus-pro
 
   setup:
     image: wordpress:cli-php8.2
@@ -60,8 +61,8 @@ services:
     working_dir: /var/www/html
     volumes:
       - wp_data:/var/www/html
-      - ../../apps/plugin:/var/www/html/wp-content/plugins/nimbus
-      - ../../apps/plugin/tools/local-wp:/scripts:ro
+      - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
+      - ../../apps/plugin/nimbus/tools/local-wp:/scripts:ro
     entrypoint: ["/bin/sh", "/scripts/setup.sh"]
     restart: "no"
 
@@ -82,9 +83,46 @@ services:
     working_dir: /var/www/html
     volumes:
       - wp_data:/var/www/html
-      - ../../apps/plugin:/var/www/html/wp-content/plugins/nimbus
+      - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
     entrypoint: ["wp", "--allow-root", "--path=/var/www/html"]
+
+  # MinIO: S3-compatible object storage used for local/CI testing.
+  # Access key: minioadmin / minioadmin  (change for production)
+  # API:     http://localhost:9000
+  # Console: http://localhost:9001
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-shot container that creates the test bucket on first startup.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin &&
+        mc mb --ignore-existing local/nimbus-test &&
+        mc anonymous set download local/nimbus-test &&
+        echo 'MinIO bucket ready.'
+      "
+    restart: "no"
 
 volumes:
   db_data:
   wp_data:
+  minio_data:

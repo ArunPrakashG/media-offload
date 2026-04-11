@@ -14,10 +14,24 @@ type Config struct {
 	LicensePrivateKey string // base64-encoded 64-byte Ed25519 private key
 	LicensePublicKey  string // base64-encoded 32-byte Ed25519 public key
 	TokenTTLDays      int
+	// TokenGracePeriodDays is added to exp to compute the gau (grace-until) claim
+	// embedded in every activation token. The plugin treats gau as the hard
+	// deadline — features stop working after gau, not after exp.
+	// Default: 7 days. Override via TOKEN_GRACE_PERIOD_DAYS env var.
+	TokenGracePeriodDays int
 	// AdminAPISecret protects the /admin/* routes. Required for license issuance.
 	AdminAPISecret string
 	// ProductSlug is the slug of the product in the database (default: "nimbus").
 	ProductSlug string
+
+	// R2 — Cloudflare R2 bucket used to distribute the pro plugin zip.
+	// All fields are optional; if unset, the update check endpoint returns
+	// update_available=false with reason="r2_not_configured".
+	R2AccountID       string
+	R2AccessKeyID     string
+	R2AccessKeySecret string
+	R2BucketName      string
+	R2PresignTTLHours int // default 24
 
 	// Razorpay — credentials for subscription creation and webhook verification.
 	RazorpayKeyID         string
@@ -58,15 +72,37 @@ func Load() (*Config, error) {
 		}
 	}
 
+	graceDays := 7
+	if v := os.Getenv("TOKEN_GRACE_PERIOD_DAYS"); v != "" {
+		graceDays, err = strconv.Atoi(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid TOKEN_GRACE_PERIOD_DAYS: %w", err)
+		}
+	}
+
 	return &Config{
-		Port:              getOr("PORT", "8090"),
-		DatabaseURL:       dbURL,
-		RedisURL:          redisURL,
-		LicensePrivateKey: privKey,
-		LicensePublicKey:  pubKey,
-		TokenTTLDays:      ttlDays,
-		AdminAPISecret:    os.Getenv("ADMIN_API_SECRET"),
-		ProductSlug:       getOr("PRODUCT_SLUG", "nimbus"),
+		Port:                  getOr("PORT", "8090"),
+		DatabaseURL:           dbURL,
+		RedisURL:              redisURL,
+		LicensePrivateKey:     privKey,
+		LicensePublicKey:      pubKey,
+		TokenTTLDays:          ttlDays,
+		TokenGracePeriodDays:  graceDays,
+		AdminAPISecret:        os.Getenv("ADMIN_API_SECRET"),
+		ProductSlug:           getOr("PRODUCT_SLUG", "nimbus"),
+
+		R2AccountID:       os.Getenv("R2_ACCOUNT_ID"),
+		R2AccessKeyID:     os.Getenv("R2_ACCESS_KEY_ID"),
+		R2AccessKeySecret: os.Getenv("R2_ACCESS_KEY_SECRET"),
+		R2BucketName:      os.Getenv("R2_BUCKET_NAME"),
+		R2PresignTTLHours: func() int {
+			if v := os.Getenv("R2_PRESIGN_TTL_HOURS"); v != "" {
+				if n, err2 := strconv.Atoi(v); err2 == nil && n > 0 {
+					return n
+				}
+			}
+			return 24
+		}(),
 
 		RazorpayKeyID:         os.Getenv("RAZORPAY_KEY_ID"),
 		RazorpayKeySecret:     os.Getenv("RAZORPAY_KEY_SECRET"),

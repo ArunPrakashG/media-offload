@@ -266,6 +266,16 @@ const links = [
     mobile?.setAttribute("aria-hidden", String(!open));
   });
 
+  // Close mobile menu on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mobile?.classList.contains("open")) {
+      mobile.classList.remove("open");
+      toggle?.setAttribute("aria-expanded", "false");
+      mobile.setAttribute("aria-hidden", "true");
+      toggle?.focus();
+    }
+  });
+
   // Close on link click (mobile)
   mobile?.querySelectorAll("a").forEach((a) => {
     a.addEventListener("click", () => {

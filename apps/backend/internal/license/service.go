@@ -44,10 +44,11 @@ var (
 
 // Service is the core domain object for license operations.
 type Service struct {
-	db         *db.DB
-	privateKey ed25519.PrivateKey
-	publicKey  ed25519.PublicKey
-	tokenTTL   time.Duration
+	db          *db.DB
+	privateKey  ed25519.PrivateKey
+	publicKey   ed25519.PublicKey
+	tokenTTL    time.Duration
+	gracePeriod time.Duration // added to exp → gau claim; defined by server config
 }
 
 // PublicKey returns the Ed25519 public key used to verify activation tokens.
@@ -74,10 +75,11 @@ func NewService(database *db.DB, cfg *config.Config) (*Service, error) {
 			ed25519.PublicKeySize, len(pubBytes))
 	}
 	return &Service{
-		db:         database,
-		privateKey: ed25519.PrivateKey(privBytes),
-		publicKey:  ed25519.PublicKey(pubBytes),
-		tokenTTL:   time.Duration(cfg.TokenTTLDays) * 24 * time.Hour,
+		db:          database,
+		privateKey:  ed25519.PrivateKey(privBytes),
+		publicKey:   ed25519.PublicKey(pubBytes),
+		tokenTTL:    time.Duration(cfg.TokenTTLDays) * 24 * time.Hour,
+		gracePeriod: time.Duration(cfg.TokenGracePeriodDays) * 24 * time.Hour,
 	}, nil
 }
 
@@ -161,13 +163,14 @@ func (s *Service) Activate(ctx context.Context, req ActivateRequest) (*ActivateR
 		}
 		expiresAt := time.Now().Add(s.tokenTTL)
 		claims := TokenClaims{
-			LicenseID: lic.ID,
-			Domain:    domain,
-			Product:   req.Product,
-			Tier:      lic.Tier,
-			Features:  features,
-			IssuedAt:  time.Now().Unix(),
-			ExpiresAt: expiresAt.Unix(),
+			LicenseID:  lic.ID,
+			Domain:     domain,
+			Product:    req.Product,
+			Tier:       lic.Tier,
+			Features:   features,
+			IssuedAt:   time.Now().Unix(),
+			ExpiresAt:  expiresAt.Unix(),
+			GraceUntil: expiresAt.Add(s.gracePeriod).Unix(),
 		}
 		token, err := SignToken(claims, s.privateKey)
 		if err != nil {

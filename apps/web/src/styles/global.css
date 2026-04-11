@@ -147,7 +147,9 @@ p {
 
 .badge-accent {
   background: var(--nmb-accent-light);
-  color: var(--nmb-accent);
+  color: var(
+    --nmb-accent-hover
+  ); /* darkened from --nmb-accent for 4.5:1 on accent-light bg */
   border: 1px solid rgba(79, 99, 245, 0.2);
 }
 
@@ -198,6 +200,19 @@ p {
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ── Focus ────────────────────────────────────────────────────────────────── */

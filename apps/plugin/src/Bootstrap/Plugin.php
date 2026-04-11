@@ -1,14 +1,11 @@
 <?php
 namespace Nimbus\Plugin\Bootstrap;
 
-use Nimbus\Plugin\Cache\PurgeManager;
-use Nimbus\Plugin\Jobs\BulkJobManager;
+use Nimbus\Plugin\Extension\Registry;
 use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
 use Nimbus\Plugin\License\LicenseManager;
-use Nimbus\Plugin\License\UpdateChecker;
-use Nimbus\Plugin\Cli\Command;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Delivery\UrlRewriter;
 use Nimbus\Plugin\Media\UploadHandler;
@@ -55,28 +52,29 @@ final class Plugin
     }
   }
 
+  /**
+   * Called by the NIMBUS_LICENSE_REFRESH_HOOK cron.
+   * The actual refresh is delegated to whichever pro extension provides it.
+   */
+  public function onLicenseRefresh(): void
+  {
+    do_action('nimbus/license/refresh');
+  }
+
   public function onPluginsLoaded(): void
   {
-    $lm = $this->licenseManager();
-
-    if ($lm->isActive() && $lm->hasFeature('cache_purge')) {
-      $this->purgeManager()->register();
-    }
-
     $this->uploadHandler()->register();
-
-    if ($lm->isActive() && $lm->hasFeature('nightly_batch')) {
-      $this->uploadHandler()->registerNightlyBatch();
-    }
-
-    if ($lm->isActive() && $lm->hasFeature('wpcli')) {
-      $this->cliCommand()->register();
-    }
-
-    if ($lm->isActive() && $lm->hasFeature('bulk_migration')) {
-      $this->bulkJobManager()->register();
-    }
     $this->apiController()->register();
+  }
+
+  /**
+   * Boot all registered pro extensions.
+   * Runs at plugins_loaded priority 25, after pro extensions have registered
+   * themselves at priority 0–20 via the nimbus/extensions/register action.
+   */
+  public function bootExtensions(): void
+  {
+    $this->extensionRegistry()->bootAll($this->container, $this->licenseManager());
   }
 
   private function bootInternal(): void
@@ -92,7 +90,19 @@ final class Plugin
     add_action('plugins_loaded', [$this, 'onPluginsLoaded'], 20);
 
     $this->settingsUi()->register();
-    $this->updateChecker()->register();
+
+    // Allow pro and third-party extensions to register themselves.
+    // Fired at plugins_loaded priority 0 so all plugin files are loaded by then.
+    $registry = $this->extensionRegistry();
+    add_action('plugins_loaded', static function () use ($registry): void {
+      do_action('nimbus/extensions/register', $registry);
+    }, 0);
+
+    // Boot registered extensions after the free plugin has initialised (priority 20).
+    add_action('plugins_loaded', [$this, 'bootExtensions'], 25);
+
+    // The cron action always fires; pro extension optionally listens via nimbus/license/refresh.
+    add_action(NIMBUS_LICENSE_REFRESH_HOOK, [$this, 'onLicenseRefresh']);
 
     $this->booted = true;
   }
@@ -132,11 +142,6 @@ final class Plugin
     return $this->container->get('settings_ui', fn (Container $container): SettingsUi => new SettingsUi($this->settings(), $this->logger(), $this->statistics(), $this->uploadHandler()));
   }
 
-  private function cliCommand(): Command
-  {
-    return $this->container->get('cli_command', fn (Container $container): Command => new Command($this->uploadHandler(), $this->settings(), $this->adapterFactory(), $this->logger()));
-  }
-
   private function smartSliderAssetRewriter(): SmartSliderAssetRewriter
   {
     return $this->container->get('smartslider_asset_rewriter', fn (Container $container): SmartSliderAssetRewriter => new SmartSliderAssetRewriter($this->settings(), $this->logger()));
@@ -157,32 +162,14 @@ final class Plugin
     return $this->container->get('license_manager', fn (Container $container): LicenseManager => new LicenseManager());
   }
 
-  private function updateChecker(): UpdateChecker
-  {
-    return $this->container->get('update_checker', fn (Container $container): UpdateChecker => new UpdateChecker($this->licenseManager()));
-  }
-
   private function onboardingManager(): OnboardingManager
   {
     return $this->container->get('onboarding_manager', fn (Container $container): OnboardingManager => new OnboardingManager($this->settings(), $this->licenseManager(), new ConflictDetector()));
   }
 
-  private function bulkJobManager(): BulkJobManager
+  private function extensionRegistry(): Registry
   {
-    return $this->container->get('bulk_job_manager', fn (Container $container): BulkJobManager => new BulkJobManager(
-      $this->settings(),
-      $this->uploadHandler(),
-      $this->logger(),
-      $this->licenseManager(),
-    ));
-  }
-
-  private function purgeManager(): PurgeManager
-  {
-    return $this->container->get('purge_manager', fn (Container $container): PurgeManager => new PurgeManager(
-      $this->settings(),
-      $this->logger(),
-    ));
+    return $this->container->get('extension_registry', static fn (Container $container): Registry => new Registry());
   }
 
   private function apiController(): ApiController
@@ -191,7 +178,6 @@ final class Plugin
       $this->settings(),
       $this->statistics(),
       $this->uploadHandler(),
-      $this->bulkJobManager(),
       $this->integrationDiscovery(),
       $this->licenseManager(),
       $this->onboardingManager(),

@@ -4,51 +4,41 @@ Thumbs.db
 .idea/
 .vscode/
 
+# ── Playwright MCP ────────────────────────────────────────────────────────────
+.playwright-mcp/
+
 # ── Secrets & environment ──────────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
 
 # ── apps/plugin (PHP / WordPress) ─────────────────────────────────────────────
-apps/plugin/vendor/
-apps/plugin/.phpunit.result.cache
-apps/plugin/coverage/
+apps/plugin/nimbus/vendor/
+apps/plugin/nimbus/.phpunit.result.cache
+apps/plugin/nimbus/coverage/
+apps/plugin/nimbus-pro/vendor/
 
 # ── pnpm workspace ───────────────────────────────────────────────────────────
-node_modules/
 **/node_modules/
 package-lock.json
 yarn.lock
 
-# ── apps/web (JavaScript / Node) ──────────────────────────────────────────────
-apps/web/.next/
+# ── apps/web (Astro) ──────────────────────────────────────────────────────────
+apps/web/.astro/
 apps/web/dist/
 apps/web/build/
 apps/web/.output/
-apps/web/.astro/
 
 # ── apps/backend (Go) ─────────────────────────────────────────────────────────
 apps/backend/bin/
 apps/backend/tmp/
 
-# ── apps/backend (Python — if chosen instead) ─────────────────────────────────
-apps/backend/.venv/
-apps/backend/__pycache__/
-apps/backend/*.py[cod]
-apps/backend/.pytest_cache/
-apps/backend/.mypy_cache/
-apps/backend/.ruff_cache/
-
 # ── packages (shared libs) ────────────────────────────────────────────────────
 packages/**/dist/
-packages/**/__pycache__/
 
-# ── infra ─────────────────────────────────────────────────────────────────────
-infra/**/.terraform/
-infra/**/*.tfstate
-infra/**/*.tfstate.backup
-infra/**/*.tfvars
-!infra/**/*.tfvars.example
+# ── tests/e2e (Playwright) ────────────────────────────────────────────────────
+tests/e2e/playwright-report/
+tests/e2e/test-results/
 
 # ── Logs / temp ───────────────────────────────────────────────────────────────
 *.log

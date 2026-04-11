@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Bootstrap\DataMigration;
-use Nimbus\Plugin\Jobs\BulkJobManager;
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
@@ -34,7 +33,6 @@ final class PageRenderer
     private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
     private IntegrationDiscovery $integrationDiscovery,
-    private BulkJobManager $bulkJobManager,
   ) {
   }
 
@@ -122,11 +120,20 @@ final class PageRenderer
     $settings = $this->settings->all();
     $license = $this->licenseManager->all();
     $state = $this->onboardingManager->state();
-    $requestedStep = isset($_GET['onboarding_step']) ? sanitize_key((string) wp_unslash($_GET['onboarding_step'])) : 'account';
     $stepKeys = ['account', 'storage', 'delivery', 'review'];
+    $state = $this->onboardingManager->state();
+    $savedStep = !empty($state['current_step']) ? (string) $state['current_step'] : '';
+    $defaultStep = $this->licenseManager->hasKey() ? 'storage' : 'account';
+    // Only resume from a later step if the license-key prerequisite is satisfied.
+    if ($savedStep !== '' && in_array($savedStep, $stepKeys, true)) {
+      if ($savedStep === 'account' || $this->licenseManager->hasKey()) {
+        $defaultStep = $savedStep;
+      }
+    }
+    $requestedStep = isset($_GET['onboarding_step']) ? sanitize_key((string) wp_unslash($_GET['onboarding_step'])) : $defaultStep;
     $currentStepIndex = array_search($requestedStep, $stepKeys, true);
     if ($currentStepIndex === false) {
-      $currentStepIndex = 0;
+      $currentStepIndex = array_search($defaultStep, $stepKeys, true) ?: 0;
     }
     ?>
     <div id="nmb-onboarding-wizard" class="nmb-onboarding-shell" data-current-step="<?php echo esc_attr((string) $currentStepIndex); ?>">
@@ -202,74 +209,108 @@ final class PageRenderer
         </section>
 
         <section class="nmb-card nmb-onboarding-step" data-step="storage" hidden>
+          <?php
+            $savedProvider  = (string) ($settings['provider'] ?? 's3');
+            $isLocalDefault = $savedProvider === 'local';
+            $isR2Default    = $savedProvider === 'r2';
+            $isS3CDefault   = $savedProvider === 's3_compatible';
+          ?>
           <div class="nmb-onboarding-step-header">
             <p class="nmb-eyebrow"><?php esc_html_e('Step 2', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Connect your storage provider', NIMBUS_TEXT_DOMAIN); ?></h2>
-            <p><?php esc_html_e('Select the provider where media should live, then enter the bucket and credentials needed for offloading.', NIMBUS_TEXT_DOMAIN); ?></p>
+            <p><?php esc_html_e('Select a provider and only the fields you need will appear.', NIMBUS_TEXT_DOMAIN); ?></p>
           </div>
 
-          <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
-            <label class="nmb-onboarding-field">
+          <!-- Provider selector — always visible -->
+          <div class="nmb-storage-group">
+            <label class="nmb-onboarding-field nmb-onboarding-field--full">
               <span><?php esc_html_e('Provider', NIMBUS_TEXT_DOMAIN); ?></span>
               <select id="nimbus-provider" name="provider">
                 <?php foreach ($this->settings->available_provider_keys() as $providerKey) : ?>
-                  <option value="<?php echo esc_attr($providerKey); ?>" <?php selected((string) ($settings['provider'] ?? 's3'), $providerKey); ?>><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></option>
+                  <option value="<?php echo esc_attr($providerKey); ?>" <?php selected($savedProvider, $providerKey); ?>><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></option>
                 <?php endforeach; ?>
               </select>
             </label>
+            <p id="nmb-provider-tip" class="nmb-provider-tip" hidden></p>
+          </div>
 
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Bucket', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="text" id="nimbus-bucket" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off" />
-            </label>
+          <!-- Bucket & location — all cloud providers -->
+          <div class="nmb-storage-group" data-provider-group="bucket-location"<?php if ($isLocalDefault) echo ' hidden'; ?>>
+            <p class="nmb-storage-group__label"><?php esc_html_e('Bucket &amp; location', NIMBUS_TEXT_DOMAIN); ?></p>
+            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Bucket', NIMBUS_TEXT_DOMAIN); ?></span>
+                <input type="text" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('The name of the bucket you created in your provider\'s console.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Region', NIMBUS_TEXT_DOMAIN); ?></span>
+                <input type="text" id="nimbus-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="us-east-1"<?php if ($isR2Default) echo ' readonly'; ?> autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('e.g. us-east-1 for AWS. Cloudflare R2 uses &ldquo;auto&rdquo; — filled in automatically.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+              <label class="nmb-onboarding-field nmb-onboarding-field--full">
+                <span><?php esc_html_e('Path prefix', NIMBUS_TEXT_DOMAIN); ?> <em class="nmb-optional"><?php esc_html_e('optional', NIMBUS_TEXT_DOMAIN); ?></em></span>
+                <input type="text" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="wp-uploads" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('A sub-folder inside the bucket. Leave blank to store files at the root.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+            </div>
+          </div>
 
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Region', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="text" id="nimbus-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="ap-south-1 / auto" autocomplete="off" />
-            </label>
+          <!-- Credentials — all cloud providers -->
+          <div class="nmb-storage-group" data-provider-group="credentials"<?php if ($isLocalDefault) echo ' hidden'; ?>>
+            <p class="nmb-storage-group__label"><?php esc_html_e('Credentials', NIMBUS_TEXT_DOMAIN); ?></p>
+            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Access key', NIMBUS_TEXT_DOMAIN); ?></span>
+                <input type="text" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('AWS: IAM \u2192 Users \u2192 Security credentials. Cloudflare: R2 \u2192 Manage API tokens.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Secret key', NIMBUS_TEXT_DOMAIN); ?></span>
+                <input type="password" name="secret_key" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" autocomplete="new-password"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('The secret paired with your access key. Shown only once \u2014 copy it before closing.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+            </div>
+          </div>
 
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Path prefix', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="text" id="nimbus-prefix" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="media/uploads" autocomplete="off" />
-            </label>
+          <!-- Cloudflare R2 extras — r2 only -->
+          <div class="nmb-storage-group" data-provider-group="r2-extra"<?php if (! $isR2Default) echo ' hidden'; ?>>
+            <p class="nmb-storage-group__label"><?php esc_html_e('Cloudflare account', NIMBUS_TEXT_DOMAIN); ?></p>
+            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Account ID', NIMBUS_TEXT_DOMAIN); ?></span>
+                <input type="text" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" autocomplete="off"<?php if (! $isR2Default) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('Found in the right sidebar of your Cloudflare dashboard home page.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Custom endpoint', NIMBUS_TEXT_DOMAIN); ?> <em class="nmb-optional"><?php esc_html_e('alternative', NIMBUS_TEXT_DOMAIN); ?></em></span>
+                <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://&lt;account-id&gt;.r2.cloudflarestorage.com" autocomplete="off"<?php if (! $isR2Default) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('Use this instead of Account ID if you prefer an explicit URL.', NIMBUS_TEXT_DOMAIN); ?></small>
+              </label>
+            </div>
+          </div>
 
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Access key', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="text" id="nimbus-access-key" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off" />
-            </label>
-
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Secret key', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="password" id="nimbus-secret-key" name="secret_key" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" autocomplete="new-password" />
-            </label>
-
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('R2 account ID', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="text" id="nimbus-r2-account-id" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" placeholder="For Cloudflare R2" autocomplete="off" />
-            </label>
-
-            <label class="nmb-onboarding-field">
-              <span><?php esc_html_e('Custom endpoint', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="url" id="nimbus-endpoint" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://account-id.r2.cloudflarestorage.com" autocomplete="off" />
-            </label>
-
+          <!-- Custom endpoint — s3_compatible only -->
+          <div class="nmb-storage-group" data-provider-group="s3c-endpoint"<?php if (! $isS3CDefault) echo ' hidden'; ?>>
+            <p class="nmb-storage-group__label"><?php esc_html_e('Connection', NIMBUS_TEXT_DOMAIN); ?></p>
             <label class="nmb-onboarding-field nmb-onboarding-field--full">
-              <span><?php esc_html_e('Session token (optional)', NIMBUS_TEXT_DOMAIN); ?></span>
-              <input type="password" id="nimbus-session-token" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password" />
+              <span><?php esc_html_e('Custom endpoint', NIMBUS_TEXT_DOMAIN); ?></span>
+              <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://s3.example.com" autocomplete="off"<?php if (! $isS3CDefault) echo ' disabled'; ?> />
+              <small class="nmb-field-hint"><?php esc_html_e('The S3-compatible API base URL from your provider, e.g. https://s3.example.com.', NIMBUS_TEXT_DOMAIN); ?></small>
             </label>
           </div>
 
-          <div class="nmb-card nmb-onboarding-helper-card">
-            <h3><?php esc_html_e('How to do this', NIMBUS_TEXT_DOMAIN); ?></h3>
-            <ul class="nmb-bullet-list">
-              <li><?php esc_html_e('Amazon S3 usually needs bucket, region, access key, and secret key.', NIMBUS_TEXT_DOMAIN); ?></li>
-              <li><?php esc_html_e('Cloudflare R2 usually needs bucket, access key, secret key, and either an account ID or custom endpoint. Use region “auto”.', NIMBUS_TEXT_DOMAIN); ?></li>
-              <li><?php esc_html_e('S3-compatible services normally need a custom endpoint in addition to standard credentials.', NIMBUS_TEXT_DOMAIN); ?></li>
-            </ul>
+          <!-- Session token — s3 and s3_compatible only -->
+          <div class="nmb-storage-group" data-provider-group="session"<?php if ($isR2Default || $isLocalDefault) echo ' hidden'; ?>>
+            <p class="nmb-storage-group__label"><?php esc_html_e('Temporary credentials', NIMBUS_TEXT_DOMAIN); ?> <em class="nmb-optional"><?php esc_html_e('optional', NIMBUS_TEXT_DOMAIN); ?></em></p>
+            <label class="nmb-onboarding-field nmb-onboarding-field--full">
+              <span><?php esc_html_e('Session token', NIMBUS_TEXT_DOMAIN); ?></span>
+              <input type="password" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password"<?php if ($isR2Default || $isLocalDefault) echo ' disabled'; ?> />
+              <small class="nmb-field-hint"><?php esc_html_e('Only needed for temporary AWS STS credentials. Leave blank for standard IAM access keys.', NIMBUS_TEXT_DOMAIN); ?></small>
+            </label>
           </div>
 
           <div class="nmb-onboarding-actions">
-            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', NIMBUS_TEXT_DOMAIN); ?></button>
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
@@ -322,7 +363,6 @@ final class PageRenderer
           </div>
 
           <div class="nmb-onboarding-actions">
-            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', NIMBUS_TEXT_DOMAIN); ?></button>
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to review', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
@@ -372,7 +412,6 @@ final class PageRenderer
           </div>
 
           <div class="nmb-onboarding-actions">
-            <button type="button" class="button button-secondary" data-onboarding-back><?php esc_html_e('Back', NIMBUS_TEXT_DOMAIN); ?></button>
             <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup and unlock dashboard', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
@@ -588,7 +627,13 @@ final class PageRenderer
 
   private function renderBulkJobsPanel(): void
   {
-    $state = $this->bulkJobManager->state();
+    // BulkJobManager is provided by the nimbus-pro extension at runtime.
+    $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
+    if ($bulkJobManager === null) {
+      return;
+    }
+
+    $state = $bulkJobManager->state();
     $job = !empty($state['current']['id']) ? $state['current'] : $state['last'];
     $hasJob = !empty($job['id']);
     ?>

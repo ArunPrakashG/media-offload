@@ -110,23 +110,23 @@ type LicenseForActivation struct {
 }
 // PluginRelease is a published version of a product plugin.
 type PluginRelease struct {
-        ID             string
-        Version        string
-        DownloadURL    string
-        Changelog      string
-        MinWPVersion   string
-        MinPHPVersion  string
-        TestedUpTo     string
-        ReleasedAt     time.Time
+        ID            string
+        Version       string
+        R2ObjectKey   string // private R2 bucket object key; presigned URL generated at serve time
+        Changelog     string
+        MinWPVersion  string
+        MinPHPVersion string
+        TestedUpTo    string
+        ReleasedAt    time.Time
 }
 
 // CreateReleaseParams holds the fields required to register a new plugin release.
 type CreateReleaseParams struct {
-        ProductID      string
-        Version        string
-        DownloadURL    string
-        Changelog      string
-        MinWPVersion   string
-        MinPHPVersion  string
-        TestedUpTo     string
+        ProductID     string
+        Version       string
+        R2ObjectKey   string // e.g. "releases/nimbus-pro/0.2.0/nimbus-pro.zip"
+        Changelog     string
+        MinWPVersion  string
+        MinPHPVersion string
+        TestedUpTo    string
 }

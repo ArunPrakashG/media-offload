@@ -1,7 +1,6 @@
 <?php
 namespace Nimbus\Plugin\Rest;
 
-use Nimbus\Plugin\Jobs\BulkJobManager;
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
@@ -23,7 +22,6 @@ final class ApiController
     private Settings $settings,
     private Statistics $statistics,
     private UploadHandler $uploadHandler,
-    private BulkJobManager $bulkJobManager,
     private IntegrationDiscovery $integrationDiscovery,
     private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
@@ -128,7 +126,7 @@ final class ApiController
       ],
       'license' => $licenseData,
       'onboarding' => $this->onboardingManager->state(),
-      'jobs' => $this->bulkJobManager->state(),
+      'jobs' => apply_filters('nimbus/jobs/state', null),
       'integrations' => $this->integrationDiscovery->summary(),
       'statistics' => $this->licenseManager->hasFeature('storage_analytics')
         ? $this->statistics->get_deep_stats()
@@ -154,12 +152,17 @@ final class ApiController
 
   public function getJobs(): \WP_REST_Response
   {
-    return new \WP_REST_Response($this->bulkJobManager->state());
+    return new \WP_REST_Response(apply_filters('nimbus/jobs/state', null));
   }
 
   public function postStartJob(\WP_REST_Request $request)
   {
-    $result = $this->bulkJobManager->start((string) $request->get_param('type'), [
+    $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
+    if ($bulkJobManager === null) {
+      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
+    }
+
+    $result = $bulkJobManager->start((string) $request->get_param('type'), [
       'batch_size' => (int) $request->get_param('batch_size'),
     ]);
 
@@ -172,7 +175,12 @@ final class ApiController
 
   public function postPauseJob()
   {
-    $result = $this->bulkJobManager->pause();
+    $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
+    if ($bulkJobManager === null) {
+      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
+    }
+
+    $result = $bulkJobManager->pause();
 
     if (is_wp_error($result)) {
       return $result;
@@ -183,7 +191,12 @@ final class ApiController
 
   public function postResumeJob()
   {
-    $result = $this->bulkJobManager->resume();
+    $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
+    if ($bulkJobManager === null) {
+      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
+    }
+
+    $result = $bulkJobManager->resume();
 
     if (is_wp_error($result)) {
       return $result;
@@ -194,7 +207,12 @@ final class ApiController
 
   public function postRetryFailedJob()
   {
-    $result = $this->bulkJobManager->retryFailed();
+    $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
+    if ($bulkJobManager === null) {
+      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
+    }
+
+    $result = $bulkJobManager->retryFailed();
 
     if (is_wp_error($result)) {
       return $result;

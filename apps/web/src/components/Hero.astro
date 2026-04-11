@@ -74,8 +74,9 @@ const providers = [
 
       <p class="hero-sub">
         Nimbus offloads your WordPress media library to Amazon S3, Cloudflare
-        R2, or any S3-compatible storage — automatically, without changing how
-        you upload or manage files.
+        R2, or any S3-compatible storage — automatically, without permanently
+        coupling your database to a storage provider. Switch providers or
+        revert to local with a single settings change.
       </p>
 
       <div class="hero-actions">
@@ -357,7 +358,7 @@ const providers = [
   .mockup-title {
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     margin-left: auto;
     margin-right: auto;
     font-family: var(--nmb-font-mono);
@@ -403,6 +404,12 @@ const providers = [
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .status-indicator {
+      animation: none;
+    }
+  }
+
   .status-label {
     font-size: 0.8125rem;
     font-weight: 600;
@@ -412,7 +419,7 @@ const providers = [
 
   .status-sub {
     font-size: 0.6875rem;
-    color: #16a34a;
+    color: #166534;
     font-family: var(--nmb-font-mono);
     margin-top: 1px;
   }
@@ -445,7 +452,7 @@ const providers = [
 
   .stat-label {
     font-size: 0.6875rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     line-height: 1.3;
   }
 
@@ -462,7 +469,7 @@ const providers = [
     font-weight: 600;
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
   }
 
   .mockup-files {
@@ -516,7 +523,7 @@ const providers = [
 
   .file-time {
     font-size: 0.6875rem;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     flex-shrink: 0;
@@ -539,7 +546,7 @@ const providers = [
   .providers-label {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     white-space: nowrap;
   }
 
@@ -556,7 +563,7 @@ const providers = [
     gap: 0.4rem;
     padding: 0.3rem 0.625rem;
     border-radius: var(--nmb-radius-sm);
-    color: var(--nmb-text-subtle);
+    color: var(--nmb-text-muted);
     transition:
       background var(--nmb-t),
       color var(--nmb-t);
