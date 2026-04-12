@@ -2486,7 +2486,9 @@ body.upload_page_media-offload #wpcontent {
   font-size: 12px;
   font-family: monospace;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .nmb-path-suggestion-chip:hover:not(:disabled) {
