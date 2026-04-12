@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-final class AmazonS3ProviderProfile extends AbstractProviderProfile
+final class AmazonS3ProviderProfile extends AbstractProviderProfile implements ProviderProfile
 {
   public function key(): string
   {
@@ -39,6 +39,19 @@ final class AmazonS3ProviderProfile extends AbstractProviderProfile
       'region' => __('Region', NIMBUS_TEXT_DOMAIN),
       'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
       'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
+    ];
+  }
+
+  public function fieldHints(): array
+  {
+    return [
+      'bucket'        => __('The S3 bucket where your media files will be stored.', NIMBUS_TEXT_DOMAIN),
+      'region'        => __('AWS region code, e.g. us-east-1, eu-west-2, ap-southeast-1.', NIMBUS_TEXT_DOMAIN),
+      'access_key'    => __('AWS IAM Access Key ID.', NIMBUS_TEXT_DOMAIN),
+      'secret_key'    => __('AWS IAM Secret Access Key.', NIMBUS_TEXT_DOMAIN),
+      'session_token' => __('Optional — only needed for temporary STS credentials. Leave empty for standard IAM keys.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'      => __('Leave empty to use the standard AWS S3 endpoint. Override only for VPC or custom configurations.', NIMBUS_TEXT_DOMAIN),
+      'r2_account_id' => '',
     ];
   }
 

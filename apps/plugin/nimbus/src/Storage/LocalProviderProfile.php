@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-final class LocalProviderProfile extends AbstractProviderProfile
+final class LocalProviderProfile extends AbstractProviderProfile implements ProviderProfile
 {
   public function key(): string
   {

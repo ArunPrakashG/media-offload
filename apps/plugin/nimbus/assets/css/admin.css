@@ -1303,6 +1303,9 @@ body.upload_page_media-offload #wpcontent {
   border-bottom: 1px solid var(--nmb-border);
   text-align: left;
   vertical-align: top;
+  max-width: 300px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .nmb-log-table th {
@@ -1312,6 +1315,9 @@ body.upload_page_media-offload #wpcontent {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  max-width: none;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .nmb-log-table tbody tr:last-child td {
@@ -1320,6 +1326,7 @@ body.upload_page_media-offload #wpcontent {
 
 .nmb-log-context-details {
   color: var(--nmb-text-2);
+  max-width: 300px;
 }
 
 .nmb-log-context-details summary {
@@ -1332,7 +1339,11 @@ body.upload_page_media-offload #wpcontent {
 .nmb-log-context-details pre {
   margin: var(--nmb-space-2) 0 0;
   padding: var(--nmb-space-3);
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
   border-radius: var(--nmb-radius);
   background: #1e2530;
   color: #e2e8f0;
@@ -2217,6 +2228,151 @@ body.upload_page_media-offload #wpcontent {
 }
 
 /* --------------------------------------------------------------------------
+   29. Provider cost comparison table
+   -------------------------------------------------------------------------- */
+
+.nmb-card--full {
+  grid-column: 1 / -1;
+}
+
+.nmb-cost-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--nmb-space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--nmb-space-3);
+}
+
+.nmb-cost-card-header h3 {
+  margin: 0;
+}
+
+.nmb-cost-savings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #d1fae5;
+  color: #065f46;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nmb-cost-savings-badge .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.nmb-cost-table-wrap {
+  overflow-x: auto;
+  margin: 0 0 var(--nmb-space-3);
+}
+
+.nmb-cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 560px;
+}
+
+.nmb-cost-table thead tr {
+  border-bottom: 2px solid var(--nmb-border);
+}
+
+.nmb-cost-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--nmb-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.nmb-cost-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--nmb-border);
+  vertical-align: top;
+}
+
+.nmb-cost-table__num {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.nmb-cost-table__provider {
+  text-align: left !important;
+  min-width: 180px;
+}
+
+.nmb-cost-table__provider a {
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--nmb-accent);
+}
+
+.nmb-cost-table__provider a:hover {
+  text-decoration: underline;
+}
+
+.nmb-cost-table__note {
+  display: block;
+  font-size: 11px;
+  color: var(--nmb-text-muted);
+  margin-top: 2px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.nmb-cost-table__total {
+  white-space: nowrap;
+}
+
+.nmb-cost-table__row--current td {
+  background: #f0f7ff;
+}
+
+.nmb-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.nmb-badge--active {
+  background: var(--nmb-accent);
+  color: #fff;
+}
+
+.nmb-free {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.nmb-cost-disclaimer {
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
    28. Responsive
    -------------------------------------------------------------------------- */
 
@@ -2294,4 +2450,119 @@ body.upload_page_media-offload #wpcontent {
   .nmb-license-overlay__actions .button {
     width: 100%;
   }
+}
+
+/* ── Path-pattern pill widget ──────────────────────────────────────────────── */
+.nmb-path-pill-widget {
+  max-width: 640px;
+}
+
+/* Suggestion strip */
+.nmb-path-suggestions-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #646970;
+}
+
+.nmb-path-pill-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 3px;
+}
+
+.nmb-path-suggestion-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #2271b1;
+  background: #fff;
+  color: #2271b1;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.nmb-path-suggestion-chip:hover:not(:disabled) {
+  background: #2271b1;
+  color: #fff;
+}
+
+.nmb-path-suggestion-chip--used,
+.nmb-path-suggestion-chip:disabled {
+  border-color: #c3c4c7;
+  color: #8c8f94;
+  cursor: default;
+  text-decoration: line-through;
+}
+
+/* Active pill list */
+.nmb-path-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 36px;
+  margin-bottom: 8px;
+}
+
+.nmb-path-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 14px;
+  background: #e8f0fb;
+  border: 1px solid #b8ceef;
+  font-size: 12px;
+  font-family: monospace;
+  color: #1d4289;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.nmb-path-pill-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nmb-path-pill-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #1d4289;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.nmb-path-pill-remove:hover {
+  background: #c8d8f5;
+}
+
+/* Text input row */
+.nmb-path-pill-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.nmb-path-pill-input {
+  flex: 1;
+  min-width: 0;
+  font-family: monospace;
 }

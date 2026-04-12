@@ -2,12 +2,8 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Config\Settings;
-use Nimbus\Plugin\Integration\IntegrationDiscovery;
-use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
-use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Media\UploadHandler;
-use Nimbus\Plugin\Onboarding\ConflictDetector;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Stats\Statistics;
 use Nimbus\Plugin\Support\Logger;
@@ -27,11 +23,6 @@ final class SettingsUi
   private ActionsController $actionsController;
   private MediaLibraryController $mediaLibraryController;
   private LicenseManager $licenseManager;
-  private ConflictDetector $conflictDetector;
-  private OnboardingManager $onboardingManager;
-  private SmartSliderAssetRewriter $smartSliderAssetRewriter;
-  private DatabaseIntegrationRewriter $databaseIntegrationRewriter;
-  private IntegrationDiscovery $integrationDiscovery;
   private string $pageHook = '';
 
   public function __construct(
@@ -39,18 +30,14 @@ final class SettingsUi
     private Logger $logger,
     private Statistics $statistics,
     private UploadHandler $uploadHandler,
+    private OnboardingManager $onboardingManager,
   ) {
     $this->licenseManager = new LicenseManager();
-    $this->conflictDetector = new ConflictDetector();
-    $this->onboardingManager = new OnboardingManager($settings, $this->licenseManager, $this->conflictDetector);
-    $this->smartSliderAssetRewriter = new SmartSliderAssetRewriter($settings, $logger);
-    $this->databaseIntegrationRewriter = new DatabaseIntegrationRewriter($settings, $logger);
-    $this->integrationDiscovery = new IntegrationDiscovery($this->smartSliderAssetRewriter, $this->databaseIntegrationRewriter);
     $this->providerCatalog = new ProviderCatalog();
     $this->fieldRenderer = new FieldRenderer($settings, $this->providerCatalog);
     $this->settingsRegistrar = new SettingsRegistrar($settings, $this->fieldRenderer);
-    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $this->licenseManager, $this->onboardingManager, $this->integrationDiscovery);
-    $this->actionsController = new ActionsController($settings, $logger, $uploadHandler, $this->licenseManager, $this->onboardingManager, $this->integrationDiscovery);
+    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $this->licenseManager, $onboardingManager);
+    $this->actionsController = new ActionsController($settings, $logger, $uploadHandler, $this->licenseManager, $onboardingManager);
     $this->mediaLibraryController = new MediaLibraryController($settings, $uploadHandler, $logger);
   }
 
@@ -73,6 +60,8 @@ final class SettingsUi
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING, [$this, 'handle_complete_onboarding']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION, [$this, 'handle_rewrite_integration']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_EXPORT_CONFIG, [$this, 'handle_export_config']);
+    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_IMPORT_CONFIG, [$this, 'handle_import_config']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE, [$this, 'handle_license_activate']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE, [$this, 'handle_license_activate_free']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE, [$this, 'handle_license_deactivate_site']);
@@ -129,6 +118,7 @@ final class SettingsUi
         'jobRetryError' => __('Unable to retry failed items right now.', NIMBUS_TEXT_DOMAIN),
       ],
       'providers' => $this->providerCatalog->scriptData(),
+      'assetRoots' => $this->statistics->get_attachment_roots(),
       'ajaxUrl' => admin_url('admin-ajax.php'),
       'onboarding' => [
         'saveStepAction' => NIMBUS_AJAX_ONBOARDING_SAVE_STEP,
@@ -202,6 +192,16 @@ final class SettingsUi
   public function handle_rewrite_integration(): void
   {
     $this->actionsController->handleRewriteIntegration();
+  }
+
+  public function handle_export_config(): void
+  {
+    $this->actionsController->handleExportConfig();
+  }
+
+  public function handle_import_config(): void
+  {
+    $this->actionsController->handleImportConfig();
   }
 
   public function handle_toggle_integration(): void

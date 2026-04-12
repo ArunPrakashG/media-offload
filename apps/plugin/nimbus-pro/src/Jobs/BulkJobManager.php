@@ -5,6 +5,7 @@ use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Support\Logger;
+use Nimbus\Plugin\Jobs\JobTable;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -58,14 +59,12 @@ final class BulkJobManager
 
   public function currentJob(): array
   {
-    $stored = get_option(NIMBUS_BULK_JOB_OPTION_KEY, []);
-    return $this->normalizeJob(is_array($stored) ? $stored : []);
+    return $this->normalizeJob(JobTable::get('current'));
   }
 
   public function lastJob(): array
   {
-    $stored = get_option(NIMBUS_BULK_JOB_LAST_OPTION_KEY, []);
-    return $this->normalizeJob(is_array($stored) ? $stored : []);
+    return $this->normalizeJob(JobTable::get('last'));
   }
 
   public function state(): array
@@ -413,25 +412,30 @@ final class BulkJobManager
 
   private function countOffloadCandidates(): int
   {
-    $count = 0;
-    $cursor = 0;
-    $batchSize = 500;
+    global $wpdb;
 
-    while (true) {
-      $ids = $this->fetchOffloadCandidates($cursor, $batchSize);
-      if (empty($ids)) {
-        break;
-      }
-
-      $count += count($ids);
-      $cursor = (int) end($ids);
-
-      if (count($ids) < $batchSize) {
-        break;
-      }
+    if (!($wpdb instanceof \wpdb)) {
+      return 0;
     }
 
-    return $count;
+    return (int) $wpdb->get_var($wpdb->prepare(
+      "SELECT COUNT(DISTINCT p.ID)
+       FROM {$wpdb->posts} p
+       LEFT JOIN {$wpdb->postmeta} pm
+         ON pm.post_id = p.ID
+        AND pm.meta_key = %s
+       LEFT JOIN {$wpdb->postmeta} im
+         ON im.post_id = p.ID
+        AND im.meta_key = %s
+       WHERE p.post_type = %s
+         AND p.post_status = %s
+         AND pm.meta_id IS NULL
+         AND (im.meta_id IS NULL OR im.meta_value != '1')",
+      NIMBUS_META_KEY,
+      NIMBUS_IGNORE_META_KEY,
+      'attachment',
+      'inherit'
+    ));
   }
 
   private function countRestoreCandidates(): int
@@ -497,12 +501,12 @@ final class BulkJobManager
 
   private function persistCurrentJob(array $job): void
   {
-    update_option(NIMBUS_BULK_JOB_OPTION_KEY, $this->normalizeJob($job), false);
+    JobTable::put('current', $this->normalizeJob($job));
   }
 
   private function persistLastJob(array $job): void
   {
-    update_option(NIMBUS_BULK_JOB_LAST_OPTION_KEY, $this->normalizeJob($job), false);
+    JobTable::put('last', $this->normalizeJob($job));
   }
 
   private function calculatePercent(int $processed, int $total): int

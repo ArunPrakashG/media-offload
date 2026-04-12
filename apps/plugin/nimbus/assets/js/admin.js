@@ -92,6 +92,67 @@ jQuery(document).ready(function ($) {
     $toggle.attr('aria-expanded', connectionAdvancedOpen ? 'true' : 'false');
   }
 
+  // Keys of fields whose <p class="description"> text should change per provider.
+  var hintFieldKeys = ['bucket', 'region', 'access_key', 'secret_key', 'session_token', 'endpoint', 'r2_account_id'];
+
+  // Snapshot the original description text so we can restore it when a provider
+  // has no specific hint for a given field.
+  function initFieldHintDefaults($form) {
+    $.each(hintFieldKeys, function (_, key) {
+      var $desc = rowForField($form, key).find('p.description').first();
+      if ($desc.length && !$desc.data('nmbDefaultHint')) {
+        $desc.data('nmbDefaultHint', $desc.text());
+      }
+    });
+  }
+
+  function updateFieldHints($form, provider) {
+    var providers = adminConfig.providers || {};
+    var hints = (providers[provider] && providers[provider].hints) || {};
+
+    $.each(hintFieldKeys, function (_, key) {
+      var $desc = rowForField($form, key).find('p.description').first();
+      if (!$desc.length) {
+        return;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(hints, key)) {
+        if (hints[key]) {
+          $desc.text(hints[key]).prop('hidden', false);
+        } else {
+          // Empty string = this provider never uses the field; hide the hint.
+          $desc.prop('hidden', true);
+        }
+      } else {
+        // No provider-specific hint — restore the generic default.
+        var defaultHint = $desc.data('nmbDefaultHint') || '';
+        $desc.text(defaultHint).prop('hidden', !defaultHint);
+      }
+    });
+
+    // Update the <th> label for r2_account_id: show provider-specific label when R2.
+    var $r2Row = rowForField($form, 'r2_account_id');
+    if ($r2Row.length) {
+      var $th = $r2Row.find('th').first();
+      if ($th.length) {
+        if (!$th.data('nmbDefaultLabel')) {
+          // Strip any trailing asterisk/whitespace from "Required" markup
+          var rawLabel = $th.text().replace(/\s*\*\s*$/, '').trim();
+          $th.data('nmbDefaultLabel', rawLabel);
+        }
+        var providerLabels = (providers[provider] && providers[provider].fieldLabels) || {};
+        var newLabel = providerLabels.r2_account_id || $th.data('nmbDefaultLabel');
+        // Preserve any child nodes (e.g. required asterisk <span>) and update only text node
+        var $asterisk = $th.find('span.required');
+        $th.contents().filter(function () { return this.nodeType === 3; }).remove();
+        $th.prepend(document.createTextNode(newLabel + ' '));
+        if (!$asterisk.length) {
+          $th.text(newLabel);
+        }
+      }
+    }
+  }
+
   function renderProviderSummary(provider) {
     var providers = adminConfig.providers || {};
     var config = providers[provider] || providers.s3 || null;
@@ -170,7 +231,7 @@ jQuery(document).ready(function ($) {
       }
     });
 
-    if (!hasAdvanced && (provider === 's3' || provider === 's3_compatible') && hasValue(fieldControl($form, 'use_path_style_endpoint'))) {
+    if (!hasAdvanced && (provider === 's3' || provider === 's3_compatible' || provider === 'minio' || provider === 'wasabi' || provider === 'backblaze_b2') && hasValue(fieldControl($form, 'use_path_style_endpoint'))) {
       hasAdvanced = true;
     }
 
@@ -189,6 +250,18 @@ jQuery(document).ready(function ($) {
       }
       $sessionToken.val('');
       $pathStyle.prop('checked', true);
+      return;
+    }
+
+    if (provider === 'minio') {
+      $pathStyle.prop('checked', true);
+      $sessionToken.val('');
+      return;
+    }
+
+    if (provider === 'wasabi' || provider === 'backblaze_b2') {
+      $pathStyle.prop('checked', false);
+      $sessionToken.val('');
       return;
     }
 
@@ -244,8 +317,8 @@ jQuery(document).ready(function ($) {
     var $claimTtl = rowForField($form, 'off_hours_claim_ttl_seconds');
 
     var showS3 = provider === 's3';
-    var showS3Compatible = provider === 's3_compatible';
-    var showAwsLike = showS3 || showS3Compatible;
+    var showS3Compatible = provider === 's3_compatible' || provider === 'minio';
+    var showAwsLike = showS3 || showS3Compatible || provider === 'wasabi' || provider === 'backblaze_b2';
     var showR2 = provider === 'r2';
     var showLocal = provider === 'local';
     var showStorage = !showLocal;
@@ -261,6 +334,7 @@ jQuery(document).ready(function ($) {
     renderProviderSummary(provider);
     updateSettingsSummary($form, provider);
     updateAdvancedToggle();
+    updateFieldHints($form, provider);
     $('#nmb-toggle-advanced').prop('hidden', showLocal);
 
     setRowVisible($bucket, showStorage);
@@ -307,6 +381,7 @@ jQuery(document).ready(function ($) {
 
     previousProvider = (fieldControl($form, 'provider').val() || 's3').toLowerCase();
     connectionAdvancedOpen = providerHasAdvancedValues($form, previousProvider);
+    initFieldHintDefaults($form);
     normalizeProviderDefaults($form, previousProvider);
     applyProviderVisibility();
   })();
@@ -477,8 +552,12 @@ jQuery(document).ready(function ($) {
     var providerTips = {
       s3: 'You need an IAM user in AWS with S3 read/write permissions. <strong>Access Key ID</strong> and <strong>Secret Access Key</strong> are under IAM → Users → Security credentials.',
       r2: 'Create an R2 bucket in your Cloudflare dashboard. Then go to R2 → Manage API tokens → Create API token and choose <strong>Object Read &amp; Write</strong>.',
-      s3_compatible: 'Use the API base URL, bucket name, and credentials from your provider’s object storage dashboard. Region requirements vary by service.',
-      local: 'Local mode stores files on this server’s filesystem — no cloud credentials needed. Useful for development or testing.'
+      digitalocean_spaces: 'Create a Space in your DigitalOcean control panel. Go to API → Spaces Keys to generate an Access Key and Secret Key.',
+      wasabi: 'Create a bucket in the Wasabi console and go to Access Keys to generate credentials. The region code is shown in the bucket details (e.g. us-east-1, eu-central-1).',
+      backblaze_b2: 'Create a bucket in the Backblaze console. Under Account → Application Keys, create a new key with read/write access to your bucket. Use the keyID as Access Key and the applicationKey as Secret Key.',
+      minio: 'Enter the full base URL of your MinIO server as the endpoint (e.g. https://minio.example.com). Use your MinIO root credentials or a policy-scoped access key.',
+      s3_compatible: 'Use the API base URL, bucket name, and credentials from your provider\u2019s object storage dashboard. Region requirements vary by service.',
+      local: 'Local mode stores files on this server\u2019s filesystem — no cloud credentials needed. Useful for development or testing.'
     };
 
     function updateProviderTip(provider) {
@@ -513,7 +592,7 @@ jQuery(document).ready(function ($) {
       var provider = providerValue();
       var isLocal = provider === 'local';
       var isR2 = provider === 'r2';
-      var isS3Compatible = provider === 's3_compatible';
+      var isS3Compatible = provider === 's3_compatible' || provider === 'minio';
       var isS3 = provider === 's3';
       var $region = fieldByName('region');
 
@@ -526,7 +605,7 @@ jQuery(document).ready(function ($) {
       setGroupVisible('credentials', !isLocal);
       setGroupVisible('r2-extra', isR2);
       setGroupVisible('s3c-endpoint', isS3Compatible);
-      setGroupVisible('session', isS3 || isS3Compatible);
+      setGroupVisible('session', isS3 || provider === 's3_compatible');
 
       updateProviderTip(provider);
     }
@@ -554,11 +633,11 @@ jQuery(document).ready(function ($) {
         return 'Enter the secret key before continuing.';
       }
 
-      if ((provider === 's3' || provider === 's3_compatible') && $.trim(fieldByName('region').val() || '') === '') {
+      if ((provider === 's3' || provider === 's3_compatible' || provider === 'wasabi' || provider === 'backblaze_b2') && $.trim(fieldByName('region').val() || '') === '') {
         return 'Enter the storage region before continuing.';
       }
 
-      if (provider === 's3_compatible' && $.trim(fieldByName('endpoint').val() || '') === '') {
+      if ((provider === 's3_compatible' || provider === 'minio') && $.trim(fieldByName('endpoint').val() || '') === '') {
         return 'Enter the custom endpoint for your S3-compatible storage.';
       }
 
@@ -684,6 +763,68 @@ jQuery(document).ready(function ($) {
           return;
         }
       }
+    });
+
+    $wizard.on('change', '[data-config-import]', function () {
+      var file = this.files && this.files[0];
+      if (!file) { return; }
+
+      var $input = $(this);
+      var $hint = $input.siblings('.nmb-config-import-hint');
+
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          var json = JSON.parse(e.target.result);
+
+          // Support both wrapped format { settings: {…}, credentials: {…} }
+          // and legacy flat format {…}
+          var settings = (json && json.settings) ? json.settings : json;
+          var credentials = (json && json.credentials) ? json.credentials : {};
+          var merged = $.extend({}, settings, credentials);
+
+          // Apply the provider first so group visibility is correct before we
+          // fill the other inputs.
+          var newProvider = merged.provider;
+          if (newProvider) {
+            var $providerSelect = fieldByName('provider');
+            if ($providerSelect.length) {
+              $providerSelect.val(newProvider);
+            }
+          }
+
+          applyOnboardingProviderVisibility();
+
+          // Fill every field present in the export.
+          $.each(merged, function (key, value) {
+            if (key === 'provider') { return; } // already handled above
+            var $field = fieldByName(key);
+            if (!$field.length) { return; }
+            if ($field.is(':checkbox')) {
+              $field.prop('checked', !!value);
+            } else {
+              $field.val(value);
+            }
+          });
+
+          // If R2 was imported and region is blank, fill "auto".
+          if (providerValue() === 'r2') {
+            var $region = fieldByName('region');
+            if ($region.length && $.trim($region.val() || '') === '') {
+              $region.val('auto');
+            }
+          }
+
+          $hint.text('Configuration loaded — review the fields below, then continue.').css('color', '#00a32a');
+        } catch (_err) {
+          $hint.text('Could not read file. Make sure it is a valid Nimbus JSON export.').css('color', '#d63638');
+        }
+
+        // Reset the file input so re-selecting the same file fires change again.
+        $input.val('');
+      };
+
+      reader.readAsText(file);
     });
 
     if (Number.isNaN(currentStep) || currentStep < 0 || currentStep >= steps.length) {
@@ -840,5 +981,156 @@ jQuery(document).ready(function ($) {
 
     refresh();
     refreshTimer = window.setInterval(refresh, 5000);
+  })();
+
+  // ── Path-pattern pill widgets ──────────────────────────────────────────────
+  (function initPathPillWidgets() {
+    var roots = (adminConfig.assetRoots || []).map(function (r) {
+      return typeof r === 'object' ? r.root : String(r);
+    }).filter(Boolean);
+
+    // Build a wildcard suggestion from a root segment.
+    function suggestionFor(root) {
+      if (root === '{year}') {
+        return '{year}/**';
+      }
+      return root + '/**';
+    }
+
+    $('.nmb-path-pill-widget').each(function () {
+      var $widget     = $(this);
+      var $list       = $widget.find('.nmb-path-pill-list');
+      var $textarea   = $widget.find('.nmb-path-pill-hidden-textarea');
+      var $input      = $widget.find('.nmb-path-pill-input');
+      var $addBtn     = $widget.find('.nmb-path-pill-add-btn');
+      var $suggestBox = $widget.find('.nmb-path-pill-suggestions');
+
+      // --- helpers ---
+
+      function currentPatterns() {
+        return $.grep(
+          $.map($list.find('.nmb-path-pill--active'), function (el) {
+            return $.trim($(el).data('value') || '');
+          }),
+          function (v) { return v !== ''; }
+        );
+      }
+
+      function syncTextarea() {
+        $textarea.val(currentPatterns().join('\n'));
+      }
+
+      function hasPill(value) {
+        return currentPatterns().indexOf($.trim(value)) !== -1;
+      }
+
+      function addPill(value) {
+        value = $.trim(value);
+        if (value === '' || hasPill(value)) {
+          return false;
+        }
+
+        var $pill = $('<span class="nmb-path-pill nmb-path-pill--active" role="listitem"></span>')
+          .data('value', value)
+          .attr('data-value', value);
+
+        $('<span class="nmb-path-pill-label"></span>').text(value).appendTo($pill);
+        $('<button type="button" class="nmb-path-pill-remove" aria-label="Remove ' + value + '">×</button>').appendTo($pill);
+
+        $list.append($pill);
+        syncTextarea();
+
+        // grey-out matching suggestion chip if present
+        $suggestBox.find('.nmb-path-suggestion-chip').each(function () {
+          if ($(this).data('pattern') === value) {
+            $(this).addClass('nmb-path-suggestion-chip--used').prop('disabled', true);
+          }
+        });
+
+        return true;
+      }
+
+      function removePill($pill) {
+        var value = $.trim($pill.data('value') || '');
+        $pill.remove();
+        syncTextarea();
+
+        // re-enable suggestion chip
+        $suggestBox.find('.nmb-path-suggestion-chip').each(function () {
+          if ($(this).data('pattern') === value) {
+            $(this).removeClass('nmb-path-suggestion-chip--used').prop('disabled', false);
+          }
+        });
+      }
+
+      // --- suggestions ---
+
+      if (roots.length) {
+        var $label = $('<p class="nmb-path-suggestions-label description"></p>').text('Discovered folders:');
+        $suggestBox.append($label);
+
+        $.each(roots, function (_, root) {
+          var pattern = suggestionFor(root);
+          var $chip = $('<button type="button" class="nmb-path-suggestion-chip"></button>')
+            .text(pattern)
+            .data('pattern', pattern);
+
+          if (hasPill(pattern)) {
+            $chip.addClass('nmb-path-suggestion-chip--used').prop('disabled', true);
+          }
+
+          $chip.on('click', function () {
+            addPill(pattern);
+            $input.focus();
+          });
+
+          $suggestBox.append($chip);
+        });
+
+        $suggestBox.prop('hidden', false);
+      }
+
+      // --- remove via click / keyboard ---
+
+      $list.on('click', '.nmb-path-pill-remove', function () {
+        removePill($(this).closest('.nmb-path-pill'));
+      });
+
+      $list.on('keydown', '.nmb-path-pill-remove', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          removePill($(this).closest('.nmb-path-pill'));
+          $input.focus();
+        }
+      });
+
+      // --- text input: Enter or comma adds pill ---
+
+      $input.on('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ',') {
+          e.preventDefault();
+          var val = $.trim($input.val().replace(/,/g, ''));
+          if (val && addPill(val)) {
+            $input.val('');
+          }
+        }
+
+        // Backspace on empty input removes last pill
+        if (e.key === 'Backspace' && $.trim($input.val()) === '') {
+          var $pills = $list.find('.nmb-path-pill--active');
+          if ($pills.length) {
+            removePill($pills.last());
+          }
+        }
+      });
+
+      $addBtn.on('click', function () {
+        var val = $.trim($input.val().replace(/,/g, ''));
+        if (val && addPill(val)) {
+          $input.val('');
+        }
+        $input.focus();
+      });
+    });
   })();
 });

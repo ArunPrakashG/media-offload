@@ -14,6 +14,7 @@ import * as fs from "fs";
 import * as path from "path";
 import {
   callNimbusApi,
+  cleanupLocalFiles,
   configureMinIOCredentials,
   forceOffload,
   getAttachmentSourceUrl,
@@ -23,8 +24,13 @@ import {
   MINIO,
   openNimbusSettings,
   runWpCron,
+  setNimbusSetting,
   uploadMedia,
-  wpLogtures ──────────────────────────────────────────────────────────────────
+  uploadMediaWithFilename,
+  wpLogin,
+} from "../helpers/wp-admin";
+
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 /** Path to a tiny test image bundled with the test suite. */
 const TEST_IMAGE_PATH = path.join(__dirname, "../fixtures/test-image.jpg");
@@ -65,8 +71,13 @@ test.describe("Plugin status", () => {
     await page.goto("/wp-admin/plugins.php");
     const row = page.locator('#the-list tr[data-slug="nimbus"]');
     await expect(row).toBeVisible();
-    // Active plugins have "Deactivate" link; inactive have "Activate".
-    await expect(row.locator("a", { hasText: /deactivate/i })).toBeVisible();
+    // Active plugins show "Deactivate" link; inactive show "Activate".
+    // When nimbus-pro is active it declares nimbus as a required plugin, so
+    // WordPress replaces the "Deactivate" link with a "cannot deactivate" message.
+    // Either indicator confirms the plugin is active.
+    const deactivateLink = row.locator("a", { hasText: /deactivate/i });
+    const cannotDeactivate = row.locator("text=/cannot deactivate/i");
+    await expect(deactivateLink.or(cannotDeactivate)).toBeVisible();
   });
 
   test("deactivation hint appears when offloaded files exist", async ({
@@ -382,7 +393,6 @@ test.describe("Nightly batch configuration", () => {
     // side effects by confirming the source URL remains local after cron runs.
     await runWpCron(page);
     await page.waitForTimeout(1_500);
-    const url = await getAttachmentSourceUrl(page, id);
     // With nightly batch ON the immediate job should NOT have fired (if off-hours
     // setting is also satisfied), so URL remains local.
     // Note: this assertion is conditional – if nightly is enabled but the off-hours
@@ -1309,8 +1319,8 @@ test.describe("Selective offload & path filter settings", () => {
 
   test("settings page has allowed_path_patterns textarea", async ({ page }) => {
     await wpLogin(page);
-    await openNimbusSettings(page, "settings");
-    // Path filter section is on the main settings tab.
+    // Path filter section is on the Advanced tab, not the Settings tab.
+    await openNimbusSettings(page, "advanced");
     const textarea = page
       .locator(`textarea[name="nimbus_settings[allowed_path_patterns]"]`)
       .first();
@@ -1319,7 +1329,8 @@ test.describe("Selective offload & path filter settings", () => {
 
   test("settings page has ignored_path_patterns textarea", async ({ page }) => {
     await wpLogin(page);
-    await openNimbusSettings(page, "settings");
+    // Path filter section is on the Advanced tab, not the Settings tab.
+    await openNimbusSettings(page, "advanced");
     const textarea = page
       .locator(`textarea[name="nimbus_settings[ignored_path_patterns]"]`)
       .first();
@@ -1495,7 +1506,7 @@ test.describe("Race conditions", () => {
     const ids = [u1.attachmentId, u2.attachmentId, u3.attachmentId];
 
     // Drain via the REST pending-offload endpoint (synchronous = background: false).
-    const { ok, body } = await callNimbusApi(page, "/offload/pending", "POST", {
+    const { ok } = await callNimbusApi(page, "/offload/pending", "POST", {
       hours: 1,
       limit: 50,
       background: false,
@@ -1510,5 +1521,788 @@ test.describe("Race conditions", () => {
         `attachment ${id} should have CDN URL after bulk drain`,
       ).toMatch(new RegExp(MINIO.bucket));
     }
+  });
+});
+
+// ── Duplicate filename protection ─────────────────────────────────────────────
+//
+// Root cause: wp_unique_filename() is filesystem-only. When "Remove local
+// copies" is enabled, the local file is deleted after offload, which removes
+// exactly what WordPress checks for uniqueness. A second upload of the same
+// filename would therefore collide at the WordPress level.
+//
+// The fix: a wp_unique_filename filter performs a DB lookup against
+// _wp_attached_file only when remove_local_copies is ON. These tests validate
+// the full round-trip under real WordPress + MinIO conditions.
+//
+// Design notes:
+//   • Each test uses a timestamp-based unique filename so prior test runs leave
+//     no state that could interfere (avoids dedup_key firing on the first
+//     upload, which would change _wp_attached_file to a random-suffix key).
+//   • The re-upload always uses the ORIGINAL filename (known up-front), not
+//     the value of _wp_attached_file which — after rewrite_attachment_url_in_db
+//     — may contain a dedup key rather than the original upload name.
+
+// Unique suffix shared across all tests in this describe block.
+// Snapped once at module load time so each run produces fresh filenames.
+const DEDUP_TS = Date.now();
+
+test.describe("Duplicate filename protection", () => {
+  let firstId = 0;
+  let duplicateId = 0;
+  let trailingNumFirstId = 0;
+  let trailingNumDuplicateId = 0;
+
+  // Enable remove_local_copies before all tests; restore after.
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage();
+    await wpLogin(page);
+    await setNimbusSetting(page, "remove_local_copies", true);
+    await page.close();
+  });
+
+  test.afterAll(async ({ browser }) => {
+    const page = await browser.newPage();
+    await wpLogin(page);
+    await setNimbusSetting(page, "remove_local_copies", false);
+    await page.close();
+  });
+
+  // ── Test 1: Re-uploading the same filename gets a unique name ─────────────
+  //
+  // Uses filename nimbus-dedup-{ts}.jpg — guaranteed fresh on every test run.
+
+  test("setup: first upload offloads and has local copy removed", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+
+    const uniqueFilename = `nimbus-dedup-${DEDUP_TS}.jpg`;
+    const { attachmentId } = await uploadMediaWithFilename(
+      page,
+      TEST_IMAGE_PATH,
+      uniqueFilename,
+    );
+    firstId = attachmentId;
+    expect(firstId).toBeGreaterThan(0);
+
+    // Offload to MinIO.
+    const cdnUrl = await forceOffload(page, firstId);
+    expect(cdnUrl).toMatch(new RegExp(MINIO.bucket));
+
+    // Synchronously delete the local copy — this is the state that triggers
+    // the bug: wp_unique_filename() now finds no file on disk.
+    const stillExists = await cleanupLocalFiles(page, firstId);
+    expect(stillExists).toBe(false);
+  });
+
+  test("re-uploading the same filename gets a distinct WordPress name", async ({
+    page,
+  }) => {
+    test.skip(firstId === 0, "Depends on setup test");
+    await wpLogin(page);
+
+    // We know the exact original filename — no need to read _wp_attached_file
+    // (which after rewrite_attachment_url_in_db may be a dedup key, not the
+    // original upload name).
+    const uniqueFilename = `nimbus-dedup-${DEDUP_TS}.jpg`;
+    const stem = `nimbus-dedup-${DEDUP_TS}`;
+
+    const { attachmentId } = await uploadMediaWithFilename(
+      page,
+      TEST_IMAGE_PATH,
+      uniqueFilename,
+    );
+    duplicateId = attachmentId;
+    expect(duplicateId).toBeGreaterThan(0);
+    expect(duplicateId).not.toBe(firstId);
+
+    // _wp_attached_file is set at upload time before any offload rewrite;
+    // it should already reflect what WordPress chose as the unique filename.
+    const newRelativePath = (await getPostMeta(
+      page,
+      duplicateId,
+      "_wp_attached_file",
+    )) as string;
+    expect(newRelativePath).toBeTruthy();
+
+    const newBasename = path.basename(newRelativePath);
+
+    // Must differ from the original filename.
+    expect(newBasename).not.toBe(uniqueFilename);
+
+    // Must follow WordPress's base-N.ext convention.
+    expect(newBasename).toMatch(new RegExp(`^${stem}-\\d+\\.jpg$`));
+  });
+
+  test("both attachments are independently accessible on the CDN", async ({
+    page,
+  }) => {
+    test.skip(firstId === 0 || duplicateId === 0, "Depends on previous tests");
+    await wpLogin(page);
+
+    const url1 = await forceOffload(page, firstId);
+    const url2 = await forceOffload(page, duplicateId);
+
+    expect(url1).toMatch(new RegExp(MINIO.bucket));
+    expect(url2).toMatch(new RegExp(MINIO.bucket));
+    // The two remote keys must differ.
+    expect(url1).not.toBe(url2);
+  });
+
+  // ── Test 2: Filename with trailing number must NOT have its number stripped ─
+  //
+  // Bug guard: an earlier implementation used preg_replace('/-\d+$/', '', $base)
+  // which would turn "photo-2022.jpeg" into base "photo", generating
+  // "photo-1.jpeg" instead of "photo-2022-1.jpeg". The current fix uses
+  // WordPress's own $number counter to strip only the exact suffix WP appended.
+
+  test("setup: first upload of a trailing-number filename", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+
+    // e.g. nimbus-photo2022-1744464000000.jpeg
+    const uniqueFilename = `nimbus-photo2022-${DEDUP_TS}.jpeg`;
+    const { attachmentId } = await uploadMediaWithFilename(
+      page,
+      TEST_IMAGE_PATH,
+      uniqueFilename,
+    );
+    trailingNumFirstId = attachmentId;
+    expect(trailingNumFirstId).toBeGreaterThan(0);
+
+    await forceOffload(page, trailingNumFirstId);
+    const stillExists = await cleanupLocalFiles(page, trailingNumFirstId);
+    expect(stillExists).toBe(false);
+  });
+
+  test("re-upload of trailing-number filename preserves full stem", async ({
+    page,
+  }) => {
+    test.skip(trailingNumFirstId === 0, "Depends on setup test");
+    await wpLogin(page);
+
+    const uniqueFilename = `nimbus-photo2022-${DEDUP_TS}.jpeg`;
+    const stem = `nimbus-photo2022-${DEDUP_TS}`;
+
+    const { attachmentId } = await uploadMediaWithFilename(
+      page,
+      TEST_IMAGE_PATH,
+      uniqueFilename,
+    );
+    trailingNumDuplicateId = attachmentId;
+    expect(trailingNumDuplicateId).toBeGreaterThan(0);
+
+    const newRelativePath = (await getPostMeta(
+      page,
+      trailingNumDuplicateId,
+      "_wp_attached_file",
+    )) as string;
+    expect(newRelativePath).toBeTruthy();
+
+    const newBasename = path.basename(newRelativePath);
+
+    // Must preserve the full stem (including the trailing number).
+    expect(newBasename).toMatch(new RegExp(`^${stem}-\\d+\\.jpeg$`));
+
+    // The buggy behaviour would strip the trailing number, e.g. producing
+    // "nimbus-photo2022-1.jpeg" instead of "nimbus-photo2022-{ts}-1.jpeg".
+    // The stem without the timestamp would not be a prefix of the correct result.
+    expect(newBasename).not.toMatch(/^nimbus-photo2022-\d+\.jpeg$/);
+  });
+
+  // ── Test 3: When remove_local_copies is OFF the filter is a no-op ─────────
+
+  test("with remove_local=off, filter does not interfere with WordPress native rename", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    // Temporarily turn remove_local_copies OFF for this test.
+    const prev = await setNimbusSetting(page, "remove_local_copies", false);
+
+    try {
+      // Upload twice; the local file stays on disk, so WordPress finds it on
+      // the second upload and applies its own -N suffix — no DB query from us.
+      const u1 = await uploadMedia(page, TEST_IMAGE_PATH);
+      await forceOffload(page, u1.attachmentId);
+      // Do NOT call cleanupLocalFiles — local file intentionally kept.
+
+      const u2 = await uploadMedia(page, TEST_IMAGE_PATH);
+      expect(u2.attachmentId).toBeGreaterThan(0);
+      expect(u2.attachmentId).not.toBe(u1.attachmentId);
+
+      const path1 = (await getPostMeta(
+        page,
+        u1.attachmentId,
+        "_wp_attached_file",
+      )) as string;
+      const path2 = (await getPostMeta(
+        page,
+        u2.attachmentId,
+        "_wp_attached_file",
+      )) as string;
+
+      // Both _wp_attached_file values must exist and differ.
+      expect(path1).toBeTruthy();
+      expect(path2).toBeTruthy();
+      expect(path.basename(path1)).not.toBe(path.basename(path2));
+    } finally {
+      await setNimbusSetting(page, "remove_local_copies", prev ?? false);
+    }
+  });
+});
+
+// ── Admin navigation — tab links ──────────────────────────────────────────────
+// Verify all seven tab links render in the nav-tab-wrapper from any page load.
+
+test.describe("Admin navigation — tab links", () => {
+  const EXPECTED_TABS = [
+    "overview",
+    "settings",
+    "advanced",
+    "integrations",
+    "tools",
+    "logs",
+    "license",
+  ] as const;
+
+  for (const tab of EXPECTED_TABS) {
+    test(`nav contains "${tab}" tab link`, async ({ page }) => {
+      await wpLogin(page);
+      await page.goto("/wp-admin/upload.php?page=nimbus");
+      const navWrapper = page.locator(".nav-tab-wrapper.nmb-shell-tabs");
+      await expect(navWrapper).toBeVisible({ timeout: 5_000 });
+      // Each tab link has href containing &tab=<slug> (or overview is the default).
+      const tabLink =
+        tab === "overview"
+          ? navWrapper.locator(`a[href*="page=nimbus"]`).first()
+          : navWrapper.locator(`a[href*="tab=${tab}"]`).first();
+      await expect(tabLink).toBeVisible({ timeout: 3_000 });
+    });
+  }
+});
+
+// ── Settings tab — field inventory ────────────────────────────────────────────
+// Confirm every major settings field renders on the Settings tab.
+// Fields come from SettingsRegistrar sections: nimbus_connection + nimbus_delivery.
+
+test.describe("Settings tab — field inventory", () => {
+  test("provider dropdown is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator("select#nimbus-provider-select").first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("provider dropdown includes expected built-in providers", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    const select = page.locator("select#nimbus-provider-select").first();
+    await expect(select).toBeVisible({ timeout: 5_000 });
+    const optionValues = await select
+      .locator("option")
+      .evaluateAll((opts: HTMLOptionElement[]) => opts.map((o) => o.value));
+    // At minimum S3, R2, and an S3-compatible option must be present.
+    expect(optionValues).toContain("s3");
+    expect(optionValues).toContain("r2");
+    // At least one s3-compatible / minio option.
+    const hasCompat = optionValues.some((v) =>
+      ["s3_compatible", "minio"].includes(v),
+    );
+    expect(hasCompat).toBe(true);
+  });
+
+  test("bucket input is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[bucket]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("region input is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[region]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("access key input is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[access_key]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("secret key is a password-type input", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    const secretField = page
+      .locator(`input[name="nimbus_settings[secret_key]"]`)
+      .first();
+    await expect(secretField).toBeVisible({ timeout: 5_000 });
+    const inputType = await secretField.getAttribute("type");
+    expect(inputType).toBe("password");
+  });
+
+  test("serve_from_storage toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[serve_from_storage]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("remove_local_copies toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page
+        .locator(`input[name="nimbus_settings[remove_local_copies]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("custom_domain input is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[custom_domain]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("use_path_style_endpoint toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page
+        .locator(`input[name="nimbus_settings[use_path_style_endpoint]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("enabled offloading toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    await expect(
+      page.locator(`input[name="nimbus_settings[enabled]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("Save Settings button is present", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    // WordPress renders the submit_button() output with value="Save Settings" or
+    // in a generic submit wrapper; locate by value text.
+    const saveBtn = page
+      .locator(
+        'input[type="submit"][value="Save Settings"], button[type="submit"]:has-text("Save Settings")',
+      )
+      .first();
+    await expect(saveBtn).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ── Advanced tab — field inventory ────────────────────────────────────────────
+// Confirm all Advanced-tab fields render (nimbus_path_filters + nimbus_cache_purging).
+
+test.describe("Advanced tab — field inventory", () => {
+  test("proxy_cache_purge_urls textarea is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page
+        .locator(`textarea[name="nimbus_settings[proxy_cache_purge_urls]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("proxy_cache_purge_all_urls textarea is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page
+        .locator(`textarea[name="nimbus_settings[proxy_cache_purge_all_urls]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("cloudflare_zone_id input is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page.locator(`input[name="nimbus_settings[cloudflare_zone_id]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("cloudflare_api_token is a password field", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    const field = page
+      .locator(`input[name="nimbus_settings[cloudflare_api_token]"]`)
+      .first();
+    await expect(field).toBeVisible({ timeout: 5_000 });
+    expect(await field.getAttribute("type")).toBe("password");
+  });
+
+  test("proxy_cache_purge_method select is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page
+        .locator(`select[name="nimbus_settings[proxy_cache_purge_method]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("proxy_cache_purge_method select contains PURGE, GET, POST options", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    const select = page
+      .locator(`select[name="nimbus_settings[proxy_cache_purge_method]"]`)
+      .first();
+    await expect(select).toBeVisible({ timeout: 5_000 });
+    const optValues = await select
+      .locator("option")
+      .evaluateAll((opts: HTMLOptionElement[]) => opts.map((o) => o.value));
+    expect(optValues).toContain("PURGE");
+    expect(optValues).toContain("GET");
+    expect(optValues).toContain("POST");
+  });
+
+  test("purge_cloudflare_cache_on_delete toggle is visible", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page
+        .locator(
+          `input[name="nimbus_settings[purge_cloudflare_cache_on_delete]"]`,
+        )
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("purge_proxy_cache toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page.locator(`input[name="nimbus_settings[purge_proxy_cache]"]`).first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("purge_litespeed_cache toggle is visible", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+    await expect(
+      page
+        .locator(`input[name="nimbus_settings[purge_litespeed_cache]"]`)
+        .first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ── Path filter settings — save & reload round-trip ──────────────────────────
+// Verify that values entered in the path-filter textareas are persisted across
+// page reloads and can be cleared back to empty.
+
+test.describe("Path filter settings — save & reload round-trip", () => {
+  const TEST_PATTERN = "{year}/**\nsites/*/{year}/**";
+
+  test("saving allowed_path_patterns persists after reload", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+
+    const textarea = page
+      .locator(`textarea[name="nimbus_settings[allowed_path_patterns]"]`)
+      .first();
+    await expect(textarea).toBeVisible({ timeout: 5_000 });
+    await textarea.fill(TEST_PATTERN);
+
+    await page.click(
+      'input[type="submit"][name="submit"], button[type="submit"]',
+    );
+    await expect(page.locator(".notice-success, .updated").first()).toBeVisible(
+      { timeout: 10_000 },
+    );
+
+    // Reload and verify the value was saved.
+    await openNimbusSettings(page, "advanced");
+    const reloaded = page
+      .locator(`textarea[name="nimbus_settings[allowed_path_patterns]"]`)
+      .first();
+    const saved = (await reloaded.inputValue()).trim();
+    expect(saved).toBe(TEST_PATTERN.trim());
+  });
+
+  test("clearing allowed_path_patterns saves as empty", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+
+    const textarea = page
+      .locator(`textarea[name="nimbus_settings[allowed_path_patterns]"]`)
+      .first();
+    await expect(textarea).toBeVisible({ timeout: 5_000 });
+    await textarea.fill("");
+
+    await page.click(
+      'input[type="submit"][name="submit"], button[type="submit"]',
+    );
+    await expect(page.locator(".notice-success, .updated").first()).toBeVisible(
+      { timeout: 10_000 },
+    );
+
+    await openNimbusSettings(page, "advanced");
+    const reloaded = page
+      .locator(`textarea[name="nimbus_settings[allowed_path_patterns]"]`)
+      .first();
+    expect((await reloaded.inputValue()).trim()).toBe("");
+  });
+
+  test("saving ignored_path_patterns persists after reload", async ({
+    page,
+  }) => {
+    const IGNORE_PATTERN = "cache/**\nsmush/**";
+
+    await wpLogin(page);
+    await openNimbusSettings(page, "advanced");
+
+    const textarea = page
+      .locator(`textarea[name="nimbus_settings[ignored_path_patterns]"]`)
+      .first();
+    await expect(textarea).toBeVisible({ timeout: 5_000 });
+    await textarea.fill(IGNORE_PATTERN);
+
+    await page.click(
+      'input[type="submit"][name="submit"], button[type="submit"]',
+    );
+    await expect(page.locator(".notice-success, .updated").first()).toBeVisible(
+      { timeout: 10_000 },
+    );
+
+    await openNimbusSettings(page, "advanced");
+    const reloaded = page
+      .locator(`textarea[name="nimbus_settings[ignored_path_patterns]"]`)
+      .first();
+    expect((await reloaded.inputValue()).trim()).toBe(IGNORE_PATTERN.trim());
+
+    // Cleanup: clear the field.
+    await reloaded.fill("");
+    await page.click(
+      'input[type="submit"][name="submit"], button[type="submit"]',
+    );
+    await expect(page.locator(".notice-success, .updated").first()).toBeVisible(
+      { timeout: 10_000 },
+    );
+  });
+});
+
+// ── Tools tab — connectivity panel ───────────────────────────────────────────
+// Verify the Tools page renders its key interactive elements.
+
+test.describe("Tools tab — connectivity panel", () => {
+  test('"Test Connection" button is present', async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus&tab=tools");
+    await expect(
+      page.locator("button#nmb-test-connection").first(),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+
+  test("connection status span is present", async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus&tab=tools");
+    await expect(
+      page.locator("span#nmb-connection-status").first(),
+    ).toBeAttached({ timeout: 5_000 });
+  });
+
+  test("clicking Test Connection shows a result (no JS crash)", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus&tab=tools");
+    const btn = page.locator("button#nmb-test-connection").first();
+    await expect(btn).toBeVisible({ timeout: 5_000 });
+
+    // Capture console errors.
+    const jsErrors: string[] = [];
+    page.on("pageerror", (err) => jsErrors.push(err.message));
+
+    await btn.click();
+    // Status area should become non-empty within 5 s (spinner text or result).
+    await expect(page.locator("span#nmb-connection-status")).not.toBeEmpty({
+      timeout: 8_000,
+    });
+
+    expect(jsErrors).toHaveLength(0);
+  });
+
+  test("URL updates panel is present", async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus&tab=tools");
+    // renderUrlUpdatesPanel() always renders a .nmb-dashboard container with
+    // a card heading and action buttons — no attachment_id required.
+    const panel = page.locator(".nmb-dashboard");
+    await expect(panel).toBeAttached({ timeout: 5_000 });
+    await expect(
+      panel.locator("h3", { hasText: /run url updates/i }),
+    ).toBeVisible({ timeout: 5_000 });
+  });
+});
+
+// ── Overview tab — dashboard widgets ─────────────────────────────────────────
+// Verify the key structural widgets on the overview tab render correctly.
+
+test.describe("Overview tab — dashboard widgets", () => {
+  test("setup health card is visible", async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus");
+    await expect(page.locator("#overview-setup-health").first()).toBeVisible({
+      timeout: 5_000,
+    });
+  });
+
+  test("setup health card shows Credentials status", async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus");
+    const card = page.locator("#overview-setup-health");
+    await expect(card).toBeVisible({ timeout: 5_000 });
+    // Credentials row should say "Configured" (MinIO creds set up earlier).
+    await expect(card).toContainText(/credentials/i);
+    await expect(card).toContainText(/configured/i);
+  });
+
+  test("setup health card contains Offloaded media count", async ({ page }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus");
+    const card = page.locator("#overview-setup-health");
+    await expect(card).toBeVisible({ timeout: 5_000 });
+    await expect(card).toContainText(/offloaded media/i);
+  });
+
+  test('"Configure settings" and "Integrations" action links are present', async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?page=nimbus");
+    const card = page.locator("#overview-setup-health");
+    await expect(card).toBeVisible({ timeout: 5_000 });
+    await expect(
+      card.locator("a", { hasText: /configure settings/i }),
+    ).toBeVisible({ timeout: 3_000 });
+    await expect(card.locator("a", { hasText: /integrations/i })).toBeVisible({
+      timeout: 3_000,
+    });
+  });
+});
+
+// ── Media library — status badge text ────────────────────────────────────────
+// Verify the badge text content displayed in the list-view status column.
+
+test.describe("Media library — status badge text", () => {
+  let offloadedBadgeId = 0;
+  let localBadgeId = 0;
+
+  test("setup: create one offloaded and one local attachment", async ({
+    page,
+  }) => {
+    await wpLogin(page);
+    const r1 = await uploadMedia(page, TEST_IMAGE_PATH);
+    offloadedBadgeId = r1.attachmentId;
+    await forceOffload(page, offloadedBadgeId);
+    // Brief settle time so the DB write is visible before the list view loads.
+    await page.waitForTimeout(500);
+
+    const r2 = await uploadMedia(page, TEST_IMAGE_PATH);
+    localBadgeId = r2.attachmentId;
+    // Do NOT offload r2 — it remains local.
+    expect(offloadedBadgeId).toBeGreaterThan(0);
+    expect(localBadgeId).toBeGreaterThan(0);
+  });
+
+  test("offloaded attachment status column shows 'Offloaded' badge", async ({
+    page,
+  }) => {
+    test.skip(offloadedBadgeId === 0, "Depends on setup");
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?mode=list");
+    const row = page.locator(`tr#post-${offloadedBadgeId}`);
+    await expect(row).toBeVisible({ timeout: 5_000 });
+    const badge = row.locator("td.nimbus_status .nmb-inline-badge").first();
+    await expect(badge).toBeVisible({ timeout: 3_000 });
+    await expect(badge).toContainText(/offloaded/i);
+  });
+
+  test("local attachment status column shows 'Local' badge", async ({
+    page,
+  }) => {
+    test.skip(localBadgeId === 0, "Depends on setup");
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?mode=list");
+    const row = page.locator(`tr#post-${localBadgeId}`);
+    await expect(row).toBeVisible({ timeout: 5_000 });
+    const badge = row.locator("td.nimbus_status .nmb-inline-badge").first();
+    await expect(badge).toBeVisible({ timeout: 3_000 });
+    await expect(badge).toContainText(/local/i);
+  });
+
+  test('"View status" row action links to Tools tab', async ({ page }) => {
+    test.skip(offloadedBadgeId === 0, "Depends on setup");
+    await wpLogin(page);
+    await page.goto("/wp-admin/upload.php?mode=list");
+    const row = page.locator(`tr#post-${offloadedBadgeId}`);
+    await expect(row).toBeVisible({ timeout: 5_000 });
+    await row.hover();
+    const viewStatusLink = row
+      .locator(".row-actions a", { hasText: /view status/i })
+      .first();
+    await expect(viewStatusLink).toBeVisible({ timeout: 3_000 });
+    const href = (await viewStatusLink.getAttribute("href")) ?? "";
+    expect(href).toMatch(/tab=tools/);
+    expect(href).toMatch(new RegExp(`attachment_id=${offloadedBadgeId}`));
+  });
+});
+
+// ── Settings summary strip ────────────────────────────────────────────────────
+// The Settings tab renders a summary strip at the top with quick-read values
+// for Provider, Delivery mode, and Off-hours batch state.
+
+test.describe("Settings tab — summary strip", () => {
+  test("summary strip shows Provider label", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    // renderSummaryStrip() outputs .nmb-settings-summary-strip with items
+    // referencing the current provider/delivery/batch labels.
+    const strip = page.locator(".nmb-settings-summary-strip");
+    await expect(strip).toBeVisible({ timeout: 5_000 });
+    await expect(strip).toContainText(/provider/i);
+  });
+
+  test("summary strip shows Delivery label", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    const strip = page.locator(".nmb-settings-summary-strip");
+    await expect(strip).toBeVisible({ timeout: 5_000 });
+    await expect(strip).toContainText(/delivery/i);
+  });
+
+  test("summary strip shows Off-hours batch label", async ({ page }) => {
+    await wpLogin(page);
+    await openNimbusSettings(page, "settings");
+    const strip = page.locator(".nmb-settings-summary-strip");
+    await expect(strip).toBeVisible({ timeout: 5_000 });
+    await expect(strip).toContainText(/off.hours batch/i);
   });
 });

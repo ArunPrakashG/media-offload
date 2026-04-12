@@ -340,6 +340,20 @@ func (s *Service) IssueLicense(ctx context.Context, req IssueLicenseRequest) (*I
 	var resp *IssueLicenseResponse
 
 	err := s.db.WithTx(ctx, func(ctx context.Context, q db.DBTX) error {
+		// Idempotency: if a subscription ID is provided and a license was already
+		// issued for it (e.g. by the webhook while verify-payment was in flight),
+		// return the existing license rather than creating a duplicate.
+		if req.SubscriptionID != "" {
+			existing, getErr := db.GetLicenseBySubscriptionID(ctx, q, req.SubscriptionID)
+			if getErr == nil {
+				resp = &IssueLicenseResponse{Key: existing.Key, Tier: existing.Tier, Email: req.Email}
+				return nil
+			}
+			if !errors.Is(getErr, db.ErrNotFound) {
+				return fmt.Errorf("check existing subscription license: %w", getErr)
+			}
+		}
+
 		prod, err := db.GetProductBySlug(ctx, q, req.ProductSlug)
 		if err != nil {
 			if errors.Is(err, db.ErrNotFound) {

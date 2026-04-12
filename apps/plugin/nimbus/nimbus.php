@@ -32,6 +32,34 @@ define('NIMBUS_DISABLED_INTEGRATIONS_KEY', 'nimbus_disabled_integrations');
 define('NIMBUS_ADMIN_ACTION_ATTACHMENT_OFFLOAD', 'nimbus_attachment_offload');
 define('NIMBUS_ADMIN_ACTION_ATTACHMENT_RESTORE', 'nimbus_attachment_restore');
 define('NIMBUS_ADMIN_ACTION_ATTACHMENT_RETRY', 'nimbus_attachment_retry');
+define('NIMBUS_ADMIN_ACTION_EXPORT_CONFIG', 'nimbus_export_config');
+define('NIMBUS_ADMIN_ACTION_IMPORT_CONFIG', 'nimbus_import_config');
+// Extension point filter names — use these constants in add_filter() calls.
+define('NIMBUS_FILTER_PROVIDER_PROFILES', 'nimbus_provider_profiles');
+define('NIMBUS_FILTER_ADAPTER_FACTORIES', 'nimbus_storage_adapter_factories');
+/**
+ * Filter: nimbus_pro_status
+ *
+ * Premium add-ons hook here to report that they are loaded and active.
+ * The free plugin applies this filter with a default of an empty array.
+ *
+ * Expected return value shape:
+ *   [
+ *     'loaded'   => true,           // always true when the pro plugin hooks in
+ *     'version'  => '1.2.3',        // pro plugin version string
+ *     'features' => ['bulk_migration', 'cache_purge', ...],  // active feature slugs
+ *   ]
+ *
+ * Example (in nimbus-pro.php or ProPlugin::boot()):
+ *   add_filter( NIMBUS_FILTER_PRO_STATUS, function ( array $status ) use ( $lm ): array {
+ *       return [
+ *           'loaded'   => true,
+ *           'version'  => NIMBUS_PRO_VERSION,
+ *           'features' => $lm->features(),
+ *       ];
+ *   } );
+ */
+define('NIMBUS_FILTER_PRO_STATUS', 'nimbus_pro_status');
 define('NIMBUS_REST_NAMESPACE', 'nimbus/v1');
 define('NIMBUS_LICENSE_OPTION_KEY', 'nimbus_license');
 define('NIMBUS_ONBOARDING_OPTION_KEY', 'nimbus_onboarding');

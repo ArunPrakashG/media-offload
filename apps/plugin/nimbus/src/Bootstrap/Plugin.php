@@ -2,17 +2,14 @@
 namespace Nimbus\Plugin\Bootstrap;
 
 use Nimbus\Plugin\Extension\Registry;
-use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
-use Nimbus\Plugin\Integration\IntegrationDiscovery;
-use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Delivery\UrlRewriter;
+use Nimbus\Plugin\Media\AttachmentRepository;
 use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Admin\SettingsUi;
 use Nimbus\Plugin\Onboarding\ConflictDetector;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
-use Nimbus\Plugin\Rest\ApiController;
-use Nimbus\Plugin\Admin\SettingsUi;
 use Nimbus\Plugin\Stats\Statistics;
 use Nimbus\Plugin\Storage\StorageAdapterFactory;
 use Nimbus\Plugin\Support\Logger;
@@ -64,7 +61,6 @@ final class Plugin
   public function onPluginsLoaded(): void
   {
     $this->uploadHandler()->register();
-    $this->apiController()->register();
   }
 
   /**
@@ -129,7 +125,7 @@ final class Plugin
 
   private function uploadHandler(): UploadHandler
   {
-    return $this->container->get('upload_handler', fn (Container $container): UploadHandler => new UploadHandler($this->settings(), $this->adapterFactory(), $this->logger(), $this->licenseManager()));
+    return $this->container->get('upload_handler', fn (Container $container): UploadHandler => new UploadHandler($this->settings(), $this->adapterFactory(), $this->logger(), $this->licenseManager(), new AttachmentRepository()));
   }
 
   private function urlRewriter(): UrlRewriter
@@ -139,22 +135,7 @@ final class Plugin
 
   private function settingsUi(): SettingsUi
   {
-    return $this->container->get('settings_ui', fn (Container $container): SettingsUi => new SettingsUi($this->settings(), $this->logger(), $this->statistics(), $this->uploadHandler()));
-  }
-
-  private function smartSliderAssetRewriter(): SmartSliderAssetRewriter
-  {
-    return $this->container->get('smartslider_asset_rewriter', fn (Container $container): SmartSliderAssetRewriter => new SmartSliderAssetRewriter($this->settings(), $this->logger()));
-  }
-
-  private function integrationDiscovery(): IntegrationDiscovery
-  {
-    return $this->container->get('integration_discovery', fn (Container $container): IntegrationDiscovery => new IntegrationDiscovery($this->smartSliderAssetRewriter(), $this->databaseIntegrationRewriter()));
-  }
-
-  private function databaseIntegrationRewriter(): DatabaseIntegrationRewriter
-  {
-    return $this->container->get('database_integration_rewriter', fn (Container $container): DatabaseIntegrationRewriter => new DatabaseIntegrationRewriter($this->settings(), $this->logger()));
+    return $this->container->get('settings_ui', fn (Container $container): SettingsUi => new SettingsUi($this->settings(), $this->logger(), $this->statistics(), $this->uploadHandler(), $this->onboardingManager()));
   }
 
   private function licenseManager(): LicenseManager
@@ -170,18 +151,5 @@ final class Plugin
   private function extensionRegistry(): Registry
   {
     return $this->container->get('extension_registry', static fn (Container $container): Registry => new Registry());
-  }
-
-  private function apiController(): ApiController
-  {
-    return $this->container->get('api_controller', fn (Container $container): ApiController => new ApiController(
-      $this->settings(),
-      $this->statistics(),
-      $this->uploadHandler(),
-      $this->integrationDiscovery(),
-      $this->licenseManager(),
-      $this->onboardingManager(),
-      $this->logger(),
-    ));
   }
 }

@@ -53,6 +53,17 @@ else
   log 'Media Offload plugin already active.'
 fi
 
+if ! wp_cmd plugin is-active nimbus-pro >/dev/null 2>&1; then
+  if wp_cmd plugin list --field=name 2>/dev/null | grep -q '^nimbus-pro$'; then
+    log 'Activating Nimbus Pro plugin...'
+    wp_cmd plugin activate nimbus-pro >/dev/null
+  else
+    log 'Nimbus Pro plugin not found; skipping activation.'
+  fi
+else
+  log 'Nimbus Pro plugin already active.'
+fi
+
 log 'Configuring Media Offload for local debug storage and completing onboarding...'
 wp_cmd eval '
 $settings = get_option("nimbus_settings", []);

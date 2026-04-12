@@ -209,6 +209,67 @@ final class FieldRenderer
     }
   }
 
+  /**
+   * Render a pill-based path pattern input.
+   *
+   * Stores value as a newline-delimited string in a hidden textarea so that
+   * form submission and sanitization are identical to the plain textarea field.
+   * The visible interface shows:
+   *   - Discovered upload folder suggestions (pillsas clickable add-buttons)
+   *   - Current patterns as removable pills
+   *   - A free-text input for custom patterns
+   */
+  public function renderPathPillField(array $args): void
+  {
+    $settings = $this->settings->all();
+    $key      = $args['key'];
+    $value    = (string) ($settings[$key] ?? '');
+
+    // Existing patterns: split stored newline list.
+    $existing = array_values(array_filter(array_map('trim', explode("\n", $value))));
+
+    $fieldName = esc_attr(NIMBUS_OPTION_KEY) . '[' . esc_attr($key) . ']';
+    $widgetId  = 'nmb-pill-' . esc_attr($key);
+    ?>
+    <div class="nmb-path-pill-widget" id="<?php echo esc_attr($widgetId); ?>" data-field-key="<?php echo esc_attr($key); ?>">
+
+      <!-- Hidden textarea that gets submitted — keep name identical to old field -->
+      <textarea name="<?php echo esc_attr($fieldName); ?>"
+                id="<?php echo esc_attr($widgetId); ?>-textarea"
+                class="nmb-path-pill-hidden-textarea"
+                hidden><?php echo esc_textarea($value); ?></textarea>
+
+      <!-- Suggestion strip — populated by JS from nimbusAdmin.assetRoots -->
+      <div class="nmb-path-pill-suggestions" id="<?php echo esc_attr($widgetId); ?>-suggestions" aria-label="<?php esc_attr_e('Discovered upload folders — click to add', NIMBUS_TEXT_DOMAIN); ?>" hidden></div>
+
+      <!-- Active pill list -->
+      <div class="nmb-path-pill-list" id="<?php echo esc_attr($widgetId); ?>-list" role="list"
+           aria-label="<?php esc_attr_e('Active path patterns', NIMBUS_TEXT_DOMAIN); ?>">
+        <?php foreach ($existing as $pattern) : ?>
+          <span class="nmb-path-pill nmb-path-pill--active" role="listitem" data-value="<?php echo esc_attr($pattern); ?>">
+            <span class="nmb-path-pill-label"><?php echo esc_html($pattern); ?></span><!--
+            --><button type="button" class="nmb-path-pill-remove" aria-label="<?php echo esc_attr(sprintf(__('Remove %s', NIMBUS_TEXT_DOMAIN), $pattern)); ?>">×</button>
+          </span>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- Custom entry input -->
+      <div class="nmb-path-pill-input-row">
+        <input type="text"
+               id="<?php echo esc_attr($widgetId); ?>-input"
+               class="nmb-path-pill-input"
+               placeholder="<?php esc_attr_e('Type a pattern and press Enter or comma…', NIMBUS_TEXT_DOMAIN); ?>"
+               autocomplete="off"
+               spellcheck="false" />
+        <button type="button" class="button nmb-path-pill-add-btn"><?php esc_html_e('Add', NIMBUS_TEXT_DOMAIN); ?></button>
+      </div>
+
+    </div>
+    <?php if (!empty($args['description'])) : ?>
+      <p class="description"><?php echo esc_html($args['description']); ?></p>
+    <?php endif;
+  }
+
   public function renderPasswordField(array $args): void
   {
     $settings = $this->settings->all();

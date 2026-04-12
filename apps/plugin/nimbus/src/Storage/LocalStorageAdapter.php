@@ -102,4 +102,14 @@ final class LocalStorageAdapter implements StorageAdapter
 
     return (int) $size;
   }
+
+  /**
+   * Local storage has no signed URL concept — return the plain public URL.
+   * This satisfies the optional presign capability expected by WooCommerce
+   * and other integrations on development/staging environments.
+   */
+  public function presign(string $key, int $ttlSeconds = 3600): string
+  {
+    return $this->getUrl($key);
+  }
 }

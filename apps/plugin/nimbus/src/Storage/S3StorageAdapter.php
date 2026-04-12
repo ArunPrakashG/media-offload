@@ -343,6 +343,57 @@ final class S3StorageAdapter implements StorageAdapter
     return [];
   }
 
+  /**
+   * Create a new bucket in the configured provider.
+   *
+   * @throws \RuntimeException if the bucket could not be created.
+   */
+  public function createBucket(string $name, string $region = ''): void
+  {
+    try {
+      $client = $this->getClient();
+      $args = ['Bucket' => $name];
+
+      // S3 requires a LocationConstraint for all regions except us-east-1.
+      $effectiveRegion = $region !== '' ? $region : (string) ($this->config['region'] ?? '');
+      if ($effectiveRegion !== '' && $effectiveRegion !== 'us-east-1' && $effectiveRegion !== 'auto') {
+        $args['CreateBucketConfiguration'] = ['LocationConstraint' => $effectiveRegion];
+      }
+
+      $client->createBucket($args);
+    } catch (\Throwable $exception) {
+      $this->logger->error('createBucket("{name}") failed: {error}', [
+        'name' => $name,
+        'error' => $this->extractErrorMessage($exception),
+      ]);
+      throw new \RuntimeException($this->extractErrorMessage($exception));
+    }
+  }
+
+  /**
+   * Generate a pre-signed (temporary) URL for a remote object.
+   *
+   * @throws \RuntimeException if the client cannot sign the request.
+   */
+  public function presign(string $key, int $ttlSeconds = 3600): string
+  {
+    try {
+      $client = $this->getClient();
+      $command = $client->getCommand('GetObject', [
+        'Bucket' => $this->config['bucket'],
+        'Key' => $this->normalizeKey($key),
+      ]);
+      $presignedRequest = $client->createPresignedRequest($command, '+' . $ttlSeconds . ' seconds');
+      return (string) $presignedRequest->getUri();
+    } catch (\Throwable $exception) {
+      $this->logger->error('presign("{key}") failed: {error}', [
+        'key' => $key,
+        'error' => $this->extractErrorMessage($exception),
+      ]);
+      throw new \RuntimeException($this->extractErrorMessage($exception));
+    }
+  }
+
   private function guessMimeType(string $sourcePath): string
   {
     $type = wp_check_filetype($sourcePath);

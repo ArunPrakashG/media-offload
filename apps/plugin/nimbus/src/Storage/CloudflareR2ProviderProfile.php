@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-final class CloudflareR2ProviderProfile extends AbstractProviderProfile
+final class CloudflareR2ProviderProfile extends AbstractProviderProfile implements ProviderProfile
 {
   public function key(): string
   {
@@ -38,6 +38,25 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile
       'bucket' => __('Bucket', NIMBUS_TEXT_DOMAIN),
       'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
       'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
+    ];
+  }
+
+  public function fieldHints(): array
+  {
+    return [
+      'bucket'       => __('Your Cloudflare R2 bucket name.', NIMBUS_TEXT_DOMAIN),
+      'r2_account_id' => __('Your Cloudflare account ID (found in the dashboard → Overview). Used to auto-build the R2 endpoint when no custom endpoint is set.', NIMBUS_TEXT_DOMAIN),
+      'access_key'   => __('Access Key ID from your R2 API token — create one under R2 → Manage API tokens.', NIMBUS_TEXT_DOMAIN),
+      'secret_key'   => __('Secret Access Key from your R2 API token, paired with the Access Key ID above.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'     => __('Leave empty to auto-build from Account ID, or enter a full custom R2 endpoint URL.', NIMBUS_TEXT_DOMAIN),
+      'session_token' => '',
+    ];
+  }
+
+  public function fieldLabels(): array
+  {
+    return [
+      'r2_account_id' => __('R2 Account ID', NIMBUS_TEXT_DOMAIN),
     ];
   }
 

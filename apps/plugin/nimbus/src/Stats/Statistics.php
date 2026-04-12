@@ -9,9 +9,108 @@ if (!defined('ABSPATH')) {
 
 final class Statistics
 {
-  private const COST_RATES = [
-    'amazon_s3_standard' => 0.023,
-    'cloudflare_r2' => 0.015,
+  /**
+   * Per-provider pricing data sourced from provider websites (2025/2026 rates).
+   * Storage in USD/GB/month, egress in USD/GB, requests in USD/1k ops.
+   * null values indicate unknown/custom pricing.
+   */
+  private const PROVIDER_PRICING = [
+    's3' => [
+      'label'           => 'Amazon S3 Standard',
+      'storage_per_gb'  => 0.023,    // First 50 TB/month, US-East
+      'egress_per_gb'   => 0.090,    // To internet, first 10 TB/month
+      'put_per_1k'      => 0.005,    // PUT/COPY/POST/LIST ops
+      'get_per_1k'      => 0.0004,   // GET and other ops
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 5.0,      // Free tier (12-month new accounts)
+      'free_egress_gb'  => 0.0,
+      'notes'           => 'First 50 TB/mo storage, US-East-1. Free tier (12 mo): 5 GB, 20 k GET, 2 k PUT.',
+      'pricing_url'     => 'https://aws.amazon.com/s3/pricing/',
+    ],
+    'r2' => [
+      'label'           => 'Cloudflare R2',
+      'storage_per_gb'  => 0.015,
+      'egress_per_gb'   => 0.000,    // Zero egress fees
+      'put_per_1k'      => 0.0045,   // Class A ops ($4.50/million)
+      'get_per_1k'      => 0.00036,  // Class B ops ($0.36/million)
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 10.0,
+      'free_egress_gb'  => 999999.0, // Unlimited egress
+      'notes'           => 'Zero egress fees. Free/mo: 10 GB storage, 1 M Class A ops, 10 M Class B ops.',
+      'pricing_url'     => 'https://developers.cloudflare.com/r2/pricing/',
+    ],
+    'digitalocean_spaces' => [
+      'label'           => 'DigitalOcean Spaces',
+      'storage_per_gb'  => 0.020,    // Overage beyond 250 GiB included
+      'egress_per_gb'   => 0.010,    // Overage beyond 1 TiB included
+      'put_per_1k'      => 0.000,    // No request fees
+      'get_per_1k'      => 0.000,
+      'flat_monthly'    => 5.0,      // $5/mo per bucket (includes 250 GiB + 1 TiB)
+      'free_storage_gb' => 250.0,    // Included in flat fee
+      'free_egress_gb'  => 1024.0,   // 1 TiB included in flat fee
+      'notes'           => '$5/mo includes 250 GiB storage + 1 TiB transfer. No request fees.',
+      'pricing_url'     => 'https://www.digitalocean.com/pricing/spaces-object-storage',
+    ],
+    'wasabi' => [
+      'label'           => 'Wasabi Hot Cloud Storage',
+      'storage_per_gb'  => 0.0068,   // $6.99/TB ≈ $0.0068/GB, US-East-1
+      'egress_per_gb'   => 0.000,    // No egress fees
+      'put_per_1k'      => 0.000,    // No request fees
+      'get_per_1k'      => 0.000,
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 0.0,
+      'free_egress_gb'  => 999999.0, // Unlimited egress
+      'notes'           => 'No egress or API request fees. 90-day minimum storage per object.',
+      'pricing_url'     => 'https://wasabi.com/pricing/',
+    ],
+    'backblaze_b2' => [
+      'label'           => 'Backblaze B2',
+      'storage_per_gb'  => 0.006,    // $6/TB/month
+      'egress_per_gb'   => 0.010,    // Beyond 3× monthly storage free allowance
+      'put_per_1k'      => 0.000,    // Upload (Class A) free
+      'get_per_1k'      => 0.000,    // API calls free
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 0.0,
+      'free_egress_gb'  => 0.0,      // Special: 3× avg monthly storage free — computed dynamically
+      'notes'           => 'Upload & API calls free. Free egress = 3× avg monthly storage; $0.01/GB beyond.',
+      'pricing_url'     => 'https://www.backblaze.com/cloud-storage/pricing',
+    ],
+    'gcs' => [
+      'label'           => 'Google Cloud Storage',
+      'storage_per_gb'  => 0.020,    // Standard, US single-region
+      'egress_per_gb'   => 0.120,    // To internet, first 10 TiB/month
+      'put_per_1k'      => 0.005,    // Class A operations
+      'get_per_1k'      => 0.0004,   // Class B operations
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 5.0,      // Always Free: US regions only
+      'free_egress_gb'  => 0.0,
+      'notes'           => 'US single-region Standard. Always Free: 5 GB, 5 k Class A, 50 k Class B ops/mo.',
+      'pricing_url'     => 'https://cloud.google.com/storage/pricing',
+    ],
+    'minio' => [
+      'label'           => 'MinIO (self-hosted)',
+      'storage_per_gb'  => 0.000,
+      'egress_per_gb'   => 0.000,
+      'put_per_1k'      => 0.000,
+      'get_per_1k'      => 0.000,
+      'flat_monthly'    => 0.0,
+      'free_storage_gb' => 999999.0,
+      'free_egress_gb'  => 999999.0,
+      'notes'           => 'Self-hosted. Cloud costs are $0; infrastructure & bandwidth costs vary.',
+      'pricing_url'     => null,
+    ],
+    's3_compatible' => [
+      'label'           => 'S3-compatible (custom)',
+      'storage_per_gb'  => null,     // Unknown — custom provider
+      'egress_per_gb'   => null,
+      'put_per_1k'      => null,
+      'get_per_1k'      => null,
+      'flat_monthly'    => null,
+      'free_storage_gb' => 0.0,
+      'free_egress_gb'  => 0.0,
+      'notes'           => 'Custom provider — pricing depends on your specific vendor.',
+      'pricing_url'     => null,
+    ],
   ];
 
   public function __construct(private ?StorageAdapterFactory $factory = null)
@@ -45,24 +144,43 @@ final class Statistics
   {
     global $wpdb;
 
-    $ignoreMetaKey = esc_sql((string) NIMBUS_IGNORE_META_KEY);
-
     // All counts are per original upload (one WordPress attachment post = one
     // original upload, regardless of how many image-size variants WP generated
     // on disk or in the bucket).
-    $totalAttachments    = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'");
-    $offloadedAttachments = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . NIMBUS_META_KEY . "'");
-    $ignoredAttachments  = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = '" . $ignoreMetaKey . "' AND meta_value = '1'");
+    $totalAttachments = (int) $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s",
+        'attachment',
+        'inherit'
+      )
+    );
+    $offloadedAttachments = (int) $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
+        NIMBUS_META_KEY
+      )
+    );
+    $ignoredAttachments = (int) $wpdb->get_var(
+      $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
+        NIMBUS_IGNORE_META_KEY,
+        '1'
+      )
+    );
 
     $pendingAttachments = max(0, $totalAttachments - $offloadedAttachments - $ignoredAttachments);
     $dailyUploads = $wpdb->get_results(
-      "SELECT DATE(post_date) as date, COUNT(*) as count
-       FROM {$wpdb->posts}
-       WHERE post_type = 'attachment'
-         AND post_status = 'inherit'
-         AND post_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-       GROUP BY DATE(post_date)
-       ORDER BY date ASC"
+      $wpdb->prepare(
+        "SELECT DATE(post_date) as date, COUNT(*) as count
+         FROM {$wpdb->posts}
+         WHERE post_type = %s
+           AND post_status = %s
+           AND post_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+         GROUP BY DATE(post_date)
+         ORDER BY date ASC",
+        'attachment',
+        'inherit'
+      )
     );
 
     return [
@@ -91,7 +209,7 @@ final class Statistics
     // that WordPress stored (WP 5.3+ includes 'filesize' per size).  This
     // gives an accurate per-attachment total that reflects all the physical
     // files that would have been — or have been — uploaded to the bucket.
-    $sampleMeta  = $wpdb->get_col("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attachment_metadata' LIMIT 200");
+    $sampleMeta  = $wpdb->get_col($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s LIMIT 200", '_wp_attachment_metadata'));
     $totalBytes  = 0;
     $sampleCount = 0;
     $totalVariantsObserved = 0;
@@ -163,19 +281,28 @@ final class Statistics
     $storageBytes = isset($remote['size_bytes']) ? (int) $remote['size_bytes'] : (int) ($usage['offloaded_size'] ?? 0);
 
     return [
-      'summary' => $summary,
-      'usage' => $usage,
-      'remote' => $remote,
-      'mime_breakdown' => $this->getMimeBreakdown(),
+      'summary'           => $summary,
+      'usage'             => $usage,
+      'remote'            => $remote,
+      'mime_breakdown'    => $this->getMimeBreakdown(),
       'monthly_breakdown' => $this->getMonthlyBreakdown(),
-      'asset_roots' => $this->getAttachmentRoots(),
-      'cost_comparison' => $this->getCostComparison($storageBytes),
+      'asset_roots'       => $this->getAttachmentRoots(),
+      'cost_comparison'   => $this->getCostComparison(
+        $storageBytes,
+        (int) ($summary['offloaded'] ?? 0),
+        (int) ($usage['avg_bytes_per_upload'] ?? 200000)
+      ),
     ];
   }
 
   public function get_deep_stats(): array
   {
     return $this->getDeepStats();
+  }
+
+  public function get_attachment_roots(): array
+  {
+    return $this->getAttachmentRoots();
   }
 
   private function getMimeBreakdown(): array
@@ -309,25 +436,108 @@ final class Statistics
     return $normalized;
   }
 
-  private function getCostComparison(int $storageBytes): array
+  /**
+   * Compute a full cost comparison across all supported providers.
+   *
+   * Monthly traffic assumptions:
+   *  - GET requests: ~10 per offloaded item/month (typical media site serving)
+   *  - PUT requests: ~1% of library re-uploaded per month (new uploads estimate)
+   *  - Egress:       GET requests × avg file size
+   *
+   * @param int $storageBytes  Total bytes currently stored remotely.
+   * @param int $offloadedCount Number of offloaded attachment originals.
+   * @param int $avgBytesPerUpload Average bytes per upload (incl. size variants).
+   */
+  private function getCostComparison(int $storageBytes, int $offloadedCount, int $avgBytesPerUpload): array
   {
-    $storageGb = max(0, $storageBytes) / 1073741824;
+    $storageGb = max(0.0, $storageBytes / 1073741824);
+
+    // Monthly traffic estimates
+    $monthlyGets    = $offloadedCount * 10;
+    $monthlyPuts    = max(1, (int) round($offloadedCount * 0.01));
+    $monthlyEgressGb = ($monthlyGets * max(1, $avgBytesPerUpload)) / 1073741824;
+
     $scenarios = [];
 
-    foreach (self::COST_RATES as $provider => $ratePerGb) {
+    foreach (self::PROVIDER_PRICING as $key => $p) {
+      // Unknown/custom provider — cannot estimate
+      if ($p['storage_per_gb'] === null) {
+        $scenarios[] = [
+          'provider_key'            => $key,
+          'label'                   => $p['label'],
+          'storage_cost'            => null,
+          'egress_cost'             => null,
+          'request_cost'            => null,
+          'flat_monthly'            => null,
+          'estimated_monthly_total' => null,
+          'breakdown'               => null,
+          'notes'                   => $p['notes'],
+          'pricing_url'             => $p['pricing_url'],
+        ];
+        continue;
+      }
+
+      // Backblaze B2 special: free egress = 3× current monthly storage
+      $freeEgressGb = ($key === 'backblaze_b2')
+        ? min(3.0 * $storageGb, $monthlyEgressGb)
+        : (float) $p['free_egress_gb'];
+
+      $billableStorageGb = max(0.0, $storageGb - (float) $p['free_storage_gb']);
+      $billableEgressGb  = max(0.0, $monthlyEgressGb - $freeEgressGb);
+
+      $storageCost = $billableStorageGb * (float) $p['storage_per_gb'];
+      $egressCost  = $billableEgressGb  * (float) $p['egress_per_gb'];
+      $getCost     = ($monthlyGets / 1000.0)  * (float) $p['get_per_1k'];
+      $putCost     = ($monthlyPuts / 1000.0)  * (float) $p['put_per_1k'];
+      $flatCost    = (float) $p['flat_monthly'];
+
+      $total = $storageCost + $egressCost + $getCost + $putCost + $flatCost;
+
       $scenarios[] = [
-        'provider' => $provider,
-        'rate_per_gb' => $ratePerGb,
-        'estimated_monthly_cost' => round($storageGb * $ratePerGb, 2),
+        'provider_key'            => $key,
+        'label'                   => $p['label'],
+        'storage_cost'            => round($storageCost, 2),
+        'egress_cost'             => round($egressCost, 2),
+        'request_cost'            => round($getCost + $putCost, 2),
+        'flat_monthly'            => round($flatCost, 2),
+        'estimated_monthly_total' => round($total, 2),
+        'breakdown' => [
+          'storage_gb'      => round($storageGb, 3),
+          'egress_gb'       => round($monthlyEgressGb, 3),
+          'monthly_gets'    => $monthlyGets,
+          'monthly_puts'    => $monthlyPuts,
+          'free_egress_gb'  => round($freeEgressGb, 3),
+        ],
+        'notes'       => $p['notes'],
+        'pricing_url' => $p['pricing_url'],
       ];
     }
 
+    // Sort by estimated monthly total ascending (nulls last)
+    usort($scenarios, static function (array $a, array $b): int {
+      if ($a['estimated_monthly_total'] === null && $b['estimated_monthly_total'] === null) {
+        return 0;
+      }
+      if ($a['estimated_monthly_total'] === null) {
+        return 1;
+      }
+      if ($b['estimated_monthly_total'] === null) {
+        return -1;
+      }
+      return $a['estimated_monthly_total'] <=> $b['estimated_monthly_total'];
+    });
+
     return [
-      'storage_bytes' => $storageBytes,
-      'storage_gb' => round($storageGb, 3),
-      'currency' => 'USD',
-      'note' => 'Illustrative storage-only estimate. Request, bandwidth, and CDN fees vary by provider.',
-      'scenarios' => $scenarios,
+      'storage_bytes'    => $storageBytes,
+      'storage_gb'       => round($storageGb, 3),
+      'offloaded_count'  => $offloadedCount,
+      'avg_file_mb'      => round(max(0.0001, $avgBytesPerUpload / 1048576), 2),
+      'monthly_gets_est' => $monthlyGets,
+      'monthly_puts_est' => $monthlyPuts,
+      'egress_gb_est'    => round($monthlyEgressGb, 3),
+      'currency'         => 'USD',
+      'estimation_note'  => 'Assumes ~10 GET requests/file/month and ~1% new uploads/month. Prices from provider websites; verify for accurate billing.',
+      'scenarios'        => $scenarios,
     ];
   }
 }

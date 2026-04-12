@@ -1,7 +1,7 @@
 /**
  * WordPress Admin helper — wraps common WP-admin UI interactions.
  */
-import { type Page, right/test";
+import { expect, type Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -329,4 +329,123 @@ export async function getAttachmentSourceUrl(
   const jsonStart = rawText.indexOf("{");
   const json = jsonStart >= 0 ? JSON.parse(rawText.slice(jsonStart)) : {};
   return (json?.source_url as string) ?? "";
+}
+
+// ── Nimbus setting manipulation ───────────────────────────────────────────────
+
+/**
+ * Set a single `nimbus_settings` key via the test-helper REST endpoint.
+ * Returns the previous value of the key so callers can restore it.
+ *
+ * Example: const prev = await setNimbusSetting(page, 'remove_local_copies', true);
+ */
+export async function setNimbusSetting(
+  page: Page,
+  key: string,
+  value: unknown,
+): Promise<unknown> {
+  const nonce = await getWpNonce(page);
+  const resp = await page.request.post("/?rest_route=/nimbus-test/v1/setting", {
+    headers: {
+      "X-WP-Nonce": nonce,
+      "Content-Type": "application/json",
+    },
+    data: { key, value },
+  });
+  if (!resp.ok()) {
+    throw new Error(
+      `setNimbusSetting(${key}) failed with status ${resp.status()}`,
+    );
+  }
+  const raw = await resp.text();
+  const start = raw.indexOf("{");
+  const json: Record<string, unknown> =
+    start >= 0 ? JSON.parse(raw.slice(start)) : {};
+  return json.old_value ?? null;
+}
+
+/**
+ * Synchronously delete local copies of an attachment by firing the cleanup
+ * hook immediately via the test-helper REST endpoint.
+ * Returns whether the local file still exists after cleanup.
+ */
+export async function cleanupLocalFiles(
+  page: Page,
+  attachmentId: number,
+): Promise<boolean> {
+  const nonce = await getWpNonce(page);
+  const resp = await page.request.post(
+    `/?rest_route=/nimbus-test/v1/cleanup-local/${attachmentId}`,
+    { headers: { "X-WP-Nonce": nonce } },
+  );
+  if (!resp.ok()) {
+    console.warn(
+      `cleanupLocalFiles(${attachmentId}) returned ${resp.status()}`,
+    );
+    return false;
+  }
+  const raw = await resp.text();
+  const start = raw.indexOf("{");
+  const json: Record<string, unknown> =
+    start >= 0 ? JSON.parse(raw.slice(start)) : {};
+  return (json.local_file_exists as boolean) ?? false;
+}
+
+/**
+ * Upload a file via the WP REST API, overriding the filename in the
+ * Content-Disposition header.  Useful for testing filename-collision logic
+ * with specific names that differ from the fixture file's basename.
+ */
+export async function uploadMediaWithFilename(
+  page: Page,
+  filePath: string,
+  filename: string,
+): Promise<{ attachmentId: number; localUrl: string }> {
+  const fileBuffer = fs.readFileSync(filePath);
+  const ext = path.extname(filename).toLowerCase();
+  const mimeTypes: Record<string, string> = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+  };
+  const contentType = mimeTypes[ext] ?? "application/octet-stream";
+
+  await page.goto("/wp-admin/");
+  const nonce: string = await page.evaluate(
+    () => (window as any).wpApiSettings?.nonce ?? "",
+  );
+
+  const response = await page.request.post("/?rest_route=/wp/v2/media", {
+    headers: {
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Type": contentType,
+      ...(nonce
+        ? { "X-WP-Nonce": nonce }
+        : {
+            Authorization:
+              "Basic " +
+              Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64"),
+          }),
+    },
+    data: fileBuffer,
+  });
+
+  if (!response.ok()) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Media upload failed ${response.status()}: ${body.slice(0, 200)}`,
+    );
+  }
+
+  const rawText = await response.text();
+  const jsonStart = rawText.indexOf("{");
+  const json =
+    jsonStart >= 0 ? JSON.parse(rawText.slice(jsonStart)) : JSON.parse(rawText);
+
+  return {
+    attachmentId: (json.id as number) ?? 0,
+    localUrl: (json.source_url as string) ?? "",
+  };
 }

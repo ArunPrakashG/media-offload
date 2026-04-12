@@ -11,6 +11,9 @@ if (!defined('ABSPATH')) {
 
 final class Settings
 {
+  private const CACHE_GROUP = 'nimbus';
+  private const CACHE_KEY   = 'settings';
+
   private ProviderRegistry $providerRegistry;
 
   private array $defaults = [
@@ -65,7 +68,15 @@ final class Settings
 
   public function all(): array
   {
-    return wp_parse_args(get_option(NIMBUS_OPTION_KEY, []), $this->defaults);
+    $cached = wp_cache_get(self::CACHE_KEY, self::CACHE_GROUP);
+    if (is_array($cached)) {
+      return $cached;
+    }
+
+    $settings = wp_parse_args(get_option(NIMBUS_OPTION_KEY, []), $this->defaults);
+    wp_cache_set(self::CACHE_KEY, $settings, self::CACHE_GROUP);
+
+    return $settings;
   }
 
   public function is_enabled(): bool
@@ -217,6 +228,7 @@ final class Settings
     $current = $this->all();
     $sanitized = $this->sanitize(array_merge($current, $values));
     update_option(NIMBUS_OPTION_KEY, $sanitized, false);
+    wp_cache_delete(self::CACHE_KEY, self::CACHE_GROUP);
   }
 
   public function isEnabled(): bool

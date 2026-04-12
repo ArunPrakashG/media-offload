@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) {
 
 abstract class AbstractProviderProfile implements ProviderProfile
 {
+  use ProviderProfileHelpers;
+
   public function missingCredentialLabels(array $values): array
   {
     $values = $this->normalize($values);
@@ -21,40 +23,13 @@ abstract class AbstractProviderProfile implements ProviderProfile
     return $missing;
   }
 
-  protected function normalizeCommon(array $values): array
+  public function fieldHints(): array
   {
-    $values['bucket'] = trim((string) ($values['bucket'] ?? ''));
-    $values['r2_account_id'] = trim((string) ($values['r2_account_id'] ?? ''));
-    $values['region'] = trim((string) ($values['region'] ?? ''));
-    $values['access_key'] = trim((string) ($values['access_key'] ?? ''));
-    $values['secret_key'] = trim((string) ($values['secret_key'] ?? ''));
-    $values['session_token'] = trim((string) ($values['session_token'] ?? ''));
-    $values['prefix'] = trim((string) ($values['prefix'] ?? ''));
-    $values['endpoint'] = rtrim(trim((string) ($values['endpoint'] ?? '')), '/');
-    $values['custom_domain'] = sanitize_text_field((string) ($values['custom_domain'] ?? ''));
-    $values['use_path_style_endpoint'] = !empty($values['use_path_style_endpoint']);
-    $values['storage_class'] = trim((string) ($values['storage_class'] ?? 'STANDARD'));
-    $values['visibility'] = trim((string) ($values['visibility'] ?? 'public-read'));
-
-    return $values;
+    return [];
   }
 
-  protected function endpointLooksLikeR2(string $endpoint): bool
+  public function fieldLabels(): array
   {
-    if ($endpoint === '') {
-      return false;
-    }
-
-    $host = (string) wp_parse_url($endpoint, PHP_URL_HOST);
-    if ($host === '') {
-      return false;
-    }
-
-    return strpos(strtolower($host), 'r2.cloudflarestorage.com') !== false;
-  }
-
-  protected function buildR2Endpoint(string $accountId): string
-  {
-    return 'https://' . trim($accountId) . '.r2.cloudflarestorage.com';
+    return [];
   }
 }

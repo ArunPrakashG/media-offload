@@ -12,14 +12,16 @@ const plans = [
     features: [
       "Unlimited media files",
       "1 WordPress installation",
-      "Any S3-compatible provider",
-      "Pauseable bulk migration jobs",
-      "Nightly off-hours batch processing (2 workers)",
-      "Selective offload rules (MIME type, file size, path)",
-      "Automatic cache purging (Cloudflare, LiteSpeed, Nginx)",
-      "Deep storage analytics + S3 vs R2 cost comparison",
-      "Page-builder integration rewriting (Elementor, etc.)",
-      "WP-CLI + REST API",
+      "All 9 cloud providers — including Cloudflare R2 (zero egress fees)",
+      "Pause-and-resume bulk library migration",
+      "Nightly scheduling with 2 background workers",
+      "Offload rules by file type, size, or path",
+      "Auto cache purge (Cloudflare, LiteSpeed, Nginx)",
+      "Usage dashboard + S3 vs R2 cost comparison",
+      "Elementor, Slider Revolution, NextGEN rewriting",
+      "WooCommerce: cloud-served digital downloads",
+      "Config export/import for staging → production",
+      "Full WP-CLI + REST API",
       "Automatic plugin updates",
       "Email support",
     ],
@@ -36,7 +38,7 @@ const plans = [
     features: [
       "Everything in Personal",
       "5 WordPress installations",
-      "75 files per batch tick (vs 25 in Personal)",
+      "3× faster bulk migration (75 files/tick)",
       "Nightly batch with 5 parallel workers",
       "Priority email support",
     ],
@@ -53,9 +55,10 @@ const plans = [
     features: [
       "Everything in Pro",
       "Unlimited installations",
-      "100 files per batch tick (maximum throughput)",
+      "Maximum throughput (100 files/tick)",
       "Nightly batch with 8 parallel workers",
-      "Priority support + onboarding",
+      "Multisite network admin overview panel",
+      "Priority support + setup call",
     ],
     cta: "Get started",
   },
@@ -71,10 +74,9 @@ const plans = [
       </h2>
       <p class="section-sub">
         Paid plans billed annually in USD. Unlimited media files on every plan —
-        pay by the number of sites you run, not how much you upload.
-        <a href="/compare" class="compare-link"
-          >How does this compare to per-file pricing plugins? →</a
-        >
+        pay by the number of sites, not how much you upload. Other plugins
+        charge extra for WooCommerce support. Nimbus includes everything.
+        <a href="/compare" class="compare-link">Full feature comparison →</a>
       </p>
     </div>
 
@@ -82,12 +84,15 @@ const plans = [
     <div class="free-strip">
       <div class="free-strip-icon" aria-hidden="true">✦</div>
       <div class="free-strip-body">
-        <p class="free-strip-headline">Free tier included</p>
+        <p class="free-strip-headline">
+          Free plan — no credit card, no time limit
+        </p>
         <p class="free-strip-sub">
-          Every install ships with a free tier — new-upload offloading,
-          hook-based URL delivery, and any S3-compatible provider on 1 site
-          with unlimited media. No credit card. No time limit. <strong
-            >Activated automatically when you install the plugin.</strong
+          Every install ships with a permanent free plan — new-upload
+          offloading, automatic URL rewriting, and all 9 cloud provider profiles
+          on 1 site with unlimited media. <strong
+            >Activated automatically when you install the plugin. No sign-up
+            required.</strong
           >
         </p>
       </div>

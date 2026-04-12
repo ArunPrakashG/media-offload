@@ -20,10 +20,12 @@ final class ProviderCatalog
 
     foreach ($this->providerRegistry->all() as $key => $profile) {
       $providers[$key] = [
-        'label' => $profile->label(),
-        'title' => $profile->title(),
-        'summary' => $profile->summary(),
-        'required' => array_values($profile->requiredFields()),
+        'label'       => $profile->label(),
+        'title'       => $profile->title(),
+        'summary'     => $profile->summary(),
+        'required'    => array_values($profile->requiredFields()),
+        'hints'       => $profile->fieldHints(),
+        'fieldLabels' => $profile->fieldLabels(),
       ];
     }
 
@@ -49,9 +51,11 @@ final class ProviderCatalog
 
     foreach ($this->all() as $key => $provider) {
       $providers[$key] = [
-        'title' => $provider['title'],
-        'summary' => $provider['summary'],
-        'required' => $provider['required'],
+        'title'       => $provider['title'],
+        'summary'     => $provider['summary'],
+        'required'    => $provider['required'],
+        'hints'       => $provider['hints'],
+        'fieldLabels' => $provider['fieldLabels'],
       ];
     }
 

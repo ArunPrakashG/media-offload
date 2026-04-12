@@ -91,7 +91,8 @@ final class Logger
       return [];
     }
 
-    $level = isset($filters['level']) ? $this->normalizeLevel((string) $filters['level']) : '';
+    $rawLevel = isset($filters['level']) ? trim((string) $filters['level']) : '';
+    $level    = $rawLevel !== '' ? $this->normalizeLevel($rawLevel) : '';
     $source = isset($filters['source']) ? sanitize_key((string) $filters['source']) : '';
     $search = isset($filters['search']) ? trim((string) $filters['search']) : '';
     $limit = max(1, (int) ($filters['limit'] ?? 500));

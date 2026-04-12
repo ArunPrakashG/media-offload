@@ -6,10 +6,17 @@ use Nimbus\Plugin\Cache\PurgeManager;
 use Nimbus\Plugin\Cli\Command;
 use Nimbus\Plugin\Extension\Contracts\ProExtension;
 use Nimbus\Plugin\Extension\Registry;
+use Nimbus\Plugin\Integration\WooCommerceIntegration;
 use Nimbus\Plugin\Jobs\BulkJobManager;
+use Nimbus\Plugin\Jobs\JobTable;
 use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\License\LicenseRefresher;
 use Nimbus\Plugin\License\UpdateChecker;
+use Nimbus\Plugin\Admin\NetworkAdminPage;
+use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
+use Nimbus\Plugin\Integration\IntegrationDiscovery;
+use Nimbus\Plugin\Integration\SmartSliderAssetRewriter;
+use Nimbus\Plugin\Rest\ApiController;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -34,6 +41,50 @@ final class ProPlugin implements ProExtension
 
   public function boot(Container $container, LicenseManager $lm): void
   {
+    // ── Shared lazy factories for integration classes ──────────────────────────
+    $smartSlider = fn (Container $c): SmartSliderAssetRewriter => new SmartSliderAssetRewriter($c->get('settings'), $c->get('logger'));
+    $dbRewriter  = fn (Container $c): DatabaseIntegrationRewriter => new DatabaseIntegrationRewriter($c->get('settings'), $c->get('logger'));
+    $discovery   = fn (Container $c): IntegrationDiscovery => new IntegrationDiscovery(
+      $c->get('smartslider_asset_rewriter', $smartSlider),
+      $c->get('database_integration_rewriter', $dbRewriter),
+    );
+
+    // ── REST API ──────────────────────────────────────────────────────────────
+    // All Nimbus REST endpoints are a pro feature. Registered unconditionally
+    // when the pro plugin is active; individual handlers enforce their own
+    // feature/licence checks internally.
+    $container->get('api_controller', fn (Container $c): ApiController => new ApiController(
+      $c->get('settings'),
+      $c->get('statistics'),
+      $c->get('upload_handler'),
+      $c->get('integration_discovery', $discovery),
+      $lm,
+      $c->get('onboarding_manager'),
+      $c->get('logger'),
+    ))->register();
+
+    // ── Integration discovery filters ─────────────────────────────────────────
+    // Supplies integration data to the free plugin's admin UI and form handlers.
+    add_filter('nimbus/integrations/summary', function (array $default) use ($container, $discovery): array {
+      return $container->get('integration_discovery', $discovery)->summary();
+    });
+
+    add_filter('nimbus/integrations/can_rewrite', function (bool $default, string $key) use ($container, $discovery): bool {
+      return $container->get('integration_discovery', $discovery)->canRewrite($key);
+    }, 10, 2);
+
+    add_filter('nimbus/integrations/definition', function ($default, string $key) use ($container, $discovery): ?array {
+      return $container->get('integration_discovery', $discovery)->definition($key);
+    }, 10, 2);
+
+    add_filter('nimbus/integrations/run_rewrite', function (array $default, string $key) use ($container, $discovery): array {
+      return $container->get('integration_discovery', $discovery)->runRewrite($key);
+    }, 10, 2);
+
+    // ── Jobs table ─────────────────────────────────────────────────────────────
+    // Creates/upgrades wp_nimbus_jobs on every boot (dbDelta is idempotent).
+    JobTable::ensureTable();
+
     // ── Update checker ────────────────────────────────────────────────────────
     // Hooks into the WordPress update transient to inject Nimbus Pro update info.
     $container->get('update_checker', static function (Container $c) use ($lm): UpdateChecker {
@@ -113,6 +164,51 @@ final class ProPlugin implements ProExtension
         $c->get('logger'),
         $lm,
       ))->state();
+    });
+
+    add_filter('nimbus/purge_manager', function () use ($container, $lm): ?PurgeManager {
+      if (!$lm->isActive() || !$lm->hasFeature('cache_purge')) {
+        return null;
+      }
+      return $container->get('purge_manager', fn (Container $c): PurgeManager => new PurgeManager(
+        $c->get('settings'),
+        $c->get('logger'),
+      ));
+    });
+
+    // ── Multisite Network Admin Panel ─────────────────────────────────────────
+    // Registers a top-level Network Admin menu with per-site offload stats.
+    // Gated on the `network_admin` feature (Agency plan and above) so that
+    // Personal and Pro license holders on multisite don't see the panel.
+    if ($lm->isActive() && is_multisite() && $lm->hasFeature('network_admin')) {
+      $container->get('network_admin_page', fn (Container $c): NetworkAdminPage => new NetworkAdminPage(
+        $c->get('settings'),
+        $lm,
+      ))->register();
+    }
+
+    // ── WooCommerce protected file delivery ───────────────────────────────────
+    // Replaces proxied WooCommerce download URLs with provider-signed URLs so
+    // buyers download directly from storage, bypassing the web server.
+    if ($lm->isActive()) {
+      add_action('woocommerce_loaded', static function () use ($container, $lm): void {
+        $container->get('woocommerce_integration', fn (Container $c): WooCommerceIntegration => new WooCommerceIntegration(
+          $c->get('upload_handler'),
+          $c->get('settings'),
+          $c->get('logger'),
+        ))->register();
+      });
+    }
+
+    // ── Pro status reporter ───────────────────────────────────────────────────
+    // The free plugin reads this filter on the License tab to show whether the
+    // pro add-on is detected and which features are currently active.
+    add_filter(NIMBUS_FILTER_PRO_STATUS, static function (array $status) use ($lm): array {
+      return [
+        'loaded'   => true,
+        'version'  => NIMBUS_PRO_VERSION,
+        'features' => $lm->features(),
+      ];
     });
   }
 }

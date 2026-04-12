@@ -6,7 +6,7 @@ import Base from "../layouts/Base.astro";
 
 <Base
   title="Nimbus vs Other Media Offload Plugins — Side-by-Side Comparison"
-  description="See how Nimbus compares to WP Offload Media and per-file pricing plugins. No provider lock-in, pauseable bulk jobs, built-in cache purge and cost analytics."
+  description="See how Nimbus compares to other WordPress media offload plugins. Pauseable bulk jobs, built-in cache purge, cost analytics, and no per-file caps."
 >
   <Navbar />
 
@@ -15,11 +15,12 @@ import Base from "../layouts/Base.astro";
     <section class="compare-hero">
       <div class="container">
         <p class="section-label">Comparison</p>
-        <h1 class="compare-headline">How Nimbus stacks up</h1>
+        <h1 class="compare-headline">Why developers are switching to Nimbus</h1>
         <p class="compare-sub">
-          No per-file caps, no provider lock-in, no missing cache purge. See
-          how Nimbus compares to other media offload plugins — on pricing and
-          features.
+          Other plugins start at $99/yr — and that's before you pay for the
+          WooCommerce add-on. Nimbus includes WooCommerce, all 9 providers,
+          analytics, WP-CLI, cache purge, and bulk migration in every plan.
+          Starting at $0.
         </p>
       </div>
     </section>
@@ -162,106 +163,234 @@ import Base from "../layouts/Base.astro";
               </tr>
             </thead>
             <tbody>
+              <!-- Pricing & Limits -->
+              <tr class="compare-category-row"><td colspan="3">Pricing &amp; Limits</td></tr>
               <tr>
                 <td>Media file cap</td>
                 <td class="col-nimbus winner">None — unlimited on all plans</td>
-                <td class="col-them"
-                  >Hard cap per plan (2K → 500K → $1,199 for unlimited)</td
-                >
+                <td class="col-them">Hard cap per plan (2K → 500K → paid extra for unlimited)</td>
               </tr>
               <tr>
+                <td>Free plan</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> 1 site · unlimited media · no time limit</td>
+                <td class="col-them"><span class="dash">—</span> Paid only</td>
+              </tr>
+              <tr>
+                <td>License model</td>
+                <td class="col-nimbus winner">Per site · no media cap</td>
+                <td class="col-them">Per media item count · unlimited sites</td>
+              </tr>
+
+              <!-- Storage Providers -->
+              <tr class="compare-category-row"><td colspan="3">Storage Providers</td></tr>
+              <tr>
                 <td>Amazon S3</td>
-                <td class="col-nimbus"><span class="check">✓</span></td>
+                <td class="col-nimbus"><span class="check">✓</span> All plans</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
                 <td>Cloudflare R2</td>
-                <td class="col-nimbus"><span class="check">✓</span></td>
-                <td class="col-them"><span class="check">✓</span></td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Dedicated profile — endpoint, region &amp; path-style pre-configured from your Account ID</td>
+                <td class="col-them">Manual S3-compatible setup</td>
+              </tr>
+              <tr>
+                <td>Google Cloud Storage</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Dedicated profile via HMAC XML API</td>
+                <td class="col-them"><span class="check">✓</span> Varies by plugin</td>
               </tr>
               <tr>
                 <td>DigitalOcean Spaces</td>
-                <td class="col-nimbus"
-                  ><span class="check">✓</span> (S3-compatible)</td
-                >
+                <td class="col-nimbus"><span class="check">✓</span> Dedicated profile</td>
                 <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Backblaze B2</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Dedicated profile</td>
+                <td class="col-them">Varies by plugin</td>
+              </tr>
+              <tr>
+                <td>Wasabi</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Dedicated profile</td>
+                <td class="col-them">Varies by plugin</td>
+              </tr>
+              <tr>
+                <td>MinIO (self-hosted)</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Dedicated profile</td>
+                <td class="col-them">Generic S3-compat only</td>
               </tr>
               <tr>
                 <td>Any S3-compatible provider</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> All plans</td
-                >
+                <td class="col-nimbus winner"><span class="check">✓</span> Generic profile — all plans</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
-                <td>Pauseable bulk migration</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> Personal &amp; above</td
-                >
+                <td>Create bucket from WordPress</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> No cloud console needed</td>
+                <td class="col-them"><span class="dash">—</span> Must create manually</td>
+              </tr>
+              <tr>
+                <td>Switch providers without URL changes</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Change a setting — done</td>
+                <td class="col-them">Full database search-replace required</td>
+              </tr>
+
+              <!-- Media Delivery -->
+              <tr class="compare-category-row"><td colspan="3">Media Delivery</td></tr>
+              <tr>
+                <td>Automatic URL rewriting</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> All plans</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
-                <td>WP-CLI support</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> Personal &amp; above</td
-                >
-                <td class="col-them"><span class="check">✓</span></td>
+                <td>Custom CDN delivery domain</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Point to any CDN edge or subdomain</td>
+                <td class="col-them">Varies by plugin</td>
               </tr>
               <tr>
-                <td>WordPress Multisite (per-site)</td>
-                <td class="col-nimbus"
-                  ><span class="check">✓</span> All plans</td
-                >
-                <td class="col-them"
-                  ><span class="check">✓</span> All paid plans</td
-                >
+                <td>Toggle cloud / local serving instantly</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> One click — no post edits</td>
+                <td class="col-them"><span class="dash">—</span></td>
               </tr>
+
+              <!-- Migration & Scheduling -->
+              <tr class="compare-category-row"><td colspan="3">Migration &amp; Scheduling</td></tr>
               <tr>
-                <td>Hook-based URL delivery (no provider URL stored in DB)</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> All plans</td
-                >
-                <td class="col-them"><span class="check">✓</span></td>
-              </tr>
-              <tr>
-                <td>Automatic cache purge (Cloudflare, LiteSpeed, Nginx)</td>
+                <td>Bulk migrate existing library</td>
                 <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-them"><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Pause &amp; resume bulk migration</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Survives server restarts</td>
+                <td class="col-them">Simple background only, no pause/resume</td>
+              </tr>
+              <tr>
+                <td>Live migration progress stream</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Real-time SSE updates</td>
                 <td class="col-them"><span class="dash">—</span></td>
               </tr>
               <tr>
-                <td>Nightly off-hours batch processing</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> Personal &amp; above</td
-                >
+                <td>Nightly off-hours scheduling</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Configurable time · up to 8 workers</td>
                 <td class="col-them"><span class="dash">—</span></td>
               </tr>
               <tr>
-                <td>Storage cost analytics (S3 vs R2 comparison)</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> Personal &amp; above</td
-                >
+                <td>Restore files back to local server</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-them">Varies by plugin</td>
+              </tr>
+
+              <!-- Offload Rules -->
+              <tr class="compare-category-row"><td colspan="3">Offload Rules</td></tr>
+              <tr>
+                <td>Filter by MIME type</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-them">Varies by plugin</td>
+              </tr>
+              <tr>
+                <td>Filter by minimum file size</td>
+                <td class="col-nimbus winner"><span class="check">✓</span></td>
                 <td class="col-them"><span class="dash">—</span></td>
               </tr>
               <tr>
-                <td>Page-builder integration rewriting (Elementor, etc.)</td>
-                <td class="col-nimbus winner"
-                  ><span class="check">✓</span> Personal &amp; above</td
-                >
-                <td class="col-them">Add-on / paid extra</td>
+                <td>Path glob allow / deny rules</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Block or allow specific folders</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+
+              <!-- Caching -->
+              <tr class="compare-category-row"><td colspan="3">Cache Purging</td></tr>
+              <tr>
+                <td>Cloudflare cache purge</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Automatic after every offload</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>LiteSpeed &amp; WP Fastest Cache purge</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Built-in</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Nginx PURGE support</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Configurable endpoint</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+
+              <!-- Analytics -->
+              <tr class="compare-category-row"><td colspan="3">Analytics</td></tr>
+              <tr>
+                <td>Storage usage dashboard</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> MIME breakdown · trend charts</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>S3 vs R2 cost comparison</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Live estimate from your library size</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+
+              <!-- Integrations -->
+              <tr class="compare-category-row"><td colspan="3">Integrations</td></tr>
+              <tr>
+                <td>Page-builder URL rewriting (Elementor, etc.)</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above — included</td>
+                <td class="col-them">Separate paid add-ons</td>
+              </tr>
+              <tr>
+                <td>WooCommerce signed download URLs</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above — included</td>
+                <td class="col-them">Paid add-on required</td>
+              </tr>
+              <tr>
+                <td>WordPress Multisite (per-site settings)</td>
+                <td class="col-nimbus"><span class="check">✓</span> All plans</td>
+                <td class="col-them"><span class="check">✓</span> All paid plans</td>
+              </tr>
+              <tr>
+                <td>Multisite network admin panel</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Agency — bird's-eye view of all sites</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+
+              <!-- Developer Tools -->
+              <tr class="compare-category-row"><td colspan="3">Developer &amp; Automation</td></tr>
+              <tr>
+                <td>WP-CLI commands</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Full wp nimbus command suite</td>
+                <td class="col-them"><span class="check">✓</span> Basic commands</td>
+              </tr>
+              <tr>
+                <td>REST API (read + job control)</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Full endpoints — trigger jobs, query status</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>AI agent &amp; CI pipeline compatible</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Works with Claude, Cursor, GitHub Actions, n8n</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Config export / import (JSON)</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Staging → production in one step</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+              <tr>
+                <td>Live diagnostics &amp; log viewer</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Filterable structured logs · connection test</td>
+                <td class="col-them"><span class="dash">—</span></td>
+              </tr>
+
+              <!-- Support -->
+              <tr class="compare-category-row"><td colspan="3">Support</td></tr>
+              <tr>
+                <td>Email support</td>
+                <td class="col-nimbus"><span class="check">✓</span> All paid plans</td>
+                <td class="col-them"><span class="check">✓</span> All paid plans</td>
               </tr>
               <tr>
                 <td>Priority email support</td>
-                <td class="col-nimbus"
-                  ><span class="check">✓</span> Pro &amp; Agency</td
-                >
-                <td class="col-them"
-                  ><span class="check">✓</span> Gold tier and above</td
-                >
-              </tr>
-              <tr>
-                <td>License pricing model</td>
-                <td class="col-nimbus winner">Per site · no media cap</td>
-                <td class="col-them">Per media item count · unlimited sites</td>
+                <td class="col-nimbus"><span class="check">✓</span> Pro &amp; Agency</td>
+                <td class="col-them"><span class="check">✓</span> Higher tiers only</td>
               </tr>
             </tbody>
           </table>
@@ -269,14 +398,15 @@ import Base from "../layouts/Base.astro";
       </div>
     </section>
 
-    <!-- WP Offload Media comparison section -->
+    <!-- Competitor comparison section -->
     <section class="section section--alt">
       <div class="container">
         <h2 class="section-headline" style="margin-bottom:0.75rem">
-          How Nimbus compares to WP Offload Media
+          How Nimbus compares to the market leader
         </h2>
         <p class="section-sub" style="margin-bottom:2.5rem">
-          WP Offload Media is the market leader. Here's where Nimbus wins outright.
+          The most popular WordPress media offload plugin on the market. Here's where Nimbus wins
+          outright.
         </p>
 
         <div class="compare-table-wrap">
@@ -288,7 +418,7 @@ import Base from "../layouts/Base.astro";
                   <span class="th-brand th-brand--nimbus">Nimbus</span>
                 </th>
                 <th class="col-them">
-                  <span class="th-brand th-brand--them">WP Offload Media</span>
+                  <span class="th-brand th-brand--them">Market leader</span>
                 </th>
               </tr>
             </thead>
@@ -296,65 +426,109 @@ import Base from "../layouts/Base.astro";
               <tr>
                 <td>Cloudflare R2 — dedicated profile</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Enter Account ID — everything else is automatic
+                  <span class="check">✓</span> Dedicated R2 profile — enter Account ID, bucket
+                  &amp; API token; endpoint, region, path-style fill themselves
                 </td>
-                <td class="col-them">Manual S3-compatible setup, no R2-specific guidance</td>
+                <td class="col-them"
+                  >Manual S3-compatible setup, no R2-specific guidance</td
+                >
               </tr>
-              <tr>
-                <td>What gets stored in the database per file</td>
-                <td class="col-nimbus winner">
-                  A neutral bucket path only — no provider URL stored. CDN URLs generated at render time from current settings.
-                </td>
-                <td class="col-them">
-                  Full S3/CDN URL written into <code>_wp_attached_file</code> on every offload — DB is provider-coupled, switching requires a full DB find-and-replace
-                </td>
-              </tr>
+
               <tr>
                 <td>Switching providers</td>
                 <td class="col-nimbus winner">Change a setting — done</td>
                 <td class="col-them">Full database search-replace required</td>
               </tr>
               <tr>
+                <td>Google Cloud Storage</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Dedicated GCS profile via HMAC XML API
+                </td>
+                <td class="col-them"><span class="check">✓</span> Native support</td>
+              </tr>
+              <tr>
                 <td>Automatic cache purging</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Cloudflare, LiteSpeed, WP Fastest Cache, Nginx — built-in
+                  <span class="check">✓</span> Cloudflare, LiteSpeed, WP Fastest Cache,
+                  Nginx — built-in
                 </td>
-                <td class="col-them"><span class="dash">—</span> Not available</td>
+                <td class="col-them"
+                  ><span class="dash">—</span> Not available</td
+                >
               </tr>
               <tr>
                 <td>Pauseable bulk migration</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Pause, resume, auto-retry, real-time progress
+                  <span class="check">✓</span> Pause, resume, auto-retry, live SSE
+                  progress stream
                 </td>
-                <td class="col-them">Simple background process, no pause/resume</td>
+                <td class="col-them"
+                  >Simple background process, no pause/resume</td
+                >
               </tr>
               <tr>
                 <td>Nightly off-hours scheduling</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Configurable time · up to 8 parallel workers
+                  <span class="check">✓</span> Configurable time · up to 8 parallel
+                  workers
                 </td>
-                <td class="col-them"><span class="dash">—</span> Not available</td>
+                <td class="col-them"
+                  ><span class="dash">—</span> Not available</td
+                >
               </tr>
               <tr>
                 <td>Storage cost analytics</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Live S3 vs R2 cost comparison by your actual library size
+                  <span class="check">✓</span> Live S3 vs R2 cost comparison by your
+                  actual library size
                 </td>
-                <td class="col-them"><span class="dash">—</span> No cost analytics</td>
+                <td class="col-them"
+                  ><span class="dash">—</span> No cost analytics</td
+                >
               </tr>
               <tr>
                 <td>Page-builder integration rewriting</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Elementor, Slider Revolution, Smart Slider 3, NextGEN — included
+                  <span class="check">✓</span> Elementor, Slider Revolution, Smart
+                  Slider 3, NextGEN — included
                 </td>
                 <td class="col-them">Separate paid add-ons required</td>
               </tr>
               <tr>
+                <td>WooCommerce signed downloads</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Buyers redirected to signed storage URL
+                  — bypasses server
+                </td>
+                <td class="col-them"><span class="check">✓</span> Paid add-on required</td>
+              </tr>
+              <tr>
+                <td>Multisite network admin</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Per-site settings + network overview panel
+                </td>
+                <td class="col-them">Per-site only, no network admin panel</td>
+              </tr>
+              <tr>
+                <td>Create bucket from settings page</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> Create bucket without leaving WordPress
+                </td>
+                <td class="col-them"><span class="dash">—</span> Must create bucket manually</td>
+              </tr>
+              <tr>
                 <td>REST API</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Full read + job control endpoints
+                  <span class="check">✓</span> Full read + job control + presign endpoints
                 </td>
                 <td class="col-them">No formal REST API</td>
+              </tr>
+              <tr>
+                <td>Config export / import</td>
+                <td class="col-nimbus winner">
+                  <span class="check">✓</span> JSON backup and restore — great for staging
+                </td>
+                <td class="col-them"><span class="dash">—</span> Not available</td>
               </tr>
               <tr>
                 <td>Free tier</td>
@@ -404,9 +578,9 @@ import Base from "../layouts/Base.astro";
           <div class="faq-item">
             <h3>Is there a free version of Nimbus?</h3>
             <p>
-              Yes. The free tier includes new-upload offloading, hook-based URL
-              delivery, and any S3-compatible provider — on 1 site with unlimited
-              media files. No credit card required. Bulk migration, nightly
+              Yes. The free tier includes new-upload offloading, URL rewriting,
+              and any S3-compatible provider — on 1 site with unlimited media
+              files. No credit card required. Bulk migration, nightly
               scheduling, cache purge, and analytics are available on paid plans
               from $69/yr.
             </p>
@@ -435,32 +609,15 @@ import Base from "../layouts/Base.astro";
           </div>
 
           <div class="faq-item">
-            <h3>Does Nimbus store URLs in my database?</h3>
-            <p>
-              No. After offload, Nimbus records only a neutral bucket path
-              (e.g. <code>wp-uploads/2024/01/photo.jpg</code>) per file — never
-              a provider URL like <code>https://s3.amazonaws.com/…</code>.
-              CDN delivery URLs are assembled at render time from your current
-              settings. That means switching providers, changing your CDN domain,
-              or toggling local vs remote serving is always a settings-page
-              change — no database find-and-replace required.
-            </p>
-            <p>
-              This contrasts with WP Offload Media, which writes the full S3 URL
-              into <code>_wp_attached_file</code> on every offload, permanently
-              coupling your database to that specific provider and URL.
-            </p>
-          </div>
-
-          <div class="faq-item">
             <h3>Which storage providers does Nimbus support?</h3>
             <p>
-              Any provider with an S3-compatible API: Amazon S3, Cloudflare R2,
-              Backblaze B2, MinIO, Wasabi, Vultr Object Storage, and more.
-              Cloudflare R2 has a dedicated provider profile — just enter your
-              Account ID and Nimbus configures the endpoint, region, and
-              path-style settings automatically. If it speaks S3, Nimbus works
-              with it.
+              Nimbus ships with nine dedicated provider profiles: Amazon S3,
+              Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces,
+              Backblaze B2, Wasabi, MinIO, a generic S3-compatible option for
+              any other S3-speaking provider, and a local disk option for
+              development. Cloudflare R2 and Google Cloud Storage have
+              especially streamlined setup — just enter your Account ID or HMAC
+              key and everything else is pre-filled.
             </p>
           </div>
         </div>
@@ -585,6 +742,17 @@ import Base from "../layouts/Base.astro";
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9375rem;
+  }
+
+  .compare-category-row td {
+    background: var(--nmb-bg-subtle, #f8f9fb);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--nmb-text-subtle);
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--nmb-border);
   }
 
   .compare-table thead {

@@ -5,9 +5,8 @@
 > - Token tier keys are `personal`, `pro`, `agency`. Rename to match final marketing names before launch. Free tier token uses `free` (or equivalent) — issued during onboarding when the site registers with our server.
 > - **Free requires a license key** obtained by registering during onboarding (site connects to our licensing server). This is different from a no-key anonymous install. `isActive()` returns `true` for free users; feature flags are just absent from the token.
 > - Multisite: works per-site (each sub-site has independent settings + license via `get_option`/`home_url()`). No network-admin panel exists yet — each sub-site must be configured individually. Do not market as "full multisite support" without a network admin screen.
-> - **URL rewriting is hook-based at runtime — no DB modification of post_content.** `_wp_attached_file` and `_wp_attachment_metadata['file']` are never overwritten. After offload, a `nimbus` sub-key is added to `_wp_attachment_metadata` storing only the storage key (bucket path, not a URL). Six WordPress filters resolve the CDN URL dynamically on every request. `post_content` is never touched — the `the_content` filter rewrites local upload URLs to CDN URLs on the fly at render time.
-> - **Contrast with legacy plugin (`ovh-wp-stack`):** The legacy used a two-stage approach — runtime hooks for attachment metadata _plus_ a CLI `rewrite` command that did a DB-level search-replace of `post_content` (local URL → actual CDN URL). That pre-baked the CDN URL into the DB, making it provider-dependent. Nimbus is cleaner: `the_content` handles it at render time, so `post_content` always stores local paths and is never provider-coupled.
-> - **Contrast with WP Offload Media:** That plugin modifies `_wp_attached_file` to the full S3 URL, making the DB provider-dependent. Nimbus never touches it.
+> - **DB writes after offload:** After a successful offload, Nimbus updates four things in the DB: (1) `_nimbus` postmeta — the storage key + per-size keys map; (2) `_wp_attached_file` — updated to the relative storage key (e.g. `2024/01/image.jpg`); (3) `_wp_attachment_metadata['file']` — also updated to the relative storage key; (4) `post_content` / `post_excerpt` in posts — local upload URL is search-replaced with the CDN URL. All four writes are **reversed** on restore via `revert_attachment_url_in_db()`. Never claim "no DB modification" — the plugin absolutely modifies the database.
+> - **Provider-portable vs WP Offload Media:** The critical difference is _what_ is stored. Nimbus stores the relative storage key (`2024/01/image.jpg`), not a full provider URL. WP Offload Media stores the full S3/CDN URL (`https://bucket.s3.amazonaws.com/2024/01/image.jpg`). This means Nimbus DB content is provider-agnostic — switching CDN domain or provider requires only a settings change, no DB find-replace. WP Offload Media requires a full DB migration on every provider switch. Lead with "reversible, provider-portable writes" not "non-destructive" or "no DB modification."
 
 ---
 
@@ -30,8 +29,8 @@ WP Offload Media (Delicious Brains / WP Engine) is the market leader with 30,000
 **1. Cloudflare R2 is a first-class citizen**
 WP Offload Media treats R2 as a generic S3-compatible endpoint — you need to manually figure out the right endpoint URL and settings. Nimbus has a dedicated R2 provider profile: just enter your Account ID, everything else (region `auto`, path-style, endpoint) is handled automatically. For most new users in 2024+ R2 is the obvious choice (zero egress fees), and Nimbus is the path of least resistance for it.
 
-**2. Hook-based URL rewriting — non-destructive by design**
-WP Offload Media modifies `_wp_attached_file` to store the full S3/CDN URL, permanently coupling your DB to a specific provider. To switch providers or revert you must run a full DB replacement. Nimbus never modifies `_wp_attached_file` or `post_content`. The original local path is always preserved. After offload, only a `nimbus.key` sub-key (bucket path) is added to attachment metadata. All six delivery filters resolve the CDN URL dynamically at render time — switching providers requires only a settings change, no DB migration.
+**2. Reversible, provider-portable DB rewrites**
+WP Offload Media stores the full provider URL (e.g. `https://bucket.s3.amazonaws.com/2024/01/img.jpg`) in `_wp_attached_file`, permanently coupling your DB to a specific provider. Switching providers or CDN domains requires a full DB find-replace migration. Nimbus stores only the relative storage key (e.g. `2024/01/img.jpg`) — the CDN URL is reconstructed at render time from current settings. After offload, Nimbus writes four things to the DB (`_nimbus` postmeta, `_wp_attached_file`, `_wp_attachment_metadata[file]`, and replaces local URLs in `post_content`). Every write is fully reversed on restore — switch providers or revert to local with a settings change, no DB migration required.
 
 **3. Cache purge automation is built-in**
 WP Offload Media offers no cache purge integration — you get stale CDN responses after offloads and bulk migrations and have to purge manually or write your own code. Nimbus includes automated purge for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and any Nginx/proxy via configurable PURGE templates — triggered automatically after every offload, rewrite, or bulk migration.
@@ -67,7 +66,7 @@ Clean hook-based extension bus (`nimbus/extensions/register`), a published event
 | **Cloud storage providers** (S3, R2, S3-compatible)                                            |  ✅  |    ✅    | ✅  |   ✅   |
 | **Auto-offload on upload**                                                                     |  ✅  |    ✅    | ✅  |   ✅   |
 | **All image-size variants offloaded**                                                          |  ✅  |    ✅    | ✅  |   ✅   |
-| **Hook-based URL rewriting** (zero database changes)                                           |  ✅  |    ✅    | ✅  |   ✅   |
+| **Reversible DB rewrites** (relative storage key — not a full URL; fully reversed on restore)  |  ✅  |    ✅    | ✅  |   ✅   |
 | **Custom CDN / delivery domain**                                                               |  ✅  |    ✅    | ✅  |   ✅   |
 | **Remote file deletion**                                                                       |  ✅  |    ✅    | ✅  |   ✅   |
 | **Local copy removal after offload**                                                           |  ✅  |    ✅    | ✅  |   ✅   |
@@ -110,7 +109,8 @@ A free license is issued during onboarding — the site registers with Nimbus's 
 
 ### URL delivery
 
-- All media URLs rewritten at render time via WordPress hooks — **original file paths never written to the database**
+- After a successful offload, Nimbus updates `_wp_attached_file`, `_wp_attachment_metadata['file']`, and `post_content` URLs to the CDN URL. The storage key stored is a relative path (e.g. `2024/01/image.jpg`), not a provider-specific URL — so switching CDN domains or providers requires only a settings change.
+- All DB writes are reversed on restore via the built-in restore flow
 - Custom CDN / delivery domain (e.g. `cdn.yourdomain.com`)
 - `serve_from_storage` toggle — flip a switch to serve from local or remote without changing any data
 - Path-style URL format option (required for R2 and most S3-compatible providers)

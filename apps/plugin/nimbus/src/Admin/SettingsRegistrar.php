@@ -15,8 +15,11 @@ final class SettingsRegistrar
     'settings' => [
       'nimbus_connection',
       'nimbus_delivery',
+      'nimbus_off_hours',
+    ],
+    'advanced' => [
       'nimbus_path_filters',
-      'nimbus_off_hours'
+      'nimbus_cache_purging',
     ],
     'logs' => [
       'nimbus_logging'
@@ -70,14 +73,14 @@ final class SettingsRegistrar
 
     add_settings_field(
       'nimbus_r2_account_id',
-      __('R2 Account ID', NIMBUS_TEXT_DOMAIN),
+      __('Account ID', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderTextField'],
       self::SETTINGS_PAGE,
       'nimbus_connection',
       [
         'key' => 'r2_account_id',
         'placeholder' => '2648c6dbb6901794166cdf02b48b8aa2',
-        'description' => __('For Cloudflare R2, enter the account ID used to build the endpoint. Optional if Custom Endpoint is provided.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Used by some providers to build the storage endpoint (e.g. Cloudflare R2). Optional if a Custom Endpoint is provided directly.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -91,7 +94,7 @@ final class SettingsRegistrar
         'key' => 'region',
         'required' => true,
         'placeholder' => 'ap-south-1 / auto',
-        'description' => __('Use your AWS region for S3. For Cloudflare R2 use "auto".', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Region for your storage bucket.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -104,7 +107,7 @@ final class SettingsRegistrar
       [
         'key' => 'access_key',
         'required' => true,
-        'description' => __('For R2, use the Access Key ID from your Cloudflare R2 API token.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Access Key ID for your storage provider.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -117,7 +120,7 @@ final class SettingsRegistrar
       [
         'key' => 'secret_key',
         'required' => true,
-        'description' => __('For R2, use the Secret Access Key from your Cloudflare R2 API token.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Secret Access Key for your storage provider.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -129,7 +132,7 @@ final class SettingsRegistrar
       'nimbus_connection',
       [
         'key' => 'session_token',
-        'description' => __('Use only for temporary/session S3 credentials. Leave empty for Cloudflare R2 API keys.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Optional temporary session token. Leave empty for permanent access keys.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -151,7 +154,7 @@ final class SettingsRegistrar
       [
         'key' => 'endpoint',
         'placeholder' => 'https://<account_id>.r2.cloudflarestorage.com',
-        'description' => __('Optional endpoint for S3-compatible storage. For R2 use the account endpoint (without bucket path).', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Custom endpoint URL for your storage provider.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
@@ -200,12 +203,21 @@ final class SettingsRegistrar
       ['key' => 'remove_local_copies', 'label' => __('Delete local files after successful offload (use caution).', NIMBUS_TEXT_DOMAIN)]
     );
 
+    add_settings_section(
+      'nimbus_cache_purging',
+      __('Cache Purging', NIMBUS_TEXT_DOMAIN),
+      static function () {
+        echo '<p>' . esc_html__('Automatically purge CDN and server-side page caches when media is offloaded or URLs are rewritten. Configure the integrations that apply to your stack.', NIMBUS_TEXT_DOMAIN) . '</p>';
+      },
+      self::SETTINGS_PAGE
+    );
+
     add_settings_field(
       'nimbus_purge_cloudflare_cache',
       __('Enable Cloudflare Cache Purging', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderToggle'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       ['key' => 'purge_cloudflare_cache_on_delete', 'label' => __('Allow the built-in Cloudflare integration to purge exact URLs on remote deletes and perform a full purge after rewrite completion events.', NIMBUS_TEXT_DOMAIN)]
     );
 
@@ -214,7 +226,7 @@ final class SettingsRegistrar
       __('Cloudflare Zone ID', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderTextField'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       [
         'key' => 'cloudflare_zone_id',
         'placeholder' => 'your_zone_id',
@@ -227,7 +239,7 @@ final class SettingsRegistrar
       __('Cloudflare API Token', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderPasswordField'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       [
         'key' => 'cloudflare_api_token',
         'description' => __('Required only for Cloudflare purge. Token must include Zone:Cache Purge permission.', NIMBUS_TEXT_DOMAIN),
@@ -239,7 +251,7 @@ final class SettingsRegistrar
       __('Enable LiteSpeed Cache Purging', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderToggle'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       ['key' => 'purge_litespeed_cache', 'label' => __('Trigger LiteSpeed Cache purges when rewrite or remote-delete events request them.', NIMBUS_TEXT_DOMAIN)]
     );
 
@@ -248,7 +260,7 @@ final class SettingsRegistrar
       __('Enable WP Fastest Cache Purging', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderToggle'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       ['key' => 'purge_wp_fastest_cache', 'label' => __('Trigger WP Fastest Cache purges when full rewrite purges are requested.', NIMBUS_TEXT_DOMAIN)]
     );
 
@@ -257,7 +269,7 @@ final class SettingsRegistrar
       __('Enable Proxy / Nginx Cache Purging', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderToggle'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       ['key' => 'purge_proxy_cache', 'label' => __('Use custom PURGE/GET/POST endpoints for Nginx or reverse-proxy cache invalidation.', NIMBUS_TEXT_DOMAIN)]
     );
 
@@ -266,7 +278,7 @@ final class SettingsRegistrar
       __('Proxy Purge Method', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderSelectField'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       [
         'key' => 'proxy_cache_purge_method',
         'options' => [
@@ -283,7 +295,7 @@ final class SettingsRegistrar
       __('Proxy Purge URL Templates', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderTextareaField'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       [
         'key' => 'proxy_cache_purge_urls',
         'rows' => 4,
@@ -297,7 +309,7 @@ final class SettingsRegistrar
       __('Proxy Full Purge Endpoints', NIMBUS_TEXT_DOMAIN),
       [$this->fieldRenderer, 'renderTextareaField'],
       self::SETTINGS_PAGE,
-      'nimbus_delivery',
+      'nimbus_cache_purging',
       [
         'key' => 'proxy_cache_purge_all_urls',
         'rows' => 3,
@@ -318,28 +330,24 @@ final class SettingsRegistrar
     add_settings_field(
       'nimbus_allowed_paths',
       __('Allowed Paths', NIMBUS_TEXT_DOMAIN),
-      [$this->fieldRenderer, 'renderTextareaField'],
+      [$this->fieldRenderer, 'renderPathPillField'],
       self::SETTINGS_PAGE,
       'nimbus_path_filters',
       [
         'key' => 'allowed_path_patterns',
-        'rows' => 4,
-        'placeholder' => "{year}/**\nsites/*/{year}/**",
-        'description' => __('Optional allow-list. One pattern per line. Leave empty to allow all uploads paths. Example: {year}/** will only offload standard year folders.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Optional allow-list. Leave empty to allow all uploads paths. Example: {year}/** offloads only standard year folders.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 
     add_settings_field(
       'nimbus_ignored_paths',
       __('Ignored Paths', NIMBUS_TEXT_DOMAIN),
-      [$this->fieldRenderer, 'renderTextareaField'],
+      [$this->fieldRenderer, 'renderPathPillField'],
       self::SETTINGS_PAGE,
       'nimbus_path_filters',
       [
         'key' => 'ignored_path_patterns',
-        'rows' => 4,
-        'placeholder' => "cache/**\nsmush/**",
-        'description' => __('Optional ignore list. Matching files are always kept out of sync/offload even if they match Allowed Paths.', NIMBUS_TEXT_DOMAIN),
+        'description' => __('Optional ignore list. Matching files are always kept out of offload even if they match Allowed Paths.', NIMBUS_TEXT_DOMAIN),
       ]
     );
 

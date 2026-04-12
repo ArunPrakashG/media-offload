@@ -2,11 +2,10 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Bootstrap\DataMigration;
-use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\License\LicenseManager;
-use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Stats\Statistics;
 use Nimbus\Plugin\Support\Logger;
 
@@ -32,7 +31,6 @@ final class PageRenderer
     private SettingsRegistrar $settingsRegistrar,
     private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
-    private IntegrationDiscovery $integrationDiscovery,
   ) {
   }
 
@@ -45,8 +43,6 @@ final class PageRenderer
     if (isset($_GET['nimbus_logs_cleared']) && $_GET['nimbus_logs_cleared'] === '1') {
       echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Plugin logs cleared.', NIMBUS_TEXT_DOMAIN) . '</p></div>';
     }
-
-    settings_errors(NIMBUS_SETTINGS_GROUP);
 
     $onboarding = $this->onboardingManager->state();
     if (empty($onboarding['completed'])) {
@@ -70,6 +66,7 @@ final class PageRenderer
       <nav class="nav-tab-wrapper nmb-shell-tabs" aria-label="<?php esc_attr_e('Nimbus navigation', NIMBUS_TEXT_DOMAIN); ?>">
         <a href="<?php echo esc_url($this->adminTabUrl('overview')); ?>" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Overview', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('settings')); ?>" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Settings', NIMBUS_TEXT_DOMAIN); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('advanced')); ?>" class="nav-tab <?php echo $activeTab === 'advanced' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Advanced', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>" class="nav-tab <?php echo $activeTab === 'integrations' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Integrations', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Tools', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('logs')); ?>" class="nav-tab <?php echo $activeTab === 'logs' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Logs', NIMBUS_TEXT_DOMAIN); ?></a>
@@ -84,6 +81,8 @@ final class PageRenderer
         <?php $this->renderOverviewTab(); ?>
       <?php elseif ($activeTab === 'settings') : ?>
         <?php $this->renderSettingsTab(); ?>
+      <?php elseif ($activeTab === 'advanced') : ?>
+        <?php $this->renderAdvancedTab(); ?>
       <?php elseif ($activeTab === 'integrations') : ?>
         <?php $this->renderIntegrationsTab(); ?>
       <?php elseif ($activeTab === 'tools') : ?>
@@ -101,14 +100,14 @@ final class PageRenderer
 
   private function resolveActiveTab(): string
   {
-    if (!$this->onboardingManager->isCompleted()) {
+    if (!(bool) ($this->onboardingManager->state()['completed'] ?? true)) {
       return 'onboarding';
     }
 
     $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : 'overview';
     $tab = self::TAB_ALIASES[$tab] ?? $tab;
 
-    if (!in_array($tab, ['overview', 'settings', 'integrations', 'tools', 'logs', 'license'], true)) {
+    if (!in_array($tab, ['overview', 'settings', 'advanced', 'integrations', 'tools', 'logs', 'license'], true)) {
       return 'overview';
     }
 
@@ -221,12 +220,22 @@ final class PageRenderer
             $savedProvider  = (string) ($settings['provider'] ?? 's3');
             $isLocalDefault = $savedProvider === 'local';
             $isR2Default    = $savedProvider === 'r2';
-            $isS3CDefault   = $savedProvider === 's3_compatible';
+            $isS3CDefault   = in_array($savedProvider, ['s3_compatible', 'minio'], true);
           ?>
           <div class="nmb-onboarding-step-header">
             <p class="nmb-eyebrow"><?php esc_html_e('Step 2', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Connect your storage provider', NIMBUS_TEXT_DOMAIN); ?></h2>
             <p><?php esc_html_e('Select a provider and only the fields you need will appear.', NIMBUS_TEXT_DOMAIN); ?></p>
+          </div>
+
+          <!-- JSON import shortcut -->
+          <div class="nmb-config-import-bar">
+            <label for="nmb-onboarding-config-file" class="nmb-config-import-label">
+              <span class="dashicons dashicons-upload"></span>
+              <?php esc_html_e('Already have a config file?', NIMBUS_TEXT_DOMAIN); ?>
+            </label>
+            <input type="file" id="nmb-onboarding-config-file" accept=".json,application/json" class="nmb-config-import-input" data-config-import />
+            <span class="nmb-config-import-hint nmb-muted"><?php esc_html_e('Select a Nimbus .json export to pre-fill all fields below instantly.', NIMBUS_TEXT_DOMAIN); ?></span>
           </div>
 
           <!-- Provider selector — always visible -->
@@ -443,7 +452,7 @@ final class PageRenderer
     $stats = $this->statistics->get_stats();
     $deepStats = $this->statistics->get_deep_stats();
     $pending = $this->countPendingUrlUpdates();
-    $integrationSummary = $this->integrationDiscovery->summary();
+    $integrationSummary = $this->integrationSummary();
     $onboarding = $this->onboardingManager->state();
     $migration = DataMigration::status();
     ?>
@@ -525,8 +534,6 @@ final class PageRenderer
     $providerKey = (string) ($settings['provider'] ?? 's3');
     $providerLabel = $this->settings->provider_profile($providerKey)->label();
     $isLocalProvider = $providerKey === 'local';
-    $allowedPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['allowed_path_patterns'] ?? '')) ?: []));
-    $ignoredPatterns = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) ($settings['ignored_path_patterns'] ?? '')) ?: []));
     $deliveryLabel = $isLocalProvider
       ? __('Local debug', NIMBUS_TEXT_DOMAIN)
       : (!empty($settings['serve_from_storage']) ? __('Remote', NIMBUS_TEXT_DOMAIN) : __('Local', NIMBUS_TEXT_DOMAIN));
@@ -549,13 +556,6 @@ final class PageRenderer
           'value_id' => 'nmb-settings-delivery-label',
           'substat' => !empty($settings['custom_domain']) ? (string) $settings['custom_domain'] : __('No custom domain configured', NIMBUS_TEXT_DOMAIN),
           'substat_id' => 'nmb-settings-delivery-substat',
-        ],
-        [
-          'label' => __('Path rules', NIMBUS_TEXT_DOMAIN),
-          'value' => number_format(count($allowedPatterns) + count($ignoredPatterns)),
-          'value_id' => 'nmb-settings-rules-count',
-          'substat' => sprintf(__('Allowed: %1$d · Ignored: %2$d', NIMBUS_TEXT_DOMAIN), count($allowedPatterns), count($ignoredPatterns)),
-          'substat_id' => 'nmb-settings-rules-substat',
         ],
         [
           'label' => __('Off-hours batch', NIMBUS_TEXT_DOMAIN),
@@ -582,10 +582,10 @@ final class PageRenderer
             <section id="settings-automation" class="nmb-settings-cluster">
               <div class="nmb-settings-cluster-header">
                 <p class="nmb-eyebrow"><?php esc_html_e('Automation', NIMBUS_TEXT_DOMAIN); ?></p>
-                <h2><?php esc_html_e('Rules and scheduling', NIMBUS_TEXT_DOMAIN); ?></h2>
-                <p><?php esc_html_e('Control which paths are eligible for offload and when background batching should run.', NIMBUS_TEXT_DOMAIN); ?></p>
+                <h2><?php esc_html_e('Scheduling', NIMBUS_TEXT_DOMAIN); ?></h2>
+                <p><?php esc_html_e('Configure the off-hours batch window for background offloading. Path filters and cache purging can be found on the Advanced tab.', NIMBUS_TEXT_DOMAIN); ?></p>
               </div>
-              <?php $this->settingsRegistrar->renderSections(['nimbus_path_filters', 'nimbus_off_hours']); ?>
+              <?php $this->settingsRegistrar->renderSections(['nimbus_off_hours']); ?>
             </section>
 
             <div class="nmb-settings-submit">
@@ -615,6 +615,41 @@ final class PageRenderer
     <?php
   }
 
+  private function renderAdvancedTab(): void
+  {
+    ?>
+    <div class="nmb-settings-shell">
+      <form method="post" action="options.php" autocomplete="off" class="nmb-settings-form">
+        <?php settings_fields(NIMBUS_SETTINGS_GROUP); ?>
+
+        <div class="nmb-settings-main">
+          <section id="advanced-path-filters" class="nmb-settings-cluster">
+            <div class="nmb-settings-cluster-header">
+              <p class="nmb-eyebrow"><?php esc_html_e('Offload rules', NIMBUS_TEXT_DOMAIN); ?></p>
+              <h2><?php esc_html_e('Path filters', NIMBUS_TEXT_DOMAIN); ?></h2>
+              <p><?php esc_html_e('Limit which uploads paths are eligible for offload using allow and ignore pattern lists.', NIMBUS_TEXT_DOMAIN); ?></p>
+            </div>
+            <?php $this->settingsRegistrar->renderSections(['nimbus_path_filters']); ?>
+          </section>
+
+          <section id="advanced-cache-purging" class="nmb-settings-cluster">
+            <div class="nmb-settings-cluster-header">
+              <p class="nmb-eyebrow"><?php esc_html_e('Delivery', NIMBUS_TEXT_DOMAIN); ?></p>
+              <h2><?php esc_html_e('Cache purging', NIMBUS_TEXT_DOMAIN); ?></h2>
+              <p><?php esc_html_e('Automatically invalidate CDN and server-side page caches when media is offloaded or URLs are rewritten.', NIMBUS_TEXT_DOMAIN); ?></p>
+            </div>
+            <?php $this->settingsRegistrar->renderSections(['nimbus_cache_purging']); ?>
+          </section>
+
+          <div class="nmb-settings-submit">
+            <?php submit_button(__('Save Advanced Settings', NIMBUS_TEXT_DOMAIN)); ?>
+          </div>
+        </div>
+      </form>
+    </div>
+    <?php
+  }
+
   private function renderToolsTab(): void
   {
     $migration = DataMigration::status();
@@ -633,6 +668,7 @@ final class PageRenderer
       <?php endif; ?>
       <?php $this->renderAttachmentInspector(); ?>
       <?php $this->renderUrlUpdatesPanel(); ?>
+      <?php $this->renderConfigPortPanel(); ?>
     </div>
     <?php
   }
@@ -770,7 +806,7 @@ final class PageRenderer
 
   private function renderIntegrationsTab(): void
   {
-    $summary = $this->integrationDiscovery->summary();
+    $summary = $this->integrationSummary();
     $items = $summary['items'] ?? [];
     ?>
     <div class="nmb-settings-shell">
@@ -1075,6 +1111,83 @@ final class PageRenderer
           </form>
         <?php endif; ?>
       </div>
+
+      <?php $this->renderProStatusCard(); ?>
+    </div>
+    <?php
+  }
+
+  private function renderProStatusCard(): void
+  {
+    /**
+     * Populated by the Nimbus Pro add-on (or any other registered extension)
+     * via the NIMBUS_FILTER_PRO_STATUS filter. Returns [] when no pro plugin is
+     * active, so the free plugin never has to import or class_exists-check it.
+     *
+     * Shape: [ 'loaded' => bool, 'version' => string, 'features' => string[] ]
+     */
+    $proStatus = (array) apply_filters(NIMBUS_FILTER_PRO_STATUS, []);
+    $proLoaded = !empty($proStatus['loaded']);
+    $proVersion = (string) ($proStatus['version'] ?? '');
+    $proFeatures = is_array($proStatus['features'] ?? null) ? $proStatus['features'] : [];
+
+    $featureLabels = [
+      'bulk_migration'   => __('Bulk migration', NIMBUS_TEXT_DOMAIN),
+      'cache_purge'      => __('Cache purge', NIMBUS_TEXT_DOMAIN),
+      'nightly_batch'    => __('Nightly batch offload', NIMBUS_TEXT_DOMAIN),
+      'wpcli'            => __('WP-CLI commands', NIMBUS_TEXT_DOMAIN),
+      'selective_offload' => __('Selective offload rules', NIMBUS_TEXT_DOMAIN),
+    ];
+    ?>
+    <div class="nmb-card">
+      <h3><?php esc_html_e('Pro add-on', NIMBUS_TEXT_DOMAIN); ?></h3>
+
+      <?php if ($proLoaded) : ?>
+        <dl style="margin:0 0 16px;">
+          <div class="nmb-license-status-row">
+            <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
+            <dd class="mo-license-status-active">
+              <?php
+              echo esc_html(
+                $proVersion !== ''
+                  ? sprintf(
+                      /* translators: %s: version number */
+                      __('Detected — v%s', NIMBUS_TEXT_DOMAIN),
+                      $proVersion
+                    )
+                  : __('Detected', NIMBUS_TEXT_DOMAIN)
+              );
+              ?>
+            </dd>
+          </div>
+        </dl>
+
+        <?php if (!empty($proFeatures)) : ?>
+          <p class="nmb-muted" style="margin:0 0 8px;"><?php esc_html_e('Active features:', NIMBUS_TEXT_DOMAIN); ?></p>
+          <ul class="nmb-status-list">
+            <?php foreach ($proFeatures as $featureSlug) : ?>
+              <li>
+                <span class="dashicons dashicons-yes-alt status-ok"></span>
+                <span><?php echo esc_html($featureLabels[$featureSlug] ?? ucwords(str_replace('_', ' ', $featureSlug))); ?></span>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        <?php else : ?>
+          <p class="nmb-muted"><?php esc_html_e('No licensed features are active for the current plan.', NIMBUS_TEXT_DOMAIN); ?></p>
+        <?php endif; ?>
+
+      <?php else : ?>
+        <dl style="margin:0 0 16px;">
+          <div class="nmb-license-status-row">
+            <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
+            <dd class="mo-license-status-inactive"><?php esc_html_e('Not installed', NIMBUS_TEXT_DOMAIN); ?></dd>
+          </div>
+        </dl>
+        <p class="nmb-muted"><?php esc_html_e('Install and activate the Nimbus Pro plugin to unlock bulk migration, cache purge, WP-CLI commands, and more.', NIMBUS_TEXT_DOMAIN); ?></p>
+        <a href="https://usenimbus.dev/#pricing" target="_blank" rel="noopener noreferrer" class="button button-secondary">
+          <?php esc_html_e('Upgrade to Pro', NIMBUS_TEXT_DOMAIN); ?>
+        </a>
+      <?php endif; ?>
     </div>
     <?php
   }
@@ -1087,10 +1200,23 @@ final class PageRenderer
     $remoteStats = $deepStats['remote'] ?? $this->statistics->get_remote_stats();
     $mimeBreakdown = $deepStats['mime_breakdown'] ?? [];
     $monthlyBreakdown = $deepStats['monthly_breakdown'] ?? [];
+    $costComparison = $deepStats['cost_comparison'] ?? [];
 
     $storageSize = isset($remoteStats['size_bytes']) ? $remoteStats['size_bytes'] : $usage['offloaded_size'];
-    $storageCost = isset($remoteStats['estimated_cost']) ? $remoteStats['estimated_cost'] : ($storageSize / 1073741824 * 0.023);
     $storageCount = isset($remoteStats['object_count']) ? $remoteStats['object_count'] : $stats['offloaded'];
+
+    // Derive estimated monthly cost for the currently configured provider
+    $currentProvider = $this->settings->provider();
+    $currentScenario = null;
+    foreach ($costComparison['scenarios'] ?? [] as $scenario) {
+      if (($scenario['provider_key'] ?? '') === $currentProvider) {
+        $currentScenario = $scenario;
+        break;
+      }
+    }
+    $storageCost = $currentScenario !== null && $currentScenario['estimated_monthly_total'] !== null
+      ? $currentScenario['estimated_monthly_total']
+      : ($storageSize / 1073741824 * 0.023);
     ?>
     <div class="nmb-dashboard">
       <!-- Unified stats bar — all 4 cells are identical height -->
@@ -1112,9 +1238,12 @@ final class PageRenderer
           <span class="nmb-stat-cell__sub"><?php echo esc_html(sprintf(__('%d remote objects tracked', NIMBUS_TEXT_DOMAIN), (int) $storageCount)); ?></span>
         </div>
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Est. storage cost', NIMBUS_TEXT_DOMAIN); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Est. monthly cost', NIMBUS_TEXT_DOMAIN); ?></span>
           <span class="nmb-stat-cell__value">$<?php echo number_format($storageCost, 2); ?></span>
-          <span class="nmb-stat-cell__sub"><?php esc_html_e('Rough monthly estimate', NIMBUS_TEXT_DOMAIN); ?></span>
+          <span class="nmb-stat-cell__sub"><?php
+            $providerLabel = ($currentScenario ?? [])['label'] ?? strtoupper($currentProvider);
+            echo esc_html(sprintf(__('%s estimate', NIMBUS_TEXT_DOMAIN), $providerLabel));
+          ?></span>
         </div>
       </div>
 
@@ -1207,6 +1336,116 @@ final class PageRenderer
           <?php endif; ?>
         </div>
       </div>
+
+      <?php if (!empty($costComparison['scenarios'])) : ?>
+      <div class="nmb-card nmb-card--full">
+        <div class="nmb-cost-card-header">
+          <div>
+            <h3><?php esc_html_e('Provider Cost Comparison', NIMBUS_TEXT_DOMAIN); ?></h3>
+            <p class="nmb-muted" style="margin:4px 0 0;"><?php echo esc_html(sprintf(
+              /* translators: 1: GB stored, 2: number of files, 3: GB egress estimate */
+              __('Based on %.1f GB stored · %s files · est. %.1f GB monthly egress', NIMBUS_TEXT_DOMAIN),
+              (float) ($costComparison['storage_gb'] ?? 0),
+              number_format((int) ($costComparison['offloaded_count'] ?? 0)),
+              (float) ($costComparison['egress_gb_est'] ?? 0)
+            )); ?></p>
+          </div>
+          <?php if ($currentScenario !== null && $currentScenario['estimated_monthly_total'] !== null) :
+            // Find the cheapest non-null, non-minio scenario to surface a savings callout
+            $cheapestTotal = null;
+            $cheapestLabel = '';
+            foreach ($costComparison['scenarios'] as $sc) {
+              if ($sc['estimated_monthly_total'] === null || $sc['provider_key'] === 'minio') {
+                continue;
+              }
+              if ($cheapestTotal === null || $sc['estimated_monthly_total'] < $cheapestTotal) {
+                $cheapestTotal = $sc['estimated_monthly_total'];
+                $cheapestLabel = $sc['label'];
+              }
+            }
+            $savings = $currentScenario['estimated_monthly_total'] - ($cheapestTotal ?? $currentScenario['estimated_monthly_total']);
+            if ($savings > 0.50 && ($cheapestTotal !== null && $cheapestLabel !== ($currentScenario['label'] ?? ''))) : ?>
+            <div class="nmb-cost-savings-badge">
+              <span class="dashicons dashicons-money-alt"></span>
+              <?php echo esc_html(sprintf(
+                /* translators: 1: monthly savings, 2: cheapest provider name */
+                __('Save ~$%s/mo with %s', NIMBUS_TEXT_DOMAIN),
+                number_format($savings, 2),
+                $cheapestLabel
+              )); ?>
+            </div>
+          <?php endif; ?>
+          <?php endif; ?>
+        </div>
+
+        <div class="nmb-cost-table-wrap">
+          <table class="nmb-cost-table">
+            <thead>
+              <tr>
+                <th><?php esc_html_e('Provider', NIMBUS_TEXT_DOMAIN); ?></th>
+                <th class="nmb-cost-table__num"><?php esc_html_e('Storage', NIMBUS_TEXT_DOMAIN); ?></th>
+                <th class="nmb-cost-table__num"><?php esc_html_e('Egress', NIMBUS_TEXT_DOMAIN); ?></th>
+                <th class="nmb-cost-table__num"><?php esc_html_e('Requests', NIMBUS_TEXT_DOMAIN); ?></th>
+                <th class="nmb-cost-table__num"><?php esc_html_e('Base Fee', NIMBUS_TEXT_DOMAIN); ?></th>
+                <th class="nmb-cost-table__num"><?php esc_html_e('Est. Monthly', NIMBUS_TEXT_DOMAIN); ?></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($costComparison['scenarios'] as $scenario) :
+                $isCurrent = ($scenario['provider_key'] ?? '') === $currentProvider;
+                $rowClass  = $isCurrent ? 'nmb-cost-table__row--current' : '';
+              ?>
+                <tr class="<?php echo esc_attr($rowClass); ?>">
+                  <td class="nmb-cost-table__provider">
+                    <?php if (!empty($scenario['pricing_url'])) : ?>
+                      <a href="<?php echo esc_url($scenario['pricing_url']); ?>" target="_blank" rel="noopener noreferrer">
+                        <?php echo esc_html($scenario['label']); ?>
+                      </a>
+                    <?php else : ?>
+                      <?php echo esc_html($scenario['label']); ?>
+                    <?php endif; ?>
+                    <?php if ($isCurrent) : ?>
+                      <span class="nmb-badge nmb-badge--active"><?php esc_html_e('active', NIMBUS_TEXT_DOMAIN); ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($scenario['notes'])) : ?>
+                      <span class="nmb-cost-table__note"><?php echo esc_html($scenario['notes']); ?></span>
+                    <?php endif; ?>
+                  </td>
+                  <?php if ($scenario['estimated_monthly_total'] === null) : ?>
+                    <td colspan="5" class="nmb-muted nmb-cost-table__num"><?php esc_html_e('Custom pricing — varies by vendor', NIMBUS_TEXT_DOMAIN); ?></td>
+                  <?php else : ?>
+                    <td class="nmb-cost-table__num">$<?php echo number_format((float) $scenario['storage_cost'], 2); ?></td>
+                    <td class="nmb-cost-table__num">
+                      <?php if ($scenario['egress_cost'] == 0.0) : ?>
+                        <span class="nmb-free"><?php esc_html_e('FREE', NIMBUS_TEXT_DOMAIN); ?></span>
+                      <?php else : ?>
+                        $<?php echo number_format((float) $scenario['egress_cost'], 2); ?>
+                      <?php endif; ?>
+                    </td>
+                    <td class="nmb-cost-table__num">
+                      <?php if ($scenario['request_cost'] == 0.0) : ?>
+                        <span class="nmb-free"><?php esc_html_e('FREE', NIMBUS_TEXT_DOMAIN); ?></span>
+                      <?php else : ?>
+                        $<?php echo number_format((float) $scenario['request_cost'], 2); ?>
+                      <?php endif; ?>
+                    </td>
+                    <td class="nmb-cost-table__num">
+                      <?php echo $scenario['flat_monthly'] > 0 ? '$' . number_format((float) $scenario['flat_monthly'], 2) : '—'; ?>
+                    </td>
+                    <td class="nmb-cost-table__num nmb-cost-table__total">
+                      <strong>$<?php echo number_format((float) $scenario['estimated_monthly_total'], 2); ?></strong>
+                    </td>
+                  <?php endif; ?>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+        <p class="nmb-muted nmb-cost-disclaimer">
+          <?php esc_html_e('Estimates assume 10 monthly GET requests/file and 1% monthly new uploads. Prices sourced from provider websites and may change — always verify directly with your provider.', NIMBUS_TEXT_DOMAIN); ?>
+        </p>
+      </div>
+      <?php endif; ?>
     </div>
     <?php
   }
@@ -1503,6 +1742,46 @@ final class PageRenderer
     <?php
   }
 
+  private function renderConfigPortPanel(): void
+  {
+    ?>
+    <section class="nmb-card" id="nmb-config-port-panel">
+      <h3><?php esc_html_e('Configuration backup', NIMBUS_TEXT_DOMAIN); ?></h3>
+      <p class="nmb-muted"><?php esc_html_e('Export your current settings as a portable JSON file, or import a previously exported file to restore them on another site. Credentials are included in the export — handle the file like a password.', NIMBUS_TEXT_DOMAIN); ?></p>
+
+      <div class="nmb-config-port-grid">
+
+        <!-- Export form -->
+        <div class="nmb-config-port-block">
+          <h4><?php esc_html_e('Export configuration', NIMBUS_TEXT_DOMAIN); ?></h4>
+          <p class="nmb-muted"><?php esc_html_e('Downloads a .json file with all current provider, bucket, and delivery settings.', NIMBUS_TEXT_DOMAIN); ?></p>
+          <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG); ?>" />
+            <button type="submit" class="button button-secondary"><?php esc_html_e('Download config.json', NIMBUS_TEXT_DOMAIN); ?></button>
+          </form>
+        </div>
+
+        <!-- Import form -->
+        <div class="nmb-config-port-block">
+          <h4><?php esc_html_e('Import configuration', NIMBUS_TEXT_DOMAIN); ?></h4>
+          <p class="nmb-muted"><?php esc_html_e('Upload a Nimbus JSON export to overwrite the current settings immediately. Existing settings will be replaced.', NIMBUS_TEXT_DOMAIN); ?></p>
+          <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
+            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG); ?>" />
+            <input type="hidden" name="redirect_tab" value="tools" />
+            <div class="nmb-config-port-file-row">
+              <input type="file" name="nimbus_config_file" accept=".json,application/json" required />
+              <button type="submit" class="button button-primary"><?php esc_html_e('Import', NIMBUS_TEXT_DOMAIN); ?></button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </section>
+    <?php
+  }
+
   private function renderLicenseOverlay(): void
   {
     $activateUrl = esc_url($this->adminTabUrl('license'));
@@ -1701,5 +1980,18 @@ final class PageRenderer
       'failed' => 'is-error',
       default => '',
     };
+  }
+
+  /**
+   * Returns the integration discovery summary. The pro plugin populates this
+   * via the nimbus/integrations/summary filter.
+   */
+  private function integrationSummary(): array
+  {
+    return (array) apply_filters('nimbus/integrations/summary', [
+      'detected' => 0,
+      'rewrite_ready' => 0,
+      'items' => [],
+    ]);
   }
 }

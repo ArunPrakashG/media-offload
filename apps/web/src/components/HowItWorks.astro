@@ -3,20 +3,20 @@ const steps = [
   {
     num:    '01',
     title:  'Install & activate',
-    desc:   'Install Nimbus from the WordPress plugin directory or upload a zip manually. Activate it — setup takes under a minute.',
-    detail: 'No code required. Works with any WordPress hosting.',
+    desc:   'Install Nimbus from the WordPress plugin directory or upload the zip manually. The setup wizard walks you through everything — under a minute, no code required.',
+    detail: 'Works with any WordPress host: shared hosting, VPS, WP Engine, Kinsta, and more.',
   },
   {
     num:    '02',
     title:  'Connect your bucket',
-    desc:   'Enter your storage provider credentials and bucket name. Nimbus tests the connection and verifies write permissions instantly.',
-    detail: 'Supports IAM roles, access keys, and R2 API tokens.',
+    desc:   'Choose a provider, paste in your API credentials, and pick a bucket. Nimbus verifies the connection with a live write test so you know it works before anything moves.',
+    detail: "Don't have a bucket yet? Nimbus can create one for you directly from WordPress.",
   },
   {
     num:    '03',
-    title:  'Offload your library',
-    desc:   'New uploads go straight to the cloud. For existing files, run the bulk migrator — it processes your library in background batches without timing out.',
-    detail: 'All media URLs rewrite automatically. Zero downtime.',
+    title:  'Free your server',
+    desc:   'From this point on, every new upload goes straight to cloud storage. For your existing library, the bulk migrator moves everything in background batches — no timeouts, no downtime.',
+    detail: 'Media URLs rewrite automatically. Visitors never notice a thing.',
   },
 ];
 ---
@@ -26,10 +26,10 @@ const steps = [
 
     <div class="hiw-header">
       <p class="section-label">How it works</p>
-      <h2 class="section-headline">Up and running in&nbsp;minutes.</h2>
+      <h2 class="section-headline">Your images don't belong on your server.</h2>
       <p class="section-sub">
-        Three steps from install to a fully offloaded media library. No server config,
-        no code changes, no downtime.
+        Media is the heaviest part of every page load — and your web server is the
+        worst possible place to store it. Nimbus moves it all to the cloud in three steps.
       </p>
     </div>
 

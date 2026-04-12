@@ -26,7 +26,18 @@ final class UploadHandler
     private StorageAdapterFactory $factory,
     private Logger $logger,
     private LicenseManager $licenseManager,
+    private AttachmentRepository $repo,
   ) {
+  }
+
+  /**
+   * Expose the underlying storage adapter (e.g. for admin tooling such as
+   * the Create Bucket REST endpoint). The adapter is constructed lazily by
+   * StorageAdapterFactory so this causes no overhead when not called.
+   */
+  public function getAdapter(): \Nimbus\Plugin\Storage\StorageAdapter
+  {
+    return $this->factory->getAdapter();
   }
 
   public function register(): void
@@ -38,6 +49,9 @@ final class UploadHandler
     add_action(NIMBUS_CLEANUP_HOOK, [$this, 'cleanup_local_files'], 20, 1);
     // Async single-attachment offload: fires as soon as WP-Cron runs after upload.
     add_action(NIMBUS_OFFLOAD_JOB_HOOK, [$this, 'run_offload_job'], 20, 1);
+    // Extend WordPress's filename uniqueness check to cover offloaded files
+    // whose local copy may have been removed (e.g. "Remove local copies" enabled).
+    add_filter('wp_unique_filename', [$this, 'ensure_unique_filename_for_offloaded'], 10, 6);
   }
 
   /**
@@ -60,7 +74,7 @@ final class UploadHandler
   public function sync_ignore_state(int $attachment_id, bool $ignored): void
   {
     if ($ignored) {
-      update_post_meta($attachment_id, NIMBUS_IGNORE_META_KEY, '1');
+      $this->repo->setIgnored($attachment_id);
       $this->clear_pending_state($attachment_id);
       $this->clear_missing_source_marker($attachment_id);
       $this->clear_cleanup_schedule($attachment_id);
@@ -68,7 +82,7 @@ final class UploadHandler
       return;
     }
 
-    delete_post_meta($attachment_id, NIMBUS_IGNORE_META_KEY);
+    $this->repo->clearIgnored($attachment_id);
 
     if (!$this->should_offload()) {
       $this->reconcile_nightly_batch_schedule();
@@ -183,10 +197,11 @@ final class UploadHandler
 
     $this->mark_pending_offload($attachment_id);
 
-    if ($this->nightlyBatchEnabled) {
-      // Nightly batch is active: the off-hours worker will offload this
-      // attachment (and rewrite its DB URL) at the scheduled time.
-      // Do not queue an immediate async job to avoid double-processing.
+    if ($this->nightlyBatchEnabled && $this->settings->should_process_off_hours_batch()) {
+      // Nightly batch is active and the off-hours setting is enabled: the
+      // off-hours worker will offload this attachment (and rewrite its DB URL)
+      // at the scheduled time. Do not queue an immediate async job to avoid
+      // double-processing.
       return $metadata;
     }
 
@@ -993,6 +1008,7 @@ final class UploadHandler
 
     $key = buildStorageKey($relativePath, (string) $this->settings->get('prefix', ''));
     $uploadedKey = $key;
+    $fileSizeBytes = file_exists($file) ? (int) filesize($file) : 0;
 
     if (file_exists($file)) {
       if (($existingOffloadMeta['key'] ?? '') !== $key) {
@@ -1008,17 +1024,137 @@ final class UploadHandler
       }
     }
 
-    $offloadMeta = ['key' => $uploadedKey, 'sizes' => []];
+    $offloadMeta = ['key' => $uploadedKey, 'sizes' => [], 'file_size_bytes' => $fileSizeBytes];
     if (!empty($metadata['sizes'])) {
       $offloadMeta['sizes'] = $this->offload_sizes($attachment_id, $file, $metadata, $adapter, $existingSizes);
     }
 
-    update_post_meta($attachment_id, NIMBUS_META_KEY, $offloadMeta);
+    $this->repo->setOffloadMeta($attachment_id, $offloadMeta);
     if ($this->settings->should_remove_local()) {
       $this->schedule_local_cleanup($attachment_id);
     }
 
     return $offloadMeta;
+  }
+
+  /**
+   * Extends WordPress's filename uniqueness check to cover offloaded
+   * attachments whose local copies may have been removed.
+   *
+   * WordPress's built-in wp_unique_filename() only checks the local
+   * filesystem. When "Remove local copies" is enabled, the local file is
+   * deleted after a successful offload. A subsequent upload of a file with
+   * the same name then bypasses the conflict check — WordPress assigns the
+   * same filename and the new upload physically overwrites the old local path.
+   *
+   * This filter fires after WordPress has ensured the proposed filename is
+   * unique on disk. We additionally query the postmeta table for any existing
+   * attachment whose _wp_attached_file matches the relative path the new file
+   * would receive. The check covers both the pre-rewrite state (plain
+   * relative path, e.g. "2026/04/123.jpeg") and the post-rewrite state
+   * (storage key with optional prefix, e.g. "my-prefix/2026/04/123.jpeg"),
+   * since rewrite_attachment_url_in_db overwrites _wp_attached_file with the
+   * full storage key.
+   *
+   * @param string       $filename      WordPress-proposed unique filename.
+   * @param string       $ext           File extension WITH leading dot (e.g. ".jpg").
+   * @param string       $dir           Absolute filesystem path to the upload directory.
+   * @param callable|null $callback     Unused; passed through from WordPress.
+   * @param string[]     $alt_filenames Unused; alternate filenames WordPress checked.
+   * @param int|string   $number        Counter WordPress appended ('' if none, int otherwise).
+   */
+  public function ensure_unique_filename_for_offloaded(
+    string $filename,
+    string $ext,
+    string $dir,
+    $callback,
+    array $alt_filenames,
+    $number
+  ): string {
+    // The DB lookup is only necessary when local copies are removed.
+    // If local files are kept, WordPress's own filesystem check in
+    // wp_unique_filename() is sufficient — no DB query needed.
+    if (!$this->should_offload() || !$this->settings->should_remove_local()) {
+      return $filename;
+    }
+
+    $uploads     = wp_upload_dir();
+    $relativeDir = ltrim(str_replace(trailingslashit($uploads['basedir']), '', trailingslashit($dir)), '/');
+
+    if (!$this->db_has_attachment_at_path($relativeDir . $filename)) {
+      return $filename;
+    }
+
+    // DB collision found. WordPress may have already appended "-N" to avoid a
+    // disk conflict (stored in $number). We use $number to strip only that exact
+    // suffix — not any digits that are part of the original filename (e.g.
+    // "photo-2022.jpeg" must not be stripped to "photo").
+    //
+    // NOTE: WordPress passes $ext WITH a leading dot (e.g. ".jpg"), so we must
+    // NOT add another dot. Use $ext directly as the extension-with-dot.
+    //
+    // Then we continue incrementing from N+1 so we never re-check the already-
+    // known collision and minimise DB round-trips.
+    $ext_with_dot = $ext; // already includes the leading dot (e.g. ".jpg")
+    $base         = $ext !== '' ? substr($filename, 0, -strlen($ext)) : $filename;
+
+    $number_int = (int) $number;
+    if ($number !== '' && $number_int > 0 && str_ends_with($base, '-' . $number_int)) {
+      // WordPress appended "-{$number_int}"; strip it so we increment from the
+      // true root (e.g. "123-1" → "123", counter starts at 2).
+      $base_root = substr($base, 0, -strlen('-' . $number_int));
+      $counter   = $number_int + 1;
+    } else {
+      // WordPress did not append a counter (local file was already gone);
+      // use the full base as-is and start from 1.
+      $base_root = $base;
+      $counter   = 1;
+    }
+
+    do {
+      $candidate = $base_root . '-' . $counter . $ext_with_dot;
+      $counter++;
+    } while (
+      file_exists(trailingslashit($dir) . $candidate) ||
+      $this->db_has_attachment_at_path($relativeDir . $candidate)
+    );
+
+    return $candidate;
+  }
+
+  /**
+   * Check whether any existing attachment in postmeta already uses the given
+   * relative upload path as its _wp_attached_file value.
+   *
+   * This covers two states:
+   *  - Pre-rewrite / no prefix: _wp_attached_file = "2026/04/123.jpeg"
+   *  - Post-rewrite with prefix: _wp_attached_file = "my-prefix/2026/04/123.jpeg"
+   */
+  private function db_has_attachment_at_path(string $relativePath): bool
+  {
+    global $wpdb;
+
+    $prefix     = trim((string) $this->settings->get('prefix', ''), '/');
+    $storageKey = $prefix !== '' ? $prefix . '/' . $relativePath : $relativePath;
+
+    if ($relativePath === $storageKey) {
+      $result = $wpdb->get_var($wpdb->prepare(
+        "SELECT meta_id FROM {$wpdb->postmeta}
+         WHERE meta_key = '_wp_attached_file' AND meta_value = %s
+         LIMIT 1",
+        $relativePath
+      ));
+    } else {
+      $result = $wpdb->get_var($wpdb->prepare(
+        "SELECT meta_id FROM {$wpdb->postmeta}
+         WHERE meta_key = '_wp_attached_file' AND meta_value IN (%s, %s)
+         LIMIT 1",
+        $relativePath,
+        $storageKey
+      ));
+    }
+
+    return $result !== null;
   }
 
   /**
@@ -1103,7 +1239,7 @@ final class UploadHandler
         continue;
       }
 
-      $results[$size] = ['key' => $uploadedSizeKey];
+      $results[$size] = ['key' => $uploadedSizeKey, 'file_size_bytes' => (int) filesize($sizePath)];
       $metadata['sizes'][$size]['nimbus'] = ['key' => $uploadedSizeKey];
     }
 
@@ -1162,18 +1298,13 @@ final class UploadHandler
       return;
     }
 
-    if ((int) get_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY, true) <= 0) {
-      update_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY, time());
-    }
-
+    $this->repo->markPending($attachment_id);
     $this->ensure_nightly_schedule();
   }
 
   private function clear_pending_state(int $attachment_id): void
   {
-    delete_post_meta($attachment_id, NIMBUS_PENDING_AT_META_KEY);
-    delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
-    delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
+    $this->repo->clearPendingState($attachment_id);
   }
 
   private function claim_pending_attachment_ids(int $hours, int $limit, string $claim_owner, int $claim_ttl): array
@@ -1233,36 +1364,14 @@ final class UploadHandler
 
   private function try_claim_pending_attachment(int $attachment_id, string $claim_owner, int $claim_ttl): bool
   {
-    $currentOwner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
-    $currentClaimedAt = (int) get_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY, true);
-
-    if ($currentOwner !== '' && $currentOwner !== $claim_owner) {
-      $isFreshClaim = $currentClaimedAt > 0 && (time() - $currentClaimedAt) < $claim_ttl;
-      if ($isFreshClaim) {
-        return false;
-      }
-
-      delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
-      delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
-    }
-
-    if (!add_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, $claim_owner, true)) {
-      $owner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
-      if ($owner !== $claim_owner) {
-        return false;
-      }
-    }
-
-    update_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY, time());
-    return true;
+    return $this->repo->claim($attachment_id, $claim_owner, $claim_ttl);
   }
 
   private function release_pending_claim(int $attachment_id, string $claim_owner): void
   {
-    $owner = (string) get_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY, true);
+    $owner = $this->repo->getClaimedBy($attachment_id);
     if ($owner === '' || $owner === $claim_owner) {
-      delete_post_meta($attachment_id, NIMBUS_CLAIMED_BY_META_KEY);
-      delete_post_meta($attachment_id, NIMBUS_CLAIMED_AT_META_KEY);
+      $this->repo->releaseClaim($attachment_id);
     }
   }
 
@@ -1456,8 +1565,8 @@ final class UploadHandler
   private function mark_missing_source(int $attachment_id): void
   {
     $now = time();
-    $previous = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
-    update_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, $now);
+    $previous = $this->repo->getMissingSourceAt($attachment_id);
+    $this->repo->markMissingSource($attachment_id);
 
     $cooldown = max(300, (int) apply_filters('nimbus_missing_source_log_cooldown_seconds', 6 * HOUR_IN_SECONDS));
     if ($previous > 0 && ($now - $previous) < $cooldown) {
@@ -1469,7 +1578,7 @@ final class UploadHandler
 
   private function clear_missing_source_marker(int $attachment_id): void
   {
-    delete_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY);
+    $this->repo->clearMissingSource($attachment_id);
   }
 
   private function missing_source_retry_cooldown_seconds(): int

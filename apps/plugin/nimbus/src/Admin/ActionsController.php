@@ -2,12 +2,11 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Bootstrap\DataMigration;
-use Nimbus\Plugin\Integration\IntegrationDiscovery;
 use Nimbus\Plugin\License\LicenseClient;
 use Nimbus\Plugin\License\LicenseManager;
-use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
+use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Storage\StorageAdapterFactory;
 use Nimbus\Plugin\Support\Events;
 use Nimbus\Plugin\Support\Logger;
@@ -28,7 +27,6 @@ final class ActionsController
     private UploadHandler $uploadHandler,
     private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
-    private IntegrationDiscovery $integrationDiscovery,
   ) {
   }
 
@@ -310,7 +308,7 @@ final class ActionsController
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION);
 
     $integration = isset($_POST['integration']) ? sanitize_key((string) wp_unslash($_POST['integration'])) : '';
-    if ($integration === '' || !$this->integrationDiscovery->canRewrite($integration)) {
+    if ($integration === '' || !(bool) apply_filters('nimbus/integrations/can_rewrite', false, $integration)) {
       pushAdminNotice(__('This integration does not yet support automated URL rewriting.', NIMBUS_TEXT_DOMAIN), 'warning');
       $this->redirectToTab('integrations');
     }
@@ -320,9 +318,9 @@ final class ActionsController
       $this->redirectToTab('integrations');
     }
 
-    $definition = $this->integrationDiscovery->definition($integration);
+    $definition = (array) apply_filters('nimbus/integrations/definition', null, $integration);
     $label = (string) ($definition['label'] ?? ucwords(str_replace('_', ' ', $integration)));
-    $result = $this->integrationDiscovery->runRewrite($integration);
+    $result = (array) apply_filters('nimbus/integrations/run_rewrite', [], $integration);
     if (($result['errors'] ?? 0) > 0) {
       pushAdminNotice(sprintf(__('%1$s rewrite finished with warnings. Tables: %2$d, Updated rows: %3$d, Errors: %4$d.', NIMBUS_TEXT_DOMAIN), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0), (int) ($result['errors'] ?? 0)), 'warning');
     } else {
@@ -846,4 +844,134 @@ final class ActionsController
     wp_safe_redirect($tabUrl);
     exit;
   }
+
+  // ── Config export ──────────────────────────────────────────────────────────
+
+  /**
+   * Keys included in a config export. Sensitive credential keys are included
+   * but the user is warned. Internal-only keys (logging, batch tuning) are
+   * deliberately excluded to keep the portable config concise.
+   */
+  private const EXPORT_KEYS = [
+    'provider', 'bucket', 'r2_account_id', 'region', 'access_key', 'secret_key',
+    'session_token', 'prefix', 'endpoint', 'use_path_style_endpoint',
+    'remove_local_copies', 'serve_from_storage', 'custom_domain',
+    'purge_cloudflare_cache_on_delete', 'purge_litespeed_cache',
+    'purge_wp_fastest_cache', 'purge_proxy_cache',
+    'cloudflare_zone_id', 'cloudflare_api_token',
+    'proxy_cache_purge_method', 'proxy_cache_purge_urls', 'proxy_cache_purge_all_urls',
+    'allowed_path_patterns', 'ignored_path_patterns',
+    'offload_min_size_kb', 'offload_allowed_mime_types',
+    'storage_class', 'visibility', 'delete_remote_on_wp_delete',
+    'enabled',
+  ];
+
+  /**
+   * Keys that carry credential data. The export file notes these are present
+   * so importers can decide whether to trust or strip them.
+   */
+  private const CREDENTIAL_KEYS = ['access_key', 'secret_key', 'session_token', 'cloudflare_api_token', 'r2_account_id'];
+
+  public function handleExportConfig(): void
+  {
+    if (!current_user_can('manage_options')) {
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
+    }
+
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG);
+
+    $all = $this->settings->all();
+    $export = [];
+    foreach (self::EXPORT_KEYS as $key) {
+      if (array_key_exists($key, $all)) {
+        $export[$key] = $all[$key];
+      }
+    }
+
+    $hasCredentials = array_reduce(
+      self::CREDENTIAL_KEYS,
+      static fn (bool $carry, string $key): bool => $carry || ($export[$key] ?? '') !== '',
+      false
+    );
+
+    $payload = [
+      'version'         => '1.0',
+      'plugin'          => 'nimbus',
+      'exported_at'     => gmdate('c'),
+      'has_credentials' => $hasCredentials,
+      'settings'        => $export,
+    ];
+
+    $filename = 'nimbus-config-' . gmdate('Ymd-His') . '.json';
+    $json = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    if ($json === false) {
+      wp_die(esc_html__('Failed to encode configuration.', NIMBUS_TEXT_DOMAIN));
+    }
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Content-Length: ' . strlen($json));
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON download
+    exit;
+  }
+
+  public function handleImportConfig(): void
+  {
+    if (!current_user_can('manage_options')) {
+      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN));
+    }
+
+    $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG);
+
+    $redirectTab = isset($_POST['redirect_tab']) && $_POST['redirect_tab'] === 'settings' ? 'settings' : 'tools';
+
+    if (empty($_FILES['nimbus_config_file']['tmp_name'])) {
+      pushAdminNotice(__('No file was uploaded. Please choose a JSON configuration file.', NIMBUS_TEXT_DOMAIN), 'error');
+      $this->redirectToTab($redirectTab);
+    }
+
+    $file = $_FILES['nimbus_config_file'];
+
+    // Validate file type by extension and MIME.
+    $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+    if ($ext !== 'json') {
+      pushAdminNotice(__('Invalid file type. Only .json files are accepted.', NIMBUS_TEXT_DOMAIN), 'error');
+      $this->redirectToTab($redirectTab);
+    }
+
+    $raw = file_get_contents((string) $file['tmp_name']); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+    if ($raw === false || strlen($raw) > 512 * 1024) {
+      pushAdminNotice(__('Could not read the uploaded file or file exceeds the 512 KB limit.', NIMBUS_TEXT_DOMAIN), 'error');
+      $this->redirectToTab($redirectTab);
+    }
+
+    $payload = json_decode((string) $raw, true);
+    if (!is_array($payload)) {
+      pushAdminNotice(__('Invalid JSON: could not parse the configuration file.', NIMBUS_TEXT_DOMAIN), 'error');
+      $this->redirectToTab($redirectTab);
+    }
+
+    if (($payload['plugin'] ?? '') !== 'nimbus') {
+      pushAdminNotice(__('This file does not appear to be a Nimbus configuration export.', NIMBUS_TEXT_DOMAIN), 'error');
+      $this->redirectToTab($redirectTab);
+    }
+
+    $incoming = is_array($payload['settings'] ?? null) ? $payload['settings'] : [];
+
+    // Filter to allowed keys only — never trust arbitrary keys from the file.
+    $filtered = array_intersect_key($incoming, array_flip(self::EXPORT_KEYS));
+
+    // Sanitize via the existing settings sanitizer.
+    $normalized = $this->settings->sanitize(array_merge($this->settings->all(), $filtered));
+
+    $this->settings->update($normalized);
+
+    pushAdminNotice(__('Configuration imported successfully. Review the settings below and save if needed.', NIMBUS_TEXT_DOMAIN), 'success');
+    $this->redirectToTab($redirectTab);
+  }
 }
+

@@ -85,6 +85,17 @@ final class MediaLibraryController
     if (!empty($status['reason'])) {
       printf('<div class="nmb-muted nmb-library-note">%s</div>', esc_html((string) $status['reason']));
     }
+
+    if (($status['status'] ?? '') === 'offloaded') {
+      $nimbusMeta = get_post_meta($postId, NIMBUS_META_KEY, true);
+      $fileSizeBytes = is_array($nimbusMeta) && isset($nimbusMeta['file_size_bytes']) ? (int) $nimbusMeta['file_size_bytes'] : 0;
+      if ($fileSizeBytes > 0) {
+        printf(
+          '<div class="nmb-muted nmb-library-note">%s</div>',
+          esc_html(size_format($fileSizeBytes, 1))
+        );
+      }
+    }
   }
 
   public function filterRowActions(array $actions, \WP_Post $post): array

@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-final class S3CompatibleProviderProfile extends AbstractProviderProfile
+final class S3CompatibleProviderProfile extends AbstractProviderProfile implements ProviderProfile
 {
   public function key(): string
   {
@@ -40,6 +40,19 @@ final class S3CompatibleProviderProfile extends AbstractProviderProfile
       'endpoint' => __('Custom Endpoint', NIMBUS_TEXT_DOMAIN),
       'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
       'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
+    ];
+  }
+
+  public function fieldHints(): array
+  {
+    return [
+      'bucket'        => __('The bucket name on your S3-compatible storage provider.', NIMBUS_TEXT_DOMAIN),
+      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', NIMBUS_TEXT_DOMAIN),
+      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', NIMBUS_TEXT_DOMAIN),
+      'secret_key'    => __('Secret Access Key paired with the access key above.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', NIMBUS_TEXT_DOMAIN),
+      'session_token' => '',
+      'r2_account_id' => '',
     ];
   }
 
