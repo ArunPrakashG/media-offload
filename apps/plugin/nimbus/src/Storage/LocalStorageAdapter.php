@@ -41,8 +41,8 @@ final class LocalStorageAdapter implements StorageAdapter
   public function delete(string $key): void
   {
     $path = trailingslashit($this->basePath) . ltrim($key, '/');
-    if (file_exists($path)) {
-      @unlink($path);
+    if (file_exists($path) && is_writable($path)) {
+      unlink($path);
     }
   }
 

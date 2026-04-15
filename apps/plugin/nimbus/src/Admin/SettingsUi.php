@@ -52,7 +52,9 @@ final class SettingsUi
     add_action('admin_notices', [$this, 'render_deactivation_hint']);
     add_filter('plugin_action_links_nimbus/nimbus.php', [$this, 'add_plugin_action_links']);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+    add_action('admin_enqueue_scripts', [$this, 'enqueue_notice_scripts']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
+    add_action('wp_ajax_mo_dismiss_license_banner', [$this, 'handle_dismiss_license_banner']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
     add_action('wp_ajax_' . NIMBUS_AJAX_ONBOARDING_SAVE_STEP, [$this, 'handle_save_onboarding_step']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
@@ -66,6 +68,49 @@ final class SettingsUi
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE, [$this, 'handle_license_activate_free']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE, [$this, 'handle_license_deactivate_site']);
     $this->mediaLibraryController->register();
+  }
+
+  public function enqueue_notice_scripts(): void
+  {
+    if ($this->licenseManager->hasKey() && $this->licenseManager->status() === 'active') {
+      return;
+    }
+
+    if (get_transient('mo_license_banner_dismissed_' . get_current_user_id())) {
+      return;
+    }
+
+    $js = '(function(){
+  function initNimbusLicenseBanner(){
+    var banner=document.querySelector(".mo-license-notice");
+    if(!banner)return;
+    var btn=banner.querySelector("[data-mo-dismiss-banner]");
+    if(!btn)return;
+    btn.addEventListener("click",function(){
+      banner.remove();
+      var nonce=banner.dataset.moDismissNonce||"";
+      if(!nonce)return;
+      var xhr=new XMLHttpRequest();
+      xhr.open("POST",ajaxurl);
+      xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+      xhr.send("action=mo_dismiss_license_banner&nonce="+encodeURIComponent(nonce));
+    });
+  }
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",initNimbusLicenseBanner);
+  }else{
+    initNimbusLicenseBanner();
+  }
+})();';
+
+    wp_add_inline_script('jquery', $js);
+  }
+
+  public function handle_dismiss_license_banner(): void
+  {
+    check_ajax_referer('mo_dismiss_license_banner', 'nonce');
+    set_transient('mo_license_banner_dismissed_' . get_current_user_id(), true, 7 * DAY_IN_SECONDS);
+    wp_die();
   }
 
   public function enqueue_assets($hook): void
@@ -307,23 +352,6 @@ final class SettingsUi
       </p>
       <button type="button" class="notice-dismiss" data-mo-dismiss-banner></button>
     </div>
-    <script>
-    (function () {
-      var banner = document.querySelector('.mo-license-notice');
-      if (!banner) return;
-      var btn = banner.querySelector('[data-mo-dismiss-banner]');
-      if (!btn) return;
-      btn.addEventListener('click', function () {
-        banner.remove();
-        var nonce = banner.dataset.moDismissNonce || '';
-        if (!nonce) return;
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', ajaxurl);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('action=mo_dismiss_license_banner&nonce=' + encodeURIComponent(nonce));
-      });
-    })();
-    </script>
     <?php
   }
 

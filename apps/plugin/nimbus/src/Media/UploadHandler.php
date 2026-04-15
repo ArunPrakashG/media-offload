@@ -803,8 +803,8 @@ final class UploadHandler
     }
 
     $attachedFile = get_attached_file($attachment_id);
-    if (is_string($attachedFile) && $attachedFile !== '' && file_exists($attachedFile)) {
-      @unlink($attachedFile);
+    if (is_string($attachedFile) && $attachedFile !== '' && file_exists($attachedFile) && is_writable($attachedFile)) {
+      unlink($attachedFile);
     }
 
     $metadata = wp_get_attachment_metadata($attachment_id);
@@ -819,8 +819,8 @@ final class UploadHandler
       }
 
       $sizePath = function_exists('path_join') ? path_join($baseDir, $sizeData['file']) : trailingslashit($baseDir) . ltrim($sizeData['file'], '/');
-      if (file_exists($sizePath)) {
-        @unlink($sizePath);
+      if (file_exists($sizePath) && is_writable($sizePath)) {
+        unlink($sizePath);
       }
     }
   }

@@ -1,10 +1,16 @@
 <?php
 /**
  * Plugin Name: Nimbus
+ * Plugin URI: https://usenimbus.dev
  * Description: Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.
  * Version: 0.1.4
+ * Requires at least: 6.0
+ * Requires PHP: 8.1
  * Author: Arun Prakash
+ * Author URI: https://arunprakashg.com
  * Text Domain: nimbus
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) {
