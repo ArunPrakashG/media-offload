@@ -38,7 +38,6 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
-      - ../../apps/plugin/nimbus-pro:/var/www/html/wp-content/plugins/nimbus-pro
       - ../../apps/plugin/nimbus/tools/local-wp/mu-plugins:/var/www/html/wp-content/mu-plugins
 
   setup:
@@ -63,7 +62,6 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
-      - ../../apps/plugin/nimbus-pro:/var/www/html/wp-content/plugins/nimbus-pro
       - ../../apps/plugin/nimbus/tools/local-wp:/scripts:ro
     entrypoint: ["/bin/sh", "/scripts/setup.sh"]
     restart: "no"
@@ -86,7 +84,6 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ../../apps/plugin/nimbus:/var/www/html/wp-content/plugins/nimbus
-      - ../../apps/plugin/nimbus-pro:/var/www/html/wp-content/plugins/nimbus-pro
     entrypoint: ["wp", "--allow-root", "--path=/var/www/html"]
 
   # MinIO: S3-compatible object storage used for local/CI testing.

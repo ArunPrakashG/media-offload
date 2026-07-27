@@ -53,17 +53,6 @@ else
   log 'Media Offload plugin already active.'
 fi
 
-if ! wp_cmd plugin is-active nimbus-pro >/dev/null 2>&1; then
-  if wp_cmd plugin list --field=name 2>/dev/null | grep -q '^nimbus-pro$'; then
-    log 'Activating Nimbus Pro plugin...'
-    wp_cmd plugin activate nimbus-pro >/dev/null
-  else
-    log 'Nimbus Pro plugin not found; skipping activation.'
-  fi
-else
-  log 'Nimbus Pro plugin already active.'
-fi
-
 log 'Configuring Media Offload for local debug storage and completing onboarding...'
 wp_cmd eval '
 $settings = get_option("nimbus_settings", []);
@@ -76,17 +65,6 @@ $settings["logging_enabled"] = true;
 $settings["log_level"] = "debug";
 $settings["log_to_error_log"] = true;
 update_option("nimbus_settings", $settings, false);
-
-update_option("nimbus_license", [
-  "key" => "local-dev-license",
-  "status" => "active",
-  "tier" => "agency",
-  "billing_cycle" => "monthly",
-  "subscription_id" => "",
-  "token" => "",
-  "token_expires_at" => 0,
-  "last_validated_at" => time(),
-], false);
 
 update_option("nimbus_onboarding", [
   "completed" => true,
@@ -144,7 +122,7 @@ $content = "<p>This site is ready for local Media Offload testing.</p>";
 $content .= "<ul>";
 $content .= "<li>Plugin: <strong>Media Offload</strong> is active.</li>";
 $content .= "<li>Provider: <strong>Local / Debug Mode</strong>.</li>";
-$content .= "<li>Onboarding: <strong>completed</strong> with a local dummy license key.</li>";
+$content .= "<li>Onboarding: <strong>completed</strong>.</li>";
 $content .= "</ul>";
 if ($attachmentId > 0) {
   $content .= "<p>Sample media item:</p>" . wp_get_attachment_image($attachmentId, "full");
