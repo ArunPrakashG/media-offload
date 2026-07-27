@@ -15,6 +15,7 @@
   "minimum-stability": "stable",
   "name": "arun-prakash/nimbus",
   "require": {
+    "php": ">=8.1",
     "aws/aws-sdk-php": "^3.200"
   },
   "support": {
@@ -22,6 +23,9 @@
   },
   "type": "wordpress-plugin",
   "config": {
-    "autoloader-suffix": "NimbusMediaOffload"
+    "autoloader-suffix": "NimbusMediaOffload",
+    "platform": {
+      "php": "8.1.0"
+    }
   }
 }
