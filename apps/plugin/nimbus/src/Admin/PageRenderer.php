@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Bootstrap\DataMigration;
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
@@ -29,7 +28,6 @@ final class PageRenderer
     private Statistics $statistics,
     private UploadHandler $uploadHandler,
     private SettingsRegistrar $settingsRegistrar,
-    private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
   ) {
   }
@@ -56,7 +54,6 @@ final class PageRenderer
     }
 
     $activeTab = $this->resolveActiveTab();
-    $showOverlay = !$this->licenseManager->hasKey() && $activeTab !== 'license';
     ?>
     <div class="wrap nimbus-settings">
       <h1 class="wp-heading-inline"><?php esc_html_e('Nimbus', NIMBUS_TEXT_DOMAIN); ?></h1>
@@ -70,12 +67,7 @@ final class PageRenderer
         <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>" class="nav-tab <?php echo $activeTab === 'integrations' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Integrations', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Tools', NIMBUS_TEXT_DOMAIN); ?></a>
         <a href="<?php echo esc_url($this->adminTabUrl('logs')); ?>" class="nav-tab <?php echo $activeTab === 'logs' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Logs', NIMBUS_TEXT_DOMAIN); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('license')); ?>" class="nav-tab <?php echo $activeTab === 'license' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('License', NIMBUS_TEXT_DOMAIN); ?></a>
       </nav>
-
-      <?php if ($showOverlay) : ?>
-        <?php $this->renderLicenseOverlay(); ?>
-      <?php endif; ?>
 
       <?php if ($activeTab === 'overview') : ?>
         <?php $this->renderOverviewTab(); ?>
@@ -89,8 +81,6 @@ final class PageRenderer
         <?php $this->renderToolsTab(); ?>
       <?php elseif ($activeTab === 'logs') : ?>
         <?php $this->renderLogsTab(); ?>
-      <?php elseif ($activeTab === 'license') : ?>
-        <?php $this->renderLicenseTab(); ?>
       <?php else : ?>
         <?php $this->renderOverviewTab(); ?>
       <?php endif; ?>
@@ -107,7 +97,7 @@ final class PageRenderer
     $tab = isset($_GET['tab']) ? sanitize_key((string) wp_unslash($_GET['tab'])) : 'overview';
     $tab = self::TAB_ALIASES[$tab] ?? $tab;
 
-    if (!in_array($tab, ['overview', 'settings', 'advanced', 'integrations', 'tools', 'logs', 'license'], true)) {
+    if (!in_array($tab, ['overview', 'settings', 'advanced', 'integrations', 'tools', 'logs'], true)) {
       return 'overview';
     }
 
@@ -117,24 +107,15 @@ final class PageRenderer
   private function renderOnboardingTab(): void
   {
     $settings = $this->settings->all();
-    $license = $this->licenseManager->all();
     $state = $this->onboardingManager->state();
-    $stepKeys = ['account', 'storage', 'delivery', 'review'];
+    $stepKeys = ['storage', 'delivery', 'review'];
 
-    // If a license key is already set (e.g. free tier was activated), default
-    // to the storage step so the user is not shown the "no license" account
-    // screen again on a plain page refresh.
     // If a step was explicitly saved (user progressed mid-wizard and navigated
     // away), resume from that saved step rather than starting over.
     $savedStep = !empty($state['current_step']) ? (string) $state['current_step'] : '';
-    $defaultStep = $this->licenseManager->hasKey() ? 'storage' : 'account';
-    // Only resume from a later step if the license-key prerequisite is satisfied.
-    // Without a key, stepping past 'account' would leave the form's license_key
-    // input empty and block submission.
+    $defaultStep = 'storage';
     if ($savedStep !== '' && in_array($savedStep, $stepKeys, true)) {
-      if ($savedStep === 'account' || $this->licenseManager->hasKey()) {
-        $defaultStep = $savedStep;
-      }
+      $defaultStep = $savedStep;
     }
     $requestedStep = isset($_GET['onboarding_step']) ? sanitize_key((string) wp_unslash($_GET['onboarding_step'])) : $defaultStep;
 
@@ -153,29 +134,22 @@ final class PageRenderer
 
         <div class="nmb-card nmb-onboarding-step-nav">
           <ol class="nmb-onboarding-step-list">
-            <li class="nmb-onboarding-step-item" data-step-item="account">
-              <span class="nmb-onboarding-step-index">1</span>
-              <div>
-                <strong><?php esc_html_e('Account', NIMBUS_TEXT_DOMAIN); ?></strong>
-                <span><?php esc_html_e('Add your license key.', NIMBUS_TEXT_DOMAIN); ?></span>
-              </div>
-            </li>
             <li class="nmb-onboarding-step-item" data-step-item="storage">
-              <span class="nmb-onboarding-step-index">2</span>
+              <span class="nmb-onboarding-step-index">1</span>
               <div>
                 <strong><?php esc_html_e('Storage', NIMBUS_TEXT_DOMAIN); ?></strong>
                 <span><?php esc_html_e('Connect the provider and bucket.', NIMBUS_TEXT_DOMAIN); ?></span>
               </div>
             </li>
             <li class="nmb-onboarding-step-item" data-step-item="delivery">
-              <span class="nmb-onboarding-step-index">3</span>
+              <span class="nmb-onboarding-step-index">2</span>
               <div>
                 <strong><?php esc_html_e('Delivery', NIMBUS_TEXT_DOMAIN); ?></strong>
                 <span><?php esc_html_e('Choose how media should be served.', NIMBUS_TEXT_DOMAIN); ?></span>
               </div>
             </li>
             <li class="nmb-onboarding-step-item" data-step-item="review">
-              <span class="nmb-onboarding-step-index">4</span>
+              <span class="nmb-onboarding-step-index">3</span>
               <div>
                 <strong><?php esc_html_e('Review', NIMBUS_TEXT_DOMAIN); ?></strong>
                 <span><?php esc_html_e('Confirm and unlock the dashboard.', NIMBUS_TEXT_DOMAIN); ?></span>
@@ -189,33 +163,7 @@ final class PageRenderer
         <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>
         <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>" />
 
-        <section class="nmb-card nmb-onboarding-step" data-step="account">
-          <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 1', NIMBUS_TEXT_DOMAIN); ?></p>
-            <h2><?php esc_html_e('Connect your account', NIMBUS_TEXT_DOMAIN); ?></h2>
-            <p><?php esc_html_e('Paste your license key, or start with the Free tier to try Nimbus now — no registration required.', NIMBUS_TEXT_DOMAIN); ?></p>
-          </div>
-
-          <label class="nmb-onboarding-field nmb-onboarding-field--full">
-            <span><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></span>
-            <input type="text" id="nimbus-license-key" name="license_key" value="<?php echo esc_attr((string) ($license['key'] ?? '')); ?>" placeholder="nmb_live_xxxxxxxxx" autocomplete="off" class="nmb-key-input" />
-          </label>
-
-          <ul class="nmb-onboarding-tips">
-            <li><?php esc_html_e('Copy the key exactly as shown in your account or email.', NIMBUS_TEXT_DOMAIN); ?></li>
-            <li><?php esc_html_e('Avoid spaces before or after the value.', NIMBUS_TEXT_DOMAIN); ?></li>
-          </ul>
-
-          <div class="nmb-onboarding-actions">
-            <button type="button" class="button button-secondary" data-free-tier
-              data-action="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>"
-              data-nonce="<?php echo esc_attr(wp_create_nonce(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE)); ?>"
-              data-url="<?php echo esc_url(admin_url('admin-post.php')); ?>"><?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?></button>
-            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue with license key', NIMBUS_TEXT_DOMAIN); ?></button>
-          </div>
-        </section>
-
-        <section class="nmb-card nmb-onboarding-step" data-step="storage" hidden>
+        <section class="nmb-card nmb-onboarding-step" data-step="storage">
           <?php
             $savedProvider  = (string) ($settings['provider'] ?? 's3');
             $isLocalDefault = $savedProvider === 'local';
@@ -223,7 +171,7 @@ final class PageRenderer
             $isS3CDefault   = in_array($savedProvider, ['s3_compatible', 'minio'], true);
           ?>
           <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 2', NIMBUS_TEXT_DOMAIN); ?></p>
+            <p class="nmb-eyebrow"><?php esc_html_e('Step 1', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Connect your storage provider', NIMBUS_TEXT_DOMAIN); ?></h2>
             <p><?php esc_html_e('Select a provider and only the fields you need will appear.', NIMBUS_TEXT_DOMAIN); ?></p>
           </div>
@@ -334,7 +282,7 @@ final class PageRenderer
 
         <section class="nmb-card nmb-onboarding-step" data-step="delivery" hidden>
           <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 3', NIMBUS_TEXT_DOMAIN); ?></p>
+            <p class="nmb-eyebrow"><?php esc_html_e('Step 2', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Choose delivery behavior', NIMBUS_TEXT_DOMAIN); ?></h2>
             <p><?php esc_html_e('Decide how Nimbus should behave once setup is complete. You can still tune these later from Settings.', NIMBUS_TEXT_DOMAIN); ?></p>
           </div>
@@ -390,7 +338,7 @@ final class PageRenderer
 
         <section class="nmb-card nmb-onboarding-step" data-step="review" hidden>
           <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 4', NIMBUS_TEXT_DOMAIN); ?></p>
+            <p class="nmb-eyebrow"><?php esc_html_e('Step 3', NIMBUS_TEXT_DOMAIN); ?></p>
             <h2><?php esc_html_e('Review and finish setup', NIMBUS_TEXT_DOMAIN); ?></h2>
             <p><?php esc_html_e('Confirm the final checklist below. Once you finish this step, the plugin dashboard unlocks and the guided setup disappears.', NIMBUS_TEXT_DOMAIN); ?></p>
           </div>
@@ -399,7 +347,6 @@ final class PageRenderer
             <div class="nmb-card nmb-onboarding-helper-card">
               <h3><?php esc_html_e('Final checklist', NIMBUS_TEXT_DOMAIN); ?></h3>
               <ul class="nmb-status-list">
-                <li><span class="dashicons dashicons-admin-network"></span><strong><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></strong><span class="nmb-spacer"></span><?php echo !empty($license['key']) ? esc_html__('Previously saved', NIMBUS_TEXT_DOMAIN) : esc_html__('Will be saved now', NIMBUS_TEXT_DOMAIN); ?></li>
                 <li><span class="dashicons dashicons-cloud"></span><strong><?php esc_html_e('Storage', NIMBUS_TEXT_DOMAIN); ?></strong><span class="nmb-spacer"></span><?php esc_html_e('Connected in this setup flow', NIMBUS_TEXT_DOMAIN); ?></li>
                 <li><span class="dashicons dashicons-admin-home"></span><strong><?php esc_html_e('Dashboard', NIMBUS_TEXT_DOMAIN); ?></strong><span class="nmb-spacer"></span><?php esc_html_e('Unlocks after finish', NIMBUS_TEXT_DOMAIN); ?></li>
               </ul>
@@ -436,12 +383,6 @@ final class PageRenderer
             <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup and unlock dashboard', NIMBUS_TEXT_DOMAIN); ?></button>
           </div>
         </section>
-      </form>
-
-      <?php /* Standalone free-tier form — outside the main wizard form to avoid nesting */ ?>
-      <form id="nmb-free-tier-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" hidden>
-        <input type="hidden" name="_wpnonce" id="nmb-free-tier-nonce">
-        <input type="hidden" name="action" id="nmb-free-tier-action">
       </form>
     </div>
     <?php
@@ -602,14 +543,6 @@ final class PageRenderer
             <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Manage integrations', NIMBUS_TEXT_DOMAIN); ?></a>
           </div>
         </div>
-
-        <div class="nmb-card">
-          <h3><?php esc_html_e('Account and licensing', NIMBUS_TEXT_DOMAIN); ?></h3>
-          <p class="nmb-muted"><?php esc_html_e('License state is shown on Overview, while initial key entry remains in onboarding so setup stays linear for new installs.', NIMBUS_TEXT_DOMAIN); ?></p>
-          <div class="nmb-actions nmb-actions-left">
-            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('license')); ?>"><?php esc_html_e('Manage license', NIMBUS_TEXT_DOMAIN); ?></a>
-          </div>
-        </div>
       </div>
     </div>
     <?php
@@ -675,7 +608,7 @@ final class PageRenderer
 
   private function renderBulkJobsPanel(): void
   {
-    // BulkJobManager is provided by the nimbus-pro extension at runtime.
+    // BulkJobManager is registered unconditionally in Bootstrap\Plugin::bootFeatures().
     $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
     if ($bulkJobManager === null) {
       return;
@@ -920,274 +853,6 @@ final class PageRenderer
           </tbody>
         </table>
       </div>
-    </div>
-    <?php
-  }
-
-  private function renderLicenseTab(): void
-  {
-    $license   = $this->licenseManager->all();
-    $hasKey    = $this->licenseManager->hasKey();
-    $status    = (string) ($license['status'] ?? 'inactive');
-    $isActive  = $status === 'active';
-    $isPending = $status === 'pending'; // max_activations hit; key stored but not yet active here
-
-    /** @var \Nimbus\Plugin\License\LicenseClient $client */
-    $client = new \Nimbus\Plugin\License\LicenseClient();
-
-    // Fetch the sites list whenever we have a key.
-    $sitesData    = [];
-    $sitesError   = null;
-    $maxSites     = 0;
-    $tier         = (string) ($license['tier'] ?? '');
-    if ($hasKey) {
-      $token = $this->licenseManager->token();
-      $sitesResult = $token !== '' ? $client->listSites($token) : new \WP_Error('no_token', __('Activate this license to view connected sites.', 'nimbus'));
-      if (is_wp_error($sitesResult)) {
-        $sitesError = $sitesResult->get_error_message();
-      } else {
-        $sitesData = (array) ($sitesResult['activations'] ?? []);
-        $maxSites  = (int) ($sitesResult['max_activations'] ?? 0);
-        if (empty($tier)) {
-          $tier = (string) ($sitesResult['tier'] ?? '');
-        }
-      }
-    }
-
-    $currentDomain = wp_parse_url(home_url(), PHP_URL_HOST) ?: '';
-    $adminPostUrl  = esc_url(admin_url('admin-post.php'));
-    ?>
-    <div class="nmb-settings-shell">
-      <div class="nmb-card" id="license-key-section">
-        <h3><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></h3>
-
-        <?php if ($hasKey) : ?>
-          <!-- Status row -->
-          <dl style="margin:0 0 16px;">
-            <div class="nmb-license-status-row">
-              <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
-              <dd class="<?php echo $isActive ? 'mo-license-status-active' : 'mo-license-status-inactive'; ?>">
-                <?php
-                if ($isActive) {
-                  esc_html_e('Active', NIMBUS_TEXT_DOMAIN);
-                } elseif ($isPending) {
-                  esc_html_e('Pending — activation limit reached', NIMBUS_TEXT_DOMAIN);
-                } else {
-                  echo esc_html(ucfirst($status));
-                }
-                ?>
-              </dd>
-            </div>
-            <?php if (!empty($tier)) : ?>
-              <div class="nmb-license-status-row">
-                <dt><?php esc_html_e('Plan', NIMBUS_TEXT_DOMAIN); ?></dt>
-                <dd><?php echo esc_html(ucfirst($tier)); ?></dd>
-              </div>
-            <?php endif; ?>
-            <?php if ($maxSites > 0) : ?>
-              <div class="nmb-license-status-row">
-                <dt><?php esc_html_e('Sites', NIMBUS_TEXT_DOMAIN); ?></dt>
-                <dd>
-                  <?php echo esc_html(sprintf(
-                    /* translators: 1: used, 2: max */
-                    __('%1$d / %2$d used', NIMBUS_TEXT_DOMAIN),
-                    count($sitesData),
-                    $maxSites
-                  )); ?>
-                </dd>
-              </div>
-            <?php endif; ?>
-          </dl>
-
-          <!-- Actions -->
-          <div class="nmb-actions nmb-actions-left" style="margin-bottom:16px;">
-            <a class="button button-secondary" href="https://usenimbus.dev/account/" target="_blank" rel="noopener noreferrer">
-              <?php esc_html_e('Manage subscription', NIMBUS_TEXT_DOMAIN); ?>
-            </a>
-            <!-- Deactivate this site -->
-            <?php if ($isActive) : ?>
-              <form method="post" action="<?php echo $adminPostUrl; ?>" style="display:inline;">
-                <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>
-                <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>">
-                <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
-                <input type="hidden" name="domain" value="<?php echo esc_attr($currentDomain); ?>">
-                <button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e('Deactivate Nimbus on this site?', NIMBUS_TEXT_DOMAIN); ?>')">
-                  <?php esc_html_e('Deactivate this site', NIMBUS_TEXT_DOMAIN); ?>
-                </button>
-              </form>
-            <?php endif; ?>
-          </div>
-
-          <!-- Sites list -->
-          <?php if ($sitesError) : ?>
-            <p class="nmb-muted"><?php echo esc_html(sprintf(__('Could not load site list: %s', NIMBUS_TEXT_DOMAIN), $sitesError)); ?></p>
-          <?php elseif (!empty($sitesData)) : ?>
-            <h4 style="margin:0 0 10px;"><?php esc_html_e('Activated sites', NIMBUS_TEXT_DOMAIN); ?></h4>
-            <table class="widefat striped" style="margin-bottom:0;">
-              <thead>
-                <tr>
-                  <th><?php esc_html_e('Domain', NIMBUS_TEXT_DOMAIN); ?></th>
-                  <th><?php esc_html_e('Activated', NIMBUS_TEXT_DOMAIN); ?></th>
-                  <th><?php esc_html_e('Last seen', NIMBUS_TEXT_DOMAIN); ?></th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php foreach ($sitesData as $site) :
-                  $siteDomain    = (string) ($site['domain'] ?? '');
-                  $activatedAt   = !empty($site['activated_at']) ? wp_date(get_option('date_format'), strtotime($site['activated_at'])) : '—';
-                  $lastSeenAt    = !empty($site['last_seen_at']) ? wp_date(get_option('date_format'), strtotime($site['last_seen_at'])) : '—';
-                  $isCurrentSite = ($siteDomain === $currentDomain);
-                ?>
-                  <tr>
-                    <td>
-                      <?php echo esc_html($siteDomain); ?>
-                      <?php if ($isCurrentSite) : ?>
-                        <span class="nmb-badge nmb-badge--info"><?php esc_html_e('this site', NIMBUS_TEXT_DOMAIN); ?></span>
-                      <?php endif; ?>
-                    </td>
-                    <td><?php echo esc_html($activatedAt); ?></td>
-                    <td><?php echo esc_html($lastSeenAt); ?></td>
-                    <td>
-                      <form method="post" action="<?php echo $adminPostUrl; ?>" style="margin:0;">
-                        <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>
-                        <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE); ?>">
-                        <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
-                        <input type="hidden" name="domain" value="<?php echo esc_attr($siteDomain); ?>">
-                        <button type="submit" class="button button-small button-secondary"
-                          onclick="return confirm('<?php echo esc_attr(sprintf(
-                            /* translators: %s: domain */
-                            __('Remove %s from this license?', NIMBUS_TEXT_DOMAIN),
-                            $siteDomain
-                          )); ?>')">
-                          <?php esc_html_e('Remove', NIMBUS_TEXT_DOMAIN); ?>
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              </tbody>
-            </table>
-
-            <?php if ($isPending) : ?>
-              <p style="margin:12px 0 0;" class="nmb-muted">
-                <?php esc_html_e('Remove a site above to free a slot, then enter your key again to activate on this site.', NIMBUS_TEXT_DOMAIN); ?>
-              </p>
-              <!-- Re-enter key to re-activate after freeing a slot -->
-              <form method="post" action="<?php echo $adminPostUrl; ?>" style="margin-top:12px;" autocomplete="off">
-                <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>
-                <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>">
-                <input type="hidden" name="license_key" value="<?php echo esc_attr($this->licenseManager->key()); ?>">
-                <button type="submit" class="button button-primary"><?php esc_html_e('Retry activation', NIMBUS_TEXT_DOMAIN); ?></button>
-              </form>
-            <?php endif; ?>
-          <?php endif; ?>
-
-        <?php else : ?>
-          <!-- No key yet — show the activation form -->
-          <p class="nmb-muted"><?php esc_html_e('Enter your license key to activate Nimbus. You can find your key in your account dashboard after subscribing.', NIMBUS_TEXT_DOMAIN); ?></p>
-          <form method="post" action="<?php echo $adminPostUrl; ?>" autocomplete="off">
-            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>
-            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE); ?>">
-            <div class="nmb-license-key-field">
-              <label for="mo-license-key"><?php esc_html_e('License key', NIMBUS_TEXT_DOMAIN); ?></label>
-              <input type="text" id="mo-license-key" name="license_key" class="regular-text" placeholder="nmb_live_XXXX-XXXX-XXXX-XXXX" autocomplete="off">
-            </div>
-            <div class="nmb-actions nmb-actions-left" style="margin-top:12px;">
-              <button type="submit" class="button button-primary"><?php esc_html_e('Activate license', NIMBUS_TEXT_DOMAIN); ?></button>
-              <a href="https://usenimbus.dev/#pricing" target="_blank" rel="noopener noreferrer" class="button button-secondary"><?php esc_html_e('Get a license', NIMBUS_TEXT_DOMAIN); ?></a>
-            </div>
-          </form>
-
-          <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
-
-          <p class="nmb-muted" style="font-size:13px;"><?php esc_html_e('No license yet? You can activate the Free tier instantly — no registration or credit card required.', NIMBUS_TEXT_DOMAIN); ?></p>
-          <form method="post" action="<?php echo $adminPostUrl; ?>">
-            <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>
-            <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE); ?>">
-            <button type="submit" class="button button-secondary">
-              <?php esc_html_e('Continue with Free tier', NIMBUS_TEXT_DOMAIN); ?>
-            </button>
-          </form>
-        <?php endif; ?>
-      </div>
-
-      <?php $this->renderProStatusCard(); ?>
-    </div>
-    <?php
-  }
-
-  private function renderProStatusCard(): void
-  {
-    /**
-     * Populated by the Nimbus Pro add-on (or any other registered extension)
-     * via the NIMBUS_FILTER_PRO_STATUS filter. Returns [] when no pro plugin is
-     * active, so the free plugin never has to import or class_exists-check it.
-     *
-     * Shape: [ 'loaded' => bool, 'version' => string, 'features' => string[] ]
-     */
-    $proStatus = (array) apply_filters(NIMBUS_FILTER_PRO_STATUS, []);
-    $proLoaded = !empty($proStatus['loaded']);
-    $proVersion = (string) ($proStatus['version'] ?? '');
-    $proFeatures = is_array($proStatus['features'] ?? null) ? $proStatus['features'] : [];
-
-    $featureLabels = [
-      'bulk_migration'   => __('Bulk migration', NIMBUS_TEXT_DOMAIN),
-      'cache_purge'      => __('Cache purge', NIMBUS_TEXT_DOMAIN),
-      'nightly_batch'    => __('Nightly batch offload', NIMBUS_TEXT_DOMAIN),
-      'wpcli'            => __('WP-CLI commands', NIMBUS_TEXT_DOMAIN),
-      'selective_offload' => __('Selective offload rules', NIMBUS_TEXT_DOMAIN),
-    ];
-    ?>
-    <div class="nmb-card">
-      <h3><?php esc_html_e('Pro add-on', NIMBUS_TEXT_DOMAIN); ?></h3>
-
-      <?php if ($proLoaded) : ?>
-        <dl style="margin:0 0 16px;">
-          <div class="nmb-license-status-row">
-            <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
-            <dd class="mo-license-status-active">
-              <?php
-              echo esc_html(
-                $proVersion !== ''
-                  ? sprintf(
-                      /* translators: %s: version number */
-                      __('Detected — v%s', NIMBUS_TEXT_DOMAIN),
-                      $proVersion
-                    )
-                  : __('Detected', NIMBUS_TEXT_DOMAIN)
-              );
-              ?>
-            </dd>
-          </div>
-        </dl>
-
-        <?php if (!empty($proFeatures)) : ?>
-          <p class="nmb-muted" style="margin:0 0 8px;"><?php esc_html_e('Active features:', NIMBUS_TEXT_DOMAIN); ?></p>
-          <ul class="nmb-status-list">
-            <?php foreach ($proFeatures as $featureSlug) : ?>
-              <li>
-                <span class="dashicons dashicons-yes-alt status-ok"></span>
-                <span><?php echo esc_html($featureLabels[$featureSlug] ?? ucwords(str_replace('_', ' ', $featureSlug))); ?></span>
-              </li>
-            <?php endforeach; ?>
-          </ul>
-        <?php else : ?>
-          <p class="nmb-muted"><?php esc_html_e('No licensed features are active for the current plan.', NIMBUS_TEXT_DOMAIN); ?></p>
-        <?php endif; ?>
-
-      <?php else : ?>
-        <dl style="margin:0 0 16px;">
-          <div class="nmb-license-status-row">
-            <dt><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></dt>
-            <dd class="mo-license-status-inactive"><?php esc_html_e('Not installed', NIMBUS_TEXT_DOMAIN); ?></dd>
-          </div>
-        </dl>
-        <p class="nmb-muted"><?php esc_html_e('Install and activate the Nimbus Pro plugin to unlock bulk migration, cache purge, WP-CLI commands, and more.', NIMBUS_TEXT_DOMAIN); ?></p>
-        <a href="https://usenimbus.dev/#pricing" target="_blank" rel="noopener noreferrer" class="button button-secondary">
-          <?php esc_html_e('Upgrade to Pro', NIMBUS_TEXT_DOMAIN); ?>
-        </a>
-      <?php endif; ?>
     </div>
     <?php
   }
@@ -1779,27 +1444,6 @@ final class PageRenderer
 
       </div>
     </section>
-    <?php
-  }
-
-  private function renderLicenseOverlay(): void
-  {
-    $activateUrl = esc_url($this->adminTabUrl('license'));
-    ?>
-    <div class="nmb-license-overlay" id="mo-license-overlay" role="dialog" aria-modal="true" aria-labelledby="mo-overlay-heading">
-      <div class="nmb-license-overlay__box">
-        <div class="nmb-license-overlay__icon">
-          <span class="dashicons dashicons-lock" aria-hidden="true"></span>
-        </div>
-        <h2 id="mo-overlay-heading"><?php esc_html_e('License required', NIMBUS_TEXT_DOMAIN); ?></h2>
-        <p><?php esc_html_e('Nimbus requires an active license key. Activate your license to access all features, including media offloading, URL rewriting, and background jobs.', NIMBUS_TEXT_DOMAIN); ?></p>
-        <div class="nmb-license-overlay__actions">
-          <a href="<?php echo $activateUrl; ?>" class="button button-primary"><?php esc_html_e('Activate license', NIMBUS_TEXT_DOMAIN); ?></a>
-          <a href="https://plugintree.com/nimbus/" target="_blank" rel="noopener noreferrer" class="button button-secondary"><?php esc_html_e('Purchase', NIMBUS_TEXT_DOMAIN); ?></a>
-          <button type="button" class="button" onclick="document.getElementById('mo-license-overlay').style.display='none'"><?php esc_html_e('Dismiss', NIMBUS_TEXT_DOMAIN); ?></button>
-        </div>
-      </div>
-    </div>
     <?php
   }
 

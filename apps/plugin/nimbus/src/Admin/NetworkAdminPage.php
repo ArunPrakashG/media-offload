@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Config\Settings;
-use Nimbus\Plugin\License\LicenseManager;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -21,7 +20,6 @@ final class NetworkAdminPage
 
   public function __construct(
     private Settings $settings,
-    private LicenseManager $licenseManager,
   ) {
   }
 
@@ -50,32 +48,9 @@ final class NetworkAdminPage
     }
 
     $sites = $this->getSiteStats();
-    $license = $this->licenseManager->status();
     ?>
     <div class="wrap">
       <h1><?php esc_html_e('Nimbus — Network Overview', NIMBUS_TEXT_DOMAIN); ?></h1>
-
-      <h2><?php esc_html_e('License', NIMBUS_TEXT_DOMAIN); ?></h2>
-      <table class="widefat striped" style="max-width:600px;margin-bottom:2em">
-        <tbody>
-          <tr>
-            <th><?php esc_html_e('Status', NIMBUS_TEXT_DOMAIN); ?></th>
-            <td><?php echo esc_html((string) ($license['status'] ?? '—')); ?></td>
-          </tr>
-          <tr>
-            <th><?php esc_html_e('Plan', NIMBUS_TEXT_DOMAIN); ?></th>
-            <td><?php echo esc_html((string) ($license['tier'] ?? '—')); ?></td>
-          </tr>
-          <tr>
-            <th><?php esc_html_e('Sites allowed', NIMBUS_TEXT_DOMAIN); ?></th>
-            <td><?php echo esc_html((string) ($license['sites_allowed'] ?? '—')); ?></td>
-          </tr>
-          <tr>
-            <th><?php esc_html_e('Domain', NIMBUS_TEXT_DOMAIN); ?></th>
-            <td><?php echo esc_html((string) ($license['domain'] ?? '—')); ?></td>
-          </tr>
-        </tbody>
-      </table>
 
       <h2><?php esc_html_e('Per-site offload statistics', NIMBUS_TEXT_DOMAIN); ?></h2>
       <?php if (empty($sites)) : ?>

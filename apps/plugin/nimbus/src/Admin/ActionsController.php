@@ -2,8 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Bootstrap\DataMigration;
-use Nimbus\Plugin\License\LicenseClient;
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
@@ -25,7 +23,6 @@ final class ActionsController
     private Settings $settings,
     private Logger $logger,
     private UploadHandler $uploadHandler,
-    private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
   ) {
   }
@@ -212,11 +209,6 @@ final class ActionsController
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING);
 
     $provider = isset($_POST['provider']) ? sanitize_key((string) wp_unslash($_POST['provider'])) : $this->settings->provider();
-    $licenseKeyFromPost = isset($_POST['license_key']) ? sanitize_text_field((string) wp_unslash($_POST['license_key'])) : '';
-    $storedKey = $this->licenseManager->key();
-    // Fall back to the stored key so that free-tier or externally-activated
-    // licenses are accepted even if the form field happened to be empty.
-    $licenseKey = $licenseKeyFromPost !== '' ? $licenseKeyFromPost : $storedKey;
     $conflictAcknowledged = !empty($_POST['conflict_acknowledged']);
     $values = [
       'enabled' => !empty($_POST['enabled']),
@@ -237,11 +229,6 @@ final class ActionsController
     $normalized = $this->settings->sanitize(array_merge($this->settings->all(), $values));
     $missing = $provider !== 'local' ? $this->settings->missing_required_credentials($normalized, $provider) : [];
 
-    if ($licenseKey === '') {
-      pushAdminNotice(__('Add your license key before finishing onboarding.', NIMBUS_TEXT_DOMAIN), 'error');
-      $this->redirectToTab('onboarding', ['onboarding_step' => 'account']);
-    }
-
     if ($provider !== 'local' && !empty($missing)) {
       pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', NIMBUS_TEXT_DOMAIN), implode(', ', $missing)), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'storage']);
@@ -254,18 +241,6 @@ final class ActionsController
     }
 
     $this->settings->update($normalized);
-    // Only write license data when a new or different key was explicitly submitted.
-    // Preserves an existing 'active' free-tier status when the form just
-    // re-submits the stored key, and avoids touching the license when the
-    // key came entirely from the DB fallback (empty POST field).
-    $isNewKey = $licenseKeyFromPost !== '' && !($licenseKeyFromPost === $storedKey && $this->licenseManager->status() === 'active');
-    if ($isNewKey) {
-      $this->licenseManager->update($licenseKey, [
-        'status' => 'active-pending-validation',
-        'plan' => 'monthly',
-        'last_validated_at' => 0,
-      ]);
-    }
     $this->onboardingManager->markCompleted();
 
     if (!empty($activeConflicts)) {
@@ -626,223 +601,6 @@ final class ActionsController
   {
     $cooldown = max(300, (int) apply_filters('nimbus_missing_source_retry_cooldown_seconds', 12 * HOUR_IN_SECONDS));
     return time() - $cooldown;
-  }
-
-  // ── License management ─────────────────────────────────────────────────────
-
-  /**
-   * Handle admin-post activation of a license key.
-   *
-   * 1. Verifies nonce + permissions.
-   * 2. Calls the backend /v1/licenses/activate for the current domain.
-   * 3. On success, persists token + metadata in WordPress options.
-   * 4. On max_activations_reached, redirects back with an error notice;
-   *    the License tab will show the active-sites list so the user can
-   *    deactivate one and retry.
-   */
-  public function handleLicenseActivate(): void
-  {
-    if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $nonce = isset($_POST['_wpnonce']) ? (string) wp_unslash($_POST['_wpnonce']) : '';
-    if (!wp_verify_nonce($nonce, NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE)) {
-      wp_die(esc_html__('Security check failed.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $key     = isset($_POST['license_key']) ? sanitize_text_field((string) wp_unslash($_POST['license_key'])) : '';
-    $key     = trim($key);
-    $tabUrl  = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'license'], admin_url('admin.php'));
-
-    if ($key === '') {
-      pushAdminNotice(__('Please enter a license key.', NIMBUS_TEXT_DOMAIN), 'error');
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    $domain  = wp_parse_url(home_url(), PHP_URL_HOST) ?: '';
-    $product = 'nimbus'; // must match the product slug in the backend DB
-
-    $client = new LicenseClient();
-    $result = $client->activate($key, $domain, $product);
-
-    if (is_wp_error($result)) {
-      $code = $result->get_error_code();
-
-      if ($code === 'max_activations_reached') {
-        // Store the key as "pending" so the License tab can show the sites list.
-        $this->licenseManager->update($key, ['status' => 'pending']);
-        pushAdminNotice(
-          __('This license has reached its activation limit. Visit the License tab to deactivate an existing site and re-activate here.', NIMBUS_TEXT_DOMAIN),
-          'warning'
-        );
-      } else {
-        pushAdminNotice(
-          sprintf(
-            /* translators: %s: error message */
-            __('License activation failed: %s', NIMBUS_TEXT_DOMAIN),
-            $result->get_error_message()
-          ),
-          'error'
-        );
-      }
-
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    // Persist the issued token + metadata.
-    $this->licenseManager->update($key, [
-      'status'           => 'active',
-      'tier'             => sanitize_key((string) ($result['tier'] ?? '')),
-      'token'            => sanitize_text_field((string) ($result['token'] ?? '')),
-      'token_expires_at' => strtotime((string) ($result['expires_at'] ?? '')) ?: 0,
-      'last_validated_at' => time(),
-    ]);
-
-    pushAdminNotice(__('License activated successfully.', NIMBUS_TEXT_DOMAIN), 'success');
-    wp_safe_redirect($tabUrl);
-    exit;
-  }
-
-  /**
-   * Register a free-tier license directly from within the plugin.
-   *
-   * No license key is needed from the user. The handler uses the site's admin
-   * email and home URL domain to call the public backend registration endpoint,
-   * which is idempotent — repeated calls return the same free license.
-   */
-  public function handleLicenseActivateFree(): void
-  {
-    if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $nonce = isset($_POST['_wpnonce']) ? (string) wp_unslash($_POST['_wpnonce']) : '';
-    if (!wp_verify_nonce($nonce, NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE)) {
-      wp_die(esc_html__('Security check failed.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $tabUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'license'], admin_url('admin.php'));
-    $email  = (string) get_option('admin_email', '');
-    $domain = wp_parse_url(home_url(), PHP_URL_HOST) ?: '';
-
-    if ($email === '' || $domain === '') {
-      pushAdminNotice(__('Could not determine site email or domain. Please enter a license key manually.', NIMBUS_TEXT_DOMAIN), 'error');
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    $client = new LicenseClient();
-    $result = $client->registerFree($email, $domain);
-
-    if (is_wp_error($result)) {
-      pushAdminNotice(
-        sprintf(
-          /* translators: %s: error message */
-          __('Free tier registration failed: %s', NIMBUS_TEXT_DOMAIN),
-          $result->get_error_message()
-        ),
-        'error'
-      );
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    $key = sanitize_text_field((string) ($result['key'] ?? ''));
-
-    $this->licenseManager->update($key, [
-      'status'            => 'active',
-      'tier'              => 'free',
-      'token'             => sanitize_text_field((string) ($result['token'] ?? '')),
-      'token_expires_at'  => 0,   // free tier tokens don't expire
-      'last_validated_at' => time(),
-    ]);
-
-    pushAdminNotice(__('Free tier activated. You can upgrade to a paid plan at any time.', NIMBUS_TEXT_DOMAIN), 'success');
-
-    // If coming from the onboarding wizard, advance to the storage step.
-    // Otherwise, stay on the License tab.
-    if (!$this->onboardingManager->isCompleted()) {
-      $this->redirectToTab('onboarding', ['onboarding_step' => 'storage']);
-    }
-
-    wp_safe_redirect($tabUrl);
-    exit;
-  }
-
-  /**
-   * Handle deactivation of a specific domain from a license.
-   *
-   * The License tab renders a form with `domain` (the domain to deactivate)
-   * and `license_key` (the current key). This handler calls the backend
-   * /v1/licenses/deactivate to free up that slot.
-   */
-  public function handleLicenseDeactivateSite(): void
-  {
-    if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $nonce = isset($_POST['_wpnonce']) ? (string) wp_unslash($_POST['_wpnonce']) : '';
-    if (!wp_verify_nonce($nonce, NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE)) {
-      wp_die(esc_html__('Security check failed.', NIMBUS_TEXT_DOMAIN), 403);
-    }
-
-    $key    = isset($_POST['license_key']) ? sanitize_text_field((string) wp_unslash($_POST['license_key'])) : '';
-    $domain = isset($_POST['domain']) ? sanitize_text_field((string) wp_unslash($_POST['domain'])) : '';
-    $tabUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'license'], admin_url('admin.php'));
-
-    if ($key === '' || $domain === '') {
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    $token = $this->licenseManager->token();
-    if (empty($token)) {
-      pushAdminNotice(
-        __('No activation token found. Please re-activate your license first, then try again.', NIMBUS_TEXT_DOMAIN),
-        'error'
-      );
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    $client = new LicenseClient();
-    $result = $client->deactivate($token, $domain);
-
-    if (is_wp_error($result)) {
-      pushAdminNotice(
-        sprintf(
-          /* translators: %s: error message */
-          __('Could not deactivate site: %s', NIMBUS_TEXT_DOMAIN),
-          $result->get_error_message()
-        ),
-        'error'
-      );
-      wp_safe_redirect($tabUrl);
-      exit;
-    }
-
-    // If the deactivated domain is the current site, clear local license data.
-    $currentDomain = wp_parse_url(home_url(), PHP_URL_HOST) ?: '';
-    if ($domain === $currentDomain) {
-      $this->licenseManager->clear();
-      pushAdminNotice(__('This site has been deactivated from the license.', NIMBUS_TEXT_DOMAIN), 'info');
-    } else {
-      pushAdminNotice(
-        sprintf(
-          /* translators: %s: domain name */
-          __('Site "%s" deactivated from license.', NIMBUS_TEXT_DOMAIN),
-          esc_html($domain)
-        ),
-        'success'
-      );
-    }
-
-    wp_safe_redirect($tabUrl);
-    exit;
   }
 
   // ── Config export ──────────────────────────────────────────────────────────

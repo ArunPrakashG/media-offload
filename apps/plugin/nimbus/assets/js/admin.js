@@ -502,7 +502,7 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    var steps = ['account', 'storage', 'delivery', 'review'];
+    var steps = ['storage', 'delivery', 'review'];
     var currentStep = parseInt($wizard.data('currentStep') || 0, 10);
     var $form = $wizard.find('form.nmb-onboarding-main');
     var $notice = $('<div/>', {
@@ -613,10 +613,6 @@ jQuery(document).ready(function ($) {
     function validateStep(step) {
       var provider = providerValue();
 
-      if (step === 'account' && $.trim(fieldByName('license_key').val() || '') === '') {
-        return 'Enter a license key before continuing.';
-      }
-
       if (step !== 'storage' || provider === 'local') {
         return '';
       }
@@ -708,21 +704,6 @@ jQuery(document).ready(function ($) {
       goToStep(currentStep + 1);
     });
 
-    $wizard.on('click', '[data-free-tier]', function () {
-      var $btn = $(this);
-
-      if ($btn.prop('disabled')) {
-        return;
-      }
-
-      $btn.prop('disabled', true)
-        .html('<span class="nmb-spinner"></span> Registering&hellip;');
-
-      $('#nmb-free-tier-nonce').val($btn.data('nonce'));
-      $('#nmb-free-tier-action').val($btn.data('action'));
-      $('#nmb-free-tier-form').attr('action', $btn.data('url')).get(0).submit();
-    });
-
     $wizard.on('click', '.nmb-onboarding-step-item', function () {
       var step = $(this).data('stepItem');
       var targetIndex = steps.indexOf(step);
@@ -750,7 +731,7 @@ jQuery(document).ready(function ($) {
     });
 
     $form.on('submit', function (event) {
-      var blockingSteps = ['account', 'storage'];
+      var blockingSteps = ['storage'];
 
       applyOnboardingProviderVisibility();
 

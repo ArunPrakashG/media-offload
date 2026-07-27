@@ -2,7 +2,7 @@
 
 > Your media, elevated.
 
-Nimbus is a WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, or any S3-compatible storage provider, with automatic URL rewriting, optional CDN delivery, and a clean admin UI designed for developers and site operators.
+Nimbus is a free, open-source WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, or any S3-compatible storage provider, with automatic URL rewriting, optional CDN delivery, and a clean admin UI designed for developers and site operators. There is no license key and no paid tier — every feature is available out of the box.
 
 The plugin entry point is `nimbus.php`. Runtime and domain logic lives under `src/`, namespaced as `Nimbus\Plugin\*`.
 
@@ -21,11 +21,16 @@ Maintained by **Arun Prakash** — `contact@arunprakashg.com`
 - Per-attachment ignore toggle in the Media Library
 - Media Library status column, dropdown filter, and native bulk actions (offload / restore / retry)
 - Configurable path filters: allow-list and deny-list with glob placeholders
-- Smart Slider 3, Slider Revolution, Elementor, and NextGEN Gallery integration rewrites
-- First-run onboarding flow for license key and bucket configuration
+- Smart Slider 3, Slider Revolution, Elementor, and NextGEN Gallery database URL rewrites
+- First-run onboarding flow for bucket configuration
 - Integrations tab driven by the `nimbus_integrations` filter — extensible without core edits
 - Cache purge integrations for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and generic proxy/Nginx endpoints
-- REST API endpoints for status, statistics, integration discovery, and offload triggers
+- Bulk job scheduler (offload existing media, restore local copies, retry failed items) with pause/resume support
+- WooCommerce protected-download delivery via signed storage URLs
+- Multisite network admin panel with per-site offload statistics
+- Selective offload rules by MIME type and file size
+- Nightly background batch offload for anything missed by the real-time hook
+- REST API endpoints for status, statistics, integration discovery, bulk jobs, cache purge, and offload triggers
 - Statistics dashboard with media-type, monthly trend, asset-root, and estimated provider cost breakdowns
 - Structured logger with source/level/context metadata, retention cap, and a dedicated Logs admin tab
 
@@ -54,7 +59,7 @@ Activate the plugin in WordPress. On first activation you will be redirected to 
 ## Configuration
 
 1. Activate Nimbus in WordPress.
-2. Complete the **Onboarding** tab: enter your license key and bucket credentials.
+2. Complete the **Onboarding** tab: enter your bucket credentials.
 3. Review any conflict warnings for other media offload plugins you may have installed.
 4. Enable **Serve From Storage** to rewrite public URLs.
 5. Leave **Remove Local Copies** disabled in development until everything is verified.
@@ -265,4 +270,4 @@ All image traffic flows through Cloudflare's CDN — eliminating inbound S3/R2 b
 - Failed uploads surface as admin notices and fall back transparently to local storage.
 - Additional storage providers can be added by implementing `Nimbus\Plugin\Storage\StorageAdapter` and registering via `StorageAdapterFactory`.
 
-See [`docs/refactor-roadmap.md`](docs/refactor-roadmap.md) for the architecture and commercialization roadmap, and [`docs/competitor-analysis.md`](docs/competitor-analysis.md) for the UI and feature gap analysis.
+See [`docs/competitor-analysis.md`](docs/competitor-analysis.md) for the UI and feature gap analysis. [`docs/refactor-roadmap.md`](docs/refactor-roadmap.md) documents the plugin's earlier commercial-licensing architecture and is kept for historical context only — it no longer reflects how the plugin works.
