@@ -2,7 +2,7 @@
 
 > Your media, elevated.
 
-Monorepo for the Nimbus product — a WordPress media offload plugin, a marketing website, and a subscription/licensing backend.
+Monorepo for the Nimbus product — a free, open-source WordPress media offload plugin and its marketing/docs website. There is no subscription or licensing backend; Nimbus has no paid tier.
 
 ## Structure
 
@@ -10,8 +10,7 @@ Monorepo for the Nimbus product — a WordPress media offload plugin, a marketin
 nimbus/
 ├── apps/
 │   ├── plugin/     WordPress plugin (PHP) — offloads media to S3 / R2 / compatible storage
-│   ├── web/        Marketing & documentation website
-│   └── backend/    Subscription and license management API (Go / Python)
+│   └── web/        Marketing & documentation website
 ├── packages/       Shared libraries and utilities consumed across apps
 ├── infra/          Infrastructure-as-code (Terraform / Docker / CI configs)
 ├── scripts/        Repo-level dev and automation scripts
@@ -23,11 +22,10 @@ nimbus/
 
 ## Apps
 
-| App                              | Language    | Purpose                        |
-| -------------------------------- | ----------- | ------------------------------ |
-| [`apps/plugin/`](apps/plugin/)   | PHP 8.1+    | WordPress media offload plugin |
-| [`apps/web/`](apps/web/)         | TBD         | Marketing and docs site        |
-| [`apps/backend/`](apps/backend/) | Go / Python | License & subscription API     |
+| App                            | Language | Purpose                        |
+| ------------------------------- | -------- | ------------------------------- |
+| [`apps/plugin/`](apps/plugin/) | PHP 8.1+ | WordPress media offload plugin |
+| [`apps/web/`](apps/web/)       | TBD      | Marketing and docs site        |
 
 ## Quick start — plugin development
 

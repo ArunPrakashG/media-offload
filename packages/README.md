@@ -6,12 +6,7 @@ Shared libraries consumed by two or more apps in this monorepo.
 
 Add a subdirectory here when a piece of logic (types, utilities, API clients, shared config) needs to be used by more than one app and keeping it duplicated across apps would cause drift.
 
-## Example packages (to be created as needed)
-
-| Package                    | Purpose                                                                                      |
-| -------------------------- | -------------------------------------------------------------------------------------------- |
-| `packages/license-client/` | Typed HTTP client for the backend licensing API, shared between `apps/plugin` and `apps/web` |
-| `packages/types/`          | Shared TypeScript types for the web ↔ backend contract                                       |
+No packages exist yet. Add one here if logic needs to be shared between `apps/plugin` and `apps/web` (e.g. shared TypeScript types, config, or utilities) — there is no backend service for either app to share a client with.
 
 ## Conventions
 

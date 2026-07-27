@@ -7,7 +7,7 @@ Infrastructure-as-code and environment configuration for the Nimbus platform.
 ```
 infra/
 ├── terraform/      Cloud resource definitions (VPS, DNS, object storage, CDN)
-├── docker/         Production Dockerfiles for apps/backend and apps/web
+├── docker/         Production Dockerfiles for apps/web
 └── ci/             CI/CD pipeline configs (GitHub Actions workflows)
 ```
 
