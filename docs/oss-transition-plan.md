@@ -10,7 +10,7 @@ This doc is the punch list. Work top to bottom; each phase is mergeable independ
 
 ---
 
-## Phase 1 — Merge pro into free, strip all licensing
+## Phase 1 — Merge pro into free, strip all licensing ✅ done ([PR #9](https://github.com/ArunPrakashG/media-offload/pull/9))
 
 Goal: one plugin, zero license gates, all current pro features available to everyone.
 
@@ -49,13 +49,22 @@ Goal: one plugin, zero license gates, all current pro features available to ever
 
 ---
 
-## Phase 2 — Decommission paid infrastructure
+## Phase 2 — Decommission paid infrastructure ✅ code done, ops action still required (see below)
 
-- `apps/backend`: archive the repo directory (or delete after confirming Phase 1 is fully merged and no plugin code points at it) — DB, Redis, and hosting can be torn down.
+**Done in code** (repo work, this session):
+- Deleted `apps/backend` entirely, and `bruno/backend/` (its API test collections).
+- `infra/docker-compose.yml`: removed the `nimbus-api`, `nimbus-db`, `nimbus-redis` services and `BACKEND_URL` wiring — only `nimbus-web` remains.
+- `infra/deploy.sh`: simplified to only build/restart the web frontend.
+- `infra/.env.example`: stripped all backend-only secrets (DB password, license signing keys, admin API secret, Razorpay keys/plan IDs).
+- Root `README.md` / `packages/README.md`: dropped backend references.
+- `bruno/environments/{Local,Production}.bru`: removed `backendUrl` and a hardcoded `adminToken` that was committed in plaintext (see ops action below).
+
+**Still required — these are real-world actions outside this repo, not something committing code accomplishes:**
 - Revoke/rotate the Razorpay API keys (`RazorpayKeyID/KeySecret/WebhookSecret`) and cancel the Razorpay account/webhook subscription once confirmed no other product depends on them.
-- Revoke the `LICENSE_PRIVATE_KEY` Ed25519 signing key material — it no longer signs anything meaningful once `LicenseManager` is deleted.
+- Revoke the `LICENSE_PRIVATE_KEY` Ed25519 signing key material — it no longer signs anything meaningful once `LicenseManager` is deleted (done in Phase 1).
+- **Rotate the `adminToken` found hardcoded in `bruno/environments/{Local,Production}.bru` git history** — removing it from the working tree does not remove it from history; treat it as compromised.
 - Cloudflare R2 bucket used for pro-zip distribution — no longer needed once WordPress.org hosts the zip; deprovision or repurpose.
-- DNS/hosting for `api.usenimbus.dev` — take down once Phase 1 confirms zero remaining references.
+- DNS/hosting for `api.usenimbus.dev` and the backend's DB/Redis hosting — take down now that the code is gone.
 
 Since there are no existing paying customers, no billing wind-down or customer-refund emails are needed here.
 
