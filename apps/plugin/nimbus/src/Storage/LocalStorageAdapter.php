@@ -41,8 +41,9 @@ final class LocalStorageAdapter implements StorageAdapter
   public function delete(string $key): void
   {
     $path = trailingslashit($this->basePath) . ltrim($key, '/');
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Plain writability check on a local dev-adapter path; WP_Filesystem would require credential prompts inappropriate for same-server file management.
     if (file_exists($path) && is_writable($path)) {
-      unlink($path);
+      wp_delete_file($path);
     }
   }
 
@@ -50,10 +51,12 @@ final class LocalStorageAdapter implements StorageAdapter
   {
     $sourcePath = trailingslashit($this->basePath) . ltrim($key, '/');
     if (!file_exists($sourcePath)) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException(sprintf('File not found in local storage: %s', $key));
     }
 
     if (!is_dir(dirname($destinationPath)) && !wp_mkdir_p(dirname($destinationPath))) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException(sprintf('Unable to prepare local destination: %s', dirname($destinationPath)));
     }
 
@@ -92,11 +95,13 @@ final class LocalStorageAdapter implements StorageAdapter
   {
     $path = trailingslashit($this->basePath) . ltrim($key, '/');
     if (!file_exists($path) || !is_readable($path)) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException(sprintf('Object not found in local adapter: %s', $key));
     }
 
     $size = filesize($path);
     if ($size === false) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException(sprintf('Failed to read object size in local adapter: %s', $key));
     }
 

@@ -187,6 +187,7 @@ final class Logger
     update_option(NIMBUS_LOG_OPTION_KEY, $entries, false);
 
     if ($this->shouldMirrorToPhpErrorLog() && function_exists('error_log')) {
+      // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Intentional, user-configurable "mirror log entries to the PHP error log" feature (Settings > Logging), not leftover debug code.
       error_log('[Nimbus][' . strtoupper($level) . '][' . $entry['source'] . '] ' . $interpolated);
     }
 
@@ -318,6 +319,7 @@ final class Logger
       return $source;
     }
 
+    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Intentional: infers the calling class name to auto-tag log entries by source when the caller didn't pass one explicitly. Not leftover debug code.
     foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 8) as $frame) {
       $class = (string) ($frame['class'] ?? '');
       if ($class === '' || $class === self::class) {

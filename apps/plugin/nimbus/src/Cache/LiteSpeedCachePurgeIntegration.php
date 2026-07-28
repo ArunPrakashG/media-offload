@@ -109,6 +109,7 @@ final class LiteSpeedCachePurgeIntegration implements PurgeIntegration
     }
 
     if (has_action('litespeed_purge_all')) {
+      // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Triggering LiteSpeed Cache's own hook by its required name, not defining one of ours.
       do_action('litespeed_purge_all');
       return true;
     }
@@ -124,6 +125,7 @@ final class LiteSpeedCachePurgeIntegration implements PurgeIntegration
     }
 
     if (has_action('litespeed_purge_url')) {
+      // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Triggering LiteSpeed Cache's own hook by its required name, not defining one of ours.
       do_action('litespeed_purge_url', $url);
       return true;
     }

@@ -34,6 +34,7 @@ final class Events
 
   public static function dispatch(string $hook, array $payload = []): void
   {
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- $hook is always one of this class's own nimbus_*-prefixed constants; every call site passes an Events::* constant, never an arbitrary string.
     do_action($hook, $payload);
   }
 }

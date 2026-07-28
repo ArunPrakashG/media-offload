@@ -31,8 +31,8 @@ final class NetworkAdminPage
   public function addNetworkMenu(): void
   {
     add_menu_page(
-      __('Nimbus Network', NIMBUS_TEXT_DOMAIN),
-      __('Nimbus', NIMBUS_TEXT_DOMAIN),
+      __('Nimbus Network', 'nimbus'),
+      __('Nimbus', 'nimbus'),
       'manage_network',
       self::MENU_SLUG,
       [$this, 'renderPage'],
@@ -44,26 +44,26 @@ final class NetworkAdminPage
   public function renderPage(): void
   {
     if (!current_user_can('manage_network')) {
-      wp_die(esc_html__('You do not have permission to access this page.', NIMBUS_TEXT_DOMAIN));
+      wp_die(esc_html__('You do not have permission to access this page.', 'nimbus'));
     }
 
     $sites = $this->getSiteStats();
     ?>
     <div class="wrap">
-      <h1><?php esc_html_e('Nimbus — Network Overview', NIMBUS_TEXT_DOMAIN); ?></h1>
+      <h1><?php esc_html_e('Nimbus — Network Overview', 'nimbus'); ?></h1>
 
-      <h2><?php esc_html_e('Per-site offload statistics', NIMBUS_TEXT_DOMAIN); ?></h2>
+      <h2><?php esc_html_e('Per-site offload statistics', 'nimbus'); ?></h2>
       <?php if (empty($sites)) : ?>
-        <p><?php esc_html_e('No sites found in this network.', NIMBUS_TEXT_DOMAIN); ?></p>
+        <p><?php esc_html_e('No sites found in this network.', 'nimbus'); ?></p>
       <?php else : ?>
         <table class="widefat striped">
           <thead>
             <tr>
-              <th><?php esc_html_e('Site', NIMBUS_TEXT_DOMAIN); ?></th>
-              <th><?php esc_html_e('Provider', NIMBUS_TEXT_DOMAIN); ?></th>
-              <th><?php esc_html_e('Offloaded files', NIMBUS_TEXT_DOMAIN); ?></th>
-              <th><?php esc_html_e('Pending', NIMBUS_TEXT_DOMAIN); ?></th>
-              <th><?php esc_html_e('Settings', NIMBUS_TEXT_DOMAIN); ?></th>
+              <th><?php esc_html_e('Site', 'nimbus'); ?></th>
+              <th><?php esc_html_e('Provider', 'nimbus'); ?></th>
+              <th><?php esc_html_e('Offloaded files', 'nimbus'); ?></th>
+              <th><?php esc_html_e('Pending', 'nimbus'); ?></th>
+              <th><?php esc_html_e('Settings', 'nimbus'); ?></th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +72,7 @@ final class NetworkAdminPage
                 <td>
                   <strong><?php echo esc_html($site['name']); ?></strong>
                   <div class="row-actions">
-                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', NIMBUS_TEXT_DOMAIN); ?></a></span>
+                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'nimbus'); ?></a></span>
                   </div>
                 </td>
                 <td><?php echo esc_html($site['provider']); ?></td>
@@ -80,7 +80,7 @@ final class NetworkAdminPage
                 <td><?php echo esc_html((string) $site['pending_count']); ?></td>
                 <td>
                   <a href="<?php echo esc_url($site['settings_url']); ?>" target="_blank">
-                    <?php esc_html_e('Open', NIMBUS_TEXT_DOMAIN); ?>
+                    <?php esc_html_e('Open', 'nimbus'); ?>
                   </a>
                 </td>
               </tr>
@@ -116,11 +116,13 @@ final class NetworkAdminPage
 
       global $wpdb;
 
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Per-site counts on the network admin overview; read live across each blog in the switch_to_blog() loop, viewed only occasionally by super admins.
       $offloadedCount = (int) $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_META_KEY
       ));
 
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Per-site counts on the network admin overview; read live across each blog in the switch_to_blog() loop, viewed only occasionally by super admins.
       $pendingCount = (int) $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(DISTINCT post_id) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_PENDING_AT_META_KEY

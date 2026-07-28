@@ -37,6 +37,7 @@ function ensureDirectory(string $path): void
 {
   $directory = dirname($path);
   if (!is_dir($directory) && !wp_mkdir_p($directory)) {
+    // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
     throw new RuntimeException('Failed to create directory: ' . $directory);
   }
 }

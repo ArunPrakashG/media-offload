@@ -68,12 +68,14 @@ final class CloudflareCachePurgeIntegration implements PurgeIntegration
     ]);
 
     if (is_wp_error($response)) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new RuntimeException($response->get_error_message());
     }
 
     $status = (int) wp_remote_retrieve_response_code($response);
     $payload = json_decode((string) wp_remote_retrieve_body($response), true);
     if ($status < 200 || $status >= 300 || empty($payload['success'])) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new RuntimeException($this->extractCloudflareError($payload, $status));
     }
 

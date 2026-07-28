@@ -33,37 +33,37 @@ final class MinioProviderProfile extends AbstractProviderProfile implements Prov
 
   public function label(): string
   {
-    return __('MinIO', NIMBUS_TEXT_DOMAIN);
+    return __('MinIO', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('MinIO', NIMBUS_TEXT_DOMAIN);
+    return __('MinIO', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('Self-hosted S3-compatible object storage. Enter the full URL of your MinIO server as the custom endpoint. Path-style requests are enabled automatically.', NIMBUS_TEXT_DOMAIN);
+    return __('Self-hosted S3-compatible object storage. Enter the full URL of your MinIO server as the custom endpoint. Path-style requests are enabled automatically.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'   => __('Bucket', NIMBUS_TEXT_DOMAIN),
-      'endpoint' => __('MinIO Endpoint URL', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
+      'bucket'   => __('Bucket', 'nimbus'),
+      'endpoint' => __('MinIO Endpoint URL', 'nimbus'),
+      'access_key' => __('Access Key', 'nimbus'),
+      'secret_key' => __('Secret Key', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The bucket name on your MinIO server.', NIMBUS_TEXT_DOMAIN),
-      'endpoint'      => __('Full URL of your MinIO server, e.g. https://minio.example.com. Required — MinIO does not use a shared cloud endpoint.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('MinIO access key (root user or a policy-scoped key from the MinIO console).', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('MinIO secret key paired with the access key above.', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('MinIO does not enforce regions — leave as us-east-1 or any value your server accepts.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('The bucket name on your MinIO server.', 'nimbus'),
+      'endpoint'      => __('Full URL of your MinIO server, e.g. https://minio.example.com. Required — MinIO does not use a shared cloud endpoint.', 'nimbus'),
+      'access_key'    => __('MinIO access key (root user or a policy-scoped key from the MinIO console).', 'nimbus'),
+      'secret_key'    => __('MinIO secret key paired with the access key above.', 'nimbus'),
+      'region'        => __('MinIO does not enforce regions — leave as us-east-1 or any value your server accepts.', 'nimbus'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

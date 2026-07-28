@@ -1,0 +1,12 @@
+# Files and directories excluded from the WordPress.org SVN release package.
+# Only the runtime plugin (src/, vendor/, assets/, nimbus.php, uninstall.php,
+# readme.txt) ships to end users.
+
+.distignore
+.git
+.gitignore
+.gitattributes
+tools
+composer.json
+composer.lock
+README.md

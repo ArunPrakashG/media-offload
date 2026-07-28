@@ -123,6 +123,7 @@ final class DataMigration
     }
 
     foreach ($mappings as $legacyKey => $newKey) {
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time legacy-key migration on plugin upgrade; not a repeated read path, nothing to cache.
       $wpdb->query($wpdb->prepare(
         "UPDATE {$wpdb->postmeta} SET meta_key = %s WHERE meta_key = %s",
         $newKey,
@@ -139,6 +140,7 @@ final class DataMigration
       return false;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time legacy-data migration scan on plugin upgrade; must read current state live, nothing to cache.
     $attachmentIds = $wpdb->get_col($wpdb->prepare(
       "SELECT post_id
        FROM {$wpdb->postmeta}
@@ -214,12 +216,14 @@ final class DataMigration
     }
 
     $placeholders = implode(', ', array_fill(0, count($legacyKeys), '%s'));
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Table name is $wpdb->prefix + a hardcoded suffix (never user input); values bound via $wpdb->prepare(). Placeholders are built dynamically (one %s per key) so the static sniff can't count them; the runtime count always matches. One-time legacy-key check on plugin upgrade, nothing to cache.
     $sql = $wpdb->prepare(
       "SELECT DISTINCT meta_key FROM {$wpdb->postmeta} WHERE meta_key IN ($placeholders)",
       ...$legacyKeys
     );
 
     $results = $wpdb->get_col($sql);
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
     return is_array($results) ? array_map('strval', $results) : [];
   }
 
@@ -244,6 +248,7 @@ final class DataMigration
       return false;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time legacy-data check on plugin upgrade; must read current state live, nothing to cache.
     $postId = $wpdb->get_var($wpdb->prepare(
       "SELECT post_id
        FROM {$wpdb->postmeta}

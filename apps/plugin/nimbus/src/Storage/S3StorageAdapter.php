@@ -20,6 +20,7 @@ final class S3StorageAdapter implements StorageAdapter
     $required = ['bucket', 'region', 'access_key', 'secret_key'];
     foreach ($required as $key) {
       if (empty($config[$key])) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
         throw new RuntimeException(sprintf('Missing required S3 configuration value: %s', $key));
       }
     }
@@ -125,6 +126,7 @@ final class S3StorageAdapter implements StorageAdapter
         'key' => $destinationKey,
         'error' => $error,
       ]);
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new RuntimeException('Failed to upload object to storage: ' . $error);
     }
 
@@ -160,6 +162,7 @@ final class S3StorageAdapter implements StorageAdapter
           }
         }
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
         throw new RuntimeException('Storage authentication failed while deleting object: ' . $this->extractErrorMessage($exception));
       }
 
@@ -293,6 +296,7 @@ final class S3StorageAdapter implements StorageAdapter
             'error' => $this->extractErrorMessage($fallbackException),
           ]);
 
+          // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
           throw new RuntimeException(sprintf('Failed to get object size for key: %s', $key));
         }
       }
@@ -302,6 +306,7 @@ final class S3StorageAdapter implements StorageAdapter
         'error' => $this->extractErrorMessage($exception),
       ]);
 
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new RuntimeException(sprintf('Failed to get object size for key: %s', $key));
     }
   }
@@ -334,6 +339,7 @@ final class S3StorageAdapter implements StorageAdapter
       $this->logger->error('Connection test failed: {error}', [
         'error' => $this->extractErrorMessage($exception),
       ]);
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new RuntimeException($this->extractErrorMessage($exception));
     }
   }
@@ -366,6 +372,7 @@ final class S3StorageAdapter implements StorageAdapter
         'name' => $name,
         'error' => $this->extractErrorMessage($exception),
       ]);
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException($this->extractErrorMessage($exception));
     }
   }
@@ -390,6 +397,7 @@ final class S3StorageAdapter implements StorageAdapter
         'key' => $key,
         'error' => $this->extractErrorMessage($exception),
       ]);
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException($this->extractErrorMessage($exception));
     }
   }

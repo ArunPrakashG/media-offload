@@ -122,6 +122,7 @@ final class WpFastestCachePurgeIntegration implements PurgeIntegration
     }
 
     if (has_action('wpfc_clear_all_cache')) {
+      // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Triggering WP Fastest Cache's own hook by its required name, not defining one of ours.
       do_action('wpfc_clear_all_cache');
       return true;
     }
@@ -144,6 +145,7 @@ final class WpFastestCachePurgeIntegration implements PurgeIntegration
     }
 
     if (has_action('wpfc_clear_cache_by_url')) {
+      // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Triggering WP Fastest Cache's own hook by its required name, not defining one of ours.
       do_action('wpfc_clear_cache_by_url', $url);
       return true;
     }

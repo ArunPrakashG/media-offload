@@ -34,38 +34,38 @@ final class WasabiProviderProfile extends AbstractProviderProfile implements Pro
 
   public function label(): string
   {
-    return __('Wasabi', NIMBUS_TEXT_DOMAIN);
+    return __('Wasabi', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('Wasabi Hot Cloud Storage', NIMBUS_TEXT_DOMAIN);
+    return __('Wasabi Hot Cloud Storage', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('Wasabi is an S3-compatible cloud storage service with no egress fees. Select the region matching your Wasabi bucket and enter the access/secret keys from your Wasabi console.', NIMBUS_TEXT_DOMAIN);
+    return __('Wasabi is an S3-compatible cloud storage service with no egress fees. Select the region matching your Wasabi bucket and enter the access/secret keys from your Wasabi console.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'     => __('Bucket', NIMBUS_TEXT_DOMAIN),
-      'region'     => __('Region (e.g. us-east-1, eu-central-1)', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('Wasabi Access Key', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('Wasabi Secret Key', NIMBUS_TEXT_DOMAIN),
+      'bucket'     => __('Bucket', 'nimbus'),
+      'region'     => __('Region (e.g. us-east-1, eu-central-1)', 'nimbus'),
+      'access_key' => __('Wasabi Access Key', 'nimbus'),
+      'secret_key' => __('Wasabi Secret Key', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your Wasabi bucket name.', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('Wasabi region code, e.g. us-east-1, us-east-2, us-central-1, eu-central-1, ap-northeast-1.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('Access Key from the Wasabi console (IAM → Access Keys).', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('Secret Key paired with the access key above from the Wasabi console.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('Your Wasabi bucket name.', 'nimbus'),
+      'region'        => __('Wasabi region code, e.g. us-east-1, us-east-2, us-central-1, eu-central-1, ap-northeast-1.', 'nimbus'),
+      'access_key'    => __('Access Key from the Wasabi console (IAM → Access Keys).', 'nimbus'),
+      'secret_key'    => __('Secret Key paired with the access key above from the Wasabi console.', 'nimbus'),
       'session_token' => '',
-      'endpoint'      => __('Leave empty — Wasabi endpoints are built automatically from the region.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'      => __('Leave empty — Wasabi endpoints are built automatically from the region.', 'nimbus'),
       'r2_account_id' => '',
     ];
   }

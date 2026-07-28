@@ -2,7 +2,7 @@
 Contributors: arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1
 Stable tag: 0.2.0
 License: GPL-2.0-or-later

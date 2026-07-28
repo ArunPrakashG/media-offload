@@ -13,6 +13,11 @@
  *   POST   /nimbus-test/v1/cleanup-local/{id}      Synchronously delete local copies.
  *   POST   /nimbus-test/v1/setting                 Read/write a nimbus_settings key.
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 add_action( 'rest_api_init', function () {
 
     // ── Force offload ─────────────────────────────────────────────────────────
@@ -45,6 +50,7 @@ add_action( 'rest_api_init', function () {
             $value   = get_post_meta( $postId, $metaKey, true );
             return new WP_REST_Response( [
                 'post_id'  => $postId,
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- False positive: this is a literal "meta_key" response field label, not a WP_Query/get_posts arg. Dev-only Playwright test helper, not shipped in production.
                 'meta_key' => $metaKey,
                 'value'    => $value,
             ] );

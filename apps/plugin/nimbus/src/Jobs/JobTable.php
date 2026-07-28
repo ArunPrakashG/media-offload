@@ -71,10 +71,12 @@ final class JobTable
     global $wpdb;
 
     $table = self::tableName();
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table name is $wpdb->prefix + a hardcoded suffix (never user input). Values are bound via $wpdb->prepare() placeholders.
     $row = $wpdb->get_row(
       $wpdb->prepare("SELECT payload FROM {$table} WHERE slot = %s LIMIT 1", $slot),
       ARRAY_A
     );
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
     if (!is_array($row) || empty($row['payload'])) {
       return [];
@@ -95,6 +97,7 @@ final class JobTable
     global $wpdb;
 
     $table = self::tableName();
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom job-state table write; must persist immediately, nothing to cache on a write path.
     $wpdb->replace(
       $table,
       [

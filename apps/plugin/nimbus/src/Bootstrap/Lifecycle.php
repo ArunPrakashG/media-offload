@@ -47,6 +47,7 @@ final class Lifecycle
       // Record that the plugin was deactivated while DB-rewritten URLs exist so
       // the re-activation notice can warn the admin to check URL integrity.
       global $wpdb;
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- One-shot check on plugin deactivation; must read current state live, nothing to cache.
       $offloaded = (int) $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_META_KEY

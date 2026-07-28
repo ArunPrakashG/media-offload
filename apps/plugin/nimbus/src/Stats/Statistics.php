@@ -147,6 +147,7 @@ final class Statistics
     // All counts are per original upload (one WordPress attachment post = one
     // original upload, regardless of how many image-size variants WP generated
     // on disk or in the bucket).
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $totalAttachments = (int) $wpdb->get_var(
       $wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s",
@@ -154,12 +155,14 @@ final class Statistics
         'inherit'
       )
     );
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $offloadedAttachments = (int) $wpdb->get_var(
       $wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_META_KEY
       )
     );
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $ignoredAttachments = (int) $wpdb->get_var(
       $wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value = %s",
@@ -169,6 +172,7 @@ final class Statistics
     );
 
     $pendingAttachments = max(0, $totalAttachments - $offloadedAttachments - $ignoredAttachments);
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $dailyUploads = $wpdb->get_results(
       $wpdb->prepare(
         "SELECT DATE(post_date) as date, COUNT(*) as count
@@ -209,6 +213,7 @@ final class Statistics
     // that WordPress stored (WP 5.3+ includes 'filesize' per size).  This
     // gives an accurate per-attachment total that reflects all the physical
     // files that would have been — or have been — uploaded to the bucket.
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $sampleMeta  = $wpdb->get_col($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s LIMIT 200", '_wp_attachment_metadata'));
     $totalBytes  = 0;
     $sampleCount = 0;
@@ -309,6 +314,7 @@ final class Statistics
   {
     global $wpdb;
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $rows = $wpdb->get_results(
       $wpdb->prepare(
         "SELECT p.post_mime_type AS mime_type,
@@ -359,6 +365,7 @@ final class Statistics
   {
     global $wpdb;
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $rows = $wpdb->get_results(
       $wpdb->prepare(
         "SELECT DATE_FORMAT(p.post_date, '%%Y-%%m') AS month,
@@ -401,6 +408,7 @@ final class Statistics
   {
     global $wpdb;
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Live dashboard/statistics aggregate; must reflect current counts immediately after an offload/restore action, so it is intentionally not cached.
     $rows = $wpdb->get_col($wpdb->prepare("SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s LIMIT 5000", '_wp_attached_file'));
     if (!is_array($rows)) {
       return [];

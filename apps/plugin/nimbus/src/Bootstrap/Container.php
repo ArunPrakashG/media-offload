@@ -37,6 +37,7 @@ final class Container
     }
 
     if ($factory === null) {
+      // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
       throw new \RuntimeException(sprintf('Service "%s" has not been registered.', $id));
     }
 

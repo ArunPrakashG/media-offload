@@ -82,32 +82,33 @@ final class SettingsUi
       'actions' => ['testConnection' => NIMBUS_AJAX_TEST_CONNECTION],
       'restNamespace' => NIMBUS_REST_NAMESPACE,
       'strings' => [
-        'showAdvanced' => __('Show advanced connection fields', NIMBUS_TEXT_DOMAIN),
-        'hideAdvanced' => __('Hide advanced connection fields', NIMBUS_TEXT_DOMAIN),
-        'noExtraCredentials' => __('No extra credentials required', NIMBUS_TEXT_DOMAIN),
-        'providerNoBucket' => __('No bucket required in local mode', NIMBUS_TEXT_DOMAIN),
-        'providerBucketNotSet' => __('Bucket not set', NIMBUS_TEXT_DOMAIN),
-        'deliveryLocalDebug' => __('Local debug', NIMBUS_TEXT_DOMAIN),
-        'deliveryRemote' => __('Remote', NIMBUS_TEXT_DOMAIN),
-        'deliveryLocal' => __('Local', NIMBUS_TEXT_DOMAIN),
-        'deliveryNoCustomDomain' => __('No custom domain configured', NIMBUS_TEXT_DOMAIN),
-        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', NIMBUS_TEXT_DOMAIN),
-        'batchOn' => __('On', NIMBUS_TEXT_DOMAIN),
-        'batchOff' => __('Off', NIMBUS_TEXT_DOMAIN),
-        'batchNoSchedule' => __('No schedule set', NIMBUS_TEXT_DOMAIN),
-        'shellLocalDebugMode' => __('Local debug mode', NIMBUS_TEXT_DOMAIN),
-        'shellServingStorage' => __('Serving from storage', NIMBUS_TEXT_DOMAIN),
-        'shellServingLocal' => __('Serving from local URLs', NIMBUS_TEXT_DOMAIN),
-        'testing' => __('Testing…', NIMBUS_TEXT_DOMAIN),
-        'testingMessage' => __('Testing connection…', NIMBUS_TEXT_DOMAIN),
-        'testConnection' => __('Test Connection', NIMBUS_TEXT_DOMAIN),
-        'serverError' => __('Server error occurred.', NIMBUS_TEXT_DOMAIN),
-        'detailsHeading' => __('Connection details', NIMBUS_TEXT_DOMAIN),
-        'hintsHeading' => __('Suggested checks', NIMBUS_TEXT_DOMAIN),
-        'jobStartError' => __('Unable to start the requested bulk job.', NIMBUS_TEXT_DOMAIN),
-        'jobPauseError' => __('Unable to pause the current bulk job.', NIMBUS_TEXT_DOMAIN),
-        'jobResumeError' => __('Unable to resume the current bulk job.', NIMBUS_TEXT_DOMAIN),
-        'jobRetryError' => __('Unable to retry failed items right now.', NIMBUS_TEXT_DOMAIN),
+        'showAdvanced' => __('Show advanced connection fields', 'nimbus'),
+        'hideAdvanced' => __('Hide advanced connection fields', 'nimbus'),
+        'noExtraCredentials' => __('No extra credentials required', 'nimbus'),
+        'providerNoBucket' => __('No bucket required in local mode', 'nimbus'),
+        'providerBucketNotSet' => __('Bucket not set', 'nimbus'),
+        'deliveryLocalDebug' => __('Local debug', 'nimbus'),
+        'deliveryRemote' => __('Remote', 'nimbus'),
+        'deliveryLocal' => __('Local', 'nimbus'),
+        'deliveryNoCustomDomain' => __('No custom domain configured', 'nimbus'),
+        /* translators: this string is used as a client-side JS template; 1: allowed-pattern count, 2: ignored-pattern count */
+        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', 'nimbus'),
+        'batchOn' => __('On', 'nimbus'),
+        'batchOff' => __('Off', 'nimbus'),
+        'batchNoSchedule' => __('No schedule set', 'nimbus'),
+        'shellLocalDebugMode' => __('Local debug mode', 'nimbus'),
+        'shellServingStorage' => __('Serving from storage', 'nimbus'),
+        'shellServingLocal' => __('Serving from local URLs', 'nimbus'),
+        'testing' => __('Testing…', 'nimbus'),
+        'testingMessage' => __('Testing connection…', 'nimbus'),
+        'testConnection' => __('Test Connection', 'nimbus'),
+        'serverError' => __('Server error occurred.', 'nimbus'),
+        'detailsHeading' => __('Connection details', 'nimbus'),
+        'hintsHeading' => __('Suggested checks', 'nimbus'),
+        'jobStartError' => __('Unable to start the requested bulk job.', 'nimbus'),
+        'jobPauseError' => __('Unable to pause the current bulk job.', 'nimbus'),
+        'jobResumeError' => __('Unable to resume the current bulk job.', 'nimbus'),
+        'jobRetryError' => __('Unable to retry failed items right now.', 'nimbus'),
       ],
       'providers' => $this->providerCatalog->scriptData(),
       'assetRoots' => $this->statistics->get_attachment_roots(),
@@ -134,8 +135,8 @@ final class SettingsUi
   public function add_menu(): void
   {
     $hook = add_media_page(
-      __('Nimbus', NIMBUS_TEXT_DOMAIN),
-      __('Nimbus', NIMBUS_TEXT_DOMAIN),
+      __('Nimbus', 'nimbus'),
+      __('Nimbus', 'nimbus'),
       'manage_options',
       NIMBUS_SLUG,
       [$this, 'render_page']
@@ -216,12 +217,12 @@ final class SettingsUi
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       printf(
         '<div class="notice notice-warning"><p><strong>%s</strong> %s</p></div>',
-        esc_html__('Nimbus – URL integrity check recommended', NIMBUS_TEXT_DOMAIN),
+        esc_html__('Nimbus – URL integrity check recommended', 'nimbus'),
         sprintf(
           /* translators: %1$s: file count, %2$s: Tools link */
-          esc_html__('Nimbus was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', NIMBUS_TEXT_DOMAIN),
+          esc_html__('Nimbus was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', 'nimbus'),
           '<strong>' . esc_html(number_format_i18n($reactivationCount)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', NIMBUS_TEXT_DOMAIN) . '</a>'
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus') . '</a>'
         )
       );
     }
@@ -233,7 +234,7 @@ final class SettingsUi
 
     foreach ($notices as $notice) {
       $class = 'notice notice-' . esc_attr($notice['type']);
-      printf('<div class="%1$s"><p>%2$s</p></div>', $class, esc_html($notice['message']));
+      printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($class), esc_html($notice['message']));
     }
   }
 
@@ -256,6 +257,7 @@ final class SettingsUi
     $offloaded = (int) get_transient('nimbus_offloaded_count_cache');
     if ($offloaded === 0) {
       global $wpdb;
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Result is cached via the transient above/below; this only runs on a cache miss.
       $offloaded = (int) $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_META_KEY
@@ -273,13 +275,13 @@ final class SettingsUi
     ?>
     <div class="notice notice-warning nimbus-deactivation-hint">
       <p>
-        <strong><?php esc_html_e('Nimbus – Before you deactivate', NIMBUS_TEXT_DOMAIN); ?></strong><br>
+        <strong><?php esc_html_e('Nimbus – Before you deactivate', 'nimbus'); ?></strong><br>
         <?php
         printf(
           /* translators: %1$s: offloaded file count, %2$s: Tools link */
-          esc_html__('%1$s media file(s) have their URLs stored as CDN paths in the database. Deactivating Nimbus without reverting these first will break image delivery site-wide. Go to %2$s to revert all URLs back to local paths before deactivating.', NIMBUS_TEXT_DOMAIN),
+          esc_html__('%1$s media file(s) have their URLs stored as CDN paths in the database. Deactivating Nimbus without reverting these first will break image delivery site-wide. Go to %2$s to revert all URLs back to local paths before deactivating.', 'nimbus'),
           '<strong>' . esc_html(number_format_i18n($offloaded)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools → Revert URLs', NIMBUS_TEXT_DOMAIN) . '</a>'
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools → Revert URLs', 'nimbus') . '</a>'
         );
         ?>
       </p>
@@ -297,21 +299,25 @@ final class SettingsUi
   public function add_plugin_action_links(array $links): array
   {
     $settingsUrl = add_query_arg(['page' => NIMBUS_SLUG], admin_url('upload.php'));
-    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', NIMBUS_TEXT_DOMAIN) . '</a>');
+    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', 'nimbus') . '</a>');
 
     $offloaded = (int) get_transient('nimbus_offloaded_count_cache');
     if ($offloaded === 0) {
       global $wpdb;
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Result is cached via the transient above/below; this only runs on a cache miss.
       $offloaded = (int) $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s",
         NIMBUS_META_KEY
       ));
+      if ($offloaded > 0) {
+        set_transient('nimbus_offloaded_count_cache', $offloaded, HOUR_IN_SECONDS);
+      }
     }
 
     if ($offloaded > 0) {
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       $links[] = '<a href="' . esc_url($toolsUrl) . '" style="color:#d63638;font-weight:600;">'
-        . esc_html__('⚠ Revert URLs before deactivating', NIMBUS_TEXT_DOMAIN)
+        . esc_html__('⚠ Revert URLs before deactivating', 'nimbus')
         . '</a>';
     }
 
