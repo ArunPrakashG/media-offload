@@ -70,14 +70,14 @@ Since there are no existing paying customers, no billing wind-down or customer-r
 
 ---
 
-## Phase 3 — Update `apps/web` marketing site
+## Phase 3 — Update `apps/web` marketing site ✅ done
 
-- `src/components/Pricing.astro`: delete entirely (Razorpay checkout.js embed, plan prices, "14-day money-back guarantee" copy).
-- `src/pages/api/create-subscription.ts`, `src/pages/api/verify-payment.ts`: delete.
-- `src/pages/{refund,terms}.astro`: refund policy no longer applies (free product) — either delete or replace with a short "Nimbus is free — no purchases, no refunds needed" notice. Keep `privacy.astro` (still relevant — plugin may still involve user data via storage providers) but audit it for any now-false claims about payment data handling.
-- Replace the removed pricing section with a "Get Nimbus" CTA linking to the WordPress.org plugin page and the GitHub repo.
-- Update `Hero`/`Features`/`Cta`/`Navbar` copy that references "Pro"/"Personal"/"Agency" tiers to reflect the single free feature set.
-- Remove the `razorpay` npm dependency from `package.json`.
+- ~~`src/components/Pricing.astro`: delete entirely~~ — done, along with `create-subscription.ts`/`verify-payment.ts`.
+- ~~`src/pages/{refund,terms}.astro`~~ — `refund.astro` now shows a short "Nimbus is free, nothing to refund" notice (route kept alive for old bookmarks); `terms.astro` rewritten around the GPL-2.0-or-later grant; `privacy.astro` rewritten to reflect that the plugin has no license server or telemetry.
+- CTAs across `Hero`/`Cta`/`Navbar`/`Footer` now point at `/docs#installation` instead of `/#pricing`; the pricing nav entry and "cryptographically secured licensing" assurance are gone.
+- `compare.astro` and `docs.astro` (not originally scoped, but found to be just as stale) were also rewritten — pricing tables and every "Personal & above"/"Agency" qualifier removed.
+- `changelog.astro` gained a v0.2.0 entry documenting the free/OSS transition.
+- `razorpay` npm dependency removed; `pnpm-lock.yaml` regenerated. Verified with a full `astro build`.
 
 ---
 
