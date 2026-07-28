@@ -72,8 +72,6 @@ test.describe("Plugin status", () => {
     const row = page.locator('#the-list tr[data-slug="nimbus"]');
     await expect(row).toBeVisible();
     // Active plugins show "Deactivate" link; inactive show "Activate".
-    // When nimbus-pro is active it declares nimbus as a required plugin, so
-    // WordPress replaces the "Deactivate" link with a "cannot deactivate" message.
     // Either indicator confirms the plugin is active.
     const deactivateLink = row.locator("a", { hasText: /deactivate/i });
     const cannotDeactivate = row.locator("text=/cannot deactivate/i");

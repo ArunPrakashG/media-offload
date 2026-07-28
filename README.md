@@ -9,23 +9,21 @@ Monorepo for the Nimbus product — a free, open-source WordPress media offload 
 ```
 nimbus/
 ├── apps/
-│   ├── plugin/     WordPress plugin (PHP) — offloads media to S3 / R2 / compatible storage
-│   └── web/        Marketing & documentation website
-├── packages/       Shared libraries and utilities consumed across apps
-├── infra/          Infrastructure-as-code (Terraform / Docker / CI configs)
-├── scripts/        Repo-level dev and automation scripts
-└── infra/
-    ├── dev/
-    │   └── docker-compose.yml   Local WordPress sandbox for plugin development
-    └── docker-compose.yml       Production infrastructure
+│   ├── plugin/nimbus/  WordPress plugin (PHP) — offloads media to S3 / R2 / compatible storage
+│   └── web/            Marketing & documentation website (Astro)
+├── packages/           Shared libraries and utilities consumed across apps
+├── infra/              Infrastructure-as-code (Docker / CI configs)
+├── scripts/            Repo-level dev and automation scripts
+├── docs/               Architecture notes; docs/history/ is archived pre-OSS planning docs
+└── tests/e2e/          Playwright end-to-end tests
 ```
 
 ## Apps
 
-| App                            | Language | Purpose                        |
-| ------------------------------- | -------- | ------------------------------- |
-| [`apps/plugin/`](apps/plugin/) | PHP 8.1+ | WordPress media offload plugin |
-| [`apps/web/`](apps/web/)       | TBD      | Marketing and docs site        |
+| App                                          | Language     | Purpose                        |
+| --------------------------------------------- | ------------ | ------------------------------- |
+| [`apps/plugin/nimbus/`](apps/plugin/nimbus/) | PHP 8.1+     | WordPress media offload plugin |
+| [`apps/web/`](apps/web/)                     | Astro/TS     | Marketing and docs site        |
 
 ## Quick start — plugin development
 
@@ -43,8 +41,16 @@ docker compose -f infra/dev/docker-compose.yml down -v
 
 WordPress runs at `http://localhost:8080` · admin / password
 
-See [`apps/plugin/README.md`](apps/plugin/README.md) for full plugin documentation.
+See [`apps/plugin/nimbus/README.md`](apps/plugin/nimbus/README.md) for full plugin documentation.
 
 ## Contributing
 
-Each app and package has its own README with setup instructions. Start with the relevant subdirectory.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Each app also has its own README with setup instructions — start with the relevant subdirectory.
+
+## License
+
+GPL-2.0-or-later — see [`LICENSE`](LICENSE).
+
+## Security
+
+See [`SECURITY.md`](SECURITY.md) for how to report a vulnerability.

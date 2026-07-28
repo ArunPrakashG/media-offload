@@ -270,4 +270,4 @@ All image traffic flows through Cloudflare's CDN — eliminating inbound S3/R2 b
 - Failed uploads surface as admin notices and fall back transparently to local storage.
 - Additional storage providers can be added by implementing `Nimbus\Plugin\Storage\StorageAdapter` and registering via `StorageAdapterFactory`.
 
-See [`docs/competitor-analysis.md`](docs/competitor-analysis.md) for the UI and feature gap analysis. [`docs/refactor-roadmap.md`](docs/refactor-roadmap.md) documents the plugin's earlier commercial-licensing architecture and is kept for historical context only — it no longer reflects how the plugin works.
+See [`docs/history/`](../../docs/history/) for archived planning and marketing-positioning docs from the plugin's earlier commercial-licensing era — kept for historical context only; none of it reflects how the plugin works today.
