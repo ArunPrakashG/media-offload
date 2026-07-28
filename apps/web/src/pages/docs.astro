@@ -34,7 +34,7 @@ import Base from "@layouts/Base.astro";
           <p class="docs-nav-label">On this page</p>
           <ul>
             <li><a href="#installation">Installation</a></li>
-            <li><a href="#onboarding">Get your license</a></li>
+            <li><a href="#onboarding">Onboarding</a></li>
             <li><a href="#providers">Connect your bucket</a></li>
             <li><a href="#offloading">Offloading media</a></li>
             <li><a href="#bulk-migration">Bulk migration</a></li>
@@ -75,15 +75,16 @@ import Base from "@layouts/Base.astro";
           </p>
           <ol>
             <li>
-              Download the <strong>Nimbus ZIP</strong> from your account dashboard
-              (or get the free version from the WordPress plugin directory).
+              Get Nimbus from the <strong>WordPress plugin directory</strong>,
+              or download it from <strong>GitHub</strong>.
             </li>
             <li>
               In your WordPress admin, go to <strong
-                >Plugins → Add New → Upload Plugin</strong
-              >, select the ZIP file, click <strong>Install Now</strong>, then <strong
+                >Plugins → Add New</strong
+              >, search for "Nimbus", click <strong>Install Now</strong>, then <strong
                 >Activate</strong
-              >.
+              > (or upload the ZIP via <strong>Plugins → Add New → Upload Plugin</strong>
+              if you downloaded it from GitHub).
             </li>
             <li>
               After activation you will be automatically redirected to the
@@ -92,25 +93,18 @@ import Base from "@layouts/Base.astro";
           </ol>
           <p>
             <strong>System requirements:</strong> WordPress 6.0+, PHP 8.1+. That's
-            it — no other dependencies.
+            it — no other dependencies, no license key.
           </p>
         </section>
 
-        <!-- Onboarding / License -->
+        <!-- Onboarding -->
         <section id="onboarding" class="docs-section">
-          <h2>Get your license</h2>
+          <h2>Onboarding</h2>
           <p>
             The first time you open Nimbus after activation, the Onboarding
-            screen guides you through two steps:
+            screen walks you straight through connecting your storage:
           </p>
           <ol>
-            <li>
-              <strong>Enter your license key.</strong> Paste the key from your purchase
-              email. Nimbus verifies it instantly — your features and plan limits
-              unlock immediately. If you are on the <strong>free tier</strong>,
-              click <em>Register for free</em> instead and your site receives a free
-              license automatically. No credit card needed.
-            </li>
             <li>
               <strong>Connect your storage bucket.</strong> Choose a provider, fill
               in your credentials, and click <em>Test Connection</em>. Nimbus
@@ -118,11 +112,10 @@ import Base from "@layouts/Base.astro";
               anything fails.
             </li>
           </ol>
-          <div class="docs-callout">
-            <strong>Can't find your key?</strong> Email <a
-              href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
-            > with your order reference and we'll resend it right away.
-          </div>
+          <p>
+            That's it — every Nimbus feature is unlocked immediately, with no
+            license key or sign-up step.
+          </p>
         </section>
 
         <!-- Connect your bucket -->
@@ -342,18 +335,17 @@ import Base from "@layouts/Base.astro";
           <p>
             If you have an existing media library that hasn't been offloaded
             yet, the <strong>bulk migration job</strong> handles it in the background
-            — no WP-CLI, no timeouts, no manual batching. Available on Personal plans
-            and above.
+            — no WP-CLI, no timeouts, no manual batching.
           </p>
 
           <h3>Starting a job</h3>
           <p>
             Go to <strong>Nimbus → Jobs</strong> and click <strong
               >Start bulk offload</strong
-            >. The job processes your library in batches (25 files per tick on
-            Personal, 75 on Pro, 100 on Agency) on a 2-second cron interval. You
-            can see live progress — files processed, succeeded, failed, and
-            skipped — in real time as the job runs.
+            >. The job processes your library in batches (up to 100 files per
+            tick) on a 2-second cron interval. You can see live progress —
+            files processed, succeeded, failed, and skipped — in real time as
+            the job runs.
           </p>
 
           <h3>Pause and resume</h3>
@@ -486,7 +478,7 @@ import Base from "@layouts/Base.astro";
             </table>
           </div>
 
-          <h3>Selective offload (Personal+)</h3>
+          <h3>Selective offload</h3>
           <p>
             Control exactly which files get offloaded. Find these under
             <strong>Settings → Offload rules</strong>:
@@ -538,7 +530,6 @@ import Base from "@layouts/Base.astro";
             Large libraries can take hours to migrate. The nightly scheduler
             runs that work automatically at a configured time — by default 3 AM
             — so your server resources are free during peak traffic hours.
-            Available on Personal plans and above.
           </p>
           <p>
             Configure it under <strong>Nimbus → Settings → Nightly batch</strong
@@ -551,7 +542,7 @@ import Base from "@layouts/Base.astro";
             </li>
             <li>
               <strong>Parallel workers</strong> — how many simultaneous workers process
-              the queue: 2 on Personal, 5 on Pro, 8 on Agency.
+              the queue, up to 8.
             </li>
             <li>
               <strong>Batch size per worker</strong> — how many files each worker
@@ -571,8 +562,7 @@ import Base from "@layouts/Base.astro";
           <p>
             After an offload or URL rewrite, cached copies of your old URLs can
             serve stale content. Nimbus fires purge requests automatically so
-            visitors always get the current version. Available on Personal plans
-            and above.
+            visitors always get the current version.
           </p>
           <p>
             Configure your cache provider under <strong
@@ -706,18 +696,17 @@ import Base from "@layouts/Base.astro";
           <h2>WordPress Multisite</h2>
           <p>
             Nimbus works on WordPress Multisite. Each sub-site in the network
-            has its own independent Nimbus settings and its own license
-            activation — configured via the individual site's admin panel, just
-            like a regular install.
+            has its own independent Nimbus settings — configured via the
+            individual site's admin panel, just like a regular install.
           </p>
           <p>
             Super-admins can see a bird's-eye view of all sites at once in the
-            <strong>Network Admin → Nimbus</strong> panel, which shows the license
-            status and offload statistics for every site in the network.
+            <strong>Network Admin → Nimbus</strong> panel, which shows offload
+            statistics for every site in the network.
           </p>
           <div class="docs-callout">
-            Each sub-site consumes one activation from your license. A Pro
-            license covers 5 sites; an Agency license covers unlimited sites.
+            There's no per-site activation limit — Nimbus works the same way
+            on every sub-site, free of charge.
           </div>
         </section>
 
@@ -746,8 +735,7 @@ import Base from "@layouts/Base.astro";
         <section id="cli" class="docs-section">
           <h2>WP-CLI</h2>
           <p>
-            All commands are under the <code>nimbus</code> namespace. Available on
-            Personal plans and above.
+            All commands are under the <code>nimbus</code> namespace.
           </p>
           <div class="docs-table-wrap">
             <table>
@@ -828,7 +816,7 @@ import Base from "@layouts/Base.astro";
           <p>
             All endpoints are under <code>/wp-json/nimbus/v1/</code> and require a
             WordPress administrator session (<code>manage_options</code>
-            capability). Available on Personal plans and above.
+            capability).
           </p>
           <div class="docs-table-wrap">
             <table>
@@ -840,7 +828,7 @@ import Base from "@layouts/Base.astro";
                   <td><span class="method get">GET</span></td>
                   <td><code>/status</code></td>
                   <td
-                    >Plugin version, settings, license info, and provider
+                    >Plugin version, settings, onboarding state, and provider
                     connectivity.</td
                   >
                 </tr>

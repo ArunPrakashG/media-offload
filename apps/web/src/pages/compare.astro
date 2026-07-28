@@ -6,7 +6,7 @@ import Base from "../layouts/Base.astro";
 
 <Base
   title="Nimbus vs Other Media Offload Plugins — Side-by-Side Comparison"
-  description="See how Nimbus compares to other WordPress media offload plugins. Pauseable bulk jobs, built-in cache purge, cost analytics, and no per-file caps."
+  description="See how Nimbus compares to other WordPress media offload plugins. Free and open source, with pauseable bulk jobs, built-in cache purge, cost analytics, and no per-file caps."
 >
   <Navbar />
 
@@ -19,8 +19,8 @@ import Base from "../layouts/Base.astro";
         <p class="compare-sub">
           Other plugins start at $99/yr — and that's before you pay for the
           WooCommerce add-on. Nimbus includes WooCommerce, all 9 providers,
-          analytics, WP-CLI, cache purge, and bulk migration in every plan.
-          Starting at $0.
+          analytics, WP-CLI, cache purge, and bulk migration — 100% free and
+          open source, no license key, no tiers.
         </p>
       </div>
     </section>
@@ -30,10 +30,10 @@ import Base from "../layouts/Base.astro";
       <div class="container diff-banner-inner">
         <div class="diff-item diff-item--us">
           <span class="diff-label">Nimbus</span>
-          <p class="diff-heading">Pay per site, unlimited media</p>
+          <p class="diff-heading">Free, unlimited, every feature included</p>
           <p class="diff-body">
-            Upload 1 file or 1 million — your annual price never changes. You're
-            billed by the number of WordPress sites you run.
+            Upload 1 file or 1 million, run 1 site or 100 — there is no price,
+            no license key, and no feature held back behind a paid tier.
           </p>
         </div>
         <div class="diff-vs">vs</div>
@@ -55,8 +55,8 @@ import Base from "../layouts/Base.astro";
           Pricing at a glance
         </h2>
         <p class="section-sub" style="margin-bottom:2.5rem">
-          All prices are annual. Competitor prices are representative of the
-          leading per-file pricing plugins at regular (non-promo) rates.
+          Competitor prices are representative of the leading per-file pricing
+          plugins at regular (non-promo) rates, shown annually.
         </p>
 
         <div class="compare-table-wrap">
@@ -74,66 +74,29 @@ import Base from "../layouts/Base.astro";
             </thead>
             <tbody>
               <tr>
-                <td>Free tier</td>
+                <td>Price</td>
                 <td class="col-nimbus winner">
                   <strong>$0 / forever</strong>
                   <span class="td-note"
-                    >1 site · unlimited media · new uploads</span
+                    >Unlimited sites · unlimited media · every feature</span
                   >
                 </td>
                 <td class="col-them">
                   <span class="dash">—</span>
-                  <span class="td-note">No free tier available</span>
+                  <span class="td-note">$99–$1,199/yr depending on media volume</span>
                 </td>
               </tr>
               <tr>
-                <td>Entry tier</td>
-                <td class="col-nimbus">
-                  <strong>$69 / yr</strong>
-                  <span class="td-note">1 site · unlimited media</span>
-                </td>
-                <td class="col-them">
-                  <strong>$99 / yr</strong>
-                  <span class="td-note"
-                    >Unlimited sites · up to 6,000 files</span
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>Mid tier</td>
-                <td class="col-nimbus">
-                  <strong>$169 / yr</strong>
-                  <span class="td-note">5 sites · unlimited media</span>
-                </td>
-                <td class="col-them">
-                  <strong>$249 / yr</strong>
-                  <span class="td-note"
-                    >Unlimited sites · up to 40,000 files</span
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>Top tier</td>
-                <td class="col-nimbus">
-                  <strong>$449 / yr</strong>
-                  <span class="td-note">Unlimited sites · unlimited media</span>
-                </td>
-                <td class="col-them">
-                  <strong>$799 / yr</strong>
-                  <span class="td-note"
-                    >Unlimited sites · up to 500,000 files</span
-                  >
-                </td>
-              </tr>
-              <tr>
-                <td>Truly unlimited</td>
+                <td>Media file cap</td>
                 <td class="col-nimbus winner">
-                  <strong>$449 / yr</strong>
-                  <span class="td-note">No file cap at any tier</span>
+                  <strong>None</strong>
+                  <span class="td-note">Unlimited on every install</span>
                 </td>
                 <td class="col-them">
-                  <strong>$1,199 / yr</strong>
-                  <span class="td-note">Unlimited file plan</span>
+                  <strong>Hard cap per plan</strong>
+                  <span class="td-note"
+                    >2K → 500K, paid extra for unlimited</span
+                  >
                 </td>
               </tr>
             </tbody>
@@ -177,7 +140,7 @@ import Base from "../layouts/Base.astro";
               </tr>
               <tr>
                 <td>License model</td>
-                <td class="col-nimbus winner">Per site · no media cap</td>
+                <td class="col-nimbus winner">Free — no license, no media cap</td>
                 <td class="col-them">Per media item count · unlimited sites</td>
               </tr>
 
@@ -185,7 +148,7 @@ import Base from "../layouts/Base.astro";
               <tr class="compare-category-row"><td colspan="3">Storage Providers</td></tr>
               <tr>
                 <td>Amazon S3</td>
-                <td class="col-nimbus"><span class="check">✓</span> All plans</td>
+                <td class="col-nimbus"><span class="check">✓</span> Included</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
@@ -220,7 +183,7 @@ import Base from "../layouts/Base.astro";
               </tr>
               <tr>
                 <td>Any S3-compatible provider</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Generic profile — all plans</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Generic profile</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
@@ -238,7 +201,7 @@ import Base from "../layouts/Base.astro";
               <tr class="compare-category-row"><td colspan="3">Media Delivery</td></tr>
               <tr>
                 <td>Automatic URL rewriting</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> All plans</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
@@ -256,7 +219,7 @@ import Base from "../layouts/Base.astro";
               <tr class="compare-category-row"><td colspan="3">Migration &amp; Scheduling</td></tr>
               <tr>
                 <td>Bulk migrate existing library</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them"><span class="check">✓</span></td>
               </tr>
               <tr>
@@ -276,7 +239,7 @@ import Base from "../layouts/Base.astro";
               </tr>
               <tr>
                 <td>Restore files back to local server</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them">Varies by plugin</td>
               </tr>
 
@@ -284,7 +247,7 @@ import Base from "../layouts/Base.astro";
               <tr class="compare-category-row"><td colspan="3">Offload Rules</td></tr>
               <tr>
                 <td>Filter by MIME type</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them">Varies by plugin</td>
               </tr>
               <tr>
@@ -333,22 +296,22 @@ import Base from "../layouts/Base.astro";
               <tr class="compare-category-row"><td colspan="3">Integrations</td></tr>
               <tr>
                 <td>Page-builder URL rewriting (Elementor, etc.)</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above — included</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them">Separate paid add-ons</td>
               </tr>
               <tr>
                 <td>WooCommerce signed download URLs</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Personal &amp; above — included</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
                 <td class="col-them">Paid add-on required</td>
               </tr>
               <tr>
                 <td>WordPress Multisite (per-site settings)</td>
-                <td class="col-nimbus"><span class="check">✓</span> All plans</td>
+                <td class="col-nimbus"><span class="check">✓</span> Included</td>
                 <td class="col-them"><span class="check">✓</span> All paid plans</td>
               </tr>
               <tr>
                 <td>Multisite network admin panel</td>
-                <td class="col-nimbus winner"><span class="check">✓</span> Agency — bird's-eye view of all sites</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included — bird's-eye view of all sites</td>
                 <td class="col-them"><span class="dash">—</span></td>
               </tr>
 
@@ -383,14 +346,9 @@ import Base from "../layouts/Base.astro";
               <!-- Support -->
               <tr class="compare-category-row"><td colspan="3">Support</td></tr>
               <tr>
-                <td>Email support</td>
-                <td class="col-nimbus"><span class="check">✓</span> All paid plans</td>
-                <td class="col-them"><span class="check">✓</span> All paid plans</td>
-              </tr>
-              <tr>
-                <td>Priority email support</td>
-                <td class="col-nimbus"><span class="check">✓</span> Pro &amp; Agency</td>
-                <td class="col-them"><span class="check">✓</span> Higher tiers only</td>
+                <td>Community support</td>
+                <td class="col-nimbus"><span class="check">✓</span> WordPress.org forum, GitHub issues, email</td>
+                <td class="col-them"><span class="check">✓</span> Paid plans only</td>
               </tr>
             </tbody>
           </table>
@@ -531,11 +489,11 @@ import Base from "../layouts/Base.astro";
                 <td class="col-them"><span class="dash">—</span> Not available</td>
               </tr>
               <tr>
-                <td>Free tier</td>
+                <td>Price</td>
                 <td class="col-nimbus winner">
-                  <span class="check">✓</span> Unlimited media, 1 site, no time limit
+                  <span class="check">✓</span> Free forever, unlimited media, unlimited sites
                 </td>
-                <td class="col-them"><span class="dash">—</span> Paid only</td>
+                <td class="col-them"><span class="dash">—</span> Paid, tiered by media volume</td>
               </tr>
             </tbody>
           </table>
@@ -552,59 +510,41 @@ import Base from "../layouts/Base.astro";
 
         <div class="faq-grid">
           <div class="faq-item">
-            <h3>Why does Nimbus limit by sites instead of media files?</h3>
+            <h3>Is Nimbus really free?</h3>
             <p>
-              Media file caps punish growth. A photography portfolio site might
-              have 50,000 images on a single install, while an agency running 20
-              small business sites might have 500 total. Limiting by media count
-              charges the small photographer more than the agency — that's
-              backwards. We charge by the number of WordPress installations you
-              manage, so your cost reflects your operational footprint, not how
-              many photos your clients shot this year.
+              Yes — completely. Bulk migration, nightly scheduling, cache
+              purge, cost analytics, page-builder rewriting, WooCommerce
+              signed downloads, and multisite network admin are all included
+              on every install. There is no license key, no paid tier, and no
+              feature held back.
             </p>
           </div>
 
           <div class="faq-item">
-            <h3>What happens if I go over my site limit?</h3>
+            <h3>Is there a limit on sites or media files?</h3>
             <p>
-              You'll see a notice in your dashboard when you approach your
-              activation limit. Existing sites continue working normally. To add
-              another site you simply upgrade your plan. There's no sudden
-              feature cutoff — unlike media-count models where hitting the cap
-              disables functionality on sites you've already configured.
+              No. Run Nimbus on as many WordPress installations as you want,
+              with as much media as you want. There is no activation limit and
+              no per-file cap of any kind.
             </p>
           </div>
 
           <div class="faq-item">
-            <h3>Is there a free version of Nimbus?</h3>
+            <h3>Is Nimbus open source?</h3>
             <p>
-              Yes. The free tier includes new-upload offloading, URL rewriting,
-              and any S3-compatible provider — on 1 site with unlimited media
-              files. No credit card required. Bulk migration, nightly
-              scheduling, cache purge, and analytics are available on paid plans
-              from $69/yr.
+              Yes. Nimbus is licensed under GPL-2.0-or-later and its source is
+              publicly available. Contributions, bug reports, and feature
+              requests are welcome.
             </p>
           </div>
 
           <div class="faq-item">
-            <h3>How does annual billing work?</h3>
+            <h3>Do updates and support ever require payment?</h3>
             <p>
-              You're charged once per year. Your license is valid for 12 months
-              from the payment date and auto-renews unless cancelled. Cancelling
-              is instant from your account dashboard — no hoops to jump through.
-              If you cancel, your license stays active until the end of the
-              billing period.
-            </p>
-          </div>
-
-          <div class="faq-item">
-            <h3>Do I get updates and support after my license expires?</h3>
-            <p>
-              Plugin updates and support require an active license. The plugin
-              itself will continue to function — your media will keep serving
-              from your storage provider — but you won't receive new features or
-              security patches until you renew. We recommend staying current for
-              security reasons.
+              No. Plugin updates come through WordPress.org like any other
+              free plugin, and support is community-based via the
+              WordPress.org forum, GitHub issues, and email — no active
+              license or subscription required.
             </p>
           </div>
 
@@ -628,10 +568,8 @@ import Base from "../layouts/Base.astro";
     <section class="section compare-cta-section">
       <div class="container compare-cta">
         <h2>Ready to switch?</h2>
-        <p>
-          Start with the plan that fits your sites. Upgrade or cancel any time.
-        </p>
-        <a class="btn btn-primary" href="/#pricing">See pricing →</a>
+        <p>Free, unlimited, no strings attached. Get started in a minute.</p>
+        <a class="btn btn-primary" href="/docs#installation">Get Nimbus →</a>
       </div>
     </section>
   </main>

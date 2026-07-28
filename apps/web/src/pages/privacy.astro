@@ -35,121 +35,83 @@ import "@styles/tokens.css";
         <header class="legal-header">
           <p class="section-label">Legal</p>
           <h1 class="legal-title">Privacy Policy</h1>
-          <p class="legal-date">Last updated: 4 April 2026</p>
+          <p class="legal-date">Last updated: 28 July 2026</p>
         </header>
 
         <div class="legal-body">
           <h2>1. Who we are</h2>
           <p>
-            Nimbus is a WordPress plugin for cloud media offloading. We are an
-            independent software product reachable at <a
+            Nimbus is a free, open-source WordPress plugin for cloud media
+            offloading. We are reachable at <a
               href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
             >. When this policy says "Nimbus", "we", "us", or "our" it refers to
-            the operator of the Nimbus plugin and the website usenimbus.dev.
+            the maintainers of the Nimbus plugin and the website usenimbus.dev.
           </p>
 
-          <h2>2. Information we collect</h2>
-          <p>We collect only what is necessary to operate the product:</p>
-          <ul>
-            <li>
-              <strong>Purchase information.</strong> When you buy a license, our payment
-              processor collects your email address and payment details. We receive
-              your email address and the tier of license purchased. We do not store
-              full card numbers.
-            </li>
-            <li>
-              <strong>License validation.</strong> When the plugin is active on a
-              WordPress site, it periodically sends your license key and the WordPress
-              installation's site URL to our license API (<code
-                >api.usenimbus.dev</code
-              >) to verify that the license is valid. No data about your site
-              visitors is transmitted.
-            </li>
-            <li>
-              <strong>Website logs.</strong> Our web server temporarily records standard
-              HTTP logs (IP address, browser, page requested, timestamp). These are
-              used for debugging and security and are not retained beyond 30 days.
-            </li>
-          </ul>
+          <h2>2. The plugin does not phone home</h2>
+          <p>
+            Nimbus has no license server, no account system, and no telemetry.
+            The plugin does not send any data — settings, usage statistics, or
+            otherwise — to us or to any Nimbus-operated service. The only
+            outbound network calls the plugin makes are directly from your own
+            server to the storage provider (Amazon S3, Cloudflare R2, etc.) and
+            cache provider you configure yourself, using credentials you enter
+            and control. We never see your storage credentials, your media
+            files, or any data about your site's visitors.
+          </p>
 
-          <h2>3. How we use your information</h2>
-          <ul>
-            <li>To issue and validate your software license.</li>
-            <li>
-              To contact you about significant product updates or security
-              notices (not marketing without consent).
-            </li>
-            <li>To maintain the security and integrity of our services.</li>
-          </ul>
+          <h2>3. Information collected by this website</h2>
+          <p>
+            The Nimbus marketing/documentation website (usenimbus.dev) does not
+            use advertising or analytics tracking cookies. Our web server
+            temporarily records standard HTTP logs (IP address, browser, page
+            requested, timestamp) for debugging and security purposes; these
+            are not retained beyond 30 days and are not linked to any other
+            data we hold.
+          </p>
+          <p>
+            If you email us for support, we retain that correspondence only as
+            long as needed to resolve your request.
+          </p>
 
           <h2>4. Data sharing</h2>
           <p>
-            We do not sell, rent, or trade your personal data. We may share data
-            only with:
-          </p>
-          <ul>
-            <li>
-              <strong>Razorpay</strong> (razorpay.com) to process your payment securely.
-              Razorpay's privacy policy governs their use of your payment data.
-            </li>
-            <li>
-              <strong>Infrastructure providers</strong> for hosting the license API.
-              These operate under data processing agreements.
-            </li>
-          </ul>
-          <p>
-            We have no advertising or analytics partners that receive personal
-            data.
+            We do not sell, rent, or trade personal data, and we have no
+            advertising or analytics partners that receive personal data. We
+            have no payment processor, since Nimbus has no paid tier.
           </p>
 
-          <h2>5. Cookies and tracking</h2>
+          <h2>5. Third-party services you configure</h2>
           <p>
-            The Nimbus website does not use advertising or analytics tracking
-            cookies. Your browser may store a functional session cookie if you
-            visit a page that requires authentication, but this is not used for
-            cross-site tracking.
+            When you connect Nimbus to a storage provider or cache provider,
+            your data is transmitted directly between your WordPress site and
+            that provider under their own privacy policy and terms — not
+            through any Nimbus-operated infrastructure.
           </p>
 
-          <h2>6. Data security</h2>
+          <h2>6. Your rights</h2>
           <p>
-            All data transmitted between the plugin and our license API uses TLS
-            (HTTPS) encryption. License keys are stored using secure hashing
-            practices. We apply security best-practices to our infrastructure,
-            but no system is 100% immune to all threats.
+            Since we hold no account or license data about you, there is
+            generally nothing for us to access, correct, delete, or export
+            beyond the website's short-lived server logs described above and
+            any support email correspondence. If you have a specific concern,
+            email <a href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a>.
           </p>
 
-          <h2>7. Data retention</h2>
-          <p>
-            Your email address and license record are retained for as long as
-            your license is active plus a short period after for dispute
-            resolution. You may request deletion at any time (see Your Rights
-            below). Server log data is purged automatically after 30 days.
-          </p>
-
-          <h2>8. Your rights</h2>
-          <p>
-            Depending on your jurisdiction, you may have rights to access,
-            correct, delete, or export the personal data we hold about you. To
-            exercise any of these rights, email us at <a
-              href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a
-            > and we will respond within 30 days.
-          </p>
-
-          <h2>9. Children's privacy</h2>
+          <h2>7. Children's privacy</h2>
           <p>
             Nimbus is a developer tool and is not directed at children under the
             age of 16. We do not knowingly collect personal data from children.
           </p>
 
-          <h2>10. Changes to this policy</h2>
+          <h2>8. Changes to this policy</h2>
           <p>
             We may update this policy to reflect changes in our practices or for
             legal reasons. When we do, we will update the "last updated" date at
-            the top of this page. Material changes will be communicated via
-            email to active license holders.
+            the top of this page.
           </p>
 
-          <h2>11. Contact</h2>
+          <h2>9. Contact</h2>
           <p>
             Questions about this policy? Email <a
               href="mailto:hello@usenimbus.dev">hello@usenimbus.dev</a

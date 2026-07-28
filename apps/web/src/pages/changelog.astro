@@ -15,19 +15,67 @@ import Base from "@layouts/Base.astro";
         <p class="section-label">Release notes</p>
         <h1>Changelog</h1>
         <p class="changelog-intro">
-          Every release of Nimbus, in reverse chronological order. The free
-          plugin and the Pro add-on share a single changelog — Pro-only
-          additions are marked with a badge.
+          Every release of Nimbus, in reverse chronological order. As of
+          v0.2.0, Nimbus is a single free, open-source plugin — every feature
+          below is included on every install, with no license key required.
         </p>
       </header>
 
       <div class="releases">
+        <!-- v0.2.0 -->
+        <article class="release" id="v0-2-0">
+          <aside class="release-meta">
+            <span class="release-version">v0.2.0</span>
+            <time class="release-date" datetime="2026-07-28">July 2026</time>
+            <span class="release-badge badge-latest">Latest</span>
+          </aside>
+          <div class="release-body">
+            <h2>Nimbus is now 100% free and open source</h2>
+            <p class="release-summary">
+              The Nimbus Pro add-on has been merged into this plugin and all
+              licensing has been removed. Every feature below — previously
+              split across free and paid tiers — is now included on every
+              install, with no license key, no activation limits, and no
+              upgrade path required.
+            </p>
+
+            <h3>Now free for everyone</h3>
+            <ul>
+              <li>Bulk migration with pause, resume, and retry-failed.</li>
+              <li>
+                Cache purge integrations: Cloudflare, LiteSpeed Cache, WP
+                Fastest Cache, and generic proxy/Nginx.
+              </li>
+              <li>Full <code>wp nimbus</code> WP-CLI command suite.</li>
+              <li>
+                Page-builder and gallery database URL rewriting: Elementor,
+                Slider Revolution, Smart Slider 3, NextGEN Gallery.
+              </li>
+              <li>WooCommerce signed download delivery.</li>
+              <li>Multisite network admin overview panel.</li>
+              <li>Selective offload rules by MIME type and file size.</li>
+              <li>Nightly off-hours batch offload.</li>
+            </ul>
+
+            <h3>Removed</h3>
+            <ul>
+              <li>
+                The license key requirement, license activation screen, and
+                every call to the former Nimbus licensing backend.
+              </li>
+              <li>
+                The separate Nimbus Pro plugin — its code is now part of this
+                plugin.
+              </li>
+            </ul>
+          </div>
+        </article>
+
         <!-- v0.1.4 -->
         <article class="release" id="v0-1-4">
           <aside class="release-meta">
             <span class="release-version">v0.1.4</span>
             <time class="release-date" datetime="2025-05-01">May 2025</time>
-            <span class="release-badge badge-latest">Latest</span>
           </aside>
           <div class="release-body">
             <h2>Nine dedicated provider profiles</h2>
@@ -157,9 +205,7 @@ import Base from "@layouts/Base.astro";
               integration matrix.
             </p>
 
-            <h3>
-              Nightly off-hours batch <span class="inline-badge pro">Pro</span>
-            </h3>
+            <h3>Nightly off-hours batch</h3>
             <ul>
               <li>
                 New nightly scheduler that processes the pending-offload queue
@@ -222,8 +268,7 @@ import Base from "@layouts/Base.astro";
             </ul>
 
             <h3>
-              Selective offload rules <span class="inline-badge personal"
-                >Personal+</span>
+              Selective offload rules
             </h3>
             <ul>
               <li>
@@ -249,10 +294,7 @@ import Base from "@layouts/Base.astro";
               > WP-CLI namespace.
             </p>
 
-            <h3>
-              Bulk migration with pause &amp; resume <span
-                class="inline-badge personal">Personal+</span>
-            </h3>
+            <h3>Bulk migration with pause &amp; resume</h3>
             <ul>
               <li>
                 Background bulk job that processes your existing library in
@@ -292,8 +334,7 @@ import Base from "@layouts/Base.astro";
             </ul>
 
             <h3>
-              Storage analytics <span class="inline-badge personal"
-                >Personal+</span>
+              Storage analytics
             </h3>
             <ul>
               <li>
@@ -306,7 +347,7 @@ import Base from "@layouts/Base.astro";
               </li>
             </ul>
 
-            <h3>WP-CLI <span class="inline-badge personal">Personal+</span></h3>
+            <h3>WP-CLI</h3>
             <ul>
               <li>
                 New <code>wp nimbus</code> command namespace with <code
@@ -319,8 +360,7 @@ import Base from "@layouts/Base.astro";
             </ul>
 
             <h3>
-              Selective offload rules <span class="inline-badge personal"
-                >Personal+</span>
+              Selective offload rules
             </h3>
             <ul>
               <li>
