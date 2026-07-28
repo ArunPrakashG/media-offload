@@ -99,6 +99,7 @@ final class DatabaseIntegrationRewriter
     $tables = [];
     foreach ($patterns as $pattern) {
       $resolved = str_replace('{prefix}', (string) $wpdb->prefix, (string) $pattern);
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema introspection (SHOW TABLES) must read the live database; result is only used transiently within this request.
       $matches = $wpdb->get_col($wpdb->prepare('SHOW TABLES LIKE %s', $resolved));
       if (is_array($matches)) {
         foreach ($matches as $table) {
@@ -124,12 +125,14 @@ final class DatabaseIntegrationRewriter
     }
 
     $placeholders = implode(', ', array_fill(0, count($metaKeys), '%s'));
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Table name is $wpdb->prefix + a hardcoded suffix (never user input). Values are bound via $wpdb->prepare() placeholders; the IN(...) placeholder list is built dynamically (one %s per key) so the static sniff can't count them, but the runtime count always matches.
     $sql = $wpdb->prepare(
       "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key IN ({$placeholders})",
       ...array_values(array_map('strval', $metaKeys))
     );
 
     return max(0, (int) $wpdb->get_var($sql));
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
   }
 
   /**
@@ -174,6 +177,7 @@ final class DatabaseIntegrationRewriter
         $columnSql = '`' . str_replace('`', '``', $column) . '`';
 
         foreach ($pairs as $pair) {
+          // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table/column identifier only, not a value; discovered via SHOW TABLES/DESCRIBE against this site's own schema (never user input) and backtick-escaped. Values are bound via $wpdb->prepare() placeholders.
           $sql = $wpdb->prepare(
             "UPDATE {$tableSql} SET {$columnSql} = REPLACE({$columnSql}, %s, %s) WHERE {$columnSql} LIKE %s",
             (string) $pair['from'],
@@ -182,6 +186,7 @@ final class DatabaseIntegrationRewriter
           );
 
           $result = $wpdb->query($sql);
+          // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
           if ($result === false) {
             $errors++;
             continue;
@@ -195,6 +200,7 @@ final class DatabaseIntegrationRewriter
     if (!empty($postmetaKeys)) {
       $placeholders = implode(', ', array_fill(0, count($postmetaKeys), '%s'));
       foreach ($pairs as $pair) {
+        // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Table name is $wpdb->prefix + a hardcoded suffix (never user input). Values are bound via $wpdb->prepare() placeholders; the IN(...) placeholder list is built dynamically (one %s per key) so the static sniff can't count them, but the runtime count always matches.
         $sql = $wpdb->prepare(
           "UPDATE {$wpdb->postmeta} SET meta_value = REPLACE(meta_value, %s, %s) WHERE meta_key IN ({$placeholders}) AND meta_value LIKE %s",
           ...array_merge([
@@ -204,6 +210,7 @@ final class DatabaseIntegrationRewriter
         );
 
         $result = $wpdb->query($sql);
+        // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
         if ($result === false) {
           $errors++;
           continue;
@@ -320,6 +327,7 @@ final class DatabaseIntegrationRewriter
     }
 
     $tableSql = '`' . str_replace('`', '``', $table) . '`';
+    // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table/column identifier only, not a value; discovered via SHOW TABLES/DESCRIBE against this site's own schema (never user input) and backtick-escaped. Values are bound via $wpdb->prepare() placeholders.
     $columns = $wpdb->get_results("DESCRIBE {$tableSql}", ARRAY_A);
     if (!is_array($columns)) {
       return [];

@@ -33,38 +33,38 @@ final class BackblazeB2ProviderProfile extends AbstractProviderProfile implement
 
   public function label(): string
   {
-    return __('Backblaze B2', NIMBUS_TEXT_DOMAIN);
+    return __('Backblaze B2', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('Backblaze B2 Cloud Storage', NIMBUS_TEXT_DOMAIN);
+    return __('Backblaze B2 Cloud Storage', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('Backblaze B2 S3-compatible cloud storage. Enter the B2 region (e.g. us-west-004), bucket name, and your Application Key ID + Application Key from the Backblaze console.', NIMBUS_TEXT_DOMAIN);
+    return __('Backblaze B2 S3-compatible cloud storage. Enter the B2 region (e.g. us-west-004), bucket name, and your Application Key ID + Application Key from the Backblaze console.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'     => __('Bucket', NIMBUS_TEXT_DOMAIN),
-      'region'     => __('Region (e.g. us-west-004, eu-central-003)', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('Application Key ID', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('Application Key', NIMBUS_TEXT_DOMAIN),
+      'bucket'     => __('Bucket', 'nimbus'),
+      'region'     => __('Region (e.g. us-west-004, eu-central-003)', 'nimbus'),
+      'access_key' => __('Application Key ID', 'nimbus'),
+      'secret_key' => __('Application Key', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your Backblaze B2 bucket name.', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('B2 region code visible in your bucket endpoint URL, e.g. us-west-004, eu-central-003.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('Application Key ID — create one under App Keys in the Backblaze console (not your account ID).', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('Application Key shown once at creation time, paired with the Key ID above.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('Your Backblaze B2 bucket name.', 'nimbus'),
+      'region'        => __('B2 region code visible in your bucket endpoint URL, e.g. us-west-004, eu-central-003.', 'nimbus'),
+      'access_key'    => __('Application Key ID — create one under App Keys in the Backblaze console (not your account ID).', 'nimbus'),
+      'secret_key'    => __('Application Key shown once at creation time, paired with the Key ID above.', 'nimbus'),
       'session_token' => '',
-      'endpoint'      => __('Leave empty — B2 endpoints are built automatically from the region.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'      => __('Leave empty — B2 endpoints are built automatically from the region.', 'nimbus'),
       'r2_account_id' => '',
     ];
   }

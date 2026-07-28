@@ -801,8 +801,9 @@ final class UploadHandler
     }
 
     $attachedFile = get_attached_file($attachment_id);
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Plain writability check on the attachment's own uploads-dir path; WP_Filesystem would require credential prompts inappropriate for same-server file cleanup.
     if (is_string($attachedFile) && $attachedFile !== '' && file_exists($attachedFile) && is_writable($attachedFile)) {
-      unlink($attachedFile);
+      wp_delete_file($attachedFile);
     }
 
     $metadata = wp_get_attachment_metadata($attachment_id);
@@ -817,8 +818,9 @@ final class UploadHandler
       }
 
       $sizePath = function_exists('path_join') ? path_join($baseDir, $sizeData['file']) : trailingslashit($baseDir) . ltrim($sizeData['file'], '/');
+      // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Plain writability check on an image-size variant path in the uploads dir; WP_Filesystem would require credential prompts inappropriate for same-server file cleanup.
       if (file_exists($sizePath) && is_writable($sizePath)) {
-        unlink($sizePath);
+        wp_delete_file($sizePath);
       }
     }
   }
@@ -917,7 +919,7 @@ final class UploadHandler
   public function get_attachment_status(int $attachment_id): array
   {
     if ($attachment_id <= 0 || get_post_type($attachment_id) !== 'attachment') {
-      return ['status' => 'unknown', 'label' => __('Unknown', NIMBUS_TEXT_DOMAIN), 'reason' => __('Attachment could not be found.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'unknown', 'label' => __('Unknown', 'nimbus'), 'reason' => __('Attachment could not be found.', 'nimbus')];
     }
 
     $offloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
@@ -926,26 +928,26 @@ final class UploadHandler
     $missingSourceAt = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
 
     if ($this->is_ignored_attachment($attachment_id)) {
-      return ['status' => 'ignored', 'label' => __('Ignored', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is marked to stay local-only.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'ignored', 'label' => __('Ignored', 'nimbus'), 'reason' => __('This attachment is marked to stay local-only.', 'nimbus')];
     }
 
     if (!empty($offloadMeta['key'])) {
-      return ['status' => 'offloaded', 'label' => __('Offloaded', NIMBUS_TEXT_DOMAIN), 'reason' => __('Remote object metadata is present for this attachment.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'offloaded', 'label' => __('Offloaded', 'nimbus'), 'reason' => __('Remote object metadata is present for this attachment.', 'nimbus')];
     }
 
     if ($pendingAt > 0 && $claimedBy !== '') {
-      return ['status' => 'processing', 'label' => __('Processing', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is currently claimed by a background worker.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'processing', 'label' => __('Processing', 'nimbus'), 'reason' => __('This attachment is currently claimed by a background worker.', 'nimbus')];
     }
 
     if ($pendingAt > 0) {
-      return ['status' => 'pending', 'label' => __('Pending', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is queued for a future offload.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'pending', 'label' => __('Pending', 'nimbus'), 'reason' => __('This attachment is queued for a future offload.', 'nimbus')];
     }
 
     if ($missingSourceAt > 0) {
-      return ['status' => 'failed', 'label' => __('Needs attention', NIMBUS_TEXT_DOMAIN), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', NIMBUS_TEXT_DOMAIN)];
+      return ['status' => 'failed', 'label' => __('Needs attention', 'nimbus'), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', 'nimbus')];
     }
 
-    return ['status' => 'local', 'label' => __('Local only', NIMBUS_TEXT_DOMAIN), 'reason' => __('This attachment is still being served from local storage.', NIMBUS_TEXT_DOMAIN)];
+    return ['status' => 'local', 'label' => __('Local only', 'nimbus'), 'reason' => __('This attachment is still being served from local storage.', 'nimbus')];
   }
 
   private function dispatch_nightly_workers(string $run_token, int $worker_count, int $hours, int $limit): void
@@ -1136,6 +1138,7 @@ final class UploadHandler
     $storageKey = $prefix !== '' ? $prefix . '/' . $relativePath : $relativePath;
 
     if ($relativePath === $storageKey) {
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Path-collision check must reflect the current DB state at upload time; not cacheable.
       $result = $wpdb->get_var($wpdb->prepare(
         "SELECT meta_id FROM {$wpdb->postmeta}
          WHERE meta_key = '_wp_attached_file' AND meta_value = %s
@@ -1143,6 +1146,7 @@ final class UploadHandler
         $relativePath
       ));
     } else {
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Path-collision check must reflect the current DB state at upload time; not cacheable.
       $result = $wpdb->get_var($wpdb->prepare(
         "SELECT meta_id FROM {$wpdb->postmeta}
          WHERE meta_key = '_wp_attached_file' AND meta_value IN (%s, %s)
@@ -1311,6 +1315,7 @@ final class UploadHandler
     $missingSourceRetryBefore = time() - $this->missing_source_retry_cooldown_seconds();
     $candidateLimit = max($limit * 4, $limit);
 
+    // phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Offload status is only tracked via postmeta; there is no faster native alternative for finding pending attachments.
     $query = new \WP_Query([
       'post_type' => 'attachment',
       'post_status' => 'inherit',
@@ -1335,6 +1340,7 @@ final class UploadHandler
         ],
       ],
     ]);
+    // phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 
     $candidateIds = is_array($query->posts) ? array_map('intval', $query->posts) : [];
     if (empty($candidateIds)) {
@@ -1377,6 +1383,7 @@ final class UploadHandler
   {
     $missingSourceRetryBefore = time() - $this->missing_source_retry_cooldown_seconds();
 
+    // phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Offload status is only tracked via postmeta; there is no faster native alternative for finding pending attachments.
     $query = new \WP_Query([
       'post_type' => 'attachment',
       'post_status' => 'inherit',
@@ -1398,6 +1405,7 @@ final class UploadHandler
         ],
       ],
     ]);
+    // phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 
     $candidateIds = is_array($query->posts) ? array_map('intval', $query->posts) : [];
     return !empty($this->filter_eligible_attachment_ids($candidateIds));

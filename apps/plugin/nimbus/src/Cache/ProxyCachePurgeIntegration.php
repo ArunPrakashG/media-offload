@@ -63,11 +63,13 @@ final class ProxyCachePurgeIntegration implements PurgeIntegration
 
       $response = wp_remote_request($target, $args);
       if (is_wp_error($response)) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
         throw new RuntimeException($response->get_error_message());
       }
 
       $status = (int) wp_remote_retrieve_response_code($response);
       if ($status >= 400) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
         throw new RuntimeException(sprintf('Proxy cache purge endpoint returned HTTP %d for %s', $status, $target));
       }
 

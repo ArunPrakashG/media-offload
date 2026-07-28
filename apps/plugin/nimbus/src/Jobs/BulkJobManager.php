@@ -93,22 +93,22 @@ final class BulkJobManager
   {
     $type = sanitize_key($type);
     if (!isset(self::JOB_TYPES[$type])) {
-      return new \WP_Error('nimbus_invalid_job_type', __('Unsupported bulk job type.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid_job_type', __('Unsupported bulk job type.', 'nimbus'), ['status' => 400]);
     }
 
     $current = $this->currentJob();
     if ($this->isActiveStatus((string) ($current['status'] ?? ''))) {
-      return new \WP_Error('nimbus_job_active', __('A bulk media job is already running. Pause or wait for it to finish first.', NIMBUS_TEXT_DOMAIN), ['status' => 409]);
+      return new \WP_Error('nimbus_job_active', __('A bulk media job is already running. Pause or wait for it to finish first.', 'nimbus'), ['status' => 409]);
     }
 
     if ($type === 'offload_existing' || $type === 'retry_failed') {
       if (!$this->settings->is_enabled() || !$this->settings->has_valid_credentials()) {
-        return new \WP_Error('nimbus_not_ready', __('Storage credentials and enabled offloading are required before starting an offload job.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+        return new \WP_Error('nimbus_not_ready', __('Storage credentials and enabled offloading are required before starting an offload job.', 'nimbus'), ['status' => 400]);
       }
     }
 
     if ($type === 'restore_local' && !$this->settings->has_valid_credentials()) {
-      return new \WP_Error('nimbus_restore_not_ready', __('Storage credentials are required before restoring local copies from remote storage.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_restore_not_ready', __('Storage credentials are required before restoring local copies from remote storage.', 'nimbus'), ['status' => 400]);
     }
 
     $batchSize = max(1, min(self::MAX_BATCH_SIZE, (int) ($args['batch_size'] ?? self::MAX_BATCH_SIZE)));
@@ -125,7 +125,7 @@ final class BulkJobManager
       $totalItems = count($retryIds);
 
       if ($totalItems < 1) {
-        return new \WP_Error('nimbus_no_failed_items', __('There are no failed items available to retry.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+        return new \WP_Error('nimbus_no_failed_items', __('There are no failed items available to retry.', 'nimbus'), ['status' => 400]);
       }
     }
 
@@ -148,7 +148,7 @@ final class BulkJobManager
       'percent_complete' => $totalItems > 0 ? 0 : 100,
       'failed_ids' => [],
       'retry_ids' => $retryIds,
-      'last_message' => $totalItems > 0 ? __('Bulk media job queued.', NIMBUS_TEXT_DOMAIN) : __('No matching attachments were found for this bulk job.', NIMBUS_TEXT_DOMAIN),
+      'last_message' => $totalItems > 0 ? __('Bulk media job queued.', 'nimbus') : __('No matching attachments were found for this bulk job.', 'nimbus'),
     ]);
 
     $this->persistCurrentJob($job);
@@ -168,12 +168,12 @@ final class BulkJobManager
   {
     $job = $this->currentJob();
     if (($job['status'] ?? '') !== 'running') {
-      return new \WP_Error('nimbus_job_not_running', __('There is no running bulk job to pause.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_job_not_running', __('There is no running bulk job to pause.', 'nimbus'), ['status' => 400]);
     }
 
     $job['status'] = 'paused';
     $job['updated_at'] = time();
-    $job['last_message'] = __('Bulk media job paused.', NIMBUS_TEXT_DOMAIN);
+    $job['last_message'] = __('Bulk media job paused.', 'nimbus');
     $this->persistCurrentJob($job);
 
     return $job;
@@ -186,12 +186,12 @@ final class BulkJobManager
   {
     $job = $this->currentJob();
     if (($job['status'] ?? '') !== 'paused') {
-      return new \WP_Error('nimbus_job_not_paused', __('There is no paused bulk job to resume.', NIMBUS_TEXT_DOMAIN), ['status' => 400]);
+      return new \WP_Error('nimbus_job_not_paused', __('There is no paused bulk job to resume.', 'nimbus'), ['status' => 400]);
     }
 
     $job['status'] = 'running';
     $job['updated_at'] = time();
-    $job['last_message'] = __('Bulk media job resumed.', NIMBUS_TEXT_DOMAIN);
+    $job['last_message'] = __('Bulk media job resumed.', 'nimbus');
     $this->persistCurrentJob($job);
     $this->scheduleNextTick((string) $job['id']);
 
@@ -257,7 +257,8 @@ final class BulkJobManager
       $job['updated_at'] = time();
       $job['percent_complete'] = $this->calculatePercent((int) $job['processed_items'], (int) $job['total_items']);
       $job['last_message'] = sprintf(
-        __('Processed %1$d of %2$d attachments.', NIMBUS_TEXT_DOMAIN),
+        /* translators: 1: number of attachments processed so far, 2: total attachments in this job */
+        __('Processed %1$d of %2$d attachments.', 'nimbus'),
         (int) $job['processed_items'],
         (int) $job['total_items']
       );
@@ -276,7 +277,8 @@ final class BulkJobManager
       $job['status'] = 'failed';
       $job['updated_at'] = time();
       $job['finished_at'] = time();
-      $job['last_message'] = sprintf(__('Bulk media job failed: %s', NIMBUS_TEXT_DOMAIN), $exception->getMessage());
+      /* translators: %s: exception message describing why the job failed */
+      $job['last_message'] = sprintf(__('Bulk media job failed: %s', 'nimbus'), $exception->getMessage());
       $this->persistCurrentJob($job);
       $this->persistLastJob($job);
       $this->logger->error('Bulk media job {job} failed: {error}', [
@@ -327,6 +329,7 @@ final class BulkJobManager
     $candidateBatchSize = max(50, $limit * 4);
 
     while (count($eligible) < $limit) {
+      // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk-job candidate list/count; must reflect live attachment state as the job progresses, not cached.
       $candidateIds = $wpdb->get_col($wpdb->prepare(
         "SELECT p.ID
          FROM {$wpdb->posts} p
@@ -379,6 +382,7 @@ final class BulkJobManager
       return [];
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk-job candidate list/count; must reflect live attachment state as the job progresses, not cached.
     $ids = $wpdb->get_col($wpdb->prepare(
       "SELECT post_id
        FROM {$wpdb->postmeta}
@@ -408,6 +412,7 @@ final class BulkJobManager
       return 0;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk-job candidate list/count; must reflect live attachment state as the job progresses, not cached.
     return (int) $wpdb->get_var($wpdb->prepare(
       "SELECT COUNT(DISTINCT p.ID)
        FROM {$wpdb->posts} p
@@ -436,6 +441,7 @@ final class BulkJobManager
       return 0;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk-job candidate list/count; must reflect live attachment state as the job progresses, not cached.
     return (int) $wpdb->get_var($wpdb->prepare(
       "SELECT COUNT(DISTINCT post_id)
        FROM {$wpdb->postmeta}
@@ -453,12 +459,13 @@ final class BulkJobManager
     if ((int) $job['failed_count'] > 0) {
       $job['status'] = 'completed_with_errors';
       $job['last_message'] = sprintf(
-        __('Bulk media job finished with %d failed items.', NIMBUS_TEXT_DOMAIN),
+        /* translators: %d: number of items that failed in this job */
+        __('Bulk media job finished with %d failed items.', 'nimbus'),
         (int) $job['failed_count']
       );
     } else {
       $job['status'] = 'completed';
-      $job['last_message'] = __('Bulk media job completed.', NIMBUS_TEXT_DOMAIN);
+      $job['last_message'] = __('Bulk media job completed.', 'nimbus');
     }
 
     $this->persistCurrentJob($job);
@@ -534,12 +541,12 @@ final class BulkJobManager
   private function statusLabel(string $status): string
   {
     return match ($status) {
-      'running' => __('Running', NIMBUS_TEXT_DOMAIN),
-      'paused' => __('Paused', NIMBUS_TEXT_DOMAIN),
-      'completed' => __('Completed', NIMBUS_TEXT_DOMAIN),
-      'completed_with_errors' => __('Completed with errors', NIMBUS_TEXT_DOMAIN),
-      'failed' => __('Failed', NIMBUS_TEXT_DOMAIN),
-      default => __('Idle', NIMBUS_TEXT_DOMAIN),
+      'running' => __('Running', 'nimbus'),
+      'paused' => __('Paused', 'nimbus'),
+      'completed' => __('Completed', 'nimbus'),
+      'completed_with_errors' => __('Completed with errors', 'nimbus'),
+      'failed' => __('Failed', 'nimbus'),
+      default => __('Idle', 'nimbus'),
     };
   }
 }

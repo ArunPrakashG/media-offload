@@ -317,6 +317,7 @@ final class Command
     global $wpdb;
 
     $limit = max(1, (int) ($assoc_args['limit'] ?? 500));
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- One-shot WP-CLI operation; must scan current post_content live, nothing to cache.
     $postIds = $wpdb->get_col($wpdb->prepare(
       "SELECT ID FROM {$wpdb->posts} WHERE post_type NOT IN ('revision', 'nav_menu_item') AND post_content LIKE %s LIMIT %d",
       '%' . $wpdb->esc_like($from) . '%',

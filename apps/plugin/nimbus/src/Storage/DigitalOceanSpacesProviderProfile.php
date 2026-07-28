@@ -33,37 +33,37 @@ final class DigitalOceanSpacesProviderProfile extends AbstractProviderProfile im
 
   public function label(): string
   {
-    return __('DigitalOcean Spaces', NIMBUS_TEXT_DOMAIN);
+    return __('DigitalOcean Spaces', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('DigitalOcean Spaces', NIMBUS_TEXT_DOMAIN);
+    return __('DigitalOcean Spaces', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('DigitalOcean Spaces Object Storage — S3-compatible. Enter your Space name as the bucket and select the datacenter region. Optionally enable the built-in Spaces CDN from your DigitalOcean control panel and enter the CDN URL here.', NIMBUS_TEXT_DOMAIN);
+    return __('DigitalOcean Spaces Object Storage — S3-compatible. Enter your Space name as the bucket and select the datacenter region. Optionally enable the built-in Spaces CDN from your DigitalOcean control panel and enter the CDN URL here.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Space Name (bucket)', NIMBUS_TEXT_DOMAIN),
-      'region' => __('Region (e.g. nyc3, ams3, sgp1)', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('Spaces Access Key', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('Spaces Secret Key', NIMBUS_TEXT_DOMAIN),
+      'bucket' => __('Space Name (bucket)', 'nimbus'),
+      'region' => __('Region (e.g. nyc3, ams3, sgp1)', 'nimbus'),
+      'access_key' => __('Spaces Access Key', 'nimbus'),
+      'secret_key' => __('Spaces Secret Key', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your DigitalOcean Space name (used as the bucket).', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('Spaces region slug, e.g. nyc3, ams3, sgp1, fra1, blr1. Found in your Space URL.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('Spaces access key from the DigitalOcean control panel → API → Spaces Keys.', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('Spaces secret key paired with the access key above.', NIMBUS_TEXT_DOMAIN),
-      'endpoint'      => __('Leave empty to use the auto-built Spaces endpoint, or enter a Spaces CDN URL for edge delivery.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('Your DigitalOcean Space name (used as the bucket).', 'nimbus'),
+      'region'        => __('Spaces region slug, e.g. nyc3, ams3, sgp1, fra1, blr1. Found in your Space URL.', 'nimbus'),
+      'access_key'    => __('Spaces access key from the DigitalOcean control panel → API → Spaces Keys.', 'nimbus'),
+      'secret_key'    => __('Spaces secret key paired with the access key above.', 'nimbus'),
+      'endpoint'      => __('Leave empty to use the auto-built Spaces endpoint, or enter a Spaces CDN URL for edge delivery.', 'nimbus'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

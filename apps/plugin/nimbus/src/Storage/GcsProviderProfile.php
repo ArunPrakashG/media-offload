@@ -35,38 +35,38 @@ final class GcsProviderProfile extends AbstractProviderProfile implements Provid
 
   public function label(): string
   {
-    return __('Google Cloud Storage', NIMBUS_TEXT_DOMAIN);
+    return __('Google Cloud Storage', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('Google Cloud Storage', NIMBUS_TEXT_DOMAIN);
+    return __('Google Cloud Storage', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('Google Cloud Storage via the S3-compatible XML API. Requires an HMAC key pair generated from IAM → Service Accounts in the GCS console. Uniform bucket-level access must be enabled and the service account must have the Storage Object Admin role.', NIMBUS_TEXT_DOMAIN);
+    return __('Google Cloud Storage via the S3-compatible XML API. Requires an HMAC key pair generated from IAM → Service Accounts in the GCS console. Uniform bucket-level access must be enabled and the service account must have the Storage Object Admin role.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket Name', NIMBUS_TEXT_DOMAIN),
-      'region' => __('Location (e.g. us-central1, europe-west1)', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('HMAC Access Key', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('HMAC Secret', NIMBUS_TEXT_DOMAIN),
+      'bucket' => __('Bucket Name', 'nimbus'),
+      'region' => __('Location (e.g. us-central1, europe-west1)', 'nimbus'),
+      'access_key' => __('HMAC Access Key', 'nimbus'),
+      'secret_key' => __('HMAC Secret', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your GCS bucket name. Uniform bucket-level access must be enabled.', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('GCS location for metadata, e.g. us-central1, europe-west1, US, EU. The API endpoint is always storage.googleapis.com.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('HMAC Access Key from the GCS console: IAM → Service Accounts → select account → HMAC Keys tab.', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('HMAC Secret shown once at creation time in the GCS console, paired with the access key above.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('Your GCS bucket name. Uniform bucket-level access must be enabled.', 'nimbus'),
+      'region'        => __('GCS location for metadata, e.g. us-central1, europe-west1, US, EU. The API endpoint is always storage.googleapis.com.', 'nimbus'),
+      'access_key'    => __('HMAC Access Key from the GCS console: IAM → Service Accounts → select account → HMAC Keys tab.', 'nimbus'),
+      'secret_key'    => __('HMAC Secret shown once at creation time in the GCS console, paired with the access key above.', 'nimbus'),
       'session_token' => '',
-      'endpoint'      => __('Pre-filled to https://storage.googleapis.com — change only if using a custom endpoint.', NIMBUS_TEXT_DOMAIN),
+      'endpoint'      => __('Pre-filled to https://storage.googleapis.com — change only if using a custom endpoint.', 'nimbus'),
       'r2_account_id' => '',
     ];
   }

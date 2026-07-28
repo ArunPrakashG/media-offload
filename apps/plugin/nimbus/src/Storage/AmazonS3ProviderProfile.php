@@ -19,38 +19,38 @@ final class AmazonS3ProviderProfile extends AbstractProviderProfile implements P
 
   public function label(): string
   {
-    return __('Amazon S3', NIMBUS_TEXT_DOMAIN);
+    return __('Amazon S3', 'nimbus');
   }
 
   public function title(): string
   {
-    return __('Amazon S3', NIMBUS_TEXT_DOMAIN);
+    return __('Amazon S3', 'nimbus');
   }
 
   public function summary(): string
   {
-    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', NIMBUS_TEXT_DOMAIN);
+    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', 'nimbus');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', NIMBUS_TEXT_DOMAIN),
-      'region' => __('Region', NIMBUS_TEXT_DOMAIN),
-      'access_key' => __('Access Key', NIMBUS_TEXT_DOMAIN),
-      'secret_key' => __('Secret Key', NIMBUS_TEXT_DOMAIN),
+      'bucket' => __('Bucket', 'nimbus'),
+      'region' => __('Region', 'nimbus'),
+      'access_key' => __('Access Key', 'nimbus'),
+      'secret_key' => __('Secret Key', 'nimbus'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The S3 bucket where your media files will be stored.', NIMBUS_TEXT_DOMAIN),
-      'region'        => __('AWS region code, e.g. us-east-1, eu-west-2, ap-southeast-1.', NIMBUS_TEXT_DOMAIN),
-      'access_key'    => __('AWS IAM Access Key ID.', NIMBUS_TEXT_DOMAIN),
-      'secret_key'    => __('AWS IAM Secret Access Key.', NIMBUS_TEXT_DOMAIN),
-      'session_token' => __('Optional — only needed for temporary STS credentials. Leave empty for standard IAM keys.', NIMBUS_TEXT_DOMAIN),
-      'endpoint'      => __('Leave empty to use the standard AWS S3 endpoint. Override only for VPC or custom configurations.', NIMBUS_TEXT_DOMAIN),
+      'bucket'        => __('The S3 bucket where your media files will be stored.', 'nimbus'),
+      'region'        => __('AWS region code, e.g. us-east-1, eu-west-2, ap-southeast-1.', 'nimbus'),
+      'access_key'    => __('AWS IAM Access Key ID.', 'nimbus'),
+      'secret_key'    => __('AWS IAM Secret Access Key.', 'nimbus'),
+      'session_token' => __('Optional — only needed for temporary STS credentials. Leave empty for standard IAM keys.', 'nimbus'),
+      'endpoint'      => __('Leave empty to use the standard AWS S3 endpoint. Override only for VPC or custom configurations.', 'nimbus'),
       'r2_account_id' => '',
     ];
   }

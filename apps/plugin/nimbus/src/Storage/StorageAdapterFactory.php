@@ -61,6 +61,7 @@ final class StorageAdapterFactory
 
     if (!is_callable($factory)) {
       throw new RuntimeException(
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Internal exception message, never echoed directly; caught and logged or wrapped by callers.
         sprintf('Unsupported storage adapter type "%s" for provider "%s".', $adapterType, $provider)
       );
     }

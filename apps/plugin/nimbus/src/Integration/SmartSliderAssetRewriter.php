@@ -31,6 +31,7 @@ final class SmartSliderAssetRewriter
 
     $prefix = (string) $wpdb->prefix;
     $pattern = $prefix . 'nextend2_%';
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Schema introspection (SHOW TABLES) must read the live database; result is only used transiently within this request.
     $tables = $wpdb->get_col($wpdb->prepare('SHOW TABLES LIKE %s', $pattern));
     if (!is_array($tables)) {
       return [];
@@ -198,6 +199,7 @@ final class SmartSliderAssetRewriter
             continue;
           }
 
+          // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table/column identifier only, not a value; discovered via SHOW TABLES/DESCRIBE against this site's own schema (never user input) and backtick-escaped. Values are bound via $wpdb->prepare() placeholders.
           $sql = $wpdb->prepare(
             "UPDATE {$tableSql} SET {$columnSql} = REPLACE({$columnSql}, %s, %s) WHERE {$columnSql} LIKE %s",
             $from,
@@ -206,6 +208,7 @@ final class SmartSliderAssetRewriter
           );
 
           $result = $wpdb->query($sql);
+          // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
           if ($result === false) {
             $errors++;
             continue;
@@ -276,6 +279,7 @@ final class SmartSliderAssetRewriter
     }
 
     $tableSql = '`' . str_replace('`', '``', $table) . '`';
+    // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Table/column identifier only, not a value; discovered via SHOW TABLES/DESCRIBE against this site's own schema (never user input) and backtick-escaped. Values are bound via $wpdb->prepare() placeholders.
     $columns = $wpdb->get_results("DESCRIBE {$tableSql}", ARRAY_A);
     if (!is_array($columns)) {
       return [];
