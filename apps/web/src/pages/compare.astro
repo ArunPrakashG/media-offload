@@ -17,10 +17,11 @@ import Base from "../layouts/Base.astro";
         <p class="section-label">Comparison</p>
         <h1 class="compare-headline">Why developers are switching to Nimbus</h1>
         <p class="compare-sub">
-          Other plugins start at $99/yr — and that's before you pay for the
-          WooCommerce add-on. Nimbus includes WooCommerce, all 9 providers,
-          analytics, WP-CLI, cache purge, and bulk migration — 100% free and
-          open source, no license key, no tiers.
+          The market leader still starts at $99/yr and doesn't support
+          Cloudflare R2. A newer wave of free plugins has shown up too — but
+          most of them save their best features (bulk migration, cache purge,
+          WooCommerce downloads) for a paid upgrade. Nimbus doesn't: every
+          feature is free, unlimited, on every install.
         </p>
       </div>
     </section>
@@ -38,13 +39,87 @@ import Base from "../layouts/Base.astro";
         </div>
         <div class="diff-vs">vs</div>
         <div class="diff-item diff-item--them">
-          <span class="diff-label">Per-file pricing plugins</span>
-          <p class="diff-heading">Pay per media item, unlimited sites</p>
+          <span class="diff-label">Other plugins</span>
+          <p class="diff-heading">Free to install, paid to actually use</p>
           <p class="diff-body">
-            Every license has a hard cap on total offloaded files. Exceed it and
-            non-essential features are disabled until you upgrade your plan.
+            The traditional players charge per media item, with hard caps
+            that force an upgrade as your library grows. The newer free
+            plugins usually keep bulk migration, cache purging, or
+            WooCommerce integration behind their own paid tier.
           </p>
         </div>
+      </div>
+    </section>
+
+    <!-- Free vs. free -->
+    <section class="section section--alt">
+      <div class="container">
+        <h2 class="section-headline" style="margin-bottom:0.5rem">
+          Not every free plugin is actually free to use
+        </h2>
+        <p class="section-sub" style="margin-bottom:2.5rem">
+          A few other WordPress media offload plugins now offer a free tier
+          too. The difference is what's actually included in it.
+        </p>
+
+        <div class="compare-table-wrap">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th class="col-feature">In the free tier</th>
+                <th class="col-nimbus">
+                  <span class="th-brand th-brand--nimbus">Nimbus</span>
+                </th>
+                <th class="col-them">
+                  <span class="th-brand th-brand--them">Typical free-tier plugin</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Bulk migration of existing library</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Unlimited, pause/resume, live progress</td>
+                <td class="col-them">Often a paid add-on, or capped batch size</td>
+              </tr>
+              <tr>
+                <td>Cache purge automation</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Cloudflare, LiteSpeed, WP Fastest Cache, proxy</td>
+                <td class="col-them">Rarely included at all</td>
+              </tr>
+              <tr>
+                <td>WooCommerce signed downloads</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
+                <td class="col-them">Commonly a paid add-on</td>
+              </tr>
+              <tr>
+                <td>Page-builder / gallery DB rewriting</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Elementor, Slider Revolution, Smart Slider 3, NextGEN</td>
+                <td class="col-them">Rarely included at all</td>
+              </tr>
+              <tr>
+                <td>Storage cost analytics</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
+                <td class="col-them">Rarely included at all</td>
+              </tr>
+              <tr>
+                <td>Multisite network admin panel</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Included</td>
+                <td class="col-them">Rarely included at all</td>
+              </tr>
+              <tr>
+                <td>REST API + WP-CLI</td>
+                <td class="col-nimbus winner"><span class="check">✓</span> Full read/write endpoints, full CLI suite</td>
+                <td class="col-them">CLI sometimes present; REST API rarely</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="compare-footnote">
+          Based on published feature lists and pricing pages of currently
+          active WordPress.org media offload plugins as of mid-2026. Always
+          check a plugin's current listing before switching — free tiers
+          change over time.
+        </p>
       </div>
     </section>
 
@@ -52,7 +127,7 @@ import Base from "../layouts/Base.astro";
     <section class="section">
       <div class="container">
         <h2 class="section-headline" style="margin-bottom:0.5rem">
-          Pricing at a glance
+          And against the traditional paid plugins
         </h2>
         <p class="section-sub" style="margin-bottom:2.5rem">
           Competitor prices are representative of the leading per-file pricing
@@ -795,6 +870,12 @@ import Base from "../layouts/Base.astro";
     color: var(--nmb-text-subtle);
     line-height: 1.65;
     margin: 0;
+  }
+
+  .compare-footnote {
+    font-size: 0.8125rem;
+    color: var(--nmb-text-subtle);
+    margin-top: 1.25rem;
   }
 
   /* ── CTA ─────────────────────────────────────────────────────────────────── */
