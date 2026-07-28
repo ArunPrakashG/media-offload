@@ -29,10 +29,6 @@ apps/web/dist/
 apps/web/build/
 apps/web/.output/
 
-# ── apps/backend (Go) ─────────────────────────────────────────────────────────
-apps/backend/bin/
-apps/backend/tmp/
-
 # ── packages (shared libs) ────────────────────────────────────────────────────
 packages/**/dist/
 
