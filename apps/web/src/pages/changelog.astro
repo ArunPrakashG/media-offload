@@ -1,0 +1,696 @@
+---
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Base from "@layouts/Base.astro";
+---
+
+<Base
+  title="Changelog — Nimbus"
+  description="Release notes for every version of Nimbus — new features, improvements, and fixes."
+>
+  <Navbar />
+  <main id="main-content" class="changelog-page">
+    <div class="container changelog-container">
+      <header class="changelog-header">
+        <p class="section-label">Release notes</p>
+        <h1>Changelog</h1>
+        <p class="changelog-intro">
+          Every release of Nimbus, in reverse chronological order. As of
+          v0.2.0, Nimbus is a single free, open-source plugin — every feature
+          below is included on every install, with no license key required.
+        </p>
+      </header>
+
+      <div class="releases">
+        <!-- v0.2.0 -->
+        <article class="release" id="v0-2-0">
+          <aside class="release-meta">
+            <span class="release-version">v0.2.0</span>
+            <time class="release-date" datetime="2026-07-28">July 2026</time>
+            <span class="release-badge badge-latest">Latest</span>
+          </aside>
+          <div class="release-body">
+            <h2>Nimbus is now 100% free and open source</h2>
+            <p class="release-summary">
+              The Nimbus Pro add-on has been merged into this plugin and all
+              licensing has been removed. Every feature below — previously
+              split across free and paid tiers — is now included on every
+              install, with no license key, no activation limits, and no
+              upgrade path required.
+            </p>
+
+            <h3>Now free for everyone</h3>
+            <ul>
+              <li>Bulk migration with pause, resume, and retry-failed.</li>
+              <li>
+                Cache purge integrations: Cloudflare, LiteSpeed Cache, WP
+                Fastest Cache, and generic proxy/Nginx.
+              </li>
+              <li>Full <code>wp nimbus</code> WP-CLI command suite.</li>
+              <li>
+                Page-builder and gallery database URL rewriting: Elementor,
+                Slider Revolution, Smart Slider 3, NextGEN Gallery.
+              </li>
+              <li>WooCommerce signed download delivery.</li>
+              <li>Multisite network admin overview panel.</li>
+              <li>Selective offload rules by MIME type and file size.</li>
+              <li>Nightly off-hours batch offload.</li>
+            </ul>
+
+            <h3>Removed</h3>
+            <ul>
+              <li>
+                The license key requirement, license activation screen, and
+                every call to the former Nimbus licensing backend.
+              </li>
+              <li>
+                The separate Nimbus Pro plugin — its code is now part of this
+                plugin.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- v0.1.4 -->
+        <article class="release" id="v0-1-4">
+          <aside class="release-meta">
+            <span class="release-version">v0.1.4</span>
+            <time class="release-date" datetime="2025-05-01">May 2025</time>
+          </aside>
+          <div class="release-body">
+            <h2>Nine dedicated provider profiles</h2>
+            <p class="release-summary">
+              Every supported storage provider now has its own hand-tuned
+              profile. No more filling in endpoint patterns manually — pick your
+              provider, enter your credentials, done.
+            </p>
+
+            <h3>New provider profiles</h3>
+            <ul>
+              <li>
+                <strong>Google Cloud Storage</strong> — dedicated GCS profile via
+                the HMAC XML API. Use HMAC keys (not a service account JSON). Uniform
+                bucket-level access required.
+              </li>
+              <li>
+                <strong>DigitalOcean Spaces</strong> — native Spaces profile with
+                virtual-hosted style and optional CDN URL.
+              </li>
+              <li>
+                <strong>Wasabi</strong> — dedicated profile with endpoint auto-filled
+                from the selected region.
+              </li>
+              <li>
+                <strong>Backblaze B2</strong> — B2 via the S3-compatible API. Uses
+                Application Keys with region derived from the bucket.
+              </li>
+              <li>
+                <strong>MinIO</strong> — for self-hosted S3-compatible servers. Path-style
+                access pre-enabled.
+              </li>
+            </ul>
+
+            <h3>WooCommerce signed downloads</h3>
+            <ul>
+              <li>
+                Offloaded attachments sold as WooCommerce downloadable products
+                are now delivered via a short-lived signed URL pointing directly
+                at your storage provider.
+              </li>
+              <li>
+                The buyer's browser redirects straight to the file — your web
+                server is bypassed, saving bandwidth and compute. No extra
+                configuration required.
+              </li>
+            </ul>
+
+            <h3>Multisite network admin panel</h3>
+            <ul>
+              <li>
+                Super-admins on WordPress Multisite now have a
+                <strong>Network Admin → Nimbus</strong> screen that shows license
+                status and offload statistics for every site in the network at a glance.
+              </li>
+              <li>
+                Each sub-site retains its own independent settings and license
+                activation — the network panel is a read-only overview.
+              </li>
+            </ul>
+
+            <h3>Create bucket from WordPress</h3>
+            <ul>
+              <li>
+                New <strong>Create bucket</strong> button on the storage settings
+                screen. Enter your credentials, type a bucket name, and Nimbus creates
+                it via the provider API — no need to open a separate browser tab or
+                console.
+              </li>
+            </ul>
+
+            <h3>Config export &amp; import</h3>
+            <ul>
+              <li>
+                Export your entire Nimbus configuration (credentials, rules,
+                integrations) as a JSON file.
+              </li>
+              <li>
+                Import that file on another site or environment to replicate the
+                setup instantly — ideal for staging ↔ production workflows.
+              </li>
+            </ul>
+
+            <h3>Real-time job progress via SSE</h3>
+            <ul>
+              <li>
+                New <code>/jobs/stream</code> REST endpoint provides a Server-Sent
+                Events stream. The admin UI now shows a live counter of files processed,
+                succeeded, failed, and skipped as a job runs — no polling, no page
+                refresh.
+              </li>
+            </ul>
+
+            <h3>New REST endpoints</h3>
+            <ul>
+              <li>
+                <code>POST /storage/presign</code> — generate a short-lived signed
+                URL for any stored file.
+              </li>
+              <li>
+                <code>POST /storage/create-bucket</code> — create a new bucket from
+                the API.
+              </li>
+              <li>
+                <code>POST /cache/purge</code> — manually trigger a cache purge for
+                a list of URLs.
+              </li>
+              <li>
+                <code>GET /jobs/stream</code> — Server-Sent Events stream for live
+                job progress.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- v0.1.3 -->
+        <article class="release" id="v0-1-3">
+          <aside class="release-meta">
+            <span class="release-version">v0.1.3</span>
+            <time class="release-date" datetime="2025-03-01">March 2025</time>
+          </aside>
+          <div class="release-body">
+            <h2>Nightly scheduling &amp; cache purge integrations</h2>
+            <p class="release-summary">
+              Run big migrations while you sleep. Three new cache purge
+              integrations and a new Smart Slider 3 asset rewriter round out the
+              integration matrix.
+            </p>
+
+            <h3>Nightly off-hours batch</h3>
+            <ul>
+              <li>
+                New nightly scheduler that processes the pending-offload queue
+                overnight at a configurable start time (default: 3 AM server
+                time).
+              </li>
+              <li>
+                Configurable parallel workers per plan: 2 on Personal, 5 on Pro,
+                8 on Agency.
+              </li>
+              <li>
+                No manual intervention needed — the queue drains automatically
+                each night.
+              </li>
+            </ul>
+
+            <h3>Cache purge integrations</h3>
+            <ul>
+              <li>
+                <strong>LiteSpeed Cache</strong> — automatic purge via LiteSpeed's
+                native action hooks.
+              </li>
+              <li>
+                <strong>WP Fastest Cache</strong> — per-URL and full-cache clears
+                after offload.
+              </li>
+              <li>
+                <strong>Nginx / proxy PURGE</strong> — fire an HTTP PURGE request
+                to a configurable URL template with <code>&#123;url&#125;</code
+                >,
+                <code>&#123;host&#125;</code>, <code>&#123;path&#125;</code>,
+                and
+                <code>&#123;scheme&#125;</code> variables.
+              </li>
+            </ul>
+
+            <h3>Smart Slider 3 asset rewriter</h3>
+            <ul>
+              <li>
+                Nimbus can now rewrite URLs stored in Smart Slider 3's Nextend
+                storage tables. Click <strong>Rewrite URLs</strong> on the Integrations
+                screen after your initial bulk migration.
+              </li>
+            </ul>
+
+            <h3>REST job control endpoints</h3>
+            <ul>
+              <li><code>POST /jobs/start</code> — start a new bulk job.</li>
+              <li>
+                <code>POST /jobs/pause</code> — cleanly pause the running job.
+              </li>
+              <li>
+                <code>POST /jobs/resume</code> — resume a paused job from its saved
+                position.
+              </li>
+              <li>
+                <code>POST /jobs/retry-failed</code> — re-process only the failed
+                items from the last job.
+              </li>
+            </ul>
+
+            <h3>
+              Selective offload rules
+            </h3>
+            <ul>
+              <li>
+                Path allow-list and deny-list glob filters — control exactly
+                which files are eligible for offload.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- v0.1.2 -->
+        <article class="release" id="v0-1-2">
+          <aside class="release-meta">
+            <span class="release-version">v0.1.2</span>
+            <time class="release-date" datetime="2025-01-01">January 2025</time>
+          </aside>
+          <div class="release-body">
+            <h2>Bulk migration, page-builder integrations &amp; WP-CLI</h2>
+            <p class="release-summary">
+              The bulk job engine lands in this release — along with
+              integrations for Elementor, Slider Revolution, and NextGEN
+              Gallery, in-depth storage analytics, and the <code>wp nimbus</code
+              > WP-CLI namespace.
+            </p>
+
+            <h3>Bulk migration with pause &amp; resume</h3>
+            <ul>
+              <li>
+                Background bulk job that processes your existing library in
+                configurable batches (25 per tick on Personal, 75 on Pro, 100 on
+                Agency) on a 2-second cron interval.
+              </li>
+              <li>
+                Pause a job at any time. Nimbus saves its exact position and
+                resumes from the same file when you click Resume. Nothing is
+                re-processed.
+              </li>
+              <li>
+                <strong>Retry failed</strong> — re-run only the files that failed
+                in the last job without touching succeeded files.
+              </li>
+              <li>
+                <strong>Restore local</strong> job type — re-downloads all offloaded
+                files back to your server for provider migrations.
+              </li>
+            </ul>
+
+            <h3>Page-builder integrations</h3>
+            <ul>
+              <li>
+                <strong>Elementor</strong> — rewrites URLs in
+                <code>_elementor_data</code> and
+                <code>_elementor_page_settings</code> postmeta JSON.
+              </li>
+              <li>
+                <strong>Slider Revolution</strong> — rewrites all
+                <code>revslider_*</code> database tables.
+              </li>
+              <li>
+                <strong>NextGEN Gallery</strong> — rewrites all
+                <code>ngg_*</code> database tables.
+              </li>
+            </ul>
+
+            <h3>
+              Storage analytics
+            </h3>
+            <ul>
+              <li>
+                Dashboard with offload counts, MIME type breakdown, 7-day upload
+                trend chart, and estimated monthly cost.
+              </li>
+              <li>
+                Side-by-side S3 vs R2 cost comparison to help you choose the
+                most cost-effective provider.
+              </li>
+            </ul>
+
+            <h3>WP-CLI</h3>
+            <ul>
+              <li>
+                New <code>wp nimbus</code> command namespace with <code
+                  >deploy</code
+                >, <code>download</code>, <code>sync</code>, <code>rewrite</code
+                >, <code>revert</code>, <code>replace-urls</code>, <code
+                  >process-pending</code
+                >, <code>offload-single</code>, and <code>config</code> subcommands.
+              </li>
+            </ul>
+
+            <h3>
+              Selective offload rules
+            </h3>
+            <ul>
+              <li>
+                Minimum file size filter — skip files below a threshold to avoid
+                offloading small thumbnails.
+              </li>
+              <li>
+                MIME type filter — only offload files matching specific MIME
+                patterns (e.g. <code>image/*</code>, <code>video/mp4</code>).
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- v0.1.1 -->
+        <article class="release" id="v0-1-1">
+          <aside class="release-meta">
+            <span class="release-version">v0.1.1</span>
+            <time class="release-date" datetime="2024-11-01">November 2024</time
+            >
+          </aside>
+          <div class="release-body">
+            <h2>Media library UI, Cloudflare cache purge &amp; onboarding</h2>
+            <p class="release-summary">
+              Better visibility into offload status, automated cache
+              invalidation after each offload, and a guided onboarding flow on
+              first activation.
+            </p>
+
+            <h3>Media Library status column</h3>
+            <ul>
+              <li>
+                A new <strong>Nimbus</strong> column shows the offload status of every
+                attachment: <em>Offloaded</em>, <em>Pending</em>,
+                <em>Failed</em>, <em>Ignored</em>, or <em>Local</em>.
+              </li>
+              <li>
+                Filter the Media Library by status using the new Nimbus
+                dropdown.
+              </li>
+              <li>
+                Row actions for individual files: offload, restore, or retry.
+              </li>
+            </ul>
+
+            <h3>Cloudflare cache purge</h3>
+            <ul>
+              <li>
+                Automatically purge Cloudflare CDN cache for any file that is
+                offloaded, restored, or has its URL rewritten.
+              </li>
+              <li>
+                Purge requests are batched (5 per tick) and fired asynchronously
+                so they never block page loads.
+              </li>
+              <li>Requires Zone ID and a Cache Purge–scoped API token.</li>
+            </ul>
+
+            <h3>Guided onboarding</h3>
+            <ul>
+              <li>
+                New first-activation onboarding flow walks you through license
+                activation and bucket connection.
+              </li>
+              <li>
+                Live connection test with per-step error messages (DNS, auth,
+                bucket access, write check).
+              </li>
+            </ul>
+
+            <h3>Bug fixes &amp; improvements</h3>
+            <ul>
+              <li>
+                Improved error reporting when object storage returns a non-2xx
+                response.
+              </li>
+              <li>
+                Settings screen now shows current storage usage and object
+                count.
+              </li>
+              <li>
+                More reliable URL rewriting for attachments referenced in custom
+                fields.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- v0.1.0 -->
+        <article class="release" id="v0-1-0">
+          <aside class="release-meta">
+            <span class="release-version">v0.1.0</span>
+            <time class="release-date" datetime="2024-10-01">October 2024</time>
+            <span class="release-badge badge-initial">Initial release</span>
+          </aside>
+          <div class="release-body">
+            <h2>Initial release</h2>
+            <p class="release-summary">
+              The first public version of Nimbus — automatic media offload to
+              Amazon S3, Cloudflare R2, and S3-compatible providers, with full
+              URL rewriting and a reversible database writes.
+            </p>
+
+            <h3>Core features</h3>
+            <ul>
+              <li>
+                <strong>Auto-offload on upload</strong> — every file uploaded through
+                WordPress is immediately sent to your cloud bucket.
+              </li>
+              <li>
+                <strong>URL rewriting</strong> — <code>Serve From Storage</code>
+                toggle rewrites all attachment URLs to your bucket or CDN domain.
+                Toggle off to instantly revert to local serving — no data change,
+                just a settings flip.
+              </li>
+              <li>
+                <strong>Reversible database writes</strong> — Nimbus stores a relative
+                storage key, not a full provider URL. Changing CDN domains or even
+                switching providers requires only a settings update.
+              </li>
+              <li>
+                <strong>Remove local copies</strong> — optionally delete files from
+                your server after a successful offload to free up disk space.
+              </li>
+              <li>
+                <strong>Custom CDN domain</strong> — serve media from your own CDN
+                subdomain instead of directly from the bucket URL.
+              </li>
+              <li>
+                <strong>Bucket path prefix</strong> — organise uploads under a sub-folder
+                inside a shared bucket.
+              </li>
+            </ul>
+
+            <h3>Storage providers</h3>
+            <ul>
+              <li>Amazon S3 (all regions)</li>
+              <li>Cloudflare R2 (zero egress fees)</li>
+              <li>Generic S3-compatible (Vultr, Linode, Tigris, and others)</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+  .changelog-page {
+    padding: 3.5rem 0 7rem;
+  }
+
+  .changelog-container {
+    max-width: 780px;
+  }
+
+  /* ── Header ──────────────────────────────────────────────────────────────── */
+  .changelog-header {
+    margin-bottom: 4rem;
+  }
+
+  .changelog-header h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--nmb-text);
+    margin: 0.25rem 0 0.75rem;
+    letter-spacing: -0.03em;
+  }
+
+  .changelog-intro {
+    font-size: 1.0625rem;
+    color: var(--nmb-text-muted);
+    max-width: 560px;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── Release list ────────────────────────────────────────────────────────── */
+  .releases {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  /* ── Individual release ──────────────────────────────────────────────────── */
+  .release {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 2rem;
+    align-items: start;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--nmb-border);
+  }
+
+  @media (max-width: 680px) {
+    .release {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  /* ── Release meta (left column) ─────────────────────────────────────────── */
+  .release-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    position: sticky;
+    top: 5rem;
+  }
+
+  @media (max-width: 680px) {
+    .release-meta {
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }
+
+  .release-version {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .release-date {
+    font-size: 0.8125rem;
+    color: var(--nmb-text-muted);
+  }
+
+  .release-badge {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.2em 0.55em;
+  }
+
+  .badge-latest {
+    background: #e8f0fe;
+    color: #2a52d4;
+  }
+
+  .badge-initial {
+    background: #e9fbe9;
+    color: #1d7a2d;
+  }
+
+  /* ── Release body (right column) ────────────────────────────────────────── */
+  .release-body > h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .release-summary {
+    color: var(--nmb-text-muted);
+    line-height: 1.65;
+    margin: 0 0 1.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .release-body h3 {
+    font-size: 0.9375rem;
+    font-weight: 650;
+    color: var(--nmb-text);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .release-body h3:first-of-type {
+    margin-top: 0;
+  }
+
+  .release-body ul {
+    margin: 0 0 0.5rem;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .release-body li {
+    font-size: 0.9375rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.6;
+  }
+
+  .release-body strong {
+    color: var(--nmb-text);
+    font-weight: 600;
+  }
+
+  .release-body code {
+    font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+    font-size: 0.8125em;
+    background: var(--nmb-bg-subtle, #f4f4f8);
+    border: 1px solid var(--nmb-border);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    color: var(--nmb-text);
+  }
+
+  /* ── Inline plan badges ──────────────────────────────────────────────────── */
+  .inline-badge {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.15em 0.45em;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+  }
+
+  .pro {
+    background: #fef3e2;
+    color: #a35d00;
+  }
+
+  .personal {
+    background: #eef2ff;
+    color: #3f56d1;
+  }
+</style>

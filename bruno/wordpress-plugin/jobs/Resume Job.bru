@@ -1,0 +1,19 @@
+meta {
+  name: Resume Job
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/jobs/resume
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}
+
+docs {
+  Resumes a paused bulk job. Returns 202 Accepted with the updated job state.
+}

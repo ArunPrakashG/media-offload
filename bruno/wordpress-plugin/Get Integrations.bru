@@ -1,0 +1,15 @@
+meta {
+  name: Get Integrations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{wpBaseUrl}}/wp-json/nimbus/v1/integrations
+  body: none
+  auth: none
+}
+
+headers {
+  X-WP-Nonce: {{wpNonce}}
+}

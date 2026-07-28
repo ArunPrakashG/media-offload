@@ -1,0 +1,629 @@
+---
+const providers = [
+  {
+    name: "Amazon S3",
+    color: "#FF9900",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><ellipse cx="11" cy="5.5" rx="7.5" ry="2.8" fill="currentColor"/><path d="M3.5 5.5v11c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-11" fill="currentColor" opacity=".8"/><ellipse cx="11" cy="16.5" rx="7.5" ry="2.8" fill="currentColor" opacity=".9"/></svg>`,
+  },
+  {
+    name: "Cloudflare R2",
+    color: "#F6821F",
+    logo: `<svg width="26" height="22" viewBox="0 0 26 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M22.5 13.4a4 4 0 00-3.8-2.7 4 4 0 00-3.7 2.4 2.6 2.6 0 00-1-.18 2.6 2.6 0 00-2.6 2.6 2.6 2.6 0 002.6 2.6h11a2 2 0 002-2 2 2 0 00-1.7-2l-.2.02z"/><path fill="currentColor" opacity=".4" d="M1.5 15A4 4 0 015.5 11c.4 0 .8.05 1.2.14"/></svg>`,
+  },
+  {
+    name: "Google Cloud",
+    color: "#4285F4",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M11 4.5a6.5 6.5 0 014.8 2.1l2.2-2.2A9.5 9.5 0 0011 1.5a9.5 9.5 0 00-8.5 5.3l2.6 2A6.5 6.5 0 0111 4.5z" opacity=".9"/><path fill="currentColor" d="M20.1 11.2h-9.1v3h5.2a4.5 4.5 0 01-1.9 2.8l2.5 1.9a9.5 9.5 0 002.9-7.1c0-.6-.1-1.1-.1-1.6z" opacity=".85"/><path fill="currentColor" d="M5.1 13.3l-2.6 2A9.5 9.5 0 0011 20.5a9.4 9.4 0 006.8-2.8l-2.5-1.9a6 6 0 01-4.3 1.7 6.5 6.5 0 01-5.9-4.2z" opacity=".9"/><path fill="currentColor" d="M5.1 8.7L2.5 6.8A9.5 9.5 0 001.5 11c0 1.5.3 2.9.9 4.2l2.7-2.1A6.5 6.5 0 014.5 11c0-.8.2-1.6.6-2.3z" opacity=".7"/></svg>`,
+  },
+  {
+    name: "Backblaze B2",
+    color: "#2564b8",
+    logo: `<svg width="16" height="22" viewBox="0 0 16 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M8 2C8 2 3 7.5 3 13.5a5 5 0 0010 0c0-2.8-1.4-5-2.6-6.4.1 1.7-.5 3.2-1.5 3.4-1.1.3-1.9-.8-1.6-2.1C7.6 6.1 8 2 8 2z"/></svg>`,
+  },
+  {
+    name: "MinIO",
+    color: "#C72C48",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path fill="currentColor" d="M19 7L11 2 3 7v8l8 5 8-5V7z" opacity=".9"/><path stroke="rgba(255,255,255,.3)" stroke-width=".75" fill="none" d="M11 2v18M3 7l8 4.5 8-4.5"/></svg>`,
+  },
+  {
+    name: "Wasabi",
+    color: "#3AB54A",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="currentColor"/><path d="M6 11q2.5-3.5 5 0t5 0" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>`,
+  },
+  {
+    name: "DigitalOcean",
+    color: "#0080FF",
+    logo: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="currentColor"/><path d="M11 5.5a5.5 5.5 0 010 11V13a2.5 2.5 0 000-5V5.5z" fill="rgba(255,255,255,.95)"/><rect x="8.5" y="13.5" width="2.5" height="2" rx=".4" fill="rgba(255,255,255,.95)"/><rect x="8.5" y="16.2" width="1.8" height="1.6" rx=".4" fill="rgba(255,255,255,.95)"/></svg>`,
+  },
+];
+---
+
+<section class="hero">
+  <!-- Faint background glow -->
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="container hero-inner">
+    <!-- Text block -->
+    <div class="hero-content">
+      <a class="badge badge-accent hero-badge" href="#features">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <circle cx="6" cy="6" r="3"></circle>
+        </svg>
+        Media offloading for WordPress
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 8h8M9 5l3 3-3 3"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </a>
+
+      <h1 class="hero-headline">
+        Move your media to the cloud.<br />
+        <span class="hero-headline-accent">Keep your workflow.</span>
+      </h1>
+
+      <p class="hero-sub">
+        Nimbus offloads your WordPress media library to cloud storage — Amazon
+        S3, Cloudflare R2 (zero egress fees), Google Cloud, and 6 more
+        providers. New uploads, bulk migrations, cache purging, and URL
+        rewriting all happen automatically. 100% free and open source — every
+        feature included, no license key required.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="/docs#installation">
+          Get Nimbus
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M3 8h10M9 4l4 4-4 4"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="/compare"> Compare plans </a>
+      </div>
+    </div>
+
+    <!-- Dashboard mockup -->
+    <div class="hero-visual" aria-hidden="true">
+      <div class="mockup">
+        <!-- macOS-style title bar -->
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-amber"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-title">Nimbus · Storage</span>
+        </div>
+
+        <div class="mockup-body">
+          <!-- Status row -->
+          <div class="mockup-status">
+            <span class="status-indicator"></span>
+            <div>
+              <div class="status-label">Connected to Cloudflare R2</div>
+              <div class="status-sub">nimbus-media-prod · us-east-1</div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="mockup-stats">
+            <div class="stat-tile">
+              <span class="stat-value">1,247</span>
+              <span class="stat-label">Files offloaded</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-value">4.2 GB</span>
+              <span class="stat-label">Server space freed</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-value">17.8 GB</span>
+              <span class="stat-label">Served via CDN</span>
+            </div>
+          </div>
+
+          <div class="mockup-sep"></div>
+
+          <!-- Recent uploads -->
+          <div class="mockup-files-label">Recent uploads</div>
+          <div class="mockup-files">
+            {
+              [
+                ["banner-hero.jpg", "2s ago"],
+                ["about-team.webp", "4s ago"],
+                ["product-shot.png", "12s ago"],
+              ].map(([name, time]) => (
+                <div class="file-row">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    class="file-icon"
+                  >
+                    <rect
+                      x="2"
+                      y="1"
+                      width="10"
+                      height="13"
+                      rx="1.5"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                    />
+                    <path
+                      d="M5 6h6M5 9h4"
+                      stroke="currentColor"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                  <span class="file-name">{name}</span>
+                  <span class="file-badge">offloaded</span>
+                  <span class="file-time">{time}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative blur sphere behind card -->
+      <div class="visual-blur" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- Provider compatibility strip -->
+  <div class="providers-strip">
+    <div class="container providers-inner">
+      <span class="providers-label">Compatible with</span>
+      <div class="providers-logos">
+        {
+          providers.map((p) => (
+            <div class="provider-item" style={`--brand: ${p.color}`}>
+              <span class="provider-icon" set:html={p.logo} />
+              <span class="provider-name">{p.name}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-top: 5rem;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(
+      ellipse at top,
+      rgba(79, 99, 245, 0.07) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding-bottom: 4rem;
+  }
+
+  /* ── Text ───────────────────────────────────────────────────────────────── */
+  .hero-content {
+    max-width: 560px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    margin-bottom: 1.75rem;
+    text-decoration: none;
+    transition:
+      background var(--nmb-t),
+      box-shadow var(--nmb-t);
+  }
+
+  .hero-badge:hover {
+    background: var(--nmb-accent-mid);
+    box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.1);
+  }
+
+  .hero-headline {
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--nmb-text);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-headline-accent {
+    color: var(--nmb-accent);
+  }
+
+  .hero-sub {
+    font-size: 1.0625rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.7;
+    max-width: 48ch;
+    margin-bottom: 2rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  /* ── Mockup visual ──────────────────────────────────────────────────────── */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .visual-blur {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(
+      ellipse,
+      rgba(79, 99, 245, 0.1) 0%,
+      transparent 70%
+    );
+    filter: blur(30px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .mockup {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    border-radius: var(--nmb-radius-lg);
+    border: 1px solid var(--nmb-border);
+    background: var(--nmb-surface);
+    box-shadow:
+      var(--nmb-shadow-lg),
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    overflow: hidden;
+  }
+
+  /* ── Mockup bar ─────────────────────────────────────────────────────────── */
+  .mockup-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 1rem;
+    background: var(--nmb-surface-muted);
+    border-bottom: 1px solid var(--nmb-border-light);
+    user-select: none;
+  }
+
+  .mockup-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-red {
+    background: #ff5f57;
+  }
+  .dot-amber {
+    background: #febc2e;
+  }
+  .dot-green {
+    background: #28c840;
+  }
+
+  .mockup-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--nmb-text-muted);
+    margin-left: auto;
+    margin-right: auto;
+    font-family: var(--nmb-font-mono);
+  }
+
+  /* ── Mockup body ────────────────────────────────────────────────────────── */
+  .mockup-body {
+    padding: 1.125rem 1.25rem 1.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Status row */
+  .mockup-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.75rem 0.875rem;
+    background: var(--nmb-green-light);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: var(--nmb-radius-md);
+  }
+
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--nmb-green);
+    flex-shrink: 0;
+    margin-top: 4px;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.24);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.24);
+    }
+    50% {
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.08);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-indicator {
+      animation: none;
+    }
+  }
+
+  .status-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #166534;
+    line-height: 1.3;
+  }
+
+  .status-sub {
+    font-size: 0.6875rem;
+    color: #166534;
+    font-family: var(--nmb-font-mono);
+    margin-top: 1px;
+  }
+
+  /* Stats grid */
+  .mockup-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.625rem 0.75rem;
+    background: var(--nmb-surface-alt);
+    border: 1px solid var(--nmb-border-light);
+    border-radius: var(--nmb-radius-sm);
+  }
+
+  .stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--nmb-text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.6875rem;
+    color: var(--nmb-text-muted);
+    line-height: 1.3;
+  }
+
+  /* Separator */
+  .mockup-sep {
+    height: 1px;
+    background: var(--nmb-border-light);
+    margin: 0 -0.125rem;
+  }
+
+  /* File list */
+  .mockup-files-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--nmb-text-muted);
+  }
+
+  .mockup-files {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .file-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4375rem 0.625rem;
+    background: var(--nmb-surface-muted);
+    border: 1px solid var(--nmb-border-light);
+    border-radius: var(--nmb-radius-sm);
+    transition: background var(--nmb-t);
+  }
+
+  .file-row:hover {
+    background: var(--nmb-surface-alt);
+  }
+
+  .file-icon {
+    color: var(--nmb-text-subtle);
+    flex-shrink: 0;
+  }
+
+  .file-name {
+    font-size: 0.75rem;
+    font-family: var(--nmb-font-mono);
+    color: var(--nmb-text-2);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-badge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #166534;
+    background: var(--nmb-green-light);
+    padding: 1px 6px;
+    border-radius: var(--nmb-radius-full);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .file-time {
+    font-size: 0.6875rem;
+    color: var(--nmb-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Providers strip ─────────────────────────────────────────────────────── */
+  .providers-strip {
+    border-top: 1px solid var(--nmb-border-light);
+    padding: 1.125rem 0;
+    background: var(--nmb-surface-muted);
+  }
+
+  .providers-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  .providers-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--nmb-text-muted);
+    white-space: nowrap;
+  }
+
+  .providers-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .provider-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.625rem;
+    border-radius: var(--nmb-radius-sm);
+    color: var(--nmb-text-muted);
+    transition:
+      background var(--nmb-t),
+      color var(--nmb-t);
+    cursor: default;
+  }
+
+  .provider-item:hover {
+    background: var(--nmb-border-light);
+    color: var(--brand);
+  }
+
+  .provider-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .provider-name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      text-align: left;
+    }
+
+    .hero-content {
+      max-width: none;
+    }
+    .hero-sub {
+      max-width: 56ch;
+    }
+
+    .hero-visual {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .hero {
+      padding-top: 3rem;
+    }
+
+    .mockup-stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stat-value {
+      font-size: 0.875rem;
+    }
+  }
+</style>

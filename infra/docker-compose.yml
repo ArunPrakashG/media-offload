@@ -1,0 +1,40 @@
+# Nimbus – production infrastructure
+#
+# All containers are named nimbus-* and share the internal nimbus_net network.
+# Only nimbus-web is exposed to the host (127.0.0.1) so your server's reverse
+# proxy (nginx / Caddy / Traefik / etc.) can route traffic to it.
+#
+# First-time setup:
+#   1. cp .env.example .env  and fill in every value.
+#   2. ./deploy.sh
+#
+# Rebuild after code changes:
+#   ./deploy.sh              # rebuild everything
+#   ./deploy.sh --no-build   # skip build   (config/env-only change)
+
+name: nimbus
+
+services:
+  # ── Marketing / web frontend (Astro SSR) ─────────────────────────────────
+  nimbus-web:
+    container_name: nimbus-web
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "4321"
+    env_file:
+      - .env
+    networks:
+      - nimbus_net
+      - proxy_net
+
+networks:
+  nimbus_net:
+    name: nimbus_net
+    driver: bridge
+  proxy_net:
+    external: true
+    name: ovh-wp-stack_default

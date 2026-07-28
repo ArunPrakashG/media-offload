@@ -1,0 +1,23 @@
+---
+import Cta from "@components/Cta.astro";
+import Features from "@components/Features.astro";
+import Footer from "@components/Footer.astro";
+import Hero from "@components/Hero.astro";
+import HowItWorks from "@components/HowItWorks.astro";
+import Navbar from "@components/Navbar.astro";
+import Base from "@layouts/Base.astro";
+---
+
+<Base
+  title="Nimbus — Cloud Media Offloading for WordPress"
+  description="Stop serving media from your web server. Nimbus offloads your WordPress images and files to Cloudflare R2, Amazon S3, Google Cloud, and more — automatically. 100% free and open source."
+>
+  <Navbar />
+  <main id="main-content">
+    <Hero />
+    <Features />
+    <HowItWorks />
+    <Cta />
+  </main>
+  <Footer />
+</Base>

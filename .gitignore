@@ -1,0 +1,42 @@
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ── Playwright MCP ────────────────────────────────────────────────────────────
+.playwright-mcp/
+
+# ── Secrets & environment ──────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── apps/plugin (PHP / WordPress) ─────────────────────────────────────────────
+apps/plugin/nimbus/vendor/
+apps/plugin/nimbus/.phpunit.result.cache
+apps/plugin/nimbus/coverage/
+apps/plugin/nimbus-pro/vendor/
+
+# ── pnpm workspace ───────────────────────────────────────────────────────────
+**/node_modules/
+package-lock.json
+yarn.lock
+
+# ── apps/web (Astro) ──────────────────────────────────────────────────────────
+apps/web/.astro/
+apps/web/dist/
+apps/web/build/
+apps/web/.output/
+
+# ── packages (shared libs) ────────────────────────────────────────────────────
+packages/**/dist/
+
+# ── tests/e2e (Playwright) ────────────────────────────────────────────────────
+tests/e2e/playwright-report/
+tests/e2e/test-results/
+
+# ── Logs / temp ───────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.swp

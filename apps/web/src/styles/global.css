@@ -1,0 +1,240 @@
+/* ── Base reset ───────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--nmb-font);
+  background: var(--nmb-surface);
+  color: var(--nmb-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+p,
+li {
+  line-height: 1.7;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section {
+  padding: 5.5rem 0;
+}
+
+.section--tight {
+  padding: 4rem 0;
+}
+
+/* ── Typography ───────────────────────────────────────────────────────────── */
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: var(--nmb-text);
+}
+
+h1 {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+}
+h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.625rem);
+  letter-spacing: -0.022em;
+}
+h3 {
+  font-size: 1.125rem;
+  letter-spacing: -0.015em;
+}
+p {
+  color: var(--nmb-text-muted);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--nmb-radius-md);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: var(--nmb-font);
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition:
+    background var(--nmb-t),
+    color var(--nmb-t),
+    box-shadow var(--nmb-t),
+    transform var(--nmb-t);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--nmb-accent);
+  color: var(--nmb-text-invert);
+  box-shadow: var(--nmb-shadow-accent);
+}
+
+.btn-primary:hover {
+  background: var(--nmb-accent-hover);
+  box-shadow: 0 10px 32px rgba(79, 99, 245, 0.3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--nmb-text-2);
+  border: 1px solid var(--nmb-border);
+}
+
+.btn-ghost:hover {
+  background: var(--nmb-surface-muted);
+  border-color: #c8d0dc;
+}
+
+.btn-lg {
+  padding: 0.8125rem 1.625rem;
+  font-size: 1rem;
+  border-radius: var(--nmb-radius-md);
+}
+
+/* ── Labels & badges ──────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.75rem;
+  border-radius: var(--nmb-radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.badge-accent {
+  background: var(--nmb-accent-light);
+  color: var(
+    --nmb-accent-hover
+  ); /* darkened from --nmb-accent for 4.5:1 on accent-light bg */
+  border: 1px solid rgba(79, 99, 245, 0.2);
+}
+
+.badge-success {
+  background: var(--nmb-green-light);
+  color: #16a34a;
+}
+
+/* ── Dividers ─────────────────────────────────────────────────────────────── */
+
+.divider {
+  height: 1px;
+  background: var(--nmb-border);
+  border: none;
+}
+
+/* ── Section labels ───────────────────────────────────────────────────────── */
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--nmb-accent);
+  margin-bottom: 0.75rem;
+}
+
+.section-headline {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  color: var(--nmb-text);
+}
+
+.section-sub {
+  font-size: 1.0625rem;
+  color: var(--nmb-text-muted);
+  line-height: 1.7;
+  max-width: 52ch;
+}
+
+/* ── Utility ──────────────────────────────────────────────────────────────── */
+
+.text-center {
+  text-align: center;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Focus ────────────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--nmb-accent);
+  outline-offset: 3px;
+  border-radius: var(--nmb-radius-xs);
+}
+
+/* ── Scrollbar (WebKit) ───────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--nmb-border);
+  border-radius: var(--nmb-radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nmb-text-subtle);
+}

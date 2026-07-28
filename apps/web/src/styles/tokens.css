@@ -1,0 +1,63 @@
+/* ── Nimbus design tokens ──────────────────────────────────────────────────── */
+/* These mirror the WordPress plugin admin's design language.                  */
+
+:root {
+  /* Brand */
+  --nmb-accent: #4f63f5;
+  --nmb-accent-hover: #3d50e0;
+  --nmb-accent-rgb: 79, 99, 245;
+  --nmb-accent-light: #eef0fe;
+  --nmb-accent-mid: rgba(79, 99, 245, 0.12);
+  --nmb-accent-dim: rgba(79, 99, 245, 0.06);
+
+  /* Surfaces */
+  --nmb-surface: #ffffff;
+  --nmb-surface-alt: #f7f8ff;
+  --nmb-surface-muted: #f8fafc;
+  --nmb-surface-dark: #0b1120;
+
+  /* Borders */
+  --nmb-border: #e2e8f0;
+  --nmb-border-light: #f1f5f9;
+  --nmb-border-focus: rgba(79, 99, 245, 0.4);
+
+  /* Text */
+  --nmb-text: #0f172a;
+  --nmb-text-2: #334155;
+  --nmb-text-muted: #5e6e82; /* was #64748b — darkened for ≥4.5:1 on all site backgrounds */
+  --nmb-text-subtle: #94a3b8;
+  --nmb-text-invert: #ffffff;
+
+  /* Status */
+  --nmb-green: #22c55e;
+  --nmb-green-light: #dcfce7;
+  --nmb-amber: #f59e0b;
+  --nmb-red: #ef4444;
+
+  /* Radius */
+  --nmb-radius-xs: 4px;
+  --nmb-radius-sm: 6px;
+  --nmb-radius-md: 10px;
+  --nmb-radius-lg: 16px;
+  --nmb-radius-xl: 24px;
+  --nmb-radius-full: 9999px;
+
+  /* Shadows */
+  --nmb-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --nmb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --nmb-shadow-md:
+    0 4px 16px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --nmb-shadow-lg:
+    0 16px 48px rgba(0, 0, 0, 0.09), 0 8px 16px rgba(0, 0, 0, 0.05);
+  --nmb-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  --nmb-shadow-accent: 0 8px 28px rgba(79, 99, 245, 0.22);
+
+  /* Transitions */
+  --nmb-t: 180ms ease;
+  --nmb-t-slow: 320ms ease;
+
+  /* Typography */
+  --nmb-font:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --nmb-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+}
