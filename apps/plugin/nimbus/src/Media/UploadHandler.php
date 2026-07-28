@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Media;
 
 use Nimbus\Plugin\Config\Settings;
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Storage\StorageAdapter;
 use Nimbus\Plugin\Storage\StorageAdapterFactory;
 use Nimbus\Plugin\Support\Events;
@@ -19,13 +18,19 @@ final class UploadHandler
 {
   private const NIGHTLY_BATCH_LOCK_TRANSIENT = 'nimbus_nightly_batch_lock';
 
+  /**
+   * Flat worker cap for the nightly off-hours batch. This used to scale with
+   * license tier; now that nightly batching is unconditionally available,
+   * everyone gets the same (generous) ceiling.
+   */
+  private const NIGHTLY_WORKER_CAP = 8;
+
   private bool $nightlyBatchEnabled = false;
 
   public function __construct(
     private Settings $settings,
     private StorageAdapterFactory $factory,
     private Logger $logger,
-    private LicenseManager $licenseManager,
     private AttachmentRepository $repo,
   ) {
   }
@@ -129,7 +134,7 @@ final class UploadHandler
     }
 
     // Selective offload rules (MIME type + file size) are available when
-    // the nimbus-pro extension enables them via nimbus/upload/selective_offload_enabled.
+    // selective offload rules are enabled via the nimbus/upload/selective_offload_enabled filter,
     if (apply_filters('nimbus/upload/selective_offload_enabled', false)) {
       if ($this->is_attachment_excluded_by_size_rules($attachment_id)) {
         return false;
@@ -243,14 +248,7 @@ final class UploadHandler
       $hours = max(1, (int) apply_filters('nimbus_nightly_hours', 48));
       $workerBatchSize = max(1, (int) apply_filters('nimbus_nightly_limit', $this->settings->off_hours_worker_batch_size()));
       $workerCount = $this->settings->off_hours_worker_count();
-
-      // Cap to the tier worker allowance — more workers = faster overnight processing.
-      $tierWorkerCap = match ($this->licenseManager->tier()) {
-        'agency' => 8,
-        'pro'    => 5,
-        default  => 2,  // personal (free is gated from nightly_batch entirely)
-      };
-      $workerCount = min($workerCount, $tierWorkerCap);
+      $workerCount = min($workerCount, self::NIGHTLY_WORKER_CAP);
 
       if ($workerCount <= 1) {
         $result = $this->process_pending_offloads($hours, $workerBatchSize, 'nightly-main');

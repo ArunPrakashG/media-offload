@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Rest;
 
 use Nimbus\Plugin\Integration\IntegrationDiscovery;
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
@@ -23,7 +22,6 @@ final class ApiController
     private Statistics $statistics,
     private UploadHandler $uploadHandler,
     private IntegrationDiscovery $integrationDiscovery,
-    private LicenseManager $licenseManager,
     private OnboardingManager $onboardingManager,
     private Logger $logger,
   ) {
@@ -256,9 +254,6 @@ final class ApiController
 
   public function getStatus(): \WP_REST_Response
   {
-    $licenseData = $this->licenseManager->all();
-    unset($licenseData['token'], $licenseData['key']);
-
     return rest_ensure_response([
       'plugin' => [
         'version' => NIMBUS_VERSION,
@@ -268,24 +263,15 @@ final class ApiController
         'serve_from_storage' => $this->settings->should_serve_from_storage(),
         'credentials_ready' => $this->settings->has_valid_credentials(),
       ],
-      'license' => $licenseData,
       'onboarding' => $this->onboardingManager->state(),
       'jobs' => apply_filters('nimbus/jobs/state', null),
       'integrations' => $this->integrationDiscovery->summary(),
-      'statistics' => $this->licenseManager->hasFeature('storage_analytics')
-        ? $this->statistics->get_deep_stats()
-        : array_merge($this->statistics->get_stats(), ['_upgrade_required' => 'storage_analytics']),
+      'statistics' => $this->statistics->get_deep_stats(),
     ]);
   }
 
   public function getStatistics(): \WP_REST_Response
   {
-    if (!$this->licenseManager->hasFeature('storage_analytics')) {
-      return rest_ensure_response(
-        array_merge($this->statistics->get_stats(), ['_upgrade_required' => 'storage_analytics'])
-      );
-    }
-
     return rest_ensure_response($this->statistics->get_deep_stats());
   }
 
@@ -302,9 +288,6 @@ final class ApiController
   public function postStartJob(\WP_REST_Request $request)
   {
     $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
-    if ($bulkJobManager === null) {
-      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
-    }
 
     $result = $bulkJobManager->start((string) $request->get_param('type'), [
       'batch_size' => (int) $request->get_param('batch_size'),
@@ -320,9 +303,6 @@ final class ApiController
   public function postPauseJob()
   {
     $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
-    if ($bulkJobManager === null) {
-      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
-    }
 
     $result = $bulkJobManager->pause();
 
@@ -336,9 +316,6 @@ final class ApiController
   public function postResumeJob()
   {
     $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
-    if ($bulkJobManager === null) {
-      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
-    }
 
     $result = $bulkJobManager->resume();
 
@@ -352,9 +329,6 @@ final class ApiController
   public function postRetryFailedJob()
   {
     $bulkJobManager = apply_filters('nimbus/bulk_job_manager', null);
-    if ($bulkJobManager === null) {
-      return new \WP_Error('nimbus_pro_required', __('Bulk jobs require Nimbus Pro.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
-    }
 
     $result = $bulkJobManager->retryFailed();
 
@@ -537,9 +511,6 @@ final class ApiController
   public function postCachePurge(\WP_REST_Request $request)
   {
     $purgeManager = apply_filters('nimbus/purge_manager', null);
-    if ($purgeManager === null) {
-      return new \WP_Error('nimbus_pro_required', __('Cache purge requires Nimbus Pro with the cache_purge feature enabled.', NIMBUS_TEXT_DOMAIN), ['status' => 403]);
-    }
 
     $urls = array_values(array_filter(array_map('esc_url_raw', (array) ($request->get_param('urls') ?? [])), static fn (string $u): bool => $u !== ''));
     $purgeAll = $this->toBool($request->get_param('purge_all'), empty($urls));

@@ -2,7 +2,6 @@
 namespace Nimbus\Plugin\Admin;
 
 use Nimbus\Plugin\Config\Settings;
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
 use Nimbus\Plugin\Stats\Statistics;
@@ -22,7 +21,6 @@ final class SettingsUi
   private PageRenderer $pageRenderer;
   private ActionsController $actionsController;
   private MediaLibraryController $mediaLibraryController;
-  private LicenseManager $licenseManager;
   private string $pageHook = '';
 
   public function __construct(
@@ -32,12 +30,11 @@ final class SettingsUi
     private UploadHandler $uploadHandler,
     private OnboardingManager $onboardingManager,
   ) {
-    $this->licenseManager = new LicenseManager();
     $this->providerCatalog = new ProviderCatalog();
     $this->fieldRenderer = new FieldRenderer($settings, $this->providerCatalog);
     $this->settingsRegistrar = new SettingsRegistrar($settings, $this->fieldRenderer);
-    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $this->licenseManager, $onboardingManager);
-    $this->actionsController = new ActionsController($settings, $logger, $uploadHandler, $this->licenseManager, $onboardingManager);
+    $this->pageRenderer = new PageRenderer($settings, $logger, $statistics, $uploadHandler, $this->settingsRegistrar, $onboardingManager);
+    $this->actionsController = new ActionsController($settings, $logger, $uploadHandler, $onboardingManager);
     $this->mediaLibraryController = new MediaLibraryController($settings, $uploadHandler, $logger);
   }
 
@@ -47,14 +44,10 @@ final class SettingsUi
     add_action('admin_init', [$this, 'register_settings']);
     add_action('admin_init', [$this, 'handle_onboarding_redirect'], 5);
     add_action('admin_notices', [$this, 'render_admin_notices']);
-    add_action('admin_notices', [$this, 'render_license_banner']);
-    add_action('admin_notices', [$this, 'render_pubkey_warning']);
     add_action('admin_notices', [$this, 'render_deactivation_hint']);
     add_filter('plugin_action_links_nimbus/nimbus.php', [$this, 'add_plugin_action_links']);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
-    add_action('admin_enqueue_scripts', [$this, 'enqueue_notice_scripts']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
-    add_action('wp_ajax_mo_dismiss_license_banner', [$this, 'handle_dismiss_license_banner']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
     add_action('wp_ajax_' . NIMBUS_AJAX_ONBOARDING_SAVE_STEP, [$this, 'handle_save_onboarding_step']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
@@ -64,53 +57,7 @@ final class SettingsUi
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION, [$this, 'handle_rewrite_integration']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_EXPORT_CONFIG, [$this, 'handle_export_config']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_IMPORT_CONFIG, [$this, 'handle_import_config']);
-    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE, [$this, 'handle_license_activate']);
-    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE, [$this, 'handle_license_activate_free']);
-    add_action('admin_post_' . NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE, [$this, 'handle_license_deactivate_site']);
     $this->mediaLibraryController->register();
-  }
-
-  public function enqueue_notice_scripts(): void
-  {
-    if ($this->licenseManager->hasKey() && $this->licenseManager->status() === 'active') {
-      return;
-    }
-
-    if (get_transient('mo_license_banner_dismissed_' . get_current_user_id())) {
-      return;
-    }
-
-    $js = '(function(){
-  function initNimbusLicenseBanner(){
-    var banner=document.querySelector(".mo-license-notice");
-    if(!banner)return;
-    var btn=banner.querySelector("[data-mo-dismiss-banner]");
-    if(!btn)return;
-    btn.addEventListener("click",function(){
-      banner.remove();
-      var nonce=banner.dataset.moDismissNonce||"";
-      if(!nonce)return;
-      var xhr=new XMLHttpRequest();
-      xhr.open("POST",ajaxurl);
-      xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-      xhr.send("action=mo_dismiss_license_banner&nonce="+encodeURIComponent(nonce));
-    });
-  }
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",initNimbusLicenseBanner);
-  }else{
-    initNimbusLicenseBanner();
-  }
-})();';
-
-    wp_add_inline_script('jquery', $js);
-  }
-
-  public function handle_dismiss_license_banner(): void
-  {
-    check_ajax_referer('mo_dismiss_license_banner', 'nonce');
-    set_transient('mo_license_banner_dismissed_' . get_current_user_id(), true, 7 * DAY_IN_SECONDS);
-    wp_die();
   }
 
   public function enqueue_assets($hook): void
@@ -254,21 +201,6 @@ final class SettingsUi
     $this->actionsController->handleToggleIntegration();
   }
 
-  public function handle_license_activate(): void
-  {
-    $this->actionsController->handleLicenseActivate();
-  }
-
-  public function handle_license_activate_free(): void
-  {
-    $this->actionsController->handleLicenseActivateFree();
-  }
-
-  public function handle_license_deactivate_site(): void
-  {
-    $this->actionsController->handleLicenseDeactivateSite();
-  }
-
   public function handle_onboarding_redirect(): void
   {
     $this->onboardingManager->handleActivationRedirect();
@@ -303,56 +235,6 @@ final class SettingsUi
       $class = 'notice notice-' . esc_attr($notice['type']);
       printf('<div class="%1$s"><p>%2$s</p></div>', $class, esc_html($notice['message']));
     }
-  }
-
-  public function render_pubkey_warning(): void
-  {
-    if (!current_user_can('manage_options')) {
-      return;
-    }
-
-    if ($this->licenseManager->isPublicKeyConfigured()) {
-      return;
-    }
-
-    ?>
-    <div class="notice notice-error">
-      <p>
-        <strong><?php esc_html_e('Nimbus – Configuration error', NIMBUS_TEXT_DOMAIN); ?></strong>
-        <?php esc_html_e('NIMBUS_LICENSE_PUBLIC_KEY is not defined. License token signatures cannot be verified. Define it in wp-config.php before going live.', NIMBUS_TEXT_DOMAIN); ?>
-      </p>
-    </div>
-    <?php
-  }
-
-  public function render_license_banner(): void
-  {
-    // Don't show if already on the Nimbus admin page (overlay handles it there).
-    $screen = get_current_screen();
-    if ($screen && str_contains((string) ($screen->id ?? ''), NIMBUS_SLUG)) {
-      return;
-    }
-
-    if ($this->licenseManager->hasKey() && $this->licenseManager->status() === 'active') {
-      return;
-    }
-
-    $dismissed = get_transient('mo_license_banner_dismissed_' . get_current_user_id());
-    if ($dismissed) {
-      return;
-    }
-
-    $licenseUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'license'], admin_url('upload.php'));
-    ?>
-    <div class="notice notice-warning mo-license-notice" data-mo-dismiss-nonce="<?php echo esc_attr(wp_create_nonce('mo_dismiss_license_banner')); ?>">
-      <p>
-        <strong><?php esc_html_e('Nimbus – License required', NIMBUS_TEXT_DOMAIN); ?></strong>
-        <?php esc_html_e('This plugin requires a valid license key to operate. Please activate your license to enable offloading.', NIMBUS_TEXT_DOMAIN); ?>
-        &nbsp;<a href="<?php echo esc_url($licenseUrl); ?>"><?php esc_html_e('Activate license →', NIMBUS_TEXT_DOMAIN); ?></a>
-      </p>
-      <button type="button" class="notice-dismiss" data-mo-dismiss-banner></button>
-    </div>
-    <?php
   }
 
   /**

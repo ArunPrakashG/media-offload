@@ -1,7 +1,6 @@
 <?php
 namespace Nimbus\Plugin\Onboarding;
 
-use Nimbus\Plugin\License\LicenseManager;
 use Nimbus\Plugin\Config\Settings;
 
 if (!defined('ABSPATH')) {
@@ -17,7 +16,6 @@ final class OnboardingManager
 
   public function __construct(
     private Settings $settings,
-    private LicenseManager $licenseManager,
     private ConflictDetector $conflictDetector,
   ) {
   }
@@ -56,7 +54,6 @@ final class OnboardingManager
       'completed' => !empty($state['completed']),
       'completed_at' => max(0, (int) ($state['completed_at'] ?? 0)),
       'current_step' => isset($state['current_step']) ? (string) $state['current_step'] : '',
-      'license_ready' => $this->licenseManager->hasKey(),
       'storage_ready' => $this->settings->has_valid_credentials(),
       'conflicts' => $conflicts,
       'has_active_conflicts' => count(array_filter($conflicts, static fn (array $plugin): bool => !empty($plugin['active']))) > 0,

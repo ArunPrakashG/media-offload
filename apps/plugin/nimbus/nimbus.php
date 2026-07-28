@@ -3,7 +3,7 @@
  * Plugin Name: Nimbus
  * Plugin URI: https://usenimbus.dev
  * Description: Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.
- * Version: 0.1.4
+ * Version: 0.2.0
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author: Arun Prakash
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('NIMBUS_VERSION', '0.1.4');
+define('NIMBUS_VERSION', '0.2.0');
 define('NIMBUS_FILE', __FILE__);
 define('NIMBUS_PATH', plugin_dir_path(__FILE__));
 define('NIMBUS_URL', plugin_dir_url(__FILE__));
@@ -43,31 +43,7 @@ define('NIMBUS_ADMIN_ACTION_IMPORT_CONFIG', 'nimbus_import_config');
 // Extension point filter names — use these constants in add_filter() calls.
 define('NIMBUS_FILTER_PROVIDER_PROFILES', 'nimbus_provider_profiles');
 define('NIMBUS_FILTER_ADAPTER_FACTORIES', 'nimbus_storage_adapter_factories');
-/**
- * Filter: nimbus_pro_status
- *
- * Premium add-ons hook here to report that they are loaded and active.
- * The free plugin applies this filter with a default of an empty array.
- *
- * Expected return value shape:
- *   [
- *     'loaded'   => true,           // always true when the pro plugin hooks in
- *     'version'  => '1.2.3',        // pro plugin version string
- *     'features' => ['bulk_migration', 'cache_purge', ...],  // active feature slugs
- *   ]
- *
- * Example (in nimbus-pro.php or ProPlugin::boot()):
- *   add_filter( NIMBUS_FILTER_PRO_STATUS, function ( array $status ) use ( $lm ): array {
- *       return [
- *           'loaded'   => true,
- *           'version'  => NIMBUS_PRO_VERSION,
- *           'features' => $lm->features(),
- *       ];
- *   } );
- */
-define('NIMBUS_FILTER_PRO_STATUS', 'nimbus_pro_status');
 define('NIMBUS_REST_NAMESPACE', 'nimbus/v1');
-define('NIMBUS_LICENSE_OPTION_KEY', 'nimbus_license');
 define('NIMBUS_ONBOARDING_OPTION_KEY', 'nimbus_onboarding');
 define('NIMBUS_ONBOARDING_REDIRECT_OPTION', 'nimbus_onboarding_redirect');
 define('NIMBUS_BULK_JOB_OPTION_KEY', 'nimbus_bulk_job');
@@ -89,27 +65,6 @@ define('NIMBUS_CLEANUP_HOOK', 'nimbus_cleanup_attachment');
 define('NIMBUS_CACHE_PURGE_HOOK', 'nimbus_cache_purge_worker');
 // Async single-attachment offload job fired immediately after upload metadata is saved.
 define('NIMBUS_OFFLOAD_JOB_HOOK', 'nimbus_offload_attachment');
-
-// ── License backend ────────────────────────────────────────────────────────
-// Override in wp-config.php for staging / local dev.
-if (!defined('NIMBUS_BACKEND_URL')) {
-  define('NIMBUS_BACKEND_URL', 'https://api.usenimbus.dev');
-}
-
-// Ed25519 public key (base64, standard encoding) used to verify activation
-// tokens offline. Bundled here so the plugin works out of the box.
-// Override via wp-config.php only when pointing at a staging/custom backend.
-if (!defined('NIMBUS_LICENSE_PUBLIC_KEY')) {
-  define('NIMBUS_LICENSE_PUBLIC_KEY', 'YVhjWaVmotVf2zQMC/NxlkFMElG8OVmrEUGY5c367gc=');
-}
-
-// Admin-post action constants for license management.
-define('NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE', 'nimbus_license_activate');
-define('NIMBUS_ADMIN_ACTION_LICENSE_ACTIVATE_FREE', 'nimbus_license_activate_free');
-define('NIMBUS_ADMIN_ACTION_LICENSE_DEACTIVATE_SITE', 'nimbus_license_deactivate_site');
-
-// WP-Cron hook for periodic license token refresh (every 12 hours).
-define('NIMBUS_LICENSE_REFRESH_HOOK', 'nimbus_license_refresh');
 
 if (file_exists(NIMBUS_PATH . 'vendor/autoload.php')) {
   require_once NIMBUS_PATH . 'vendor/autoload.php';

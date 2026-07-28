@@ -40,7 +40,6 @@ final class Lifecycle
       wp_clear_scheduled_hook(NIMBUS_NIGHTLY_WORKER_HOOK);
       wp_clear_scheduled_hook(NIMBUS_CLEANUP_HOOK);
       wp_clear_scheduled_hook(NIMBUS_CACHE_PURGE_HOOK);
-      wp_clear_scheduled_hook(NIMBUS_LICENSE_REFRESH_HOOK);
       wp_clear_scheduled_hook(NIMBUS_OFFLOAD_JOB_HOOK);
       wp_clear_scheduled_hook('nimbus_data_migration_batch');
       delete_option(NIMBUS_CACHE_PURGE_QUEUE_OPTION_KEY);

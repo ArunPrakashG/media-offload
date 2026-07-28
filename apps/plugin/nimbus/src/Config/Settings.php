@@ -177,7 +177,7 @@ final class Settings
 
   /**
    * Minimum file size in KB to offload. 0 = no minimum (all sizes allowed).
-   * Requires the selective_offload license feature.
+   * Applies only when selective offload is enabled via the nimbus/upload/selective_offload_enabled filter.
    */
   public function offload_min_size_kb(): int
   {
@@ -187,7 +187,7 @@ final class Settings
   /**
    * Comma-separated list of allowed MIME type patterns (e.g. "image/*,video/*").
    * Empty = all MIME types are allowed.
-   * Requires the selective_offload license feature.
+   * Applies only when selective offload is enabled via the nimbus/upload/selective_offload_enabled filter.
    *
    * @return list<string>
    */

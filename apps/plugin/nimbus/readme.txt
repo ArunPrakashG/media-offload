@@ -4,15 +4,17 @@ Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.1
-Stable tag: 0.1.4
+Stable tag: 0.2.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Offload WordPress media to Amazon S3, Cloudflare R2, or any S3-compatible storage with automatic URL rewriting.
+Offload WordPress media to Amazon S3, Cloudflare R2, or any S3-compatible storage with automatic URL rewriting. 100% free, no license required.
 
 == Description ==
 
 Nimbus offloads your WordPress media library to cloud object storage — Amazon S3, Cloudflare R2, or any S3-compatible provider — and rewrites attachment URLs so your visitors are served files directly from your storage or CDN.
+
+Nimbus is completely free and open source. There is no license key, no paid tier, and no feature is held back — everything below is available out of the box.
 
 **Key features:**
 
@@ -21,23 +23,19 @@ Nimbus offloads your WordPress media library to cloud object storage — Amazon 
 * Restore (pull back) offloaded files to the local server at any time.
 * Per-attachment offload, restore, and retry from the Media Library.
 * Bulk job scheduler with pause and resume support.
-* Integration support for popular CDN and image optimisation plugins.
+* Automatic cache purging (Cloudflare, LiteSpeed, WP Fastest Cache, and generic proxy caches) after offload, rewrite, or delete.
+* WP-CLI commands for config, deploy, rewrite, revert, download, and sync.
+* Database URL rewriting for popular page builders and galleries (Elementor, Slider Revolution, Smart Slider 3, NextGEN Gallery).
+* WooCommerce protected-download delivery via signed storage URLs.
+* Multisite network admin panel with per-site offload statistics.
+* Selective offload rules by MIME type and file size.
+* Nightly background batch offload for anything missed by the real-time hook.
 * Import / export plugin configuration as JSON.
 * Detailed activity log.
 
-A valid license key is required to enable offloading. A free-tier license is available for single-site use.
-
 == External Services ==
 
-This plugin communicates with the Nimbus licensing backend at **https://api.usenimbus.dev** in the following situations:
-
-* **License activation** — sends your license key, the current site domain, and the plugin version to verify and activate the license. The license key is HMAC-signed and is never stored in plain text after activation.
-* **License status / deactivation** — uses a signed activation token (not the raw key) to check the current license status or deactivate a domain.
-* **Free license registration** — sends the site domain and the admin email address to create a free-tier license.
-
-No tracking, analytics, or telemetry data is collected. No media files are processed by the Nimbus backend; all cloud-storage transfers go directly from your server to your configured storage provider (Amazon S3, Cloudflare R2, etc.).
-
-The licensing service Terms of Use and Privacy Policy are available at https://usenimbus.dev/legal.
+Nimbus does not communicate with any Nimbus-operated service. The only outbound network calls this plugin makes are directly from your server to the storage provider you configure (Amazon S3, Cloudflare R2, Backblaze B2, DigitalOcean Spaces, Wasabi, MinIO, Google Cloud Storage, or any other S3-compatible endpoint you enter), and, if you enable it, to your configured cache-purge provider (e.g. the Cloudflare API when Cloudflare cache purging is turned on). No license activation, telemetry, or update-check calls are made to any third-party service beyond WordPress.org's own plugin-update mechanism.
 
 == Third-Party Libraries ==
 
@@ -54,8 +52,7 @@ This plugin bundles the following third-party libraries:
 2. Activate the plugin through the **Plugins** screen in WordPress.
 3. Navigate to **Media → Nimbus** to complete the setup wizard.
 4. Enter your storage provider credentials (bucket, region, access key, secret key).
-5. Activate your license key on the **License** tab, or register for a free license.
-6. Start offloading media using the **Offload** tab or let Nimbus handle new uploads automatically.
+5. Start offloading media using the **Offload** tab or let Nimbus handle new uploads automatically.
 
 == Frequently Asked Questions ==
 
@@ -69,7 +66,7 @@ Yes, local copies are removed after a successful offload by default. You can res
 
 = Is a paid license required? =
 
-A free-tier single-site license is available. Premium licenses unlock additional features such as bulk migration, advanced scheduling, and multi-site support.
+No. Nimbus is 100% free and open source, with every feature — bulk migration, cache purging, WP-CLI, multisite support, and everything else — available to everyone with no license key.
 
 = Where can I get support? =
 
@@ -83,6 +80,11 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 4. Per-attachment offload controls in the Media Library.
 
 == Changelog ==
+
+= 0.2.0 =
+* Nimbus is now 100% free and open source — the Nimbus Pro add-on has been merged into this plugin and all licensing has been removed.
+* Bulk migration, cache purging (Cloudflare, LiteSpeed, WP Fastest Cache, proxy caches), WP-CLI, page-builder/gallery database URL rewriting, WooCommerce protected downloads, multisite network admin, selective offload rules, and nightly batch offload are now available to everyone at no cost.
+* Removed the license key requirement, license activation UI, and all calls to the former Nimbus licensing backend.
 
 = 0.1.4 =
 * Improved inline script handling for admin notices.
@@ -104,5 +106,5 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Upgrade Notice ==
 
-= 0.1.4 =
-Maintenance release — no action required.
+= 0.2.0 =
+Nimbus is now fully free — no license key needed. All former Pro features are unlocked automatically after updating.
