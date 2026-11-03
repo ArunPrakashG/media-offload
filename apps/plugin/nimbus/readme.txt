@@ -37,6 +37,15 @@ Nimbus is completely free and open source. There is no license key, no paid tier
 
 Nimbus does not communicate with any Nimbus-operated service. The only outbound network calls this plugin makes are directly from your server to the storage provider you configure (Amazon S3, Cloudflare R2, Backblaze B2, DigitalOcean Spaces, Wasabi, MinIO, Google Cloud Storage, or any other S3-compatible endpoint you enter), and, if you enable it, to your configured cache-purge provider (e.g. the Cloudflare API when Cloudflare cache purging is turned on). No license activation, telemetry, or update-check calls are made to any third-party service beyond WordPress.org's own plugin-update mechanism.
 
+Quick connect in the setup wizard also calls the provider's account API, only when you select Connect. It sends the token or key you paste, from your server, to create or find the bucket and a key for it:
+
+* Cloudflare API (api.cloudflare.com), for Cloudflare R2. [Terms](https://www.cloudflare.com/website-terms/), [Privacy](https://www.cloudflare.com/privacypolicy/)
+* Backblaze B2 API (api.backblazeb2.com). [Terms](https://www.backblaze.com/company/policy/terms-of-service), [Privacy](https://www.backblaze.com/company/policy/privacy)
+* DigitalOcean API (api.digitalocean.com), for Spaces. [Terms](https://www.digitalocean.com/legal/terms-of-service-agreement), [Privacy](https://www.digitalocean.com/legal/privacy-policy)
+* Wasabi IAM API (iam.wasabisys.com). [Terms](https://wasabi.com/legal/customer-agreement), [Privacy](https://wasabi.com/legal/privacy-policy)
+
+For Amazon S3 and Google Cloud Storage, quick connect gives you a command to run in your own AWS CloudShell or Google Cloud Shell. Nimbus only reads the line you paste back.
+
 == Third-Party Libraries ==
 
 This plugin bundles the following third-party libraries:
@@ -80,6 +89,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 4. Per-attachment offload controls in the Media Library.
 
 == Changelog ==
+
+= Unreleased =
+* Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
 
 = 0.3.0 =
 * Relicensed under the MIT License.

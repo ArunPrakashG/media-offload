@@ -6,6 +6,12 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
+## Unreleased
+
+### Added
+
+- Quick connect in the setup wizard. Paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test. Works with every provider; Backblaze B2, Wasabi and DigitalOcean Spaces also get a new key limited to the media bucket.
+
 ## 0.3.0 · November 2026
 
 A new look for the plugin admin and a more permissive license. Settings and offloaded files carry over unchanged.
