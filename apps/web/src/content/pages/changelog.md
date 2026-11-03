@@ -6,7 +6,9 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
-## Unreleased
+## 0.3.1 · November 2026
+
+Your storage keys are now encrypted in the database. Nothing to set up: existing keys are encrypted the next time an admin opens the dashboard.
 
 ### Fixed
 

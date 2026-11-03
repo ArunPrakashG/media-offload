@@ -40,3 +40,6 @@ tests/e2e/test-results/
 *.log
 *.tmp
 *.swp
+
+# Plugin release packages (scripts/release-plugin.sh)
+/dist/
