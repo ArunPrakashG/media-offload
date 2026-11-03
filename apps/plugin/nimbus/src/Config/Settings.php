@@ -11,8 +11,10 @@ if (!defined('ABSPATH')) {
 
 final class Settings
 {
-  private const CACHE_GROUP = 'nimbus';
-  private const CACHE_KEY   = 'settings';
+  // Non-persistent: the cached array holds decrypted credentials, which must
+  // not end up in Redis or Memcached.
+  public const CACHE_GROUP = 'nimbus_settings';
+  public const CACHE_KEY   = 'settings';
 
   private ProviderRegistry $providerRegistry;
 
@@ -64,6 +66,7 @@ final class Settings
   public function __construct(private Logger $logger)
   {
     $this->providerRegistry = new ProviderRegistry();
+    wp_cache_add_non_persistent_groups([self::CACHE_GROUP]);
   }
 
   public function all(): array
@@ -523,6 +526,7 @@ final class Settings
         case 'secret_key':
         case 'session_token':
         case 'cloudflare_api_token':
+          // Stored encrypted by CredentialVault on the option filters.
           $clean[$key] = trim((string) $value);
           break;
         case 'provider':

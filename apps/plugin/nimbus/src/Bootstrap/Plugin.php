@@ -4,6 +4,7 @@ namespace Nimbus\Plugin\Bootstrap;
 use Nimbus\Plugin\Admin\NetworkAdminPage;
 use Nimbus\Plugin\Cache\PurgeManager;
 use Nimbus\Plugin\Cli\Command;
+use Nimbus\Plugin\Config\CredentialVault;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Delivery\UrlRewriter;
 use Nimbus\Plugin\Integration\DatabaseIntegrationRewriter;
@@ -154,6 +155,7 @@ final class Plugin
       return;
     }
 
+    CredentialVault::register();
     DataMigration::register();
     DataMigration::run();
 
