@@ -52,4 +52,4 @@ Open a GitHub issue with:
 4. Describe what changed and why in the PR description.
 
 By submitting a contribution, you agree it will be licensed under the
-project's [GPL-2.0-or-later license](LICENSE).
+project's [MIT license](LICENSE).
