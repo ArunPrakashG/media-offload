@@ -1,0 +1,11 @@
+---
+/** The Nimbus mark. `framed` adds the 1px border used on dark backgrounds. */
+interface Props { size?: number; framed?: boolean; label?: string }
+const { size = 28, framed = true, label } = Astro.props;
+---
+<svg width={size} height={size} viewBox="0 0 32 32" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+  {framed
+    ? <rect x=".5" y=".5" width="31" height="31" rx="7.5" fill="#0E1014" stroke="#343B46" />
+    : <rect width="32" height="32" rx="8" fill="#0E1014" />}
+  <g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5" /><circle cx="18.5" cy="13" r="6.5" /><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z" /></g>
+</svg>

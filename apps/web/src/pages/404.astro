@@ -1,0 +1,18 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found" description="This page does not exist. Try the Nimbus docs or go back to the home page." noindex>
+  <Header />
+  <main id="main" class="wrap error">
+    <p class="error-code">404</p>
+    <h1 class="h2">This page is not here.</h1>
+    <p class="body-lg">It may have moved when the docs were reorganised. The docs and the home page are good places to start.</p>
+    <div class="actions">
+      <a href="/docs/" class="btn btn-primary btn-lg">Open the docs</a>
+      <a href="/" class="btn btn-secondary btn-lg">Home</a>
+    </div>
+  </main>
+  <Footer />
+</Base>

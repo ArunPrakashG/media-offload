@@ -1,0 +1,19 @@
+---
+import { DOC_SECTIONS, docPath, type Doc } from '../../lib/site';
+
+interface Props { docs: Doc[]; current: string }
+const { docs, current } = Astro.props;
+---
+<nav aria-label="Docs" class="docs-side">
+  {DOC_SECTIONS.map((s) => (
+    <div class="docs-group">
+      <p>{s.label}</p>
+      {docs.filter((d) => d.data.section === s.key).map((d) => (
+        <a href={docPath(d)} aria-current={d.id === current ? 'page' : undefined}>
+          {d.data.logo && <img src={`/logos/${d.data.logo}.svg`} alt="" width="16" height="16" />}
+          {d.data.nav}
+        </a>
+      ))}
+    </div>
+  ))}
+</nav>

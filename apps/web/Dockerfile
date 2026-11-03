@@ -26,8 +26,9 @@ ENV NODE_ENV=production \
 # Copy only what the standalone Node server needs at runtime.
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY package.json ./
+COPY package.json server.mjs ./
 
 EXPOSE 4321
 
-CMD ["node", "dist/server/entry.mjs"]
+# server.mjs wraps the Astro handler to add security and cache headers.
+CMD ["node", "server.mjs"]

@@ -1,0 +1,79 @@
+<div class="search" data-search>
+  <label for="doc-search" class="sr-only">Search docs</label>
+  <input id="doc-search" type="search" placeholder="Search docs" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="doc-search-results" aria-autocomplete="list" />
+  <ul id="doc-search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+</div>
+
+<script>
+  type Entry = { title: string; section: string; url: string; text: string };
+
+  const root = document.querySelector<HTMLElement>('[data-search]');
+  const input = root?.querySelector<HTMLInputElement>('input');
+  const list = root?.querySelector<HTMLUListElement>('ul');
+  let index: Entry[] | null = null;
+
+  async function load(): Promise<Entry[]> {
+    if (!index) index = await fetch('/docs/search.json').then((r) => r.json());
+    return index ?? [];
+  }
+
+  function close() {
+    if (!list || !input) return;
+    list.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+  }
+
+  async function search() {
+    if (!input || !list) return;
+    const q = input.value.trim().toLowerCase();
+    if (q.length < 2) return close();
+    const words = q.split(/\s+/);
+    const hits = (await load())
+      .map((e) => {
+        const title = e.title.toLowerCase();
+        const text = e.text.toLowerCase();
+        if (!words.every((w) => title.includes(w) || text.includes(w))) return null;
+        return { e, score: words.filter((w) => title.includes(w)).length };
+      })
+      .filter((h): h is { e: Entry; score: number } => h !== null)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+
+    list.replaceChildren();
+    if (hits.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'search-empty';
+      li.textContent = 'No matching pages';
+      list.append(li);
+    }
+    for (const { e } of hits) {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      const a = document.createElement('a');
+      a.href = e.url;
+      a.textContent = e.title;
+      const small = document.createElement('small');
+      small.textContent = e.section;
+      a.append(small);
+      li.append(a);
+      list.append(li);
+    }
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  input?.addEventListener('focus', () => void load());
+  input?.addEventListener('input', () => void search());
+  input?.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') { input.value = ''; close(); }
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); list?.querySelector<HTMLAnchorElement>('a')?.focus(); }
+  });
+  list?.addEventListener('keydown', (ev) => {
+    const links = [...list.querySelectorAll<HTMLAnchorElement>('a')];
+    const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); links[Math.min(i + 1, links.length - 1)]?.focus(); }
+    if (ev.key === 'ArrowUp') { ev.preventDefault(); (i <= 0 ? input : links[i - 1])?.focus(); }
+    if (ev.key === 'Escape') { close(); input?.focus(); }
+  });
+  document.addEventListener('click', (ev) => { if (root && !root.contains(ev.target as Node)) close(); });
+</script>
