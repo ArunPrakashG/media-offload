@@ -10,3 +10,4 @@ tools
 composer.json
 composer.lock
 README.md
+.wordpress-org
