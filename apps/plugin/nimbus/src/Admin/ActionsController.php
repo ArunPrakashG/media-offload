@@ -5,6 +5,8 @@ use Nimbus\Plugin\Bootstrap\DataMigration;
 use Nimbus\Plugin\Config\Settings;
 use Nimbus\Plugin\Media\UploadHandler;
 use Nimbus\Plugin\Onboarding\OnboardingManager;
+use Nimbus\Plugin\Setup\QuickConnect;
+use Nimbus\Plugin\Setup\QuickConnectException;
 use Nimbus\Plugin\Storage\StorageAdapterFactory;
 use Nimbus\Plugin\Support\Events;
 use Nimbus\Plugin\Support\Logger;
@@ -75,6 +77,69 @@ final class ActionsController
         'hints' => $this->connectionHints($exception),
       ]);
     }
+  }
+
+  /**
+   * Quick connect from the setup wizard: one pasted token or key in, ready
+   * storage values out. Pasted credentials are used for this request only.
+   */
+  public function handleQuickConnect(): void
+  {
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified right here.
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field((string) wp_unslash($_POST['nonce'])) : '';
+
+    if (!$this->isValidNonce($nonce, NIMBUS_AJAX_QUICK_CONNECT)) {
+      wp_send_json_error(['message' => __('Security check failed. Reload the page and try again.', 'nimbus')], 403);
+    }
+
+    if (!current_user_can('manage_options')) {
+      wp_send_json_error(['message' => __('Permission denied.', 'nimbus')], 403);
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
+    $provider = isset($_POST['provider']) ? sanitize_key((string) wp_unslash($_POST['provider'])) : '';
+    if (!in_array($provider, QuickConnect::PROVIDERS, true)) {
+      wp_send_json_error(['message' => __('Quick connect is not available for this provider.', 'nimbus')], 400);
+    }
+
+    try {
+      $result = (new QuickConnect($this->settings, $this->logger))->connect($provider, $this->postedQuickConnectInput());
+      wp_send_json_success($result->toArray());
+    } catch (QuickConnectException $exception) {
+      // Messages are escaped where they are thrown; the wizard renders them as text.
+      wp_send_json_error(['message' => wp_specialchars_decode($exception->getMessage(), ENT_QUOTES)]);
+    } catch (\Throwable $exception) {
+      $this->logger->error('Quick connect for {provider} failed: {error}', ['provider' => $provider, 'error' => $exception->getMessage()]);
+      /* translators: %s: error message */
+      wp_send_json_error(['message' => sprintf(__('Quick connect failed: %s', 'nimbus'), $exception->getMessage())]);
+    }
+  }
+
+  /**
+   * Tokens and keys are kept byte for byte apart from surrounding whitespace;
+   * sanitize_text_field() would strip characters that are valid in secrets.
+   *
+   * @return array<string, string>
+   */
+  private function postedQuickConnectInput(): array
+  {
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handleQuickConnect().
+    if (!isset($_POST['input']) || !is_array($_POST['input'])) {
+      return [];
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; each allowed key is cleaned below.
+    $posted = wp_unslash($_POST['input']);
+    $keys = ['token', 'account_id', 'bucket', 'key_id', 'key', 'access_key', 'secret_key', 'region', 'endpoint', 'output'];
+    $input = [];
+
+    foreach ($keys as $key) {
+      if (isset($posted[$key]) && is_scalar($posted[$key])) {
+        $input[$key] = substr(trim((string) preg_replace('/[\x00-\x1F\x7F]+/', ' ', (string) $posted[$key])), 0, 8192);
+      }
+    }
+
+    return $input;
   }
 
   /**

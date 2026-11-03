@@ -28,6 +28,7 @@ define('NIMBUS_SCRIPT_HANDLE', 'nimbus-admin');
 define('NIMBUS_SCRIPT_OBJECT', 'nimbusAdmin');
 define('NIMBUS_AJAX_TEST_CONNECTION', 'nimbus_test_connection');
 define('NIMBUS_AJAX_ONBOARDING_SAVE_STEP', 'nimbus_onboarding_save_step');
+define('NIMBUS_AJAX_QUICK_CONNECT', 'nimbus_quick_connect');
 define('NIMBUS_ADMIN_ACTION_CLEAR_LOGS', 'nimbus_clear_logs');
 define('NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES', 'nimbus_run_url_updates');
 define('NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING', 'nimbus_complete_onboarding');

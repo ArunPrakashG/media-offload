@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nimbus setup: quick connect R2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0E1014}a:hover{color:#3F5A00}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1240px; background: #F0F0F1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1D2327; display: flex; flex-direction: column; overflow: hidden">
+<div aria-hidden="true" style="height: 32px; background: #1D2327; color: #F0F0F1; display: flex; align-items: center; gap: 18px; padding: 0 12px; font-size: 13px; flex: none"><img src="/_blob/99acad1802451cc55687ec76c719d4dc" alt="" style="width: 18px; height: 18px; filter: grayscale(1) brightness(2.2)"><span>Example Site</span><span style="opacity: .8">+ New</span><span style="margin-left: auto">Howdy, admin</span></div>
+<div style="display: flex; flex: 1; min-height: 0">
+<nav aria-label="Admin menu" style="width: 160px; background: #1D2327; color: #F0F0F1; font-size: 14px; flex: none; display: flex; flex-direction: column; padding-top: 8px">
+<span style="padding: 8px 12px; opacity: .85">Dashboard</span><span style="padding: 8px 12px; opacity: .85">Posts</span>
+<span style="padding: 8px 12px; background: #2271B1">Media</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; opacity: .85; font-size: 13px">Library</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; opacity: .85; font-size: 13px">Add New</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="6 6 20 20" aria-hidden="true"><g fill="#F0F0F1" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg>Nimbus</span>
+<span style="padding: 8px 12px; opacity: .85">Pages</span><span style="padding: 8px 12px; opacity: .85">Plugins</span><span style="padding: 8px 12px; opacity: .85">Settings</span>
+</nav>
+
+<main style="flex: 1; min-width: 0; padding: 28px 32px; display: flex; justify-content: center; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #0E1014">
+<div style="width: 100%; max-width: 920px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px"><svg width="36" height="36" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0E1014"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg><h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em">Set up Nimbus</h1></div>
+<ol aria-label="Setup steps" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; font-size: 13px">
+<li aria-current="step" style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 6px; border-radius: 999px; background: #0E1014; color: #F2F4F7; font-weight: 500"><span style="width: 20px; height: 20px; border-radius: 999px; background: #C6F135; color: #0E1014; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">1</span>Storage</li>
+<li style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 6px; border-radius: 999px; background: #fff; border: 1px solid #E1E4E8; color: #4A515C"><span style="width: 20px; height: 20px; border-radius: 999px; background: #EEF0F3; display: flex; align-items: center; justify-content: center; font-size: 11px">2</span>Delivery</li>
+<li style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 6px; border-radius: 999px; background: #fff; border: 1px solid #E1E4E8; color: #4A515C"><span style="width: 20px; height: 20px; border-radius: 999px; background: #EEF0F3; display: flex; align-items: center; justify-content: center; font-size: 11px">3</span>Review</li>
+</ol>
+</div>
+
+<form style="background: #fff; border: 1px solid #E1E4E8; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 28px">
+<fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px">
+<legend style="font-size: 18px; font-weight: 600; padding: 0; margin-bottom: 14px">Where should your media live?</legend>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/c5773bec299e86cdb8f7faafe5bc20ff" alt="" style="width: 26px; height: 26px; border-radius: 5px">Amazon S3</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 2px solid #0E1014; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; background: #F7FCE6"><input type="radio" name="provider" checked="" style="position: absolute; opacity: 0"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 26px; height: 26px">Cloudflare R2<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="margin-left: auto"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/5fd012d17254db9a78464d8ee1a17a24" alt="" style="width: 26px; height: 26px">Google Cloud</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/dfecb6f0aa9d05862372bbe5c15f6b99" alt="" style="width: 22px; height: 22px">Backblaze B2</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/496dba68d0a2d529062c8a8f6ea0d5c8" alt="" style="width: 22px; height: 22px">DO Spaces</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/008de50d0b905c88b2c4d20bb87740c6" alt="" style="width: 22px; height: 22px">Wasabi</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px solid #E1E4E8; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><img src="/_blob/1763910fd74f52b6d240718ec091ecbe" alt="" style="width: 22px; height: 22px">MinIO</label>
+<label style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 12px; border: 1px dashed #C9CED6; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer"><input type="radio" name="provider" style="position: absolute; opacity: 0"><span style="width: 26px; height: 26px; border-radius: 6px; background: #EEF0F3; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; font-size: 10px">S3</span>Other S3-compatible</label>
+</div>
+</fieldset>
+
+<section aria-labelledby="qc-h" style="border-top: 1px solid #EEF0F3; padding-top: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 id="qc-h" style="margin: 0; font-size: 16px; font-weight: 600">Connect Cloudflare R2</h2><p style="margin: 0; font-size: 14px; color: #4A515C">Paste one token. Nimbus finds your account, creates the bucket and turns on public access.</p></div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px">
+<li style="display: flex; align-items: flex-start; gap: 14px">
+<span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #0E1014; color: #F2F4F7; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-top: 3px"><strong style="font-size: 14px; font-weight: 600">Create a token in Cloudflare</strong><span style="font-size: 13px; color: #646B76">The R2 permission is already filled in. Select Continue to summary, then Create token.</span></div>
+<a href="#" style="flex: none; height: 44px; padding: 0 16px; border-radius: 6px; border: 1px solid #C9CED6; background: #fff; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box">Open Cloudflare<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3h7v7M13 3L4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+</li>
+<li style="display: flex; align-items: flex-start; gap: 14px">
+<span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #0E1014; color: #F2F4F7; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding-top: 3px">
+<label for="qc-token" style="font-size: 14px; font-weight: 600">Paste the token</label>
+<div style="display: flex; gap: 10px"><input id="qc-token" type="password" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="flex: 1; min-width: 0; height: 44px; border-radius: 6px; border: 1px solid #C9CED6; padding: 0 12px; font-family: 'Geist Mono', monospace; font-size: 14px; box-sizing: border-box"><button type="button" style="flex: none; height: 44px; padding: 0 18px; border-radius: 6px; border: 0; background: #0E1014; color: #F2F4F7; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Connect</button></div>
+</div>
+</li>
+</ol>
+
+<ul aria-label="What Nimbus set up" style="list-style: none; margin: 0 0 0 42px; padding: 16px 18px; border: 1px solid #E1E4E8; border-radius: 10px; background: #FAFBFC; display: flex; flex-direction: column; gap: 12px; font-size: 14px">
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="flex: none; width: 20px; height: 20px; border-radius: 999px; background: #C6F135; color: #0E1014; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span style="font-weight: 500">Token verified</span><span style="color: #646B76">Example Co</span></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="flex: none; width: 20px; height: 20px; border-radius: 999px; background: #C6F135; color: #0E1014; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span style="font-weight: 500">Bucket created</span><code style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #4A515C">example-site-media</code><a href="#" style="margin-left: auto; font-size: 13px; text-underline-offset: 3px; color: #4A515C">Use an existing bucket</a></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="flex: none; width: 20px; height: 20px; border-radius: 999px; background: #C6F135; color: #0E1014; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span style="font-weight: 500">Public URL on</span><code style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #4A515C">pub-8a1f2c90d4.r2.dev</code></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="flex: none; width: 20px; height: 20px; border-radius: 999px; background: #C6F135; color: #0E1014; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span style="font-weight: 500">Upload test passed</span></li>
+</ul>
+<p style="margin: 0 0 0 42px; font-size: 13px; color: #646B76">Nimbus saves S3 keys made from this token. Delete the token in Cloudflare to disconnect.</p>
+</section>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 20px; border-top: 1px solid #EEF0F3">
+<p role="status" style="margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #3F5A00; font-weight: 500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>Connected to example-site-media</p>
+<button type="submit" style="height: 44px; padding: 0 18px; border-radius: 6px; border: 0; background: #C6F135; color: #0E1014; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Continue to delivery</button>
+</div>
+</form>
+<div style="display: flex; gap: 24px; font-size: 14px">
+<a href="AdminSetup.dc.html" style="text-underline-offset: 3px; color: #4A515C">Enter keys by hand</a>
+<a href="#" style="text-underline-offset: 3px; color: #4A515C">Import settings from a Nimbus .json export</a>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
