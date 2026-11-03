@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * A quick connect step failed. The message is shown to the admin as is.
+ * A quick connect step failed. The message is escaped HTML and is shown to the admin.
  */
 final class QuickConnectException extends \RuntimeException
 {

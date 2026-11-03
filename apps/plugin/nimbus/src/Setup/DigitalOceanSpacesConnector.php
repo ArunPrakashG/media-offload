@@ -34,10 +34,10 @@ final class DigitalOceanSpacesConnector
     $region = sanitize_key((string) ($input['region'] ?? 'nyc3'));
 
     if ($this->token === '') {
-      throw new QuickConnectException(__('Paste the DigitalOcean token first.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste the DigitalOcean token first.', 'nimbus'));
     }
     if (!in_array($region, self::REGIONS, true)) {
-      throw new QuickConnectException(__('Pick a Spaces region.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Pick a Spaces region.', 'nimbus'));
     }
 
     $result = new ConnectResult();
@@ -85,11 +85,11 @@ final class DigitalOceanSpacesConnector
     $key = (array) ($response['body']['key'] ?? []);
 
     if ($response['status'] === 401 || $response['status'] === 403) {
-      throw new QuickConnectException(__('DigitalOcean did not accept this token. It needs the spaces_key create, read and delete scopes.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('DigitalOcean did not accept this token. It needs the spaces_key create, read and delete scopes.', 'nimbus'));
     }
 
     if (empty($key['access_key']) || empty($key['secret_key'])) {
-      throw new QuickConnectException(__('Could not create a Spaces key', 'nimbus') . ': ' . (string) ($response['body']['message'] ?? $response['status']));
+      throw new QuickConnectException(esc_html(__('Could not create a Spaces key', 'nimbus') . ': ' . (string) ($response['body']['message'] ?? $response['status'])));
     }
 
     return ['access_key' => (string) $key['access_key'], 'secret_key' => (string) $key['secret_key']];

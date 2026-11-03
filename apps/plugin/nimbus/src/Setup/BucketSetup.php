@@ -31,7 +31,7 @@ final class BucketSetup
     try {
       $listing = $this->client->listBuckets();
     } catch (\Throwable $exception) {
-      throw new QuickConnectException(__('These keys were not accepted', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception));
+      throw new QuickConnectException(esc_html(__('These keys were not accepted', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception)));
     }
 
     $result->step(__('Keys verified', 'nimbus'));
@@ -64,15 +64,15 @@ final class BucketSetup
         return $name;
       }
       if ($exception->getAwsErrorCode() === 'BucketAlreadyExists') {
-        throw new QuickConnectException(sprintf(
+        throw new QuickConnectException(esc_html(sprintf(
           /* translators: %s: bucket name */
           __('The bucket name %s is taken by another account. Choose another name.', 'nimbus'),
           $name
-        ));
+        )));
       }
-      throw new QuickConnectException(__('Could not create the bucket', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception));
+      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception)));
     } catch (\Throwable $exception) {
-      throw new QuickConnectException(__('Could not create the bucket', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception));
+      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'nimbus') . ': ' . $this->quickConnect->errorMessage($exception)));
     }
 
     $result->buckets[] = $name;

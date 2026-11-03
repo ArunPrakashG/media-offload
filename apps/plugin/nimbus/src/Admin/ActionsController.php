@@ -106,7 +106,8 @@ final class ActionsController
       $result = (new QuickConnect($this->settings, $this->logger))->connect($provider, $this->postedQuickConnectInput());
       wp_send_json_success($result->toArray());
     } catch (QuickConnectException $exception) {
-      wp_send_json_error(['message' => $exception->getMessage()]);
+      // Messages are escaped where they are thrown; the wizard renders them as text.
+      wp_send_json_error(['message' => wp_specialchars_decode($exception->getMessage(), ENT_QUOTES)]);
     } catch (\Throwable $exception) {
       $this->logger->error('Quick connect for {provider} failed: {error}', ['provider' => $provider, 'error' => $exception->getMessage()]);
       /* translators: %s: error message */

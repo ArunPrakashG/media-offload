@@ -93,11 +93,11 @@ final class ShellConnector
 
     $data = json_decode($output, true);
     if (!is_array($data) || (int) ($data['nimbus'] ?? 0) !== 1) {
-      throw new QuickConnectException(__('Paste the line the command printed. It starts with {"nimbus":1', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste the line the command printed. It starts with {"nimbus":1', 'nimbus'));
     }
 
     if (($data['provider'] ?? '') !== $this->provider) {
-      throw new QuickConnectException(__('That line was made for a different provider. Run the command shown above.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('That line was made for a different provider. Run the command shown above.', 'nimbus'));
     }
 
     $bucket = (string) ($data['bucket'] ?? '');
@@ -106,7 +106,7 @@ final class ShellConnector
     $secret = trim((string) ($data['secret_key'] ?? ''));
 
     if (!self::validBucket($bucket) || $key === '' || $secret === '' || !preg_match('/^[a-z0-9-]+$/', $region)) {
-      throw new QuickConnectException(__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'nimbus'));
     }
 
     $result = new ConnectResult();

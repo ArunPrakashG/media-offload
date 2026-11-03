@@ -28,6 +28,7 @@ final class CloudflareR2Connector
   {
     $permissions = wp_json_encode([['key' => 'workers_r2', 'type' => 'edit']]);
 
+    // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- A link to the Cloudflare dashboard, not a loaded asset.
     return 'https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=' . rawurlencode((string) $permissions)
       . '&accountId=*&zoneId=all&name=' . rawurlencode($name);
   }
@@ -36,7 +37,7 @@ final class CloudflareR2Connector
   {
     $this->token = trim((string) ($input['token'] ?? ''));
     if ($this->token === '') {
-      throw new QuickConnectException(__('Paste the Cloudflare API token first.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste the Cloudflare API token first.', 'nimbus'));
     }
 
     $result = new ConnectResult();
@@ -94,11 +95,11 @@ final class CloudflareR2Connector
   {
     $response = $this->request('GET', '/accounts?per_page=50');
     if (in_array($response['status'], [400, 401, 403], true)) {
-      throw new QuickConnectException(__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
     }
 
     if ($response['status'] !== 200 || empty($response['body']['success'])) {
-      throw new QuickConnectException(__('Could not reach Cloudflare', 'nimbus') . ': ' . $this->apiError($response['body']));
+      throw new QuickConnectException(esc_html(__('Could not reach Cloudflare', 'nimbus') . ': ' . $this->apiError($response['body'])));
     }
 
     $accounts = [];
@@ -110,7 +111,7 @@ final class CloudflareR2Connector
     }
 
     if ($accounts === []) {
-      throw new QuickConnectException(__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'nimbus'));
     }
 
     return $accounts;
@@ -134,13 +135,13 @@ final class CloudflareR2Connector
       $id = (string) ($response['body']['result']['id'] ?? '');
       if ($response['status'] === 200 && $id !== '') {
         if (($response['body']['result']['status'] ?? 'active') !== 'active') {
-          throw new QuickConnectException(__('This token is disabled or expired in Cloudflare.', 'nimbus'));
+          throw new QuickConnectException(esc_html__('This token is disabled or expired in Cloudflare.', 'nimbus'));
         }
         return $id;
       }
     }
 
-    throw new QuickConnectException(__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
+    throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
   }
 
   /**
@@ -170,7 +171,7 @@ final class CloudflareR2Connector
     }
 
     if ($usable === []) {
-      throw new QuickConnectException(__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'nimbus'));
     }
 
     $result->accounts = $usable;
@@ -255,7 +256,7 @@ final class CloudflareR2Connector
     $response = $this->request($method, $path, $body);
 
     if ($response['status'] < 200 || $response['status'] >= 300 || empty($response['body']['success'])) {
-      throw new QuickConnectException($failure . ': ' . $this->apiError($response['body']));
+      throw new QuickConnectException(esc_html($failure . ': ' . $this->apiError($response['body'])));
     }
 
     return $response['body'];

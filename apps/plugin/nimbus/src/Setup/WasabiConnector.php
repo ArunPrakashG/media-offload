@@ -28,10 +28,10 @@ final class WasabiConnector
     $region = sanitize_key((string) ($input['region'] ?? 'us-east-1'));
 
     if ($key === '' || $secret === '') {
-      throw new QuickConnectException(__('Paste both the access key and the secret key.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste both the access key and the secret key.', 'nimbus'));
     }
     if (!in_array($region, self::REGIONS, true)) {
-      throw new QuickConnectException(__('Pick a Wasabi region.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Pick a Wasabi region.', 'nimbus'));
     }
 
     $result = new ConnectResult();
@@ -79,7 +79,7 @@ final class WasabiConnector
 
     $created = $this->iam('CreateUser', ['UserName' => $user], $key, $secret);
     if ($created['error'] !== '' && $created['error'] !== 'EntityAlreadyExists') {
-      throw new QuickConnectException($created['error']);
+      throw new QuickConnectException(esc_html($created['error']));
     }
 
     $policy = $this->iam('PutUserPolicy', [
@@ -88,13 +88,13 @@ final class WasabiConnector
       'PolicyDocument' => BucketSetup::bucketOnlyPolicy($bucket),
     ], $key, $secret);
     if ($policy['error'] !== '') {
-      throw new QuickConnectException($policy['error']);
+      throw new QuickConnectException(esc_html($policy['error']));
     }
 
     $accessKey = $this->iam('CreateAccessKey', ['UserName' => $user], $key, $secret);
     $node = $accessKey['xml']?->CreateAccessKeyResult->AccessKey;
     if ($accessKey['error'] !== '' || $node === null || (string) $node->AccessKeyId === '') {
-      throw new QuickConnectException($accessKey['error'] !== '' ? $accessKey['error'] : 'CreateAccessKey returned no key');
+      throw new QuickConnectException(esc_html($accessKey['error'] !== '' ? $accessKey['error'] : 'CreateAccessKey returned no key'));
     }
 
     return [(string) $node->AccessKeyId, (string) $node->SecretAccessKey];

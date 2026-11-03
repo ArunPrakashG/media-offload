@@ -27,7 +27,7 @@ final class BackblazeB2Connector
     $key = trim((string) ($input['key'] ?? ''));
 
     if ($keyId === '' || $key === '') {
-      throw new QuickConnectException(__('Paste both the keyID and the applicationKey.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste both the keyID and the applicationKey.', 'nimbus'));
     }
 
     $result = new ConnectResult();
@@ -36,7 +36,7 @@ final class BackblazeB2Connector
     ]);
 
     if ($auth['status'] !== 200 || empty($auth['body']['authorizationToken'])) {
-      throw new QuickConnectException(__('Backblaze did not accept this key', 'nimbus') . ': ' . $this->apiError($auth['body']));
+      throw new QuickConnectException(esc_html(__('Backblaze did not accept this key', 'nimbus') . ': ' . $this->apiError($auth['body'])));
     }
 
     $storage = (array) ($auth['body']['apiInfo']['storageApi'] ?? []);
@@ -67,7 +67,7 @@ final class BackblazeB2Connector
 
     foreach (['listBuckets', 'writeBuckets', 'writeKeys'] as $needed) {
       if (!in_array($needed, $capabilities, true)) {
-        throw new QuickConnectException(__('This key cannot create buckets and keys. In Backblaze, create a key for All buckets with Read and Write access.', 'nimbus'));
+        throw new QuickConnectException(esc_html__('This key cannot create buckets and keys. In Backblaze, create a key for All buckets with Read and Write access.', 'nimbus'));
       }
     }
 
@@ -150,7 +150,7 @@ final class BackblazeB2Connector
     $response = $this->quickConnect->http('POST', rtrim($this->apiUrl, '/') . '/b2api/v4/' . $operation, ['Authorization' => $this->authToken], $body);
 
     if ($response['status'] !== 200 || !is_array($response['body'])) {
-      throw new QuickConnectException(sprintf('%s: %s', $operation, $this->apiError($response['body'])));
+      throw new QuickConnectException(esc_html(sprintf('%s: %s', $operation, $this->apiError($response['body']))));
     }
 
     return $response['body'];

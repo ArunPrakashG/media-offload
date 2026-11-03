@@ -23,7 +23,7 @@ final class S3EndpointConnector
     $region = sanitize_text_field((string) ($input['region'] ?? ''));
 
     if ($endpoint === '' || $key === '' || $secret === '') {
-      throw new QuickConnectException(__('Enter the endpoint, access key and secret key.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Enter the endpoint, access key and secret key.', 'nimbus'));
     }
 
     $result = new ConnectResult();
