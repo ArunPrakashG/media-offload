@@ -15,6 +15,7 @@ bash scripts/<script-name>.sh
 | Script              | Purpose                                                                         |
 | ------------------- | ------------------------------------------------------------------------------- |
 | `release-plugin.sh` | Package `apps/plugin/nimbus` into `dist/nimbus-<version>.zip` and a `.sha256` file |
+| `wporg-deploy.sh`   | Commit that zip to the WordPress.org SVN trunk, `tags/<version>` and `assets/` (asks before committing) |
 
 ## Guidelines
 
