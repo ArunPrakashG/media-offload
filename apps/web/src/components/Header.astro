@@ -1,0 +1,60 @@
+---
+import { NAV, SITE } from '../lib/site';
+import GitHubIcon from './GitHubIcon.astro';
+import Mark from './Mark.astro';
+
+interface Props { wide?: boolean; section?: string }
+const { wide = false, section } = Astro.props;
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => href !== '/#features' && path.startsWith(href);
+---
+<header class:list={['site-header', { 'is-wide': wide }]}>
+  <div class="wrap">
+    <a href="/" class="brand" aria-label="Nimbus home">
+      <Mark />
+      <span class="brand-name">nimbus</span>
+      {section && <span class="brand-sub">{section}</span>}
+    </a>
+    {!section && (
+      <nav aria-label="Main" class="nav">
+        {NAV.map((l) => <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a>)}
+      </nav>
+    )}
+    <div class="header-actions">
+      <slot name="actions" />
+      <a href={SITE.repo} class="btn btn-secondary header-gh"><GitHubIcon />GitHub</a>
+      <a href="/docs/" class="btn btn-primary">Get Nimbus</a>
+      <details class="menu">
+        <summary aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        </summary>
+        <nav class="menu-panel" aria-label="Menu">
+          {NAV.map((l) => <a href={l.href}>{l.label}</a>)}
+          <a href={SITE.repo}>GitHub</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  // The menus are plain <details>. Close them on Escape and after a link is
+  // followed, so in-page anchors don't leave the panel covering the page.
+  const menus = () => document.querySelectorAll<HTMLDetailsElement>('details.menu[open], details.docs-menu[open]');
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    menus().forEach((menu) => {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+    menus().forEach((menu) => {
+      if (target.closest('a') && menu.contains(target)) menu.open = false;
+      else if (!menu.contains(target)) menu.open = false;
+    });
+  });
+</script>

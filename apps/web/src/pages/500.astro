@@ -1,0 +1,17 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Base from '../layouts/Base.astro';
+---
+<Base title="Something went wrong" description="The server could not complete this request. Try again in a moment." noindex>
+  <Header />
+  <main id="main" class="wrap error">
+    <p class="error-code">500</p>
+    <h1 class="h2">Something went wrong on our side.</h1>
+    <p class="body-lg">Try again in a moment. If it keeps happening, open an issue on GitHub.</p>
+    <div class="actions">
+      <a href="/" class="btn btn-primary btn-lg">Home</a>
+    </div>
+  </main>
+  <Footer />
+</Base>

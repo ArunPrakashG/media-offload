@@ -5,8 +5,8 @@ Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
 Stable tag: 0.2.0
-License: GPL-2.0-or-later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: MIT
+License URI: https://opensource.org/license/mit
 
 Offload WordPress media to Amazon S3, Cloudflare R2, or any S3-compatible storage with automatic URL rewriting. 100% free, no license required.
 
@@ -62,11 +62,11 @@ Amazon S3, Cloudflare R2 (via the S3-compatible API), and any other S3-compatibl
 
 = Does the plugin delete local files after offloading? =
 
-Yes, local copies are removed after a successful offload by default. You can restore them at any time using the Restore action.
+No. Local copies stay on your server unless you turn on Remove Local Copies in Settings. You can restore files from storage at any time with the Restore action.
 
 = Is a paid license required? =
 
-No. Nimbus is 100% free and open source, with every feature — bulk migration, cache purging, WP-CLI, multisite support, and everything else — available to everyone with no license key.
+No. Nimbus is free and open source under the MIT license. Every feature, including bulk migration, cache purging, WP-CLI and multisite support, is available with no license key.
 
 = Where can I get support? =
 

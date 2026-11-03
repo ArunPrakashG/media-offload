@@ -1,0 +1,94 @@
+---
+import { render } from 'astro:content';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Search from '../../components/docs/Search.astro';
+import Sidebar from '../../components/docs/Sidebar.astro';
+import Base from '../../layouts/Base.astro';
+import { DOC_SECTIONS, SITE, docPath, getDocs, type Doc } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const docs = await getDocs();
+  return docs.map((entry, i) => ({
+    params: { slug: entry.id === 'index' ? undefined : entry.id },
+    props: { entry, docs, prev: docs[i - 1], next: docs[i + 1] },
+  }));
+}
+
+interface Props { entry: Doc; docs: Doc[]; prev?: Doc; next?: Doc }
+const { entry, docs, prev, next } = Astro.props;
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const sectionLabel = DOC_SECTIONS.find((s) => s.key === entry.data.section)?.label ?? '';
+const path = docPath(entry);
+const isHome = entry.id === 'index';
+const markdown = isHome ? '/docs.md' : `/docs/${entry.id}.md`;
+const editUrl = `${SITE.repo}/edit/main/apps/web/src/content/docs/${entry.id}.md`;
+
+const crumbs = isHome
+  ? [{ name: 'Docs', url: '/docs/' }]
+  : [{ name: 'Docs', url: '/docs/' }, { name: sectionLabel }, { name: entry.data.nav, url: path }];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.filter((c) => c.url).map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: `${SITE.url}${c.url}` })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: entry.data.title,
+    description: entry.data.description,
+    url: `${SITE.url}${path}`,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: SITE.name, url: `${SITE.url}/` },
+    author: { '@type': 'Person', name: SITE.author.name, url: SITE.author.url },
+    about: { '@type': 'SoftwareApplication', name: SITE.name, applicationCategory: 'DeveloperApplication' },
+  },
+];
+---
+<Base title={entry.data.title} description={entry.data.description} markdown={markdown} ogType="article" jsonLd={jsonLd}>
+  <Header wide section="Docs">
+    <Search slot="actions" />
+  </Header>
+  <div class="docs">
+    <details class="docs-menu">
+      <summary>
+        <span class="docs-menu-label"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>Docs menu</span>
+        <span class="docs-menu-here">{isHome ? entry.data.nav : `${sectionLabel} / ${entry.data.nav}`}</span>
+      </summary>
+      <Sidebar docs={docs} current={entry.id} />
+    </details>
+    <Sidebar docs={docs} current={entry.id} />
+
+    <main id="main" class="docs-content">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <ol>
+          {crumbs.map((c, i) => (
+            <>
+              {i > 0 && <li aria-hidden="true">/</li>}
+              <li aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.url && i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : c.name}</li>
+            </>
+          ))}
+        </ol>
+      </nav>
+      <div class="doc-head">
+        {entry.data.logo && <span class="logo-tile"><img src={`/logos/${entry.data.logo}.svg`} alt="" width="30" height="30" /></span>}
+        <h1 class="doc-title">{entry.data.title}</h1>
+      </div>
+      <div class="prose doc-prose"><Content /></div>
+      <nav aria-label="Pagination" class="pager">
+        {prev && <a href={docPath(prev)} rel="prev"><span>Previous</span>{prev.data.nav}</a>}
+        {next && <a href={docPath(next)} rel="next" class="is-next"><span>Next</span>{next.data.nav}</a>}
+      </nav>
+    </main>
+
+    <aside class="toc" aria-label="On this page">
+      {toc.length > 0 && <p>On this page</p>}
+      {toc.map((h) => <a href={`#${h.slug}`} class:list={{ 'is-sub': h.depth === 3 }}>{h.text}</a>)}
+      <a href={editUrl} class="toc-edit">Edit this page on GitHub</a>
+    </aside>
+  </div>
+  <Footer wide />
+</Base>

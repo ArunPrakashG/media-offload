@@ -49,7 +49,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md). Each app also has its own README with 
 
 ## License
 
-GPL-2.0-or-later — see [`LICENSE`](LICENSE).
+MIT. See [`LICENSE`](LICENSE).
 
 ## Security
 

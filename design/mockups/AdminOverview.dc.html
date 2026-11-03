@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nimbus admin overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0E1014}a:hover{color:#3F5A00}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1100px; background: #F0F0F1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1D2327; display: flex; flex-direction: column; overflow: hidden">
+<div aria-hidden="true" style="height: 32px; background: #1D2327; color: #F0F0F1; display: flex; align-items: center; gap: 18px; padding: 0 12px; font-size: 13px; flex: none"><img src="/_blob/99acad1802451cc55687ec76c719d4dc" alt="" style="width: 18px; height: 18px; filter: grayscale(1) brightness(2.2)"><span>Example Site</span><span style="opacity: .8">+ New</span><span style="margin-left: auto">Howdy, admin</span></div>
+<div style="display: flex; flex: 1; min-height: 0">
+<nav aria-label="Admin menu" style="width: 160px; background: #1D2327; color: #F0F0F1; font-size: 14px; flex: none; display: flex; flex-direction: column; padding-top: 8px">
+<span style="padding: 8px 12px; opacity: .85">Dashboard</span><span style="padding: 8px 12px; opacity: .85">Posts</span>
+<span style="padding: 8px 12px; background: #2271B1; display: flex; align-items: center; gap: 8px">Media</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; opacity: .85; font-size: 13px">Library</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; opacity: .85; font-size: 13px">Add New</span>
+<span style="padding: 6px 12px 6px 22px; background: #2C3338; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="6 6 20 20" aria-hidden="true"><g fill="#F0F0F1" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg>Nimbus</span>
+<span style="padding: 8px 12px; opacity: .85">Pages</span><span style="padding: 8px 12px; opacity: .85">Appearance</span><span style="padding: 8px 12px; opacity: .85">Plugins</span><span style="padding: 8px 12px; opacity: .85">Settings</span>
+</nav>
+
+<main style="flex: 1; min-width: 0; padding: 20px 32px 32px; display: flex; flex-direction: column; gap: 20px; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #0E1014">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg width="36" height="36" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0E1014"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em">Nimbus</h1>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #646B76">0.3.0</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 8px; background: #fff; border: 1px solid #E1E4E8; border-radius: 999px; font-size: 14px"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 22px; height: 22px"><span>Cloudflare R2 · <span style="font-family: 'Geist Mono', monospace; font-size: 13px">nimbus-media</span></span><span style="display: inline-flex; align-items: center; gap: 4px; color: #3F5A00; font-weight: 500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>Connected</span></span>
+</div>
+</div>
+
+<nav aria-label="Nimbus" style="display: flex; gap: 4px; border-bottom: 1px solid #DCDCDE; font-size: 14px">
+<a href="#" aria-current="page" style="padding: 10px 14px; text-decoration: none; font-weight: 600; border-bottom: 2px solid #0E1014; margin-bottom: -1px">Overview</a>
+<a href="#" style="padding: 10px 14px; text-decoration: none; color: #4A515C">Settings</a>
+<a href="#" style="padding: 10px 14px; text-decoration: none; color: #4A515C">Advanced</a>
+<a href="#" style="padding: 10px 14px; text-decoration: none; color: #4A515C">Integrations</a>
+<a href="#" style="padding: 10px 14px; text-decoration: none; color: #4A515C">Tools</a>
+<a href="#" style="padding: 10px 14px; text-decoration: none; color: #4A515C">Logs</a>
+</nav>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<div style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: #4A515C">Library assets</span><strong style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">1,302</strong><span style="font-size: 13px; color: #646B76">Attachments in WordPress</span></div>
+<div style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: #4A515C">Offloaded</span><strong style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">1,247</strong><span style="font-size: 13px; color: #646B76">96% linked to storage</span></div>
+<div style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: #4A515C">Remote storage</span><strong style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">4.2 GB</strong><span style="font-size: 13px; color: #646B76">5,988 objects tracked</span></div>
+<div style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: #4A515C">Est. monthly cost</span><strong style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">$0.06</strong><span style="font-size: 13px; color: #646B76">Cloudflare R2 estimate</span></div>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px">
+<section aria-labelledby="ov-prog" style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 id="ov-prog" style="margin: 0; font-size: 16px; font-weight: 600">Library in storage</h2><p style="margin: 0; font-size: 14px; color: #4A515C">55 files are still served from this server.</p></div>
+<button type="button" style="height: 40px; padding: 0 16px; border-radius: 6px; border: 0; background: #C6F135; color: #0E1014; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Offload 55 files</button>
+</div>
+<div role="progressbar" aria-label="Library in storage" aria-valuenow="96" aria-valuemin="0" aria-valuemax="100" style="height: 10px; border-radius: 999px; background: #EEF0F3; overflow: hidden"><div style="width: 96%; height: 100%; background: #0E1014"></div></div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 13px; font-weight: 500; color: #4A515C">Uploads, last 7 days</h3>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end; height: 120px">
+<div style="height: 40%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 65%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 30%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 85%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 55%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 20%; background: #E1E4E8; border-radius: 4px"></div><div style="height: 70%; background: #0E1014; border-radius: 4px"></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; font-size: 12px; color: #646B76; text-align: center"><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span><span>Mon</span><span>Today</span></div>
+</div>
+</section>
+
+<section aria-labelledby="ov-health" style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="ov-health" style="margin: 0; font-size: 16px; font-weight: 600">Setup health</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; font-size: 14px">
+<li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EEF0F3"><span>Credentials</span><span style="display: inline-flex; align-items: center; gap: 6px; color: #3F5A00; font-weight: 500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>Configured</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EEF0F3"><span>Delivery</span><span style="display: inline-flex; align-items: center; gap: 6px; color: #3F5A00; font-weight: 500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>Serving from storage</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EEF0F3"><span>Pending URL updates</span><span style="font-weight: 500">0</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EEF0F3"><span>Plugin conflicts</span><span style="display: inline-flex; align-items: center; gap: 6px; color: #93370D; font-weight: 500"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 4.5v4M8 11h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>Review required</span></li>
+<li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0"><span>Integrations</span><span style="display: inline-flex; align-items: center; gap: 6px"><img src="/_blob/b0bb2162847332fd6739fc65d0e1ee3f" alt="WooCommerce" style="width: 22px; height: 22px"><img src="/_blob/6438eb148ca35aed0b65a80f8a129a63" alt="Elementor" style="width: 16px; height: 16px"><span style="color: #4A515C">2 detected</span></span></li>
+</ul>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Review conflicts</a>
+</section>
+</div>
+
+<section aria-labelledby="ov-cost" style="background: #fff; border: 1px solid #E1E4E8; border-radius: 10px; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 16px 20px"><h2 id="ov-cost" style="margin: 0; font-size: 16px; font-weight: 600">Provider cost comparison</h2><span style="font-size: 13px; color: #646B76">4.2 GB stored · 1,302 files · est. 6.1 GB monthly egress</span></div>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="background: #F6F7F9; text-align: left; color: #4A515C"><th scope="col" style="padding: 10px 20px; font-weight: 500">Provider</th><th scope="col" style="padding: 10px 20px; font-weight: 500">Storage</th><th scope="col" style="padding: 10px 20px; font-weight: 500">Egress</th><th scope="col" style="padding: 10px 20px; font-weight: 500; text-align: right">Est. monthly</th></tr></thead>
+<tbody style="font-variant-numeric: tabular-nums">
+<tr style="border-top: 1px solid #EEF0F3; background: #F7FCE6"><td style="padding: 10px 20px"><span style="display: inline-flex; align-items: center; gap: 10px; font-weight: 500"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 20px; height: 20px">Cloudflare R2<span style="font-size: 12px; color: #3F5A00; border: 1px solid #C6F135; border-radius: 999px; padding: 1px 8px">Active</span></span></td><td style="padding: 10px 20px">$0.06</td><td style="padding: 10px 20px">Free</td><td style="padding: 10px 20px; text-align: right; font-weight: 600">$0.06</td></tr>
+<tr style="border-top: 1px solid #EEF0F3"><td style="padding: 10px 20px"><span style="display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/dfecb6f0aa9d05862372bbe5c15f6b99" alt="" style="width: 18px; height: 18px">Backblaze B2</span></td><td style="padding: 10px 20px">$0.03</td><td style="padding: 10px 20px">Free</td><td style="padding: 10px 20px; text-align: right">$0.03</td></tr>
+<tr style="border-top: 1px solid #EEF0F3"><td style="padding: 10px 20px"><span style="display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/c5773bec299e86cdb8f7faafe5bc20ff" alt="" style="width: 20px; height: 20px; border-radius: 3px">Amazon S3</span></td><td style="padding: 10px 20px">$0.10</td><td style="padding: 10px 20px">$0.55</td><td style="padding: 10px 20px; text-align: right">$0.65</td></tr>
+<tr style="border-top: 1px solid #EEF0F3"><td style="padding: 10px 20px"><span style="display: inline-flex; align-items: center; gap: 10px"><img src="/_blob/496dba68d0a2d529062c8a8f6ea0d5c8" alt="" style="width: 18px; height: 18px">DigitalOcean Spaces</span></td><td style="padding: 10px 20px">$5.00 base</td><td style="padding: 10px 20px">Included</td><td style="padding: 10px 20px; text-align: right">$5.00</td></tr>
+</tbody>
+</table>
+<p style="margin: 0; padding: 12px 20px; font-size: 12px; color: #646B76; border-top: 1px solid #EEF0F3">Estimates only. Check current pricing with each provider.</p>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

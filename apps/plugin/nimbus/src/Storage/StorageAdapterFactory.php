@@ -28,7 +28,18 @@ final class StorageAdapterFactory
       return $this->adapter;
     }
 
-    $configuration = $this->settings->adapterConfiguration();
+    $this->adapter = $this->fromConfiguration($this->settings->adapterConfiguration());
+
+    return $this->adapter;
+  }
+
+  /**
+   * Build an uncached adapter for an explicit configuration.
+   *
+   * @param array<string, mixed> $configuration
+   */
+  public function fromConfiguration(array $configuration): StorageAdapter
+  {
     $provider      = (string) ($configuration['provider'] ?? 's3');
     $adapterType   = $this->providerRegistry->get($provider)->adapterType();
 
@@ -66,9 +77,7 @@ final class StorageAdapterFactory
       );
     }
 
-    $this->adapter = $factory($configuration);
-
-    return $this->adapter;
+    return $factory($configuration);
   }
 
   public function get_adapter(): StorageAdapter

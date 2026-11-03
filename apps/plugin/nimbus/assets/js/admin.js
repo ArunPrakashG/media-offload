@@ -513,7 +513,9 @@ jQuery(document).ready(function ($) {
     $form.prepend($notice);
 
     function providerValue() {
-      return (($form.find('[name="provider"]').val() || '') + '').toLowerCase();
+      var $provider = $form.find('[name="provider"]');
+      var $checked = $provider.filter(':checked');
+      return ((($checked.length ? $checked : $provider).val() || '') + '').toLowerCase();
     }
 
     function fieldByName(name) {
@@ -600,12 +602,14 @@ jQuery(document).ready(function ($) {
         $region.val('auto');
       }
       $region.prop('readonly', isR2);
+      $wizard.find('[data-hide-for="r2"]').prop('hidden', isR2);
 
       setGroupVisible('bucket-location', !isLocal);
       setGroupVisible('credentials', !isLocal);
       setGroupVisible('r2-extra', isR2);
       setGroupVisible('s3c-endpoint', isS3Compatible);
       setGroupVisible('session', isS3 || provider === 's3_compatible');
+      setGroupVisible('prefix', !isLocal);
 
       updateProviderTip(provider);
     }
@@ -637,13 +641,8 @@ jQuery(document).ready(function ($) {
         return 'Enter the custom endpoint for your S3-compatible storage.';
       }
 
-      if (provider === 'r2') {
-        var hasAccountId = $.trim(fieldByName('r2_account_id').val() || '') !== '';
-        var hasEndpoint = $.trim(fieldByName('endpoint').val() || '') !== '';
-
-        if (!hasAccountId && !hasEndpoint) {
-          return 'Enter either the R2 account ID or a custom R2 endpoint before continuing.';
-        }
+      if (provider === 'r2' && $.trim(fieldByName('r2_account_id').val() || '') === '') {
+        return 'Enter your Cloudflare account ID before continuing.';
       }
 
       return '';
@@ -727,7 +726,55 @@ jQuery(document).ready(function ($) {
     });
 
     $form.on('change', '[name="provider"]', function () {
+      $wizard.find('#nmb-wizard-status').text('').removeClass('is-ok is-error');
       applyOnboardingProviderVisibility();
+    });
+
+    // Test the storage fields as typed, before anything is saved.
+    $wizard.on('click', '[data-wizard-test]', function () {
+      var $btn = $(this);
+      var $status = $wizard.find('#nmb-wizard-status');
+      var strings = adminConfig.strings || {};
+      var message = validateStep('storage');
+
+      if (message) {
+        showNotice(message);
+        return;
+      }
+
+      clearNotice();
+      var data = {
+        action: (adminConfig.actions && adminConfig.actions.testConnection) || 'pt_media_offload_test_connection',
+        nonce: adminConfig.nonce
+      };
+      $form.find('[data-step="storage"]').find('input:not([disabled])').each(function () {
+        if (this.name && (this.type !== 'radio' || this.checked)) {
+          data['values[' + this.name + ']'] = this.value;
+        }
+      });
+      if ($form.find('[name="use_path_style_endpoint"]').is(':checked')) {
+        data['values[use_path_style_endpoint]'] = '1';
+      }
+
+      $btn.prop('disabled', true);
+      $status.removeClass('is-ok is-error').text(strings.testingMessage || 'Testing connection…');
+
+      $.post(ajaxurl, data)
+        .done(function (response) {
+          var ok = !!(response && response.success);
+          var bucket = $.trim(fieldByName('bucket').val() || '');
+          var text = ok
+            ? (bucket ? 'Connected to ' + bucket : (response.data && response.data.message) || 'Connected')
+            : ((response && response.data && response.data.message) || strings.serverError || 'Connection failed.');
+          $status.addClass(ok ? 'is-ok' : 'is-error').text(text);
+        })
+        .fail(function (xhr) {
+          var data = xhr.responseJSON && xhr.responseJSON.data;
+          $status.addClass('is-error').text((data && data.message) || strings.serverError || 'Server error occurred.');
+        })
+        .always(function () {
+          $btn.prop('disabled', false);
+        });
     });
 
     $form.on('submit', function (event) {
@@ -768,10 +815,9 @@ jQuery(document).ready(function ($) {
           // fill the other inputs.
           var newProvider = merged.provider;
           if (newProvider) {
-            var $providerSelect = fieldByName('provider');
-            if ($providerSelect.length) {
-              $providerSelect.val(newProvider);
-            }
+            $form.find('[name="provider"]').filter(function () {
+              return this.value === newProvider;
+            }).prop('checked', true);
           }
 
           applyOnboardingProviderVisibility();

@@ -134,9 +134,12 @@ final class SettingsUi
 
   public function add_menu(): void
   {
+    // The cloud glyph from design/brand/glyph.svg, inline so it follows the menu text color.
+    $glyph = '<svg class="nmb-menu-glyph" viewBox="6 6 20 20" width="13" height="13" aria-hidden="true" style="vertical-align:-1px;margin-right:6px"><g fill="currentColor" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"/><circle cx="18.5" cy="13" r="6.5"/><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"/></g></svg>';
+
     $hook = add_media_page(
       __('Nimbus', 'nimbus'),
-      __('Nimbus', 'nimbus'),
+      $glyph . esc_html__('Nimbus', 'nimbus'),
       'manage_options',
       NIMBUS_SLUG,
       [$this, 'render_page']

@@ -11,7 +11,7 @@
     }
   },
   "description": "Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.",
-  "license": "GPL-2.0-or-later",
+  "license": "MIT",
   "minimum-stability": "stable",
   "name": "arun-prakash/nimbus",
   "require": {

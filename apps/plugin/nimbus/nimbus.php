@@ -9,8 +9,8 @@
  * Author: Arun Prakash
  * Author URI: https://arunprakashg.com
  * Text Domain: nimbus
- * License: GPL-2.0-or-later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * License: MIT
+ * License URI: https://opensource.org/license/mit
  */
 
 if (!defined('ABSPATH')) {
