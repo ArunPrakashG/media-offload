@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nimbus home on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+.nmb{--nmb-volt:#C6F135;--nmb-volt-text:#3F5A00;--nmb-volt-tint:#F0FAD0;--nmb-bg:#F6F7F9;--nmb-surface:#FFFFFF;--nmb-surface-2:#EEF0F3;--nmb-border:#E1E4E8;--nmb-border-strong:#C9CED6;--nmb-text:#0E1014;--nmb-text-2:#4A515C;--nmb-text-3:#646B76;--nmb-font:"Geist",ui-sans-serif,system-ui,sans-serif;--nmb-mono:"Geist Mono",ui-monospace,monospace;background:var(--nmb-bg);color:var(--nmb-text);font-family:var(--nmb-font);-webkit-font-smoothing:antialiased}
+.nmb.dark{--nmb-volt-text:#C6F135;--nmb-volt-tint:rgba(198,241,53,.12);--nmb-bg:#0B0D10;--nmb-surface:#12151A;--nmb-surface-2:#181C22;--nmb-border:#242932;--nmb-border-strong:#343B46;--nmb-text:#F2F4F7;--nmb-text-2:#A9B0BB;--nmb-text-3:#858D99}
+.nmb a{color:inherit}
+</style>
+</helmet>
+<div class="nmb {{themeClass}}" style="width: 390px; min-height: 3400px">
+<header style="height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--nmb-border)">
+<a href="#" aria-label="Nimbus home" style="display: flex; align-items: center; gap: 8px; text-decoration: none"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="7.5" fill="#0E1014" stroke="#343B46"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg><span style="font-size: 19px; font-weight: 600; letter-spacing: -0.03em">nimbus</span></a>
+<button type="button" aria-label="Open menu" aria-expanded="false" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--nmb-border); background: transparent; color: inherit; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg></button>
+</header>
+<main>
+<section style="padding: 48px 16px 40px; display: flex; flex-direction: column; gap: 22px">
+<p style="margin: 0; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--nmb-text-2); border: 1px solid var(--nmb-border); border-radius: 999px; padding: 5px 10px 5px 6px"><span style="font-family: var(--nmb-mono); font-size: 11px; background: var(--nmb-volt-tint); color: var(--nmb-volt-text); border-radius: 999px; padding: 2px 7px">MIT</span>Free and open source</p>
+<h1 style="margin: 0; font-size: 40px; line-height: 1.05; letter-spacing: -0.04em; font-weight: 600">Move your media to the cloud. Keep your workflow.</h1>
+<p style="margin: 0; font-size: 17px; line-height: 27px; color: var(--nmb-text-2)">Nimbus offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible bucket, and rewrites every URL so pages load from storage or your CDN.</p>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 6px; background: #C6F135; color: #0E1014; text-decoration: none; font-weight: 600">Get Nimbus</a>
+<a href="#" style="display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 6px; border: 1px solid var(--nmb-border-strong); text-decoration: none; font-weight: 500">Read the docs</a>
+</div>
+</section>
+<section style="padding: 0 16px 48px">
+<div role="img" aria-label="How a media URL changes after offloading" style="background: #0E1014; color: #F2F4F7; border: 1px solid #242932; border-radius: 14px; overflow: hidden">
+<div style="padding: 12px 16px; border-bottom: 1px solid #242932; font-family: var(--nmb-mono); font-size: 11px; color: #858D99; display: flex; justify-content: space-between"><span>hero.webp</span><span style="color: #C6F135">Offloaded</span></div>
+<div style="padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; font-family: var(--nmb-mono); font-size: 13px; line-height: 21px">
+<code style="word-break: break-all; color: #858D99">https://<span style="text-decoration: line-through">example.com/wp-content/uploads</span>/2026/11/hero.webp</code>
+<code style="word-break: break-all">https://<span style="background: #C6F135; color: #0E1014; padding: 1px 4px; border-radius: 4px">media.example.com</span>/2026/11/hero.webp</code>
+</div>
+</div>
+</section>
+<section aria-labelledby="m-prov" style="padding: 32px 16px; background: var(--nmb-surface); border-top: 1px solid var(--nmb-border); border-bottom: 1px solid var(--nmb-border); display: flex; flex-direction: column; gap: 16px">
+<h2 id="m-prov" style="margin: 0; font-size: 14px; font-weight: 500; color: var(--nmb-text-3)">Works with the storage you already use</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 14px; font-weight: 500">
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/c5773bec299e86cdb8f7faafe5bc20ff" alt="" style="width: 22px; height: 22px; border-radius: 4px"></span>Amazon S3</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 22px; height: 22px"></span>Cloudflare R2</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/5fd012d17254db9a78464d8ee1a17a24" alt="" style="width: 22px; height: 22px"></span>Google Cloud</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/dfecb6f0aa9d05862372bbe5c15f6b99" alt="" style="width: 20px; height: 20px"></span>Backblaze B2</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/496dba68d0a2d529062c8a8f6ea0d5c8" alt="" style="width: 20px; height: 20px"></span>DO Spaces</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/008de50d0b905c88b2c4d20bb87740c6" alt="" style="width: 20px; height: 20px"></span>Wasabi</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px solid var(--nmb-border); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/1763910fd74f52b6d240718ec091ecbe" alt="" style="width: 20px; height: 20px"></span>MinIO</li>
+<li style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 10px; border: 1px dashed var(--nmb-border-strong); border-radius: 10px"><span style="width: 30px; height: 30px; border-radius: 7px; background: var(--nmb-surface-2); display: flex; align-items: center; justify-content: center; flex: none; font-family: var(--nmb-mono); font-size: 10px">S3</span>S3-compatible</li>
+</ul>
+</section>
+<section aria-labelledby="m-how" style="padding: 64px 16px; display: flex; flex-direction: column; gap: 28px">
+<h2 id="m-how" style="margin: 0; font-size: 30px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600">Set it up once. Nimbus handles every upload after that.</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px">
+<li style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--nmb-text)"><span style="font-family: var(--nmb-mono); font-size: 12px; color: var(--nmb-text-3)">01</span><h3 style="margin: 0; font-size: 19px; font-weight: 600">Connect a bucket</h3><p style="margin: 0; font-size: 16px; line-height: 25px; color: var(--nmb-text-2)">Pick a provider, paste your keys and test the connection from the setup wizard.</p></li>
+<li style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--nmb-border)"><span style="font-family: var(--nmb-mono); font-size: 12px; color: var(--nmb-text-3)">02</span><h3 style="margin: 0; font-size: 19px; font-weight: 600">Offload your library</h3><p style="margin: 0; font-size: 16px; line-height: 25px; color: var(--nmb-text-2)">New uploads go to storage automatically. Existing files move in a bulk job you can pause and resume.</p></li>
+<li style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px; border-top: 2px solid var(--nmb-border)"><span style="font-family: var(--nmb-mono); font-size: 12px; color: var(--nmb-text-3)">03</span><h3 style="margin: 0; font-size: 19px; font-weight: 600">Serve from the edge</h3><p style="margin: 0; font-size: 16px; line-height: 25px; color: var(--nmb-text-2)">URLs in posts and metadata point to your bucket or CDN domain, and caches are purged for you.</p></li>
+</ol>
+</section>
+<section aria-labelledby="m-feat" style="padding: 0 16px 64px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="m-feat" style="margin: 0 0 12px; font-size: 30px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600">Nothing behind a license key.</h2>
+<div style="padding: 20px; border: 1px solid var(--nmb-border); border-radius: 14px; background: var(--nmb-surface); display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 17px; font-weight: 600">Bulk migration</h3><p style="margin: 0; font-size: 15px; line-height: 23px; color: var(--nmb-text-2)">Move thousands of existing files in the background. Pause, resume and retry failures.</p></div>
+<div style="padding: 20px; border: 1px solid var(--nmb-border); border-radius: 14px; background: var(--nmb-surface); display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 17px; font-weight: 600">Restore any time</h3><p style="margin: 0; font-size: 15px; line-height: 23px; color: var(--nmb-text-2)">Pull files back to your server and revert URLs, one attachment or the whole library.</p></div>
+<div style="padding: 20px; border: 1px solid var(--nmb-border); border-radius: 14px; background: var(--nmb-surface); display: flex; flex-direction: column; gap: 8px"><h3 style="margin: 0; font-size: 17px; font-weight: 600">Cache purge</h3><p style="margin: 0; font-size: 15px; line-height: 23px; color: var(--nmb-text-2)">Cloudflare, LiteSpeed, WP Fastest Cache and proxy caches are cleared after each change.</p></div>
+</section>
+<section style="background: #0E1014; color: #F2F4F7; padding: 56px 16px; display: flex; flex-direction: column; gap: 18px; border-top: 1px solid #242932">
+<h2 style="margin: 0; font-size: 30px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600">Free, and open source for good.</h2>
+<p style="margin: 0; font-size: 16px; line-height: 25px; color: #A9B0BB">MIT licensed. No license server, no telemetry, no paid tier.</p>
+<a href="#" style="display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 6px; background: #C6F135; color: #0E1014; text-decoration: none; font-weight: 600">Star on GitHub</a>
+</section>
+</main>
+<footer style="padding: 32px 16px; font-size: 14px; color: var(--nmb-text-2); display: flex; flex-direction: column; gap: 16px; border-top: 1px solid var(--nmb-border)">
+<nav aria-label="Footer" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px"><a href="#" style="text-decoration: none; padding: 10px 0">Docs</a><a href="#" style="text-decoration: none; padding: 10px 0">Compare</a><a href="#" style="text-decoration: none; padding: 10px 0">Changelog</a><a href="#" style="text-decoration: none; padding: 10px 0">GitHub</a><a href="#" style="text-decoration: none; padding: 10px 0">Privacy</a><a href="#" style="text-decoration: none; padding: 10px 0">Terms</a></nav>
+<span>Nimbus · MIT License</span>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":true},"$preview":{"width":390,"height":3400}}'>
+class Component extends DCLogic {
+renderVals() {
+return { themeClass: (this.props.dark ?? true) ? 'dark' : '' };
+}
+}
+</script>
+</body>
+</html>

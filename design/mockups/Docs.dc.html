@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nimbus docs: Cloudflare R2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+.nmb{--nmb-volt:#C6F135;--nmb-volt-text:#3F5A00;--nmb-volt-tint:#F0FAD0;--nmb-bg:#F6F7F9;--nmb-surface:#FFFFFF;--nmb-surface-2:#EEF0F3;--nmb-border:#E1E4E8;--nmb-border-strong:#C9CED6;--nmb-text:#0E1014;--nmb-text-2:#4A515C;--nmb-text-3:#646B76;--nmb-font:"Geist",ui-sans-serif,system-ui,sans-serif;--nmb-mono:"Geist Mono",ui-monospace,monospace;background:var(--nmb-surface);color:var(--nmb-text);font-family:var(--nmb-font);-webkit-font-smoothing:antialiased}
+.nmb.dark{--nmb-volt-text:#C6F135;--nmb-volt-tint:rgba(198,241,53,.12);--nmb-bg:#0B0D10;--nmb-surface:#0B0D10;--nmb-surface-2:#181C22;--nmb-border:#242932;--nmb-border-strong:#343B46;--nmb-text:#F2F4F7;--nmb-text-2:#A9B0BB;--nmb-text-3:#858D99}
+.nmb a{color:inherit}.nmb a:hover{color:var(--nmb-volt-text)}
+.layout{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;gap:48px}
+.side{flex:1 1 220px;max-width:240px}
+.content{flex:999 1 560px;min-width:0;max-width:720px}
+.toc{flex:0 1 200px}
+@media (max-width:1100px){.toc{display:none}}
+.doc-menu{display:none}
+@media (max-width:760px){.side{display:none!important}.doc-menu{display:flex!important}.layout{padding-top:16px!important}}
+@media (max-width:560px){#doc-search{display:none}}
+.nmb code.i{font-family:var(--nmb-mono);font-size:.88em;background:var(--nmb-surface-2);padding:1px 6px;border-radius:4px}
+</style>
+</helmet>
+<div class="nmb {{themeClass}}">
+<header style="border-bottom: 1px solid var(--nmb-border)">
+<div style="max-width: 1280px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 16px">
+<a href="#" aria-label="Nimbus home" style="display: flex; align-items: center; gap: 10px; text-decoration: none"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="7.5" fill="#0E1014" stroke="#343B46"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.03em">nimbus</span></a>
+<span style="font-size: 15px; color: var(--nmb-text-3)">Docs</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<label for="doc-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search docs</label>
+<input id="doc-search" type="search" placeholder="Search docs" style="height: 40px; width: 220px; border-radius: 6px; border: 1px solid var(--nmb-border-strong); background: var(--nmb-surface); color: inherit; padding: 0 12px; font: inherit; font-size: 14px; box-sizing: border-box">
+<a href="#" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; background: #C6F135; color: #0E1014; text-decoration: none; font-size: 14px; font-weight: 600">Get Nimbus</a>
+</div>
+</div>
+</header>
+<div class="layout" style="padding-top: 40px; padding-bottom: 96px">
+<button type="button" class="doc-menu" aria-expanded="false" aria-controls="docs-nav" style="flex: 1 1 100%; align-items: center; justify-content: space-between; height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--nmb-border-strong); background: var(--nmb-surface); color: inherit; font: inherit; font-size: 14px"><span style="display: flex; align-items: center; gap: 10px"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Docs menu</span><span style="color: var(--nmb-text-3)">Providers / R2</span></button>
+<nav aria-label="Docs" id="docs-nav" class="side" style="font-size: 14px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 2px"><p style="margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--nmb-text-3); text-transform: uppercase; letter-spacing: .06em">Start</p><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Installation</a><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Setup wizard</a></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><p style="margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--nmb-text-3); text-transform: uppercase; letter-spacing: .06em">Providers</p>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/c5773bec299e86cdb8f7faafe5bc20ff" alt="" style="width: 16px; height: 16px; border-radius: 3px">Amazon S3</a>
+<a href="#" aria-current="page" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center; background: var(--nmb-surface-2); font-weight: 500"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 16px; height: 16px">Cloudflare R2</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/5fd012d17254db9a78464d8ee1a17a24" alt="" style="width: 16px; height: 16px">Google Cloud Storage</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/dfecb6f0aa9d05862372bbe5c15f6b99" alt="" style="width: 16px; height: 16px">Backblaze B2</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/496dba68d0a2d529062c8a8f6ea0d5c8" alt="" style="width: 16px; height: 16px">DigitalOcean Spaces</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/008de50d0b905c88b2c4d20bb87740c6" alt="" style="width: 16px; height: 16px">Wasabi</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px; display: flex; gap: 10px; align-items: center"><img src="/_blob/1763910fd74f52b6d240718ec091ecbe" alt="" style="width: 16px; height: 16px">MinIO</a>
+<a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Other S3-compatible</a></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><p style="margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--nmb-text-3); text-transform: uppercase; letter-spacing: .06em">Guides</p><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Bulk migration</a><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Custom domain</a><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Cache purge</a><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">WP-CLI</a><a href="#" style="text-decoration: none; padding: 7px 10px; border-radius: 6px">Multisite</a></div>
+</nav>
+
+<article class="content" style="display: flex; flex-direction: column; gap: 24px">
+<nav aria-label="Breadcrumb"><ol style="list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; font-size: 14px; color: var(--nmb-text-3)"><li><a href="#" style="text-decoration: none">Docs</a></li><li aria-hidden="true">/</li><li><a href="#" style="text-decoration: none">Providers</a></li><li aria-hidden="true">/</li><li aria-current="page" style="color: var(--nmb-text)">Cloudflare R2</li></ol></nav>
+<div style="display: flex; align-items: center; gap: 14px"><span style="width: 48px; height: 48px; border-radius: 12px; background: #fff; border: 1px solid var(--nmb-border); display: flex; align-items: center; justify-content: center; flex: none"><img src="/_blob/d657cccb80c855c24ce6f8090ec6d243" alt="" style="width: 32px; height: 32px"></span><h1 style="margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600">Connect Cloudflare R2</h1></div>
+<p style="margin: 0; font-size: 18px; line-height: 29px; color: var(--nmb-text-2)">R2 has no egress fees, which makes it a good default for image-heavy sites. You need a bucket and an R2 API token with read and write access.</p>
+
+<h2 id="token" style="margin: 16px 0 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 600">1. Create an API token</h2>
+<p style="margin: 0; font-size: 16px; line-height: 27px; color: var(--nmb-text-2)">In the Cloudflare dashboard open <strong style="color: var(--nmb-text); font-weight: 500">R2 → Manage API tokens</strong> and create a token with <strong style="color: var(--nmb-text); font-weight: 500">Object Read &amp; Write</strong> on your bucket. Copy the Access Key ID and Secret Access Key. The secret is shown once.</p>
+
+<h2 id="fields" style="margin: 16px 0 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 600">2. Fill in the setup wizard</h2>
+<div style="overflow-x: auto; border: 1px solid var(--nmb-border); border-radius: 10px">
+<table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 520px">
+<caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Fields for Cloudflare R2</caption>
+<thead><tr style="background: var(--nmb-surface-2); text-align: left"><th scope="col" style="padding: 12px 16px; font-weight: 500">Field</th><th scope="col" style="padding: 12px 16px; font-weight: 500">Where to find it</th></tr></thead>
+<tbody>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Bucket</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Your R2 bucket name, for example <code class="i">nimbus-media</code></td></tr>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">R2 Account ID</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Dashboard → Overview. Nimbus builds the endpoint from it.</td></tr>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Access Key</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Access Key ID from the token</td></tr>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Secret Key</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Secret Access Key from the token</td></tr>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Endpoint <span style="font-weight: 400; color: var(--nmb-text-3)">(optional)</span></td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Leave empty unless you use a custom R2 endpoint</td></tr>
+</tbody>
+</table>
+</div>
+<div role="note" style="display: flex; gap: 12px; padding: 16px; border-radius: 10px; background: var(--nmb-volt-tint); font-size: 15px; line-height: 24px"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"></circle><path d="M10 9v5M10 6.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><p style="margin: 0"><strong style="font-weight: 600">Tip:</strong> connect a custom domain to the bucket in Cloudflare, then set it as the delivery domain in Nimbus so files are cached at the edge.</p></div>
+
+<h2 id="test" style="margin: 16px 0 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 600">3. Test and offload</h2>
+<p style="margin: 0; font-size: 16px; line-height: 27px; color: var(--nmb-text-2)">Select <strong style="color: var(--nmb-text); font-weight: 500">Test connection</strong>. When it passes, new uploads go to R2. To move existing files, start a bulk job from <strong style="color: var(--nmb-text); font-weight: 500">Tools</strong> or run:</p>
+<pre style="margin: 0; background: #0E1014; color: #F2F4F7; border-radius: 10px; padding: 16px 18px; font-family: var(--nmb-mono); font-size: 14px; line-height: 22px; overflow-x: auto"><span style="color: #858D99">$</span> wp nimbus sync --limit=500</pre>
+
+<nav aria-label="Pagination" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px">
+<a href="#" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border: 1px solid var(--nmb-border); border-radius: 10px; text-decoration: none"><span style="font-size: 13px; color: var(--nmb-text-3)">Previous</span><span style="font-weight: 500">Amazon S3</span></a>
+<a href="#" style="display: flex; flex-direction: column; gap: 4px; padding: 16px; border: 1px solid var(--nmb-border); border-radius: 10px; text-decoration: none; text-align: right"><span style="font-size: 13px; color: var(--nmb-text-3)">Next</span><span style="font-weight: 500">Google Cloud Storage</span></a>
+</nav>
+</article>
+
+<aside class="toc" aria-label="On this page" style="font-size: 14px; display: flex; flex-direction: column; gap: 8px; padding-top: 44px">
+<p style="margin: 0 0 4px; font-size: 12px; font-weight: 500; color: var(--nmb-text-3); text-transform: uppercase; letter-spacing: .06em">On this page</p>
+<a href="#token" style="text-decoration: none; color: var(--nmb-text)">Create an API token</a>
+<a href="#fields" style="text-decoration: none; color: var(--nmb-text-2)">Fill in the setup wizard</a>
+<a href="#test" style="text-decoration: none; color: var(--nmb-text-2)">Test and offload</a>
+<a href="#" style="text-decoration: none; color: var(--nmb-text-3); margin-top: 16px">Edit this page on GitHub</a>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+renderVals() {
+return { themeClass: this.props.dark ? 'dark' : '' };
+}
+}
+</script>
+</body>
+</html>
