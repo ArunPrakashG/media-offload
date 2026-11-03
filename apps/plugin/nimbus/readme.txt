@@ -5,7 +5,7 @@ Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -91,8 +91,10 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Changelog ==
 
-= Unreleased =
+= 0.3.2 =
 * Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
+* Docs and donate links on the Plugins screen.
+* Tested with WordPress 7.1.
 
 = 0.3.1 =
 * Storage credentials are encrypted in the database, using your site's security keys or a NIMBUS_ENCRYPTION_KEY constant.
@@ -128,6 +130,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.2 =
+Adds quick connect to the setup wizard. Your settings and offloaded files are unchanged.
 
 = 0.3.1 =
 Your storage keys are now encrypted in the database. Nothing to do: Nimbus encrypts them the next time you open the admin.
