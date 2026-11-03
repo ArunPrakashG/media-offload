@@ -37,7 +37,7 @@ final class QuickConnect
       'digitalocean_spaces' => new DigitalOceanSpacesConnector($this),
       'minio', 's3_compatible' => new S3EndpointConnector($this, $provider),
       's3', 'gcs' => new ShellConnector($this, $provider),
-      default => throw new QuickConnectException(esc_html__('Quick connect is not available for this provider.', 'nimbus')),
+      default => throw new QuickConnectException(esc_html__('Quick connect is not available for this provider.', 'nimbus-media-offload')),
     };
 
     if (function_exists('set_time_limit')) {
@@ -49,7 +49,7 @@ final class QuickConnect
 
     if ($result->values !== []) {
       $this->verifyWrite($result, $provider === 'gcs' ? 14 : 8);
-      $result->step(__('Upload test passed', 'nimbus'));
+      $result->step(__('Upload test passed', 'nimbus-media-offload'));
     }
 
     return $result;
@@ -122,7 +122,7 @@ final class QuickConnect
 
     if (is_wp_error($response)) {
       /* translators: %s: network error message */
-      throw new QuickConnectException(esc_html(sprintf(__('Could not reach the provider: %s', 'nimbus'), $response->get_error_message())));
+      throw new QuickConnectException(esc_html(sprintf(__('Could not reach the provider: %s', 'nimbus-media-offload'), $response->get_error_message())));
     }
 
     $decoded = json_decode((string) wp_remote_retrieve_body($response), true);
@@ -139,7 +139,7 @@ final class QuickConnect
   public function s3Client(array $config): \Aws\S3\S3Client
   {
     if (!class_exists('\\Aws\\S3\\S3Client')) {
-      throw new QuickConnectException(esc_html__('The AWS SDK bundled with Nimbus is missing.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('The AWS SDK bundled with Nimbus is missing.', 'nimbus-media-offload'));
     }
 
     $clientConfig = [
@@ -230,6 +230,6 @@ final class QuickConnect
     }
 
     /* translators: %s: error from the storage provider */
-    throw new QuickConnectException(esc_html(sprintf(__('Everything was set up, but the upload test failed: %s', 'nimbus'), $lastError)));
+    throw new QuickConnectException(esc_html(sprintf(__('Everything was set up, but the upload test failed: %s', 'nimbus-media-offload'), $lastError)));
   }
 }

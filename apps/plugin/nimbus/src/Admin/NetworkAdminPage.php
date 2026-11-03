@@ -31,8 +31,8 @@ final class NetworkAdminPage
   public function addNetworkMenu(): void
   {
     add_menu_page(
-      __('Nimbus Network', 'nimbus'),
-      __('Nimbus', 'nimbus'),
+      __('Nimbus Network', 'nimbus-media-offload'),
+      __('Nimbus', 'nimbus-media-offload'),
       'manage_network',
       self::MENU_SLUG,
       [$this, 'renderPage'],
@@ -44,26 +44,26 @@ final class NetworkAdminPage
   public function renderPage(): void
   {
     if (!current_user_can('manage_network')) {
-      wp_die(esc_html__('You do not have permission to access this page.', 'nimbus'));
+      wp_die(esc_html__('You do not have permission to access this page.', 'nimbus-media-offload'));
     }
 
     $sites = $this->getSiteStats();
     ?>
     <div class="wrap">
-      <h1><?php esc_html_e('Nimbus — Network Overview', 'nimbus'); ?></h1>
+      <h1><?php esc_html_e('Nimbus — Network Overview', 'nimbus-media-offload'); ?></h1>
 
-      <h2><?php esc_html_e('Per-site offload statistics', 'nimbus'); ?></h2>
+      <h2><?php esc_html_e('Per-site offload statistics', 'nimbus-media-offload'); ?></h2>
       <?php if (empty($sites)) : ?>
-        <p><?php esc_html_e('No sites found in this network.', 'nimbus'); ?></p>
+        <p><?php esc_html_e('No sites found in this network.', 'nimbus-media-offload'); ?></p>
       <?php else : ?>
         <table class="widefat striped">
           <thead>
             <tr>
-              <th><?php esc_html_e('Site', 'nimbus'); ?></th>
-              <th><?php esc_html_e('Provider', 'nimbus'); ?></th>
-              <th><?php esc_html_e('Offloaded files', 'nimbus'); ?></th>
-              <th><?php esc_html_e('Pending', 'nimbus'); ?></th>
-              <th><?php esc_html_e('Settings', 'nimbus'); ?></th>
+              <th><?php esc_html_e('Site', 'nimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Provider', 'nimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Offloaded files', 'nimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Pending', 'nimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Settings', 'nimbus-media-offload'); ?></th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +72,7 @@ final class NetworkAdminPage
                 <td>
                   <strong><?php echo esc_html($site['name']); ?></strong>
                   <div class="row-actions">
-                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'nimbus'); ?></a></span>
+                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'nimbus-media-offload'); ?></a></span>
                   </div>
                 </td>
                 <td><?php echo esc_html($site['provider']); ?></td>
@@ -80,7 +80,7 @@ final class NetworkAdminPage
                 <td><?php echo esc_html((string) $site['pending_count']); ?></td>
                 <td>
                   <a href="<?php echo esc_url($site['settings_url']); ?>" target="_blank">
-                    <?php esc_html_e('Open', 'nimbus'); ?>
+                    <?php esc_html_e('Open', 'nimbus-media-offload'); ?>
                   </a>
                 </td>
               </tr>

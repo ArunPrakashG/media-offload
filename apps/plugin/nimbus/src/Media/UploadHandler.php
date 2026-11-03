@@ -919,7 +919,7 @@ final class UploadHandler
   public function get_attachment_status(int $attachment_id): array
   {
     if ($attachment_id <= 0 || get_post_type($attachment_id) !== 'attachment') {
-      return ['status' => 'unknown', 'label' => __('Unknown', 'nimbus'), 'reason' => __('Attachment could not be found.', 'nimbus')];
+      return ['status' => 'unknown', 'label' => __('Unknown', 'nimbus-media-offload'), 'reason' => __('Attachment could not be found.', 'nimbus-media-offload')];
     }
 
     $offloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
@@ -928,26 +928,26 @@ final class UploadHandler
     $missingSourceAt = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
 
     if ($this->is_ignored_attachment($attachment_id)) {
-      return ['status' => 'ignored', 'label' => __('Ignored', 'nimbus'), 'reason' => __('This attachment is marked to stay local-only.', 'nimbus')];
+      return ['status' => 'ignored', 'label' => __('Ignored', 'nimbus-media-offload'), 'reason' => __('This attachment is marked to stay local-only.', 'nimbus-media-offload')];
     }
 
     if (!empty($offloadMeta['key'])) {
-      return ['status' => 'offloaded', 'label' => __('Offloaded', 'nimbus'), 'reason' => __('Remote object metadata is present for this attachment.', 'nimbus')];
+      return ['status' => 'offloaded', 'label' => __('Offloaded', 'nimbus-media-offload'), 'reason' => __('Remote object metadata is present for this attachment.', 'nimbus-media-offload')];
     }
 
     if ($pendingAt > 0 && $claimedBy !== '') {
-      return ['status' => 'processing', 'label' => __('Processing', 'nimbus'), 'reason' => __('This attachment is currently claimed by a background worker.', 'nimbus')];
+      return ['status' => 'processing', 'label' => __('Processing', 'nimbus-media-offload'), 'reason' => __('This attachment is currently claimed by a background worker.', 'nimbus-media-offload')];
     }
 
     if ($pendingAt > 0) {
-      return ['status' => 'pending', 'label' => __('Pending', 'nimbus'), 'reason' => __('This attachment is queued for a future offload.', 'nimbus')];
+      return ['status' => 'pending', 'label' => __('Pending', 'nimbus-media-offload'), 'reason' => __('This attachment is queued for a future offload.', 'nimbus-media-offload')];
     }
 
     if ($missingSourceAt > 0) {
-      return ['status' => 'failed', 'label' => __('Needs attention', 'nimbus'), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', 'nimbus')];
+      return ['status' => 'failed', 'label' => __('Needs attention', 'nimbus-media-offload'), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', 'nimbus-media-offload')];
     }
 
-    return ['status' => 'local', 'label' => __('Local only', 'nimbus'), 'reason' => __('This attachment is still being served from local storage.', 'nimbus')];
+    return ['status' => 'local', 'label' => __('Local only', 'nimbus-media-offload'), 'reason' => __('This attachment is still being served from local storage.', 'nimbus-media-offload')];
   }
 
   private function dispatch_nightly_workers(string $run_token, int $worker_count, int $hours, int $limit): void

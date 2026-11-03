@@ -37,7 +37,7 @@ final class CloudflareR2Connector
   {
     $this->token = trim((string) ($input['token'] ?? ''));
     if ($this->token === '') {
-      throw new QuickConnectException(esc_html__('Paste the Cloudflare API token first.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Paste the Cloudflare API token first.', 'nimbus-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -46,11 +46,11 @@ final class CloudflareR2Connector
 
     $account = $this->pickAccount($accounts, (string) ($input['account_id'] ?? ''), $result);
     if ($account === null) {
-      $result->step(__('Token verified', 'nimbus'));
+      $result->step(__('Token verified', 'nimbus-media-offload'));
       return $result;
     }
 
-    $result->step(__('Token verified', 'nimbus'), $account['name']);
+    $result->step(__('Token verified', 'nimbus-media-offload'), $account['name']);
     $accountId = $account['id'];
 
     $existing = $this->bucketNames($accountId);
@@ -62,11 +62,11 @@ final class CloudflareR2Connector
     }
 
     if (in_array($bucket, $existing, true)) {
-      $result->step(__('Using bucket', 'nimbus'), $bucket);
+      $result->step(__('Using bucket', 'nimbus-media-offload'), $bucket);
     } else {
-      $this->call('POST', "/accounts/{$accountId}/r2/buckets", ['name' => $bucket], __('Could not create the bucket', 'nimbus'));
+      $this->call('POST', "/accounts/{$accountId}/r2/buckets", ['name' => $bucket], __('Could not create the bucket', 'nimbus-media-offload'));
       $result->buckets[] = $bucket;
-      $result->step(__('Bucket created', 'nimbus'), $bucket);
+      $result->step(__('Bucket created', 'nimbus-media-offload'), $bucket);
     }
 
     $this->setCors($accountId, $bucket);
@@ -95,11 +95,11 @@ final class CloudflareR2Connector
   {
     $response = $this->request('GET', '/accounts?per_page=50');
     if (in_array($response['status'], [400, 401, 403], true)) {
-      throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus-media-offload'));
     }
 
     if ($response['status'] !== 200 || empty($response['body']['success'])) {
-      throw new QuickConnectException(esc_html(__('Could not reach Cloudflare', 'nimbus') . ': ' . $this->apiError($response['body'])));
+      throw new QuickConnectException(esc_html(__('Could not reach Cloudflare', 'nimbus-media-offload') . ': ' . $this->apiError($response['body'])));
     }
 
     $accounts = [];
@@ -111,7 +111,7 @@ final class CloudflareR2Connector
     }
 
     if ($accounts === []) {
-      throw new QuickConnectException(esc_html__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'nimbus-media-offload'));
     }
 
     return $accounts;
@@ -135,13 +135,13 @@ final class CloudflareR2Connector
       $id = (string) ($response['body']['result']['id'] ?? '');
       if ($response['status'] === 200 && $id !== '') {
         if (($response['body']['result']['status'] ?? 'active') !== 'active') {
-          throw new QuickConnectException(esc_html__('This token is disabled or expired in Cloudflare.', 'nimbus'));
+          throw new QuickConnectException(esc_html__('This token is disabled or expired in Cloudflare.', 'nimbus-media-offload'));
         }
         return $id;
       }
     }
 
-    throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus'));
+    throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'nimbus-media-offload'));
   }
 
   /**
@@ -171,11 +171,11 @@ final class CloudflareR2Connector
     }
 
     if ($usable === []) {
-      throw new QuickConnectException(esc_html__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'nimbus-media-offload'));
     }
 
     $result->accounts = $usable;
-    $result->note = __('This token can reach more than one Cloudflare account. Pick the one for your media.', 'nimbus');
+    $result->note = __('This token can reach more than one Cloudflare account. Pick the one for your media.', 'nimbus-media-offload');
 
     return null;
   }
@@ -185,7 +185,7 @@ final class CloudflareR2Connector
    */
   private function bucketNames(string $accountId): array
   {
-    $body = $this->call('GET', "/accounts/{$accountId}/r2/buckets?per_page=1000", null, __('Could not list R2 buckets', 'nimbus'));
+    $body = $this->call('GET', "/accounts/{$accountId}/r2/buckets?per_page=1000", null, __('Could not list R2 buckets', 'nimbus-media-offload'));
     $names = [];
 
     foreach ((array) ($body['result']['buckets'] ?? []) as $bucket) {
@@ -224,7 +224,7 @@ final class CloudflareR2Connector
     $custom = $this->request('GET', "/accounts/{$accountId}/r2/buckets/{$bucket}/domains/custom");
     foreach ((array) ($custom['body']['result']['domains'] ?? []) as $domain) {
       if (!empty($domain['enabled']) && !empty($domain['domain'])) {
-        $result->step(__('Public URL', 'nimbus'), (string) $domain['domain']);
+        $result->step(__('Public URL', 'nimbus-media-offload'), (string) $domain['domain']);
         return 'https://' . $domain['domain'];
       }
     }
@@ -233,13 +233,13 @@ final class CloudflareR2Connector
     $domain = (string) ($managed['body']['result']['domain'] ?? '');
 
     if ($managed['status'] === 200 && $domain !== '') {
-      $result->step(__('Public URL on', 'nimbus'), $domain);
-      $result->note = __('r2.dev links are rate limited by Cloudflare. Before going live, connect a custom domain to this bucket in Cloudflare and enter it on the next step.', 'nimbus');
+      $result->step(__('Public URL on', 'nimbus-media-offload'), $domain);
+      $result->note = __('r2.dev links are rate limited by Cloudflare. Before going live, connect a custom domain to this bucket in Cloudflare and enter it on the next step.', 'nimbus-media-offload');
       return 'https://' . $domain;
     }
 
     $result->public = false;
-    $result->note = __('Nimbus could not turn on public access for this bucket. Add a custom domain to it in Cloudflare, then enter it on the next step.', 'nimbus');
+    $result->note = __('Nimbus could not turn on public access for this bucket. Add a custom domain to it in Cloudflare, then enter it on the next step.', 'nimbus-media-offload');
     $this->quickConnect->logger()->warning('R2 quick connect could not enable the r2.dev URL on {bucket}: {error}', [
       'bucket' => $bucket,
       'error' => $this->apiError($managed['body']),
@@ -274,6 +274,6 @@ final class CloudflareR2Connector
   {
     $error = $body['errors'][0]['message'] ?? '';
 
-    return $error !== '' ? (string) $error : __('unexpected response from Cloudflare', 'nimbus');
+    return $error !== '' ? (string) $error : __('unexpected response from Cloudflare', 'nimbus-media-offload');
   }
 }

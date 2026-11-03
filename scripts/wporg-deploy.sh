@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish dist/nimbus-<version>.zip to the WordPress.org plugin SVN repository.
+# Publish dist/nimbus-media-offload-<version>.zip to the WordPress.org plugin SVN repository.
 #
 # Run `bash scripts/release-plugin.sh` first. This checks out the plugin's SVN
 # repo, replaces trunk with the zip contents, copies trunk to tags/<version>
@@ -7,14 +7,15 @@
 # changes and asks before committing; svn prompts for your WordPress.org
 # username and SVN password. Needs svn and unzip.
 #
-# Env: WPORG_SVN_URL overrides the repo URL (default: the nimbus plugin).
+# Env: WPORG_SVN_URL overrides the repo URL (default: the nimbus-media-offload plugin).
 set -euo pipefail
 
 root="$(git rev-parse --show-toplevel)"
 plugin="$root/apps/plugin/nimbus"
 version="$(sed -n "s/^define('NIMBUS_VERSION', '\([^']*\)');/\1/p" "$plugin/nimbus.php")"
-zip_path="$root/dist/nimbus-$version.zip"
-svn_url="${WPORG_SVN_URL:-https://plugins.svn.wordpress.org/nimbus}"
+slug="nimbus-media-offload"
+zip_path="$root/dist/$slug-$version.zip"
+svn_url="${WPORG_SVN_URL:-https://plugins.svn.wordpress.org/$slug}"
 
 [ -f "$zip_path" ] || { echo "Missing $zip_path. Run scripts/release-plugin.sh first." >&2; exit 1; }
 stable="$(sed -n 's/^Stable tag: *//p' "$plugin/readme.txt" | tr -d '\r')"
@@ -31,7 +32,7 @@ if [ -e "$work/svn/tags/$version" ] || svn ls "$svn_url/tags/$version" >/dev/nul
 fi
 
 unzip -q "$zip_path" -d "$work/zip"
-rsync -a --delete --exclude .svn "$work/zip/nimbus/" "$work/svn/trunk/"
+rsync -a --delete --exclude .svn "$work/zip/$slug/" "$work/svn/trunk/"
 rsync -a --delete --exclude .svn "$plugin/.wordpress-org/" "$work/svn/assets/"
 
 cd "$work/svn"
