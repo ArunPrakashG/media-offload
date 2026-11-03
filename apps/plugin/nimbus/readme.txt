@@ -4,7 +4,7 @@ Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -81,6 +81,12 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Changelog ==
 
+= 0.3.0 =
+* Relicensed under the MIT License.
+* New Nimbus brand across the admin: header with connection status, a reworked overview and a guided setup wizard.
+* The setup wizard can test a connection with the values on screen before you save them.
+* Fonts and provider logos are bundled with the plugin, so the admin makes no external requests.
+
 = 0.2.0 =
 * Nimbus is now 100% free and open source — the Nimbus Pro add-on has been merged into this plugin and all licensing has been removed.
 * Bulk migration, cache purging (Cloudflare, LiteSpeed, WP Fastest Cache, proxy caches), WP-CLI, page-builder/gallery database URL rewriting, WooCommerce protected downloads, multisite network admin, selective offload rules, and nightly batch offload are now available to everyone at no cost.
@@ -105,6 +111,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+New admin design and an MIT license. Your settings and offloaded files are unchanged.
 
 = 0.2.0 =
 Nimbus is now fully free — no license key needed. All former Pro features are unlocked automatically after updating.
