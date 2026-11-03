@@ -4,7 +4,7 @@ Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -81,7 +81,7 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Changelog ==
 
-= Unreleased =
+= 0.3.1 =
 * Storage credentials are encrypted in the database, using your site's security keys or a NIMBUS_ENCRYPTION_KEY constant.
 * The deactivation notice points to the restore job and wp nimbus revert.
 
@@ -115,6 +115,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.1 =
+Your storage keys are now encrypted in the database. Nothing to do: Nimbus encrypts them the next time you open the admin.
 
 = 0.3.0 =
 New admin design and an MIT license. Your settings and offloaded files are unchanged.
