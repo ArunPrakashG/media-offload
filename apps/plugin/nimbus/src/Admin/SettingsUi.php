@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 final class SettingsUi
 {
   private const RESTORE_DOCS_URL = 'https://usenimbus.dev/docs/guides/restoring-files/';
+  private const DONATE_URL = 'https://buymeacoffee.com/arunprakashg';
 
   private ProviderCatalog $providerCatalog;
   private FieldRenderer $fieldRenderer;
@@ -47,7 +48,8 @@ final class SettingsUi
     add_action('admin_init', [$this, 'handle_onboarding_redirect'], 5);
     add_action('admin_notices', [$this, 'render_admin_notices']);
     add_action('admin_notices', [$this, 'render_deactivation_hint']);
-    add_filter('plugin_action_links_nimbus/nimbus.php', [$this, 'add_plugin_action_links']);
+    add_filter('plugin_action_links_' . plugin_basename(NIMBUS_FILE), [$this, 'add_plugin_action_links']);
+    add_filter('plugin_row_meta', [$this, 'add_plugin_row_meta'], 10, 2);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
@@ -303,6 +305,24 @@ final class SettingsUi
    * @param array<string> $links Existing action links.
    * @return array<string>
    */
+  /**
+   * Adds Docs and Donate links under the plugin description on the Plugins screen.
+   *
+   * @param array<string> $links Existing row meta links.
+   * @return array<string>
+   */
+  public function add_plugin_row_meta(array $links, string $file): array
+  {
+    if ($file !== plugin_basename(NIMBUS_FILE)) {
+      return $links;
+    }
+
+    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'nimbus') . '</a>';
+    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'nimbus') . '</a>';
+
+    return $links;
+  }
+
   public function add_plugin_action_links(array $links): array
   {
     $settingsUrl = add_query_arg(['page' => NIMBUS_SLUG], admin_url('upload.php'));

@@ -37,6 +37,7 @@ final class Statistics
       'free_storage_gb' => 10.0,
       'free_egress_gb'  => 999999.0, // Unlimited egress
       'notes'           => 'Zero egress fees. Free/mo: 10 GB storage, 1 M Class A ops, 10 M Class B ops.',
+      // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- A link to Cloudflare's pricing page, not a loaded asset.
       'pricing_url'     => 'https://developers.cloudflare.com/r2/pricing/',
     ],
     'digitalocean_spaces' => [

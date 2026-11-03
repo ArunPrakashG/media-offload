@@ -1,8 +1,9 @@
 === Nimbus ===
 Contributors: arunprakashg
+Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.3.1
 License: MIT
@@ -74,10 +75,10 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Screenshots ==
 
-1. Nimbus settings dashboard.
-2. Provider connection settings.
-3. Bulk offload job status.
-4. Per-attachment offload controls in the Media Library.
+1. Overview: offload totals, setup health and a storage cost comparison.
+2. Storage connection settings for the selected provider.
+3. Bulk jobs to offload the existing library, restore local copies or retry failures.
+4. Offload status for each file in the Media Library.
 
 == Changelog ==
 
