@@ -1,19 +1,21 @@
 ---
 title: "Changelog"
 description: "Release notes for every version of Nimbus, the free WordPress media offload plugin, listed from newest to oldest with added, changed, removed and fixed items."
-updated: 2026-07-28
+updated: 2026-11-03
 ---
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
-## Unreleased
+## 0.3.0 · November 2026
 
-Licensing and design changes that have not shipped in a plugin release yet.
+A new look for the plugin admin and a more permissive license. Settings and offloaded files carry over unchanged.
 
 ### Changed
 
 - Relicensed under the MIT License.
-- New brand and admin design.
+- New Nimbus brand across the admin: a header with connection status, a reworked overview and a guided setup wizard.
+- The setup wizard tests a connection with the values on screen before you save them.
+- Fonts and provider logos ship with the plugin, so the admin makes no external requests.
 
 ## 0.2.0 · July 2026
 
