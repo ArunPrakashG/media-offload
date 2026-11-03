@@ -10,7 +10,7 @@ export const SITE = {
   releases: 'https://github.com/ArunPrakashG/media-offload/releases',
   contributing: 'https://github.com/ArunPrakashG/media-offload/blob/main/CONTRIBUTING.md',
   author: { name: 'Arun Prakash', url: 'https://arunprakashg.com', email: 'hello@usenimbus.dev' },
-  version: '0.3.1',
+  version: '0.3.2',
 } as const;
 
 export const NAV = [

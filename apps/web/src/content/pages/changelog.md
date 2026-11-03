@@ -6,11 +6,18 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
-## Unreleased
+## 0.3.2 · November 2026
+
+Set up storage by pasting one token or key. Nimbus creates the bucket and fills in the settings for you.
 
 ### Added
 
 - Quick connect in the setup wizard. Paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test. Works with every provider; Backblaze B2, Wasabi and DigitalOcean Spaces also get a new key limited to the media bucket.
+- Docs and donate links next to Nimbus on the Plugins screen.
+
+### Changed
+
+- Tested with WordPress 7.1.
 
 ## 0.3.1 · November 2026
 
