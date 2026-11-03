@@ -19,23 +19,23 @@ final class LocalProviderProfile extends AbstractProviderProfile implements Prov
 
   public function label(): string
   {
-    return __('Local (debug only)', 'nimbus');
+    return __('Local (debug only)', 'nimbus-media-offload');
   }
 
   public function title(): string
   {
-    return __('Local / Debug Mode', 'nimbus');
+    return __('Local / Debug Mode', 'nimbus-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Use local mode only for debugging or dry runs. Remote credentials and delivery features are not required.', 'nimbus');
+    return __('Use local mode only for debugging or dry runs. Remote credentials and delivery features are not required.', 'nimbus-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'provider' => __('Provider', 'nimbus'),
+      'provider' => __('Provider', 'nimbus-media-offload'),
     ];
   }
 

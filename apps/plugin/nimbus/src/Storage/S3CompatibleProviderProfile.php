@@ -19,38 +19,38 @@ final class S3CompatibleProviderProfile extends AbstractProviderProfile implemen
 
   public function label(): string
   {
-    return __('S3-compatible', 'nimbus');
+    return __('S3-compatible', 'nimbus-media-offload');
   }
 
   public function title(): string
   {
-    return __('S3-compatible storage', 'nimbus');
+    return __('S3-compatible storage', 'nimbus-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'nimbus');
+    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'nimbus-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', 'nimbus'),
-      'region' => __('Region', 'nimbus'),
-      'endpoint' => __('Custom Endpoint', 'nimbus'),
-      'access_key' => __('Access Key', 'nimbus'),
-      'secret_key' => __('Secret Key', 'nimbus'),
+      'bucket' => __('Bucket', 'nimbus-media-offload'),
+      'region' => __('Region', 'nimbus-media-offload'),
+      'endpoint' => __('Custom Endpoint', 'nimbus-media-offload'),
+      'access_key' => __('Access Key', 'nimbus-media-offload'),
+      'secret_key' => __('Secret Key', 'nimbus-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'nimbus'),
-      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'nimbus'),
-      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'nimbus'),
-      'secret_key'    => __('Secret Access Key paired with the access key above.', 'nimbus'),
-      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'nimbus'),
+      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'nimbus-media-offload'),
+      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'nimbus-media-offload'),
+      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'nimbus-media-offload'),
+      'secret_key'    => __('Secret Access Key paired with the access key above.', 'nimbus-media-offload'),
+      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'nimbus-media-offload'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

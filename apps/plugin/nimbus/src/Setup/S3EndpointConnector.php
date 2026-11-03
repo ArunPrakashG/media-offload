@@ -23,7 +23,7 @@ final class S3EndpointConnector
     $region = sanitize_text_field((string) ($input['region'] ?? ''));
 
     if ($endpoint === '' || $key === '' || $secret === '') {
-      throw new QuickConnectException(esc_html__('Enter the endpoint, access key and secret key.', 'nimbus'));
+      throw new QuickConnectException(esc_html__('Enter the endpoint, access key and secret key.', 'nimbus-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -56,7 +56,7 @@ final class S3EndpointConnector
     ];
 
     if ($this->provider === 'minio') {
-      $result->note = __('Nimbus is using the keys you entered. To give it a key limited to this bucket, run: mc admin user svcacct add ALIAS USER', 'nimbus');
+      $result->note = __('Nimbus is using the keys you entered. To give it a key limited to this bucket, run: mc admin user svcacct add ALIAS USER', 'nimbus-media-offload');
     }
 
     return $result;

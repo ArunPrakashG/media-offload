@@ -6,6 +6,15 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
+## 0.3.3 · November 2026
+
+Nimbus is now called Nimbus Media Offload in WordPress, ready for the WordPress.org plugin directory.
+
+### Changed
+
+- The plugin name is **Nimbus Media Offload**, and the plugin folder and text domain are `nimbus-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
+- Installed from GitHub? Follow [Upgrading from 0.3.2 or earlier](/docs/#upgrading-from-032-or-earlier) so the old copy's uninstall cleanup does not remove your settings.
+
 ## 0.3.2 · November 2026
 
 Set up storage by pasting one token or key. Nimbus creates the bucket and fills in the settings for you.

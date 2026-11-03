@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name: Nimbus
+ * Plugin Name: Nimbus Media Offload
  * Plugin URI: https://usenimbus.dev
  * Description: Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.
- * Version: 0.3.2
+ * Version: 0.3.3
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author: Arun Prakash
  * Author URI: https://arunprakashg.com
- * Text Domain: nimbus
+ * Text Domain: nimbus-media-offload
  * License: MIT
  * License URI: https://opensource.org/license/mit
  */
@@ -17,11 +17,39 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-define('NIMBUS_VERSION', '0.3.2');
+// Copies installed before the rename live in another folder (usually plugins/nimbus)
+// and share these constants, settings and hooks. Stay idle while one is active.
+$nimbus_active_plugins = (array) get_option('active_plugins', []);
+if (is_multisite()) {
+  $nimbus_active_plugins = array_merge($nimbus_active_plugins, array_keys((array) get_site_option('active_sitewide_plugins', [])));
+}
+foreach ($nimbus_active_plugins as $nimbus_active_plugin) {
+  if (!is_string($nimbus_active_plugin) || basename($nimbus_active_plugin) !== 'nimbus.php' || $nimbus_active_plugin === plugin_basename(__FILE__)) {
+    continue;
+  }
+  $nimbus_other_copy = get_file_data(WP_PLUGIN_DIR . '/' . $nimbus_active_plugin, ['uri' => 'Plugin URI']);
+  if (defined('NIMBUS_FILE') || $nimbus_other_copy['uri'] === 'https://usenimbus.dev') {
+    $nimbus_waiting_notice = static function (): void {
+      if (!current_user_can('activate_plugins')) {
+        return;
+      }
+      printf(
+        '<div class="notice notice-warning"><p>%s</p></div>',
+        esc_html__('Nimbus Media Offload is waiting for the older Nimbus plugin. Deactivate Nimbus on the Plugins screen and this copy takes over with the same settings. Then remove the old nimbus folder over SFTP: its Delete button would also erase the settings both copies share.', 'nimbus-media-offload')
+      );
+    };
+    add_action('admin_notices', $nimbus_waiting_notice);
+    add_action('network_admin_notices', $nimbus_waiting_notice);
+    return;
+  }
+}
+unset($nimbus_active_plugins, $nimbus_active_plugin);
+
+define('NIMBUS_VERSION', '0.3.3');
 define('NIMBUS_FILE', __FILE__);
 define('NIMBUS_PATH', plugin_dir_path(__FILE__));
 define('NIMBUS_URL', plugin_dir_url(__FILE__));
-define('NIMBUS_TEXT_DOMAIN', 'nimbus');
+define('NIMBUS_TEXT_DOMAIN', 'nimbus-media-offload');
 define('NIMBUS_SLUG', 'nimbus');
 define('NIMBUS_SETTINGS_GROUP', 'nimbus');
 define('NIMBUS_SCRIPT_HANDLE', 'nimbus-admin');

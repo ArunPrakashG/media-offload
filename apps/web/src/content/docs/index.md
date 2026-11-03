@@ -25,6 +25,16 @@ Nimbus is not listed in the WordPress.org directory. You install it from a ZIP f
 
 After activation you land in the setup wizard at **Media → Nimbus**. Nimbus is open source under the MIT license.
 
+### Upgrading from 0.3.2 or earlier
+
+From 0.3.3 the plugin is called **Nimbus Media Offload** and lives in a `nimbus-media-offload` folder instead of `nimbus`, to match its WordPress.org name. Uploading the new ZIP installs it next to the old copy. Both copies share the same settings and offloaded files, so:
+
+1. Deactivate the old **Nimbus** plugin.
+2. Activate **Nimbus Media Offload**.
+3. Remove the old `wp-content/plugins/nimbus` folder over SFTP or SSH.
+
+Do not use **Delete** on the old copy in the Plugins screen. That runs its uninstall cleanup, which removes the settings and offload records the new copy uses.
+
 ## What happens on first launch
 
 Until you finish the wizard, the Nimbus page shows the **Set up Nimbus** wizard instead of the dashboard. The [setup wizard](/docs/setup-wizard/) has three steps: Storage, Delivery and Review.

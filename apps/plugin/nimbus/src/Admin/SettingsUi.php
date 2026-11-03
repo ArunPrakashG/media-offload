@@ -87,33 +87,33 @@ final class SettingsUi
       'actions' => ['testConnection' => NIMBUS_AJAX_TEST_CONNECTION],
       'restNamespace' => NIMBUS_REST_NAMESPACE,
       'strings' => [
-        'showAdvanced' => __('Show advanced connection fields', 'nimbus'),
-        'hideAdvanced' => __('Hide advanced connection fields', 'nimbus'),
-        'noExtraCredentials' => __('No extra credentials required', 'nimbus'),
-        'providerNoBucket' => __('No bucket required in local mode', 'nimbus'),
-        'providerBucketNotSet' => __('Bucket not set', 'nimbus'),
-        'deliveryLocalDebug' => __('Local debug', 'nimbus'),
-        'deliveryRemote' => __('Remote', 'nimbus'),
-        'deliveryLocal' => __('Local', 'nimbus'),
-        'deliveryNoCustomDomain' => __('No custom domain configured', 'nimbus'),
+        'showAdvanced' => __('Show advanced connection fields', 'nimbus-media-offload'),
+        'hideAdvanced' => __('Hide advanced connection fields', 'nimbus-media-offload'),
+        'noExtraCredentials' => __('No extra credentials required', 'nimbus-media-offload'),
+        'providerNoBucket' => __('No bucket required in local mode', 'nimbus-media-offload'),
+        'providerBucketNotSet' => __('Bucket not set', 'nimbus-media-offload'),
+        'deliveryLocalDebug' => __('Local debug', 'nimbus-media-offload'),
+        'deliveryRemote' => __('Remote', 'nimbus-media-offload'),
+        'deliveryLocal' => __('Local', 'nimbus-media-offload'),
+        'deliveryNoCustomDomain' => __('No custom domain configured', 'nimbus-media-offload'),
         /* translators: this string is used as a client-side JS template; 1: allowed-pattern count, 2: ignored-pattern count */
-        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', 'nimbus'),
-        'batchOn' => __('On', 'nimbus'),
-        'batchOff' => __('Off', 'nimbus'),
-        'batchNoSchedule' => __('No schedule set', 'nimbus'),
-        'shellLocalDebugMode' => __('Local debug mode', 'nimbus'),
-        'shellServingStorage' => __('Serving from storage', 'nimbus'),
-        'shellServingLocal' => __('Serving from local URLs', 'nimbus'),
-        'testing' => __('Testing…', 'nimbus'),
-        'testingMessage' => __('Testing connection…', 'nimbus'),
-        'testConnection' => __('Test Connection', 'nimbus'),
-        'serverError' => __('Server error occurred.', 'nimbus'),
-        'detailsHeading' => __('Connection details', 'nimbus'),
-        'hintsHeading' => __('Suggested checks', 'nimbus'),
-        'jobStartError' => __('Unable to start the requested bulk job.', 'nimbus'),
-        'jobPauseError' => __('Unable to pause the current bulk job.', 'nimbus'),
-        'jobResumeError' => __('Unable to resume the current bulk job.', 'nimbus'),
-        'jobRetryError' => __('Unable to retry failed items right now.', 'nimbus'),
+        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', 'nimbus-media-offload'),
+        'batchOn' => __('On', 'nimbus-media-offload'),
+        'batchOff' => __('Off', 'nimbus-media-offload'),
+        'batchNoSchedule' => __('No schedule set', 'nimbus-media-offload'),
+        'shellLocalDebugMode' => __('Local debug mode', 'nimbus-media-offload'),
+        'shellServingStorage' => __('Serving from storage', 'nimbus-media-offload'),
+        'shellServingLocal' => __('Serving from local URLs', 'nimbus-media-offload'),
+        'testing' => __('Testing…', 'nimbus-media-offload'),
+        'testingMessage' => __('Testing connection…', 'nimbus-media-offload'),
+        'testConnection' => __('Test Connection', 'nimbus-media-offload'),
+        'serverError' => __('Server error occurred.', 'nimbus-media-offload'),
+        'detailsHeading' => __('Connection details', 'nimbus-media-offload'),
+        'hintsHeading' => __('Suggested checks', 'nimbus-media-offload'),
+        'jobStartError' => __('Unable to start the requested bulk job.', 'nimbus-media-offload'),
+        'jobPauseError' => __('Unable to pause the current bulk job.', 'nimbus-media-offload'),
+        'jobResumeError' => __('Unable to resume the current bulk job.', 'nimbus-media-offload'),
+        'jobRetryError' => __('Unable to retry failed items right now.', 'nimbus-media-offload'),
       ],
       'providers' => $this->providerCatalog->scriptData(),
       'assetRoots' => $this->statistics->get_attachment_roots(),
@@ -150,8 +150,8 @@ final class SettingsUi
     $glyph = '<svg class="nmb-menu-glyph" viewBox="6 6 20 20" width="13" height="13" aria-hidden="true" style="vertical-align:-1px;margin-right:6px"><g fill="currentColor" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"/><circle cx="18.5" cy="13" r="6.5"/><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"/></g></svg>';
 
     $hook = add_media_page(
-      __('Nimbus', 'nimbus'),
-      $glyph . esc_html__('Nimbus', 'nimbus'),
+      __('Nimbus', 'nimbus-media-offload'),
+      $glyph . esc_html__('Nimbus', 'nimbus-media-offload'),
       'manage_options',
       NIMBUS_SLUG,
       [$this, 'render_page']
@@ -232,12 +232,12 @@ final class SettingsUi
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       printf(
         '<div class="notice notice-warning"><p><strong>%s</strong> %s</p></div>',
-        esc_html__('Nimbus – URL integrity check recommended', 'nimbus'),
+        esc_html__('Nimbus – URL integrity check recommended', 'nimbus-media-offload'),
         sprintf(
           /* translators: %1$s: file count, %2$s: Tools link */
-          esc_html__('Nimbus was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', 'nimbus'),
+          esc_html__('Nimbus was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', 'nimbus-media-offload'),
           '<strong>' . esc_html(number_format_i18n($reactivationCount)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus') . '</a>'
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus-media-offload') . '</a>'
         )
       );
     }
@@ -290,15 +290,15 @@ final class SettingsUi
     ?>
     <div class="notice notice-warning nimbus-deactivation-hint">
       <p>
-        <strong><?php esc_html_e('Nimbus – Before you deactivate', 'nimbus'); ?></strong><br>
+        <strong><?php esc_html_e('Nimbus – Before you deactivate', 'nimbus-media-offload'); ?></strong><br>
         <?php
         printf(
           /* translators: %1$s: offloaded file count, %2$s: Tools link, %3$s: WP-CLI command, %4$s: docs link */
-          esc_html__('%1$s media file(s) are offloaded to your bucket. Deactivating Nimbus without restoring them can break images across the site. First run Restore local copies from %2$s, then run %3$s to put post content back on local URLs. See %4$s.', 'nimbus'),
+          esc_html__('%1$s media file(s) are offloaded to your bucket. Deactivating Nimbus without restoring them can break images across the site. First run Restore local copies from %2$s, then run %3$s to put post content back on local URLs. See %4$s.', 'nimbus-media-offload'),
           '<strong>' . esc_html(number_format_i18n($offloaded)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus') . '</a>',
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus-media-offload') . '</a>',
           '<code>wp nimbus revert</code>',
-          '<a href="' . esc_url(self::RESTORE_DOCS_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Restoring files', 'nimbus') . '</a>'
+          '<a href="' . esc_url(self::RESTORE_DOCS_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Restoring files', 'nimbus-media-offload') . '</a>'
         );
         ?>
       </p>
@@ -325,8 +325,8 @@ final class SettingsUi
       return $links;
     }
 
-    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'nimbus') . '</a>';
-    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'nimbus') . '</a>';
+    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'nimbus-media-offload') . '</a>';
+    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'nimbus-media-offload') . '</a>';
 
     return $links;
   }
@@ -334,7 +334,7 @@ final class SettingsUi
   public function add_plugin_action_links(array $links): array
   {
     $settingsUrl = add_query_arg(['page' => NIMBUS_SLUG], admin_url('upload.php'));
-    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', 'nimbus') . '</a>');
+    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', 'nimbus-media-offload') . '</a>');
 
     $offloaded = (int) get_transient('nimbus_offloaded_count_cache');
     if ($offloaded === 0) {
@@ -352,7 +352,7 @@ final class SettingsUi
     if ($offloaded > 0) {
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       $links[] = '<a href="' . esc_url($toolsUrl) . '" style="color:#d63638;font-weight:600;">'
-        . esc_html__('⚠ Restore files before deactivating', 'nimbus')
+        . esc_html__('⚠ Restore files before deactivating', 'nimbus-media-offload')
         . '</a>';
     }
 

@@ -1,11 +1,11 @@
-=== Nimbus ===
+=== Nimbus Media Offload ===
 Contributors: arunprakashg
 Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -58,11 +58,10 @@ This plugin bundles the following third-party libraries:
 
 == Installation ==
 
-1. Upload the `nimbus` folder to `/wp-content/plugins/`.
-2. Activate the plugin through the **Plugins** screen in WordPress.
-3. Navigate to **Media → Nimbus** to complete the setup wizard.
-4. Enter your storage provider credentials (bucket, region, access key, secret key).
-5. Start offloading media using the **Offload** tab or let Nimbus handle new uploads automatically.
+1. In WordPress, go to **Plugins → Add New**, search for Nimbus Media Offload, then install and activate it. To install by hand, upload the `nimbus-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
+2. Go to **Media → Nimbus** to open the setup wizard.
+3. Connect your storage provider with quick connect, or enter the bucket, region and keys by hand.
+4. New uploads are offloaded automatically. To move the existing library, use **Offload existing library** on the **Tools** tab.
 
 == Frequently Asked Questions ==
 
@@ -90,6 +89,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 4. Offload status for each file in the Media Library.
 
 == Changelog ==
+
+= 0.3.3 =
+* Renamed to Nimbus Media Offload for the WordPress.org directory. The plugin folder and text domain are now nimbus-media-offload.
 
 = 0.3.2 =
 * Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
@@ -130,6 +132,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.3 =
+Renamed to Nimbus Media Offload. If you installed from GitHub, deactivate the old Nimbus, activate the new copy, then remove the old nimbus folder by SFTP rather than with Delete.
 
 = 0.3.2 =
 Adds quick connect to the setup wizard. Your settings and offloaded files are unchanged.
