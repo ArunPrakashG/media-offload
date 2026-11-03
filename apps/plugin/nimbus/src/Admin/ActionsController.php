@@ -43,7 +43,10 @@ final class ActionsController
     $factory = new StorageAdapterFactory($this->settings, $this->logger);
 
     try {
-      $adapter = $factory->getAdapter();
+      $overrides = $this->postedConnectionValues();
+      $adapter = $overrides === []
+        ? $factory->getAdapter()
+        : $factory->fromConfiguration($this->settings->adapterConfiguration($overrides));
       if (method_exists($adapter, 'testConnection')) {
         if ($adapter->testConnection()) {
           wp_send_json_success([
@@ -72,6 +75,38 @@ final class ActionsController
         'hints' => $this->connectionHints($exception),
       ]);
     }
+  }
+
+  /**
+   * Unsaved storage fields sent by the setup wizard. Empty when testing saved settings.
+   *
+   * @return array<string, string|bool>
+   */
+  private function postedConnectionValues(): array
+  {
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified at the top of handleTestConnection().
+    if (!isset($_POST['values']) || !is_array($_POST['values'])) {
+      return [];
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; each allowed key is sanitized below.
+    $posted = wp_unslash($_POST['values']);
+    $keys = ['provider', 'bucket', 'r2_account_id', 'region', 'access_key', 'secret_key', 'session_token', 'prefix', 'endpoint'];
+    $values = [];
+
+    foreach ($keys as $key) {
+      if (isset($posted[$key]) && is_scalar($posted[$key])) {
+        $values[$key] = $key === 'endpoint'
+          ? esc_url_raw(trim((string) $posted[$key]))
+          : sanitize_text_field((string) $posted[$key]);
+      }
+    }
+
+    if (isset($posted['use_path_style_endpoint'])) {
+      $values['use_path_style_endpoint'] = !empty($posted['use_path_style_endpoint']);
+    }
+
+    return $values;
   }
 
   public function handleClearLogs(): void

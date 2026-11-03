@@ -402,22 +402,30 @@ final class Settings
     return $this->matchesPathPatterns($relativePath, $allowedPatterns);
   }
 
-  public function adapterConfiguration(): array
+  /**
+   * Adapter configuration from saved settings. Values in $overrides win,
+   * which lets the setup wizard test a connection before anything is saved.
+   *
+   * @param array<string, mixed> $overrides
+   */
+  public function adapterConfiguration(array $overrides = []): array
   {
+    $value = fn(string $key, $default = null) => array_key_exists($key, $overrides) ? $overrides[$key] : $this->get($key, $default);
+
     $normalized = $this->normalizeProviderSettings([
-      'provider' => $this->provider(),
-      'bucket' => $this->get('bucket'),
-      'r2_account_id' => $this->get('r2_account_id'),
-      'region' => $this->get('region'),
-      'access_key' => $this->get('access_key'),
-      'secret_key' => $this->get('secret_key'),
-      'session_token' => $this->get('session_token'),
-      'prefix' => $this->get('prefix'),
-      'endpoint' => $this->get('endpoint'),
-      'use_path_style_endpoint' => $this->get('use_path_style_endpoint', false),
-      'storage_class' => $this->get('storage_class', 'STANDARD'),
-      'visibility' => $this->get('visibility', 'public-read'),
-      'custom_domain' => $this->get('custom_domain'),
+      'provider' => array_key_exists('provider', $overrides) ? (string) $overrides['provider'] : $this->provider(),
+      'bucket' => $value('bucket'),
+      'r2_account_id' => $value('r2_account_id'),
+      'region' => $value('region'),
+      'access_key' => $value('access_key'),
+      'secret_key' => $value('secret_key'),
+      'session_token' => $value('session_token'),
+      'prefix' => $value('prefix'),
+      'endpoint' => $value('endpoint'),
+      'use_path_style_endpoint' => $value('use_path_style_endpoint', false),
+      'storage_class' => $value('storage_class', 'STANDARD'),
+      'visibility' => $value('visibility', 'public-read'),
+      'custom_domain' => $value('custom_domain'),
     ]);
 
     return [

@@ -1522,190 +1522,6 @@ body.upload_page_media-offload #wpcontent {
    21. Onboarding wizard
    -------------------------------------------------------------------------- */
 
-.nimbus-settings--onboarding {
-  max-width: 1100px;
-}
-
-.nmb-onboarding-shell {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: var(--nmb-space-5);
-  margin-top: var(--nmb-space-4);
-  align-items: stretch;
-}
-
-/* ── Sidebar ─────────────────────────────────────────────────────────────── */
-
-.nmb-onboarding-sidebar {
-  position: sticky;
-  top: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--nmb-space-4);
-}
-
-/* Brand panel — gradient header */
-.nmb-onboarding-brand-panel {
-  background: linear-gradient(145deg, var(--nmb-accent) 0%, #6577f8 100%);
-  border-radius: var(--nmb-radius-lg);
-  padding: 28px 24px 24px;
-  text-align: center;
-  display: grid;
-  gap: var(--nmb-space-2);
-  justify-items: center;
-}
-
-.nmb-onboarding-brand-icon {
-  width: 52px;
-  height: 52px;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--nmb-space-1);
-  font-size: 26px;
-  color: #fff;
-}
-
-.nmb-onboarding-brand-name {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #fff;
-}
-
-.nmb-onboarding-brand-tagline {
-  margin: 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
-  line-height: 1.5;
-}
-
-/* Step navigator card — grows to fill remaining sidebar height */
-.nmb-onboarding-step-nav {
-  padding: var(--nmb-space-4);
-  flex: 1;
-}
-
-/* ── Step list ───────────────────────────────────────────────────────────── */
-
-.nmb-onboarding-step-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0;
-  position: relative;
-}
-
-/* Vertical connector line through the step index circles */
-.nmb-onboarding-step-list::before {
-  content: "";
-  position: absolute;
-  left: calc(
-    12px + 16px - 1px
-  ); /* item padding-left + half circle - half line-width */
-  top: 45px; /* below first circle center (12+1+16=29px + 16 = ~45px) */
-  bottom: 45px;
-  width: 2px;
-  background: var(--nmb-border);
-  z-index: 0;
-}
-
-.nmb-onboarding-step-item {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: var(--nmb-space-3);
-  align-items: start;
-  padding: var(--nmb-space-3) var(--nmb-space-3);
-  border-radius: var(--nmb-radius);
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  transition: background 0.1s;
-}
-
-.nmb-onboarding-step-item:hover {
-  background: var(--nmb-surface-alt);
-}
-
-.nmb-onboarding-step-item strong,
-.nmb-onboarding-step-item > div span {
-  display: block;
-}
-
-.nmb-onboarding-step-item span:last-child {
-  color: var(--nmb-text-2);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.nmb-onboarding-step-index {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--nmb-surface);
-  border: 2px solid var(--nmb-border);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--nmb-text-2);
-  flex-shrink: 0;
-  /* Optically align circle top with the title text baseline */
-  margin-top: 1px;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
-}
-
-/* Active step */
-.nmb-onboarding-step-item.is-active {
-  background: var(--nmb-accent-bg);
-}
-
-.nmb-onboarding-step-item.is-active strong {
-  color: var(--nmb-accent);
-}
-
-.nmb-onboarding-step-item.is-active .nmb-onboarding-step-index {
-  background: var(--nmb-accent);
-  border-color: var(--nmb-accent);
-  color: #fff;
-  box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.18);
-}
-
-/* Completed step — locked, not interactive */
-.nmb-onboarding-step-item.is-complete {
-  cursor: default;
-}
-
-.nmb-onboarding-step-item.is-complete:hover {
-  background: transparent;
-}
-
-.nmb-onboarding-step-item.is-complete .nmb-onboarding-step-index {
-  background: var(--nmb-ok);
-  border-color: var(--nmb-ok);
-  color: #fff;
-}
-
-.nmb-onboarding-step-item.is-complete strong {
-  color: var(--nmb-text-2);
-  font-weight: 400;
-}
-
-/* ── Main area ───────────────────────────────────────────────────────────── */
-
-.nmb-onboarding-main {
-  display: grid;
-  gap: var(--nmb-space-4);
-}
-
 .nmb-onboarding-step {
   display: grid;
   gap: var(--nmb-space-5);
@@ -1713,27 +1529,6 @@ body.upload_page_media-offload #wpcontent {
 
 .nmb-onboarding-step[hidden] {
   display: none;
-}
-
-.nmb-onboarding-step-header {
-  display: grid;
-  gap: var(--nmb-space-2);
-  padding-bottom: var(--nmb-space-4);
-  border-bottom: 1px solid var(--nmb-border);
-}
-
-.nmb-onboarding-step-header h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--nmb-text);
-}
-
-.nmb-onboarding-step-header p:last-child {
-  margin: 0;
-  color: var(--nmb-text-2);
-  line-height: 1.6;
 }
 
 /* ── Form fields ─────────────────────────────────────────────────────────── */
@@ -2390,12 +2185,10 @@ body.upload_page_media-offload #wpcontent {
   .nmb-stats-bar {
     grid-template-columns: repeat(2, 1fr);
   }
-  .nmb-settings-layout,
-  .nmb-onboarding-shell {
+  .nmb-settings-layout {
     grid-template-columns: 1fr;
   }
-  .nmb-settings-sidebar,
-  .nmb-onboarding-sidebar {
+  .nmb-settings-sidebar {
     position: static;
   }
   .nmb-grid-2,
@@ -2567,4 +2360,818 @@ body.upload_page_media-offload #wpcontent {
   flex: 1;
   min-width: 0;
   font-family: monospace;
+}
+
+/* ==========================================================================
+   Brand layer (design/mockups: AdminOverview, AdminSetup)
+   Ink is the interactive color. Volt marks the one action that moves media
+   to the cloud, and the selected provider.
+   ========================================================================== */
+
+.nimbus-settings {
+  max-width: 1216px;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nimbus-settings code,
+.nimbus-settings .nmb-brand__version {
+  font-family: var(--nmb-mono);
+}
+
+/* Header */
+.nmb-brand-header,
+.nmb-wizard-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+  margin: var(--nmb-space-5) 0 var(--nmb-space-5);
+}
+
+.nmb-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--nmb-space-3);
+}
+
+.nimbus-settings .nmb-brand h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--nmb-text);
+}
+
+.nmb-mark {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+
+.nmb-brand__version {
+  font-size: 12px;
+  color: var(--nmb-text-3);
+}
+
+.nimbus-settings .nmb-connection {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-pill);
+  background: var(--nmb-surface);
+  font-size: 14px;
+}
+
+.nmb-connection code {
+  padding: 0;
+  background: none;
+  font-size: 13px;
+}
+
+.nimbus-settings .wp-header-end {
+  margin: 0;
+  border: 0;
+}
+
+/* Status text: a glyph plus words, never color alone */
+.nmb-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.nmb-state--ok {
+  color: var(--nmb-ok);
+}
+
+.nmb-state--ok::before {
+  content: "";
+  width: 10px;
+  height: 6px;
+  margin-top: -3px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.nmb-state--warn {
+  color: var(--nmb-warn);
+}
+
+.nmb-state--error {
+  color: var(--nmb-error);
+}
+
+.nmb-state--warn::before,
+.nmb-state--error::before {
+  content: "!";
+  font-weight: 700;
+}
+
+/* Tabs: underline, ink active */
+.nimbus-settings .nav-tab-wrapper.nmb-shell-tabs {
+  margin-bottom: var(--nmb-space-5);
+  border-bottom-color: var(--nmb-border-strong);
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab,
+.nimbus-settings .nmb-shell-tabs .nav-tab:hover,
+.nimbus-settings .nmb-shell-tabs .nav-tab:focus {
+  margin: 0 0 -1px;
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--nmb-text-2);
+  font-size: 14px;
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab:hover {
+  color: var(--nmb-text);
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab:focus-visible {
+  outline: 2px solid var(--nmb-ink);
+  outline-offset: -2px;
+}
+
+.nimbus-settings .nmb-shell-tabs .nav-tab-active,
+.nimbus-settings .nmb-shell-tabs .nav-tab-active:hover,
+.nimbus-settings .nmb-shell-tabs .nav-tab-active:focus {
+  border-bottom: 2px solid var(--nmb-ink);
+  background: transparent;
+  color: var(--nmb-text);
+  font-weight: 600;
+}
+
+/* Cards */
+.nmb-card {
+  border-radius: var(--nmb-radius);
+  padding: var(--nmb-space-5);
+}
+
+.nimbus-settings .nmb-card h2 {
+  margin: 0 0 var(--nmb-space-1);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nmb-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.nmb-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--nmb-space-4);
+}
+
+.nimbus-settings .nmb-card-head p {
+  margin: 0;
+}
+
+/* Buttons: primary is the volt action */
+.nimbus-settings .button {
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.nimbus-settings .button.button-primary {
+  background: var(--nmb-volt);
+  border-color: var(--nmb-volt);
+  color: var(--nmb-ink);
+}
+
+.nimbus-settings .button.button-primary:hover,
+.nimbus-settings .button.button-primary:focus {
+  background: var(--nmb-volt-hover);
+  border-color: var(--nmb-volt-hover);
+  color: var(--nmb-ink);
+}
+
+.nimbus-settings .button:focus-visible,
+.nmb-provider-option:has(input:focus-visible),
+.nmb-stepper button:focus-visible {
+  outline: 2px solid var(--nmb-ink);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.nimbus-settings .nmb-link,
+.nimbus-settings .nmb-card a:not(.button) {
+  color: var(--nmb-text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--nmb-border-strong);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.nimbus-settings .nmb-link:hover,
+.nimbus-settings .nmb-card a:not(.button):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Stats */
+.nmb-stats-bar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--nmb-space-4);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.nmb-stat-cell {
+  min-height: 0;
+  padding: var(--nmb-space-5);
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  justify-content: flex-start;
+}
+
+.nmb-stat-cell__label {
+  margin-bottom: var(--nmb-space-2);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--nmb-text-2);
+}
+
+.nmb-stat-cell__value {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nmb-stat-cell__sub {
+  color: var(--nmb-text-2);
+  font-size: 13px;
+}
+
+/* Overview row */
+.nmb-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--nmb-space-4);
+}
+
+.nmb-meter {
+  height: 10px;
+  margin: var(--nmb-space-5) 0 var(--nmb-space-6);
+  border-radius: var(--nmb-pill);
+  background: var(--nmb-surface-alt);
+  overflow: hidden;
+}
+
+.nmb-meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--nmb-ink);
+}
+
+.nimbus-settings .nmb-chart-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--nmb-text-2);
+}
+
+.nimbus-settings .nmb-chart {
+  gap: var(--nmb-space-3);
+  min-height: 150px;
+  margin: 0;
+  padding: var(--nmb-space-6) 0 0;
+  list-style: none;
+}
+
+.nimbus-settings .nmb-bar-group {
+  height: 128px;
+  margin: 0;
+}
+
+.nmb-chart-bar {
+  border-radius: 2px;
+  background: var(--nmb-surface-alt);
+  box-shadow: inset 0 0 0 1px var(--nmb-border);
+}
+
+.nmb-bar-group:hover .nmb-chart-bar {
+  background: var(--nmb-border);
+}
+
+.nmb-bar-group.is-today .nmb-chart-bar {
+  background: var(--nmb-ink);
+  box-shadow: none;
+}
+
+.nmb-chart-label {
+  font-size: 12px;
+}
+
+/* Setup health rows */
+.nmb-rows {
+  margin: var(--nmb-space-3) 0 var(--nmb-space-4);
+}
+
+.nmb-rows > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nmb-space-3);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-rows > div:last-child {
+  border-bottom: 0;
+}
+
+.nmb-rows dt {
+  color: var(--nmb-text);
+}
+
+.nmb-rows dd {
+  margin: 0;
+  text-align: right;
+}
+
+.nmb-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.nmb-integration-logos {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--nmb-text-2);
+}
+
+/* Provider icons */
+.nmb-provider-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.nmb-provider-icon--text {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--nmb-surface-alt);
+  box-shadow: inset 0 0 0 1px var(--nmb-border);
+  color: var(--nmb-text-2);
+  font-family: var(--nmb-mono);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+/* Cost comparison */
+.nmb-cost-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nmb-space-2) var(--nmb-space-4);
+  padding: var(--nmb-space-5);
+}
+
+.nimbus-settings .nmb-cost-card-header p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.nimbus-settings .nmb-cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.nimbus-settings .nmb-cost-table th,
+.nimbus-settings .nmb-cost-table td {
+  padding: 12px var(--nmb-space-5);
+  border-top: 1px solid var(--nmb-border);
+  text-align: left;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.nimbus-settings .nmb-cost-table thead th {
+  background: var(--nmb-surface-alt);
+  color: var(--nmb-text-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nimbus-settings .nmb-cost-table .nmb-cost-table__num {
+  text-align: right;
+}
+
+.nmb-cost-table__provider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nimbus-settings .nmb-cost-table__provider a {
+  color: var(--nmb-text);
+  text-decoration: none;
+}
+
+.nimbus-settings .nmb-cost-table__provider a:hover {
+  text-decoration: underline;
+}
+
+.nimbus-settings .nmb-cost-table__row--current th,
+.nimbus-settings .nmb-cost-table__row--current td {
+  background: var(--nmb-volt-tint);
+}
+
+.nimbus-settings .nmb-cost-table__row--current .nmb-cost-table__total {
+  font-weight: 600;
+}
+
+.nimbus-settings .nmb-badge--active {
+  padding: 1px 8px;
+  border: 1px solid var(--nmb-volt-text);
+  border-radius: var(--nmb-pill);
+  background: transparent;
+  color: var(--nmb-volt-text);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nimbus-settings .nmb-cost-disclaimer {
+  margin: 0;
+  padding: 14px var(--nmb-space-5);
+  border-top: 1px solid var(--nmb-border);
+  font-size: 12px;
+}
+
+/* Setup wizard */
+.nimbus-settings--onboarding {
+  max-width: 920px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+.nmb-stepper {
+  display: flex;
+  gap: var(--nmb-space-2);
+  margin: 0;
+  list-style: none;
+}
+
+.nmb-stepper li {
+  margin: 0;
+}
+
+.nmb-stepper button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 12px 4px 5px;
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-pill);
+  background: var(--nmb-surface);
+  color: var(--nmb-text-2);
+  font: 500 13px/1 var(--nmb-font);
+  cursor: pointer;
+}
+
+.nmb-stepper__n {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--nmb-surface-alt);
+  font-size: 11px;
+}
+
+.nmb-stepper .is-active button {
+  border-color: var(--nmb-ink);
+  background: var(--nmb-ink);
+  color: #fff;
+}
+
+.nmb-stepper .is-active .nmb-stepper__n {
+  background: var(--nmb-volt);
+  color: var(--nmb-ink);
+}
+
+.nmb-stepper .is-complete button {
+  color: var(--nmb-text);
+  cursor: default;
+}
+
+.nmb-stepper .is-complete .nmb-stepper__n {
+  background: var(--nmb-volt-tint);
+  color: var(--nmb-volt-text);
+}
+
+.nimbus-settings .nmb-onboarding-main {
+  padding: var(--nmb-space-6) 28px;
+}
+
+.nimbus-settings .nmb-onboarding-step h2,
+.nmb-provider-picker legend {
+  margin: 0 0 var(--nmb-space-4);
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--nmb-text);
+}
+
+.nmb-provider-picker {
+  margin: 0;
+  padding: 0 0 var(--nmb-space-6);
+  border: 0;
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nimbus-settings .nmb-provider-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 14px;
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  background: var(--nmb-surface);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--nmb-dur-1) var(--nmb-ease);
+}
+
+.nmb-provider-option:hover {
+  border-color: var(--nmb-border-strong);
+}
+
+.nmb-provider-option--other {
+  border-style: dashed;
+}
+
+.nimbus-settings .nmb-provider-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nimbus-settings .nmb-provider-option:has(input:checked) {
+  border: 2px solid var(--nmb-ink);
+  padding: 0 13px;
+  background: var(--nmb-volt-tint);
+  font-weight: 600;
+}
+
+.nmb-provider-option:has(input:checked)::after {
+  content: "";
+  width: 10px;
+  height: 6px;
+  margin: -3px 2px 0 auto;
+  border-left: 2px solid var(--nmb-ink);
+  border-bottom: 2px solid var(--nmb-ink);
+  transform: rotate(-45deg);
+}
+
+.nmb-wizard-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--nmb-space-5) var(--nmb-space-5);
+  padding: var(--nmb-space-6) 0;
+  border-bottom: 1px solid var(--nmb-border);
+}
+
+.nmb-wizard-fields > [data-provider-group]:not([hidden]) {
+  display: contents;
+}
+
+.nimbus-settings .nmb-onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.nimbus-settings .nmb-onboarding-field[hidden] {
+  display: none;
+}
+
+.nimbus-settings .nmb-onboarding-field > span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nmb-text);
+}
+
+.nimbus-settings .nmb-optional {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--nmb-text-3);
+}
+
+.nimbus-settings .nmb-onboarding-field input[type="text"],
+.nimbus-settings .nmb-onboarding-field input[type="password"],
+.nimbus-settings .nmb-onboarding-field input[type="url"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--nmb-border-strong);
+  border-radius: 8px;
+  font-family: var(--nmb-mono);
+  font-size: 14px;
+}
+
+.nimbus-settings .nmb-onboarding-field input:focus {
+  border-color: var(--nmb-ink);
+  box-shadow: 0 0 0 1px var(--nmb-ink);
+}
+
+.nimbus-settings .nmb-field-hint {
+  font-size: 12px;
+  color: var(--nmb-text-2);
+}
+
+.nimbus-settings .nmb-onboarding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0;
+  padding-top: var(--nmb-space-6);
+}
+
+.nimbus-settings .nmb-wizard-status {
+  margin: 0 auto 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nmb-text-2);
+}
+
+.nmb-wizard-status.is-ok {
+  color: var(--nmb-ok);
+}
+
+.nmb-wizard-status.is-ok::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 6px;
+  margin: 0 10px 3px 2px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.nmb-wizard-status.is-error {
+  color: var(--nmb-error);
+}
+
+.nimbus-settings .nmb-onboarding-preference-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: var(--nmb-space-5);
+}
+
+.nimbus-settings .nmb-onboarding-choice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--nmb-border);
+  border-radius: var(--nmb-radius);
+  cursor: pointer;
+}
+
+.nimbus-settings .nmb-onboarding-choice-card:has(input:checked) {
+  border-color: var(--nmb-ink);
+}
+
+.nimbus-settings .nmb-onboarding-choice-card p {
+  margin: 2px 0 0;
+  color: var(--nmb-text-2);
+}
+
+.nimbus-settings .nmb-wizard-import {
+  margin: var(--nmb-space-5) 0 0;
+}
+
+.nimbus-settings .nmb-config-import-hint {
+  margin-left: var(--nmb-space-2);
+}
+
+.nimbus-settings .nmb-onboarding-inline-notice {
+  margin: 0 0 var(--nmb-space-4);
+  padding: 10px 14px;
+  border-left: 3px solid var(--nmb-error);
+  border-radius: 0 8px 8px 0;
+  background: var(--nmb-error-bg);
+  color: var(--nmb-error);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .nmb-stats-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nmb-overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 782px) {
+  .nmb-provider-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nmb-wizard-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nmb-card-head {
+    flex-direction: column;
+  }
+
+  .nimbus-settings .nmb-onboarding-main {
+    padding: var(--nmb-space-5) var(--nmb-space-4);
+  }
+
+  .nimbus-settings .nmb-onboarding-actions .button {
+    flex: 1 1 auto;
+  }
+
+  .nmb-cost-table-wrap {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .nmb-stats-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .nmb-stat-cell__value {
+    font-size: 24px;
+  }
+}
+
+.nimbus-settings .nmb-card h3.nmb-chart-title,
+.nimbus-settings .nmb-onboarding-step h3 {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nimbus-settings .nmb-cost-table tbody th {
+  color: var(--nmb-text);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nmb-wizard-fields:not(:has(> [data-provider-group]:not([hidden]))) {
+  display: none;
+}
+
+.nimbus-settings .nmb-onboarding-actions {
+  border-top: 0;
 }

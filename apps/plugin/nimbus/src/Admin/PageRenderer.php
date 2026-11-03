@@ -47,7 +47,6 @@ final class PageRenderer
     if (empty($onboarding['completed'])) {
       ?>
       <div class="wrap nimbus-settings nimbus-settings--onboarding">
-        <h1><?php esc_html_e('Set up Nimbus', 'nimbus'); ?></h1>
         <?php $this->renderOnboardingTab(); ?>
       </div>
       <?php
@@ -57,7 +56,7 @@ final class PageRenderer
     $activeTab = $this->resolveActiveTab();
     ?>
     <div class="wrap nimbus-settings">
-      <h1 class="wp-heading-inline"><?php esc_html_e('Nimbus', 'nimbus'); ?></h1>
+      <?php $this->renderBrandHeader(); ?>
 
       <?php settings_errors(NIMBUS_SETTINGS_GROUP); ?>
 
@@ -111,6 +110,11 @@ final class PageRenderer
     $settings = $this->settings->all();
     $state = $this->onboardingManager->state();
     $stepKeys = ['storage', 'delivery', 'review'];
+    $stepLabels = [
+      'storage' => __('Storage', 'nimbus'),
+      'delivery' => __('Delivery', 'nimbus'),
+      'review' => __('Review', 'nimbus'),
+    ];
 
     // If a step was explicitly saved (user progressed mid-wizard and navigated
     // away), resume from that saved step rather than starting over.
@@ -126,348 +130,211 @@ final class PageRenderer
     if ($currentStepIndex === false) {
       $currentStepIndex = array_search($defaultStep, $stepKeys, true);
     }
+
+    $savedProvider  = (string) ($settings['provider'] ?? 's3');
+    $isLocalDefault = $savedProvider === 'local';
+    $isR2Default    = $savedProvider === 'r2';
+    $isS3CDefault   = in_array($savedProvider, ['s3_compatible', 'minio'], true);
+
+    // Picker order follows the mockup. Local is a debug mode and only shows when already chosen.
+    $pickerKeys = array_values(array_filter(
+      ['s3', 'r2', 'gcs', 'backblaze_b2', 'digitalocean_spaces', 'wasabi', 'minio', 's3_compatible', 'local'],
+      fn(string $key): bool => in_array($key, $this->settings->available_provider_keys(), true) && ($key !== 'local' || $isLocalDefault)
+    ));
     ?>
-    <div id="nmb-onboarding-wizard" class="nmb-onboarding-shell" data-current-step="<?php echo esc_attr((string) $currentStepIndex); ?>">
-      <aside class="nmb-onboarding-sidebar">
-        <div class="nmb-onboarding-brand-panel">
-          <span class="nmb-onboarding-brand-icon dashicons dashicons-cloud-upload"></span>
-          <strong class="nmb-onboarding-brand-name">Nimbus</strong>
-          <p class="nmb-onboarding-brand-tagline"><?php esc_html_e('Your media, elevated.', 'nimbus'); ?></p>
+    <div id="nmb-onboarding-wizard" class="nmb-wizard" data-current-step="<?php echo esc_attr((string) $currentStepIndex); ?>">
+      <header class="nmb-wizard-header">
+        <div class="nmb-brand">
+          <?php $this->renderMark(); ?>
+          <h1><?php esc_html_e('Set up Nimbus', 'nimbus'); ?></h1>
         </div>
+        <ol class="nmb-stepper" aria-label="<?php esc_attr_e('Setup steps', 'nimbus'); ?>">
+          <?php foreach ($stepKeys as $index => $stepKey) : ?>
+            <li class="nmb-onboarding-step-item" data-step-item="<?php echo esc_attr($stepKey); ?>">
+              <button type="button"><span class="nmb-stepper__n"><?php echo esc_html((string) ($index + 1)); ?></span><?php echo esc_html($stepLabels[$stepKey]); ?></button>
+            </li>
+          <?php endforeach; ?>
+        </ol>
+      </header>
+      <hr class="wp-header-end" />
 
-        <div class="nmb-card nmb-onboarding-step-nav">
-          <ol class="nmb-onboarding-step-list">
-            <li class="nmb-onboarding-step-item" data-step-item="storage">
-              <span class="nmb-onboarding-step-index">1</span>
-              <div>
-                <strong><?php esc_html_e('Storage', 'nimbus'); ?></strong>
-                <span><?php esc_html_e('Connect the provider and bucket.', 'nimbus'); ?></span>
-              </div>
-            </li>
-            <li class="nmb-onboarding-step-item" data-step-item="delivery">
-              <span class="nmb-onboarding-step-index">2</span>
-              <div>
-                <strong><?php esc_html_e('Delivery', 'nimbus'); ?></strong>
-                <span><?php esc_html_e('Choose how media should be served.', 'nimbus'); ?></span>
-              </div>
-            </li>
-            <li class="nmb-onboarding-step-item" data-step-item="review">
-              <span class="nmb-onboarding-step-index">3</span>
-              <div>
-                <strong><?php esc_html_e('Review', 'nimbus'); ?></strong>
-                <span><?php esc_html_e('Confirm and unlock the dashboard.', 'nimbus'); ?></span>
-              </div>
-            </li>
-          </ol>
-        </div>
-      </aside>
-
-      <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="nmb-onboarding-form nmb-onboarding-main">
+      <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="nmb-onboarding-form nmb-onboarding-main nmb-card">
         <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>
         <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>" />
 
-        <section class="nmb-card nmb-onboarding-step" data-step="storage">
-          <?php
-            $savedProvider  = (string) ($settings['provider'] ?? 's3');
-            $isLocalDefault = $savedProvider === 'local';
-            $isR2Default    = $savedProvider === 'r2';
-            $isS3CDefault   = in_array($savedProvider, ['s3_compatible', 'minio'], true);
-          ?>
-          <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 1', 'nimbus'); ?></p>
-            <h2><?php esc_html_e('Connect your storage provider', 'nimbus'); ?></h2>
-            <p><?php esc_html_e('Select a provider and only the fields you need will appear.', 'nimbus'); ?></p>
-          </div>
+        <section class="nmb-onboarding-step" data-step="storage" aria-labelledby="nmb-step-storage">
+          <fieldset class="nmb-provider-picker">
+            <legend id="nmb-step-storage"><?php esc_html_e('Where should your media live?', 'nimbus'); ?></legend>
+            <div class="nmb-provider-grid">
+              <?php foreach ($pickerKeys as $providerKey) : ?>
+                <label class="nmb-provider-option<?php echo $providerKey === 's3_compatible' ? ' nmb-provider-option--other' : ''; ?>">
+                  <input type="radio" name="provider" value="<?php echo esc_attr($providerKey); ?>" <?php checked($savedProvider, $providerKey); ?> />
+                  <?php $this->renderProviderIcon($providerKey); ?>
+                  <span><?php echo esc_html($this->providerShortLabel($providerKey)); ?></span>
+                </label>
+              <?php endforeach; ?>
+            </div>
+          </fieldset>
 
-          <!-- JSON import shortcut -->
-          <div class="nmb-config-import-bar">
-            <label for="nmb-onboarding-config-file" class="nmb-config-import-label">
-              <span class="dashicons dashicons-upload"></span>
-              <?php esc_html_e('Already have a config file?', 'nimbus'); ?>
-            </label>
-            <input type="file" id="nmb-onboarding-config-file" accept=".json,application/json" class="nmb-config-import-input" data-config-import />
-            <span class="nmb-config-import-hint nmb-muted"><?php esc_html_e('Select a Nimbus .json export to pre-fill all fields below instantly.', 'nimbus'); ?></span>
-          </div>
-
-          <!-- Provider selector — always visible -->
-          <div class="nmb-storage-group">
-            <label class="nmb-onboarding-field nmb-onboarding-field--full">
-              <span><?php esc_html_e('Provider', 'nimbus'); ?></span>
-              <select id="nimbus-provider" name="provider">
-                <?php foreach ($this->settings->available_provider_keys() as $providerKey) : ?>
-                  <option value="<?php echo esc_attr($providerKey); ?>" <?php selected($savedProvider, $providerKey); ?>><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></option>
-                <?php endforeach; ?>
-              </select>
-            </label>
-            <p id="nmb-provider-tip" class="nmb-provider-tip" hidden></p>
-          </div>
-
-          <!-- Bucket & location — all cloud providers -->
-          <div class="nmb-storage-group" data-provider-group="bucket-location"<?php if ($isLocalDefault) echo ' hidden'; ?>>
-            <p class="nmb-storage-group__label"><?php esc_html_e('Bucket &amp; location', 'nimbus'); ?></p>
-            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+          <div class="nmb-wizard-fields">
+            <div data-provider-group="bucket-location"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
                 <span><?php esc_html_e('Bucket', 'nimbus'); ?></span>
-                <input type="text" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('The name of the bucket you created in your provider\'s console.', 'nimbus'); ?></small>
+                <input type="text" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
-              <label class="nmb-onboarding-field">
+              <label class="nmb-onboarding-field" data-hide-for="r2">
                 <span><?php esc_html_e('Region', 'nimbus'); ?></span>
-                <input type="text" id="nimbus-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="us-east-1"<?php if ($isR2Default) echo ' readonly'; ?> autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('e.g. us-east-1 for AWS. Cloudflare R2 uses &ldquo;auto&rdquo; — filled in automatically.', 'nimbus'); ?></small>
-              </label>
-              <label class="nmb-onboarding-field nmb-onboarding-field--full">
-                <span><?php esc_html_e('Path prefix', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus'); ?></em></span>
-                <input type="text" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="wp-uploads" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('A sub-folder inside the bucket. Leave blank to store files at the root.', 'nimbus'); ?></small>
+                <input type="text" id="nimbus-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="us-east-1" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
             </div>
-          </div>
 
-          <!-- Credentials — all cloud providers -->
-          <div class="nmb-storage-group" data-provider-group="credentials"<?php if ($isLocalDefault) echo ' hidden'; ?>>
-            <p class="nmb-storage-group__label"><?php esc_html_e('Credentials', 'nimbus'); ?></p>
-            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+            <div data-provider-group="r2-extra"<?php if (! $isR2Default) echo ' hidden'; ?>>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Account ID', 'nimbus'); ?></span>
+                <input type="text" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" autocomplete="off" spellcheck="false"<?php if (! $isR2Default) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('Cloudflare dashboard, right sidebar of the home page.', 'nimbus'); ?></small>
+              </label>
+            </div>
+
+            <div data-provider-group="s3c-endpoint"<?php if (! $isS3CDefault) echo ' hidden'; ?>>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Endpoint', 'nimbus'); ?></span>
+                <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://s3.example.com" autocomplete="off" spellcheck="false"<?php if (! $isS3CDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('The S3 API base URL from your provider.', 'nimbus'); ?></small>
+              </label>
+            </div>
+
+            <div data-provider-group="credentials"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
                 <span><?php esc_html_e('Access key', 'nimbus'); ?></span>
-                <input type="text" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off"<?php if ($isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('AWS: IAM \u2192 Users \u2192 Security credentials. Cloudflare: R2 \u2192 Manage API tokens.', 'nimbus'); ?></small>
+                <input type="text" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
               <label class="nmb-onboarding-field">
                 <span><?php esc_html_e('Secret key', 'nimbus'); ?></span>
                 <input type="password" name="secret_key" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" autocomplete="new-password"<?php if ($isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('The secret paired with your access key. Shown only once \u2014 copy it before closing.', 'nimbus'); ?></small>
               </label>
             </div>
-          </div>
 
-          <!-- Cloudflare R2 extras — r2 only -->
-          <div class="nmb-storage-group" data-provider-group="r2-extra"<?php if (! $isR2Default) echo ' hidden'; ?>>
-            <p class="nmb-storage-group__label"><?php esc_html_e('Cloudflare account', 'nimbus'); ?></p>
-            <div class="nmb-onboarding-field-grid nmb-onboarding-field-grid--two-up">
+            <div data-provider-group="session"<?php if ($isR2Default || $isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Account ID', 'nimbus'); ?></span>
-                <input type="text" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" autocomplete="off"<?php if (! $isR2Default) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('Found in the right sidebar of your Cloudflare dashboard home page.', 'nimbus'); ?></small>
-              </label>
-              <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Custom endpoint', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('alternative', 'nimbus'); ?></em></span>
-                <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://&lt;account-id&gt;.r2.cloudflarestorage.com" autocomplete="off"<?php if (! $isR2Default) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('Use this instead of Account ID if you prefer an explicit URL.', 'nimbus'); ?></small>
+                <span><?php esc_html_e('Session token', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus'); ?></em></span>
+                <input type="password" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password"<?php if ($isR2Default || $isLocalDefault) echo ' disabled'; ?> />
+                <small class="nmb-field-hint"><?php esc_html_e('Only for temporary AWS STS credentials.', 'nimbus'); ?></small>
               </label>
             </div>
-          </div>
 
-          <!-- Custom endpoint — s3_compatible only -->
-          <div class="nmb-storage-group" data-provider-group="s3c-endpoint"<?php if (! $isS3CDefault) echo ' hidden'; ?>>
-            <p class="nmb-storage-group__label"><?php esc_html_e('Connection', 'nimbus'); ?></p>
-            <label class="nmb-onboarding-field nmb-onboarding-field--full">
-              <span><?php esc_html_e('Custom endpoint', 'nimbus'); ?></span>
-              <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://s3.example.com" autocomplete="off"<?php if (! $isS3CDefault) echo ' disabled'; ?> />
-              <small class="nmb-field-hint"><?php esc_html_e('The S3-compatible API base URL from your provider, e.g. https://s3.example.com.', 'nimbus'); ?></small>
-            </label>
-          </div>
-
-          <!-- Session token — s3 and s3_compatible only -->
-          <div class="nmb-storage-group" data-provider-group="session"<?php if ($isR2Default || $isLocalDefault) echo ' hidden'; ?>>
-            <p class="nmb-storage-group__label"><?php esc_html_e('Temporary credentials', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus'); ?></em></p>
-            <label class="nmb-onboarding-field nmb-onboarding-field--full">
-              <span><?php esc_html_e('Session token', 'nimbus'); ?></span>
-              <input type="password" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password"<?php if ($isR2Default || $isLocalDefault) echo ' disabled'; ?> />
-              <small class="nmb-field-hint"><?php esc_html_e('Only needed for temporary AWS STS credentials. Leave blank for standard IAM access keys.', 'nimbus'); ?></small>
-            </label>
+            <div data-provider-group="prefix"<?php if ($isLocalDefault) echo ' hidden'; ?>>
+              <label class="nmb-onboarding-field">
+                <span><?php esc_html_e('Path prefix', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus'); ?></em></span>
+                <input type="text" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="wp-media" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
+              </label>
+            </div>
           </div>
 
           <div class="nmb-onboarding-actions">
+            <p class="nmb-wizard-status" id="nmb-wizard-status" role="status"></p>
+            <button type="button" class="button" data-wizard-test><?php esc_html_e('Test connection', 'nimbus'); ?></button>
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', 'nimbus'); ?></button>
           </div>
         </section>
 
-        <section class="nmb-card nmb-onboarding-step" data-step="delivery" hidden>
-          <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 2', 'nimbus'); ?></p>
-            <h2><?php esc_html_e('Choose delivery behavior', 'nimbus'); ?></h2>
-            <p><?php esc_html_e('Decide how Nimbus should behave once setup is complete. You can still tune these later from Settings.', 'nimbus'); ?></p>
-          </div>
+        <section class="nmb-onboarding-step" data-step="delivery" aria-labelledby="nmb-step-delivery" hidden>
+          <h2 id="nmb-step-delivery"><?php esc_html_e('How should visitors get your media?', 'nimbus'); ?></h2>
 
           <div class="nmb-onboarding-preference-grid">
-            <label class="nmb-card nmb-onboarding-choice-card">
+            <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="enabled" value="1" <?php checked(!empty($settings['enabled'])); ?> />
               <div>
-                <strong><?php esc_html_e('Enable Nimbus after setup', 'nimbus'); ?></strong>
-                <p><?php esc_html_e('Turn on the offload workflow once the wizard is finished.', 'nimbus'); ?></p>
+                <strong><?php esc_html_e('Turn on offloading', 'nimbus'); ?></strong>
+                <p><?php esc_html_e('New uploads are copied to your bucket once setup is done.', 'nimbus'); ?></p>
               </div>
             </label>
 
-            <label class="nmb-card nmb-onboarding-choice-card">
+            <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="serve_from_storage" value="1" <?php checked(!empty($settings['serve_from_storage'])); ?> />
               <div>
-                <strong><?php esc_html_e('Serve media from remote storage', 'nimbus'); ?></strong>
-                <p><?php esc_html_e('Rewrite public media URLs so visitors load files from your bucket or CDN.', 'nimbus'); ?></p>
+                <strong><?php esc_html_e('Serve media from storage', 'nimbus'); ?></strong>
+                <p><?php esc_html_e('Rewrite media URLs so visitors load files from your bucket or CDN.', 'nimbus'); ?></p>
               </div>
             </label>
 
-            <label class="nmb-card nmb-onboarding-choice-card">
+            <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="use_path_style_endpoint" value="1" <?php checked(!empty($settings['use_path_style_endpoint'])); ?> />
               <div>
                 <strong><?php esc_html_e('Use path-style requests', 'nimbus'); ?></strong>
-                <p><?php esc_html_e('Changes the S3 request URL format from subdomain-style (bucket.s3.amazonaws.com) to path-style (s3.amazonaws.com/bucket). Required for Cloudflare R2 and most S3-compatible providers. Not needed for standard AWS S3.', 'nimbus'); ?></p>
+                <p><?php esc_html_e('Needed by R2 and most S3-compatible services. Not needed for Amazon S3.', 'nimbus'); ?></p>
               </div>
             </label>
           </div>
 
-          <label class="nmb-onboarding-field nmb-onboarding-field--full">
-            <span><?php esc_html_e('Custom delivery domain (optional)', 'nimbus'); ?></span>
+          <label class="nmb-onboarding-field">
+            <span><?php esc_html_e('Custom domain', 'nimbus'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus'); ?></em></span>
             <?php
               $siteDomain = wp_parse_url(home_url(), PHP_URL_HOST) ?: 'example.com';
-              $cdnPlaceholder = 'https://cdn.' . $siteDomain;
+              $cdnPlaceholder = 'https://media.' . $siteDomain;
             ?>
-            <input type="url" name="custom_domain" value="<?php echo esc_attr((string) ($settings['custom_domain'] ?? '')); ?>" placeholder="<?php echo esc_attr($cdnPlaceholder); ?>" autocomplete="off" />
+            <input type="url" name="custom_domain" value="<?php echo esc_attr((string) ($settings['custom_domain'] ?? '')); ?>" placeholder="<?php echo esc_attr($cdnPlaceholder); ?>" autocomplete="off" spellcheck="false" />
           </label>
-
-          <div class="nmb-card nmb-onboarding-helper-card">
-            <h3><?php esc_html_e('What happens next', 'nimbus'); ?></h3>
-            <ul class="nmb-bullet-list">
-              <li><?php esc_html_e('After setup, you can validate the connection from Tools.', 'nimbus'); ?></li>
-              <li><?php esc_html_e('You can delay public URL rewriting by leaving remote delivery off for now.', 'nimbus'); ?></li>
-              <li><?php esc_html_e('All of these preferences remain editable from Settings later.', 'nimbus'); ?></li>
-            </ul>
-          </div>
 
           <div class="nmb-onboarding-actions">
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to review', 'nimbus'); ?></button>
           </div>
         </section>
 
-        <section class="nmb-card nmb-onboarding-step" data-step="review" hidden>
-          <div class="nmb-onboarding-step-header">
-            <p class="nmb-eyebrow"><?php esc_html_e('Step 3', 'nimbus'); ?></p>
-            <h2><?php esc_html_e('Review and finish setup', 'nimbus'); ?></h2>
-            <p><?php esc_html_e('Confirm the final checklist below. Once you finish this step, the plugin dashboard unlocks and the guided setup disappears.', 'nimbus'); ?></p>
-          </div>
+        <section class="nmb-onboarding-step" data-step="review" aria-labelledby="nmb-step-review" hidden>
+          <h2 id="nmb-step-review"><?php esc_html_e('Review and finish', 'nimbus'); ?></h2>
 
-          <div class="nmb-onboarding-review-grid">
-            <div class="nmb-card nmb-onboarding-helper-card">
-              <h3><?php esc_html_e('Final checklist', 'nimbus'); ?></h3>
-              <ul class="nmb-status-list">
-                <li><span class="dashicons dashicons-cloud"></span><strong><?php esc_html_e('Storage', 'nimbus'); ?></strong><span class="nmb-spacer"></span><?php esc_html_e('Connected in this setup flow', 'nimbus'); ?></li>
-                <li><span class="dashicons dashicons-admin-home"></span><strong><?php esc_html_e('Dashboard', 'nimbus'); ?></strong><span class="nmb-spacer"></span><?php esc_html_e('Unlocks after finish', 'nimbus'); ?></li>
-              </ul>
-            </div>
+          <h3><?php esc_html_e('Other media plugins', 'nimbus'); ?></h3>
+          <?php if (!empty($state['conflicts'])) : ?>
+            <ul class="nmb-status-list">
+              <?php foreach ($state['conflicts'] as $plugin) : ?>
+                <li>
+                  <span class="dashicons <?php echo !empty($plugin['active']) ? 'dashicons-warning status-error' : 'dashicons-info status-warning'; ?>"></span>
+                  <div>
+                    <strong><?php echo esc_html((string) ($plugin['name'] ?? '')); ?></strong>
+                    <div class="nmb-muted"><?php echo esc_html((string) ($plugin['reason'] ?? '')); ?></div>
+                  </div>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php else : ?>
+            <p class="nmb-state nmb-state--ok"><?php esc_html_e('No other media offload plugins found.', 'nimbus'); ?></p>
+          <?php endif; ?>
 
-            <div class="nmb-card nmb-onboarding-helper-card">
-              <h3><?php esc_html_e('Conflict review', 'nimbus'); ?></h3>
-              <?php if (!empty($state['conflicts'])) : ?>
-                <ul class="nmb-status-list">
-                  <?php foreach ($state['conflicts'] as $plugin) : ?>
-                    <li>
-                      <span class="dashicons <?php echo !empty($plugin['active']) ? 'dashicons-warning status-error' : 'dashicons-info status-warning'; ?>"></span>
-                      <div>
-                        <strong><?php echo esc_html((string) ($plugin['name'] ?? '')); ?></strong>
-                        <div class="nmb-muted"><?php echo esc_html((string) ($plugin['reason'] ?? '')); ?></div>
-                      </div>
-                    </li>
-                  <?php endforeach; ?>
-                </ul>
-              <?php else : ?>
-                <p class="nmb-muted"><?php esc_html_e('No conflicting media offload plugins were detected. Nice and clean.', 'nimbus'); ?></p>
-              <?php endif; ?>
+          <?php if (!empty($state['has_active_conflicts'])) : ?>
+            <label class="nmb-onboarding-checkbox-note">
+              <input type="checkbox" name="conflict_acknowledged" value="1" />
+              <span><?php esc_html_e('I understand another media offload plugin is active and I will review the warnings after setup.', 'nimbus'); ?></span>
+            </label>
+          <?php endif; ?>
 
-              <?php if (!empty($state['has_active_conflicts'])) : ?>
-                <label class="nmb-onboarding-checkbox-note">
-                  <input type="checkbox" name="conflict_acknowledged" value="1" />
-                  <span><?php esc_html_e('I understand another media offload plugin is active and I will review the warnings after setup.', 'nimbus'); ?></span>
-                </label>
-              <?php endif; ?>
-            </div>
-          </div>
+          <p class="nmb-muted"><?php esc_html_e('You can change every choice later from Settings.', 'nimbus'); ?></p>
 
           <div class="nmb-onboarding-actions">
-            <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup and unlock dashboard', 'nimbus'); ?></button>
+            <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup', 'nimbus'); ?></button>
           </div>
         </section>
       </form>
+
+      <p class="nmb-wizard-import">
+        <label for="nmb-onboarding-config-file" class="nmb-link"><?php esc_html_e('Import settings from a Nimbus .json export', 'nimbus'); ?></label>
+        <input type="file" id="nmb-onboarding-config-file" accept=".json,application/json" class="screen-reader-text" data-config-import />
+        <span class="nmb-config-import-hint nmb-muted" role="status"></span>
+      </p>
     </div>
     <?php
   }
 
   private function renderOverviewTab(): void
   {
-    $stats = $this->statistics->get_stats();
-    $deepStats = $this->statistics->get_deep_stats();
-    $pending = $this->countPendingUrlUpdates();
-    $integrationSummary = $this->integrationSummary();
-    $onboarding = $this->onboardingManager->state();
     $migration = DataMigration::status();
     ?>
     <div class="nmb-settings-shell">
-
-      <?php $this->renderDashboard(); ?>
-
       <?php if (!empty($migration['needs_migration'])) : ?>
         <?php $this->renderActivationRecoveryPanel($migration); ?>
       <?php endif; ?>
 
-      <div class="nmb-grid-2 nmb-overview-actions-grid">
-        <div class="nmb-card" id="overview-setup-health">
-          <h3><?php esc_html_e('Setup health', 'nimbus'); ?></h3>
-          <ul class="nmb-status-list">
-            <li>
-              <span class="dashicons <?php echo !empty($onboarding['completed']) ? 'dashicons-yes-alt status-ok' : 'dashicons-warning status-warning'; ?>"></span>
-              <strong><?php esc_html_e('Onboarding:', 'nimbus'); ?></strong>
-              <?php echo !empty($onboarding['completed']) ? esc_html__('Completed', 'nimbus') : esc_html__('Needs review', 'nimbus'); ?>
-            </li>
-            <li>
-              <span class="dashicons <?php echo $this->settings->has_valid_credentials() ? 'dashicons-yes-alt status-ok' : 'dashicons-warning status-error'; ?>"></span>
-              <strong><?php esc_html_e('Credentials:', 'nimbus'); ?></strong>
-              <?php echo $this->settings->has_valid_credentials() ? esc_html__('Configured', 'nimbus') : esc_html__('Needs attention', 'nimbus'); ?>
-            </li>
-            <li>
-              <span class="dashicons <?php echo $this->settings->should_serve_from_storage() ? 'dashicons-admin-links status-ok' : 'dashicons-minus'; ?>"></span>
-              <strong><?php esc_html_e('Delivery:', 'nimbus'); ?></strong>
-              <?php echo $this->settings->should_serve_from_storage() ? esc_html__('Serving from storage', 'nimbus') : esc_html__('Using local/origin URLs', 'nimbus'); ?>
-            </li>
-            <li>
-              <span class="dashicons <?php echo $pending > 0 ? 'dashicons-update status-warning' : 'dashicons-yes-alt status-ok'; ?>"></span>
-              <strong><?php esc_html_e('Pending URL updates:', 'nimbus'); ?></strong>
-              <?php echo number_format($pending); ?>
-            </li>
-            <li>
-              <span class="dashicons dashicons-format-status"></span>
-              <strong><?php esc_html_e('Offloaded media:', 'nimbus'); ?></strong>
-              <?php echo number_format((int) ($stats['offloaded'] ?? 0)); ?>
-            </li>
-            <li>
-              <span class="dashicons <?php echo !empty($onboarding['has_active_conflicts']) ? 'dashicons-warning status-error' : 'dashicons-yes-alt status-ok'; ?>"></span>
-              <strong><?php esc_html_e('Plugin conflicts:', 'nimbus'); ?></strong>
-              <?php echo !empty($onboarding['has_active_conflicts']) ? esc_html__('Review required', 'nimbus') : esc_html__('No active conflicts detected', 'nimbus'); ?>
-            </li>
-          </ul>
-          <div class="nmb-actions nmb-actions-left">
-            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Configure settings', 'nimbus'); ?></a>
-            <a class="button" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php /* translators: %d: number of detected integrations */ printf(esc_html__('Integrations (%d detected)', 'nimbus'), (int) ($integrationSummary['detected'] ?? 0)); ?></a>
-          </div>
-        </div>
-
-        <div class="nmb-card">
-          <h3><?php esc_html_e('Upload folder structure', 'nimbus'); ?></h3>
-          <p class="nmb-muted" style="margin:0 0 12px;"><?php esc_html_e('WordPress organises your media into date-based sub-folders. These are the top-level folders found in your uploads directory.', 'nimbus'); ?></p>
-          <?php if (empty($deepStats['asset_roots'])) : ?>
-            <p class="nmb-muted"><?php esc_html_e('No upload folders sampled yet. Upload a file to populate this.', 'nimbus'); ?></p>
-          <?php else : ?>
-            <ul class="nmb-status-list">
-              <?php foreach ($deepStats['asset_roots'] as $root) : ?>
-                <li>
-                  <span class="dashicons dashicons-category"></span>
-                  <code style="font-family:var(--mo-mono);font-size:12px;background:var(--mo-surface-alt);padding:2px 6px;border:1px solid var(--mo-border);border-radius:var(--mo-radius);"><?php echo esc_html((string) ($root['root'] ?? '')); ?>/</code>
-                  <span class="nmb-spacer"></span>
-                  <span title="<?php esc_attr_e('Files in this folder', 'nimbus'); ?>"><?php echo number_format((int) ($root['count'] ?? 0)); ?> <?php esc_html_e('files', 'nimbus'); ?></span>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          <?php endif; ?>
-        </div>
-      </div>
+      <?php $this->renderDashboard(); ?>
     </div>
     <?php
   }
@@ -867,14 +734,15 @@ final class PageRenderer
     $deepStats = $this->statistics->get_deep_stats();
     $usage = $deepStats['usage'] ?? $this->statistics->get_disk_usage_estimate();
     $remoteStats = $deepStats['remote'] ?? $this->statistics->get_remote_stats();
-    $mimeBreakdown = $deepStats['mime_breakdown'] ?? [];
-    $monthlyBreakdown = $deepStats['monthly_breakdown'] ?? [];
     $costComparison = $deepStats['cost_comparison'] ?? [];
+    $onboarding = $this->onboardingManager->state();
+    $integrations = $this->integrationSummary();
+    $pendingUrls = $this->countPendingUrlUpdates();
 
     $storageSize = isset($remoteStats['size_bytes']) ? $remoteStats['size_bytes'] : $usage['offloaded_size'];
     $storageCount = isset($remoteStats['object_count']) ? $remoteStats['object_count'] : $stats['offloaded'];
+    $localOnly = (int) ($stats['pending'] ?? 0);
 
-    // Derive estimated monthly cost for the currently configured provider
     $currentProvider = $this->settings->provider();
     $currentScenario = null;
     foreach ($costComparison['scenarios'] ?? [] as $scenario) {
@@ -886,236 +754,201 @@ final class PageRenderer
     $storageCost = $currentScenario !== null && $currentScenario['estimated_monthly_total'] !== null
       ? $currentScenario['estimated_monthly_total']
       : ($storageSize / 1073741824 * 0.023);
+    $providerLabel = $this->settings->provider_profile($currentProvider)->label();
+
+    // Seven days ending today, including days without uploads.
+    $uploadsByDate = [];
+    foreach ((array) ($stats['daily'] ?? []) as $day) {
+      $uploadsByDate[(string) $day->date] = (int) $day->count;
+    }
+    $today = current_time('timestamp');
+    $days = [];
+    for ($offset = 6; $offset >= 0; $offset--) {
+      $timestamp = $today - ($offset * DAY_IN_SECONDS);
+      $date = gmdate('Y-m-d', $timestamp);
+      $days[] = [
+        'label' => $offset === 0 ? __('Today', 'nimbus') : wp_date('D', $timestamp),
+        'date' => $date,
+        'count' => $uploadsByDate[$date] ?? 0,
+        'today' => $offset === 0,
+      ];
+    }
+    $maxUploads = max(1, max(array_column($days, 'count')));
+
+    $credentialsOk = $currentProvider === 'local' || $this->settings->has_valid_credentials();
+    $servingRemote = $this->settings->should_serve_from_storage();
+    $hasConflicts = !empty($onboarding['has_active_conflicts']);
+    $detectedIntegrations = array_values(array_filter((array) ($integrations['items'] ?? []), static function (array $item): bool {
+      return !empty($item['plugin_installed']) || !empty($item['directories']) || !empty($item['table_count']);
+    }));
     ?>
     <div class="nmb-dashboard">
-      <!-- Unified stats bar — all 4 cells are identical height -->
       <div class="nmb-stats-bar">
         <div class="nmb-stat-cell">
           <span class="nmb-stat-cell__label"><?php esc_html_e('Library assets', 'nimbus'); ?></span>
-          <span class="nmb-stat-cell__value"><?php echo number_format($stats['total']); ?></span>
+          <span class="nmb-stat-cell__value"><?php echo esc_html(number_format_i18n((int) $stats['total'])); ?></span>
           <span class="nmb-stat-cell__sub"><?php esc_html_e('Attachments in WordPress', 'nimbus'); ?></span>
         </div>
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Offloaded items', 'nimbus'); ?></span>
-          <span class="nmb-stat-cell__value"><?php echo number_format($stats['offloaded']); ?></span>
-          <div class="nmb-stat-cell__bar"><div class="nmb-stat-cell__bar-fill" style="width:<?php echo (int) $stats['percent']; ?>%"></div></div>
-          <span class="nmb-stat-cell__sub"><?php /* translators: %d: percentage of attachments linked to remote storage */ echo esc_html(sprintf(__('%d%% linked to remote storage', 'nimbus'), (int) $stats['percent'])); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Offloaded', 'nimbus'); ?></span>
+          <span class="nmb-stat-cell__value"><?php echo esc_html(number_format_i18n((int) $stats['offloaded'])); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: percentage of attachments linked to remote storage */ echo esc_html(sprintf(__('%s%% linked to storage', 'nimbus'), number_format_i18n((float) $stats['percent']))); ?></span>
         </div>
         <div class="nmb-stat-cell">
           <span class="nmb-stat-cell__label"><?php esc_html_e('Remote storage', 'nimbus'); ?></span>
-          <span class="nmb-stat-cell__value"><?php echo esc_html(size_format($storageSize)); ?></span>
-          <span class="nmb-stat-cell__sub"><?php /* translators: %d: number of remote objects tracked */ echo esc_html(sprintf(__('%d remote objects tracked', 'nimbus'), (int) $storageCount)); ?></span>
+          <span class="nmb-stat-cell__value"><?php echo esc_html(size_format($storageSize) ?: '0 B'); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: number of remote objects tracked */ echo esc_html(sprintf(_n('%s object tracked', '%s objects tracked', (int) $storageCount, 'nimbus'), number_format_i18n((int) $storageCount))); ?></span>
         </div>
         <div class="nmb-stat-cell">
           <span class="nmb-stat-cell__label"><?php esc_html_e('Est. monthly cost', 'nimbus'); ?></span>
-          <span class="nmb-stat-cell__value">$<?php echo number_format($storageCost, 2); ?></span>
-          <span class="nmb-stat-cell__sub"><?php
-            $providerLabel = ($currentScenario ?? [])['label'] ?? strtoupper($currentProvider);
-            /* translators: %s: storage provider name */
-            echo esc_html(sprintf(__('%s estimate', 'nimbus'), $providerLabel));
-          ?></span>
+          <span class="nmb-stat-cell__value">$<?php echo esc_html(number_format((float) $storageCost, 2)); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: storage provider name */ echo esc_html(sprintf(__('%s estimate', 'nimbus'), $providerLabel)); ?></span>
         </div>
       </div>
 
-      <div class="nmb-grid-2">
-        <div class="nmb-card">
-          <h3><?php esc_html_e('Uploads — last 7 days', 'nimbus'); ?></h3>
-          <div class="nmb-chart">
-            <?php if (empty($stats['daily'])) : ?>
-              <p class="nmb-muted" style="align-self:center;margin:auto;"><?php esc_html_e('No uploads in the last 7 days.', 'nimbus'); ?></p>
-            <?php else : ?>
-              <?php
-              $max = max(array_column($stats['daily'], 'count'));
-              foreach ($stats['daily'] as $day) :
-                $height = $max > 0 ? ($day->count / $max) * 100 : 0;
-              ?>
-                <div class="nmb-bar-group" title="<?php echo esc_attr($day->date . ': ' . $day->count); ?>">
-                  <div class="nmb-chart-bar" style="height:<?php echo (int) $height; ?>%"></div>
-                  <div class="nmb-chart-label"><?php echo esc_html(gmdate('M d', strtotime($day->date))); ?></div>
-                </div>
-              <?php endforeach; ?>
+      <div class="nmb-overview-grid">
+        <section class="nmb-card nmb-library-card" aria-labelledby="nmb-library-title">
+          <div class="nmb-card-head">
+            <div>
+              <h2 id="nmb-library-title"><?php esc_html_e('Library in storage', 'nimbus'); ?></h2>
+              <p class="nmb-muted">
+                <?php if ($localOnly > 0) : ?>
+                  <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('%s file is still served from this server.', '%s files are still served from this server.', $localOnly, 'nimbus'), number_format_i18n($localOnly))); ?>
+                <?php else : ?>
+                  <?php esc_html_e('Every file is in storage.', 'nimbus'); ?>
+                <?php endif; ?>
+              </p>
+            </div>
+            <?php if ($localOnly > 0 && $currentProvider !== 'local') : ?>
+              <a class="button button-primary" href="<?php echo esc_url($this->adminTabUrl('tools', 'nmb-bulk-job-app')); ?>">
+                <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('Offload %s file', 'Offload %s files', $localOnly, 'nimbus'), number_format_i18n($localOnly))); ?>
+              </a>
             <?php endif; ?>
           </div>
-        </div>
 
-        <div class="nmb-card">
-          <h3><?php esc_html_e('System status', 'nimbus'); ?></h3>
-          <ul class="nmb-status-list">
-            <li>
-              <span class="dashicons dashicons-yes-alt status-ok"></span>
-              <strong><?php esc_html_e('Plugin enabled:', 'nimbus'); ?></strong>
-              <span class="nmb-spacer"></span>
-              <?php echo $this->settings->is_enabled() ? esc_html__('Yes', 'nimbus') : esc_html__('No', 'nimbus'); ?>
-            </li>
-            <li>
-              <span class="dashicons dashicons-cloud status-ok"></span>
-              <strong><?php esc_html_e('Provider:', 'nimbus'); ?></strong>
-              <span class="nmb-spacer"></span>
-              <?php echo esc_html(strtoupper($this->settings->provider())); ?>
-            </li>
-            <li>
-              <span class="dashicons dashicons-database status-ok"></span>
-              <strong><?php esc_html_e('Bucket:', 'nimbus'); ?></strong>
-              <span class="nmb-spacer"></span>
-              <?php echo esc_html($this->settings->get('bucket') ?: '—'); ?>
-            </li>
-            <li>
-              <span class="dashicons dashicons-admin-links status-ok"></span>
-              <strong><?php esc_html_e('Rewrite URLs:', 'nimbus'); ?></strong>
-              <span class="nmb-spacer"></span>
-              <?php echo $this->settings->should_serve_from_storage() ? esc_html__('Yes', 'nimbus') : esc_html__('No', 'nimbus'); ?>
-            </li>
-          </ul>
-        </div>
-      </div>
+          <div class="nmb-meter" role="progressbar" aria-label="<?php esc_attr_e('Share of the library in storage', 'nimbus'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr((string) (int) $stats['percent']); ?>">
+            <span class="nmb-meter__fill" style="width:<?php echo esc_attr((string) (float) $stats['percent']); ?>%"></span>
+          </div>
 
-      <div class="nmb-grid-2">
-        <div class="nmb-card">
-          <h3><?php esc_html_e('Media type breakdown', 'nimbus'); ?></h3>
-          <?php if (empty($mimeBreakdown)) : ?>
-            <p><?php esc_html_e('No media type breakdown available yet.', 'nimbus'); ?></p>
-          <?php else : ?>
-            <ul class="nmb-status-list">
-              <?php foreach ($mimeBreakdown as $row) : ?>
-                <li>
-                  <span class="dashicons dashicons-media-default"></span>
-                  <strong><?php echo esc_html(ucfirst((string) ($row['category'] ?? 'other'))); ?></strong>
-                  <span class="nmb-spacer"></span>
-                  <?php echo esc_html(sprintf('%d / %d', (int) ($row['offloaded'] ?? 0), (int) ($row['total'] ?? 0))); ?>
-                </li>
-              <?php endforeach; ?>
-            </ul>
+          <h3 class="nmb-chart-title"><?php esc_html_e('Uploads, last 7 days', 'nimbus'); ?></h3>
+          <ol class="nmb-chart">
+            <?php foreach ($days as $day) : ?>
+              <li class="nmb-bar-group<?php echo $day['today'] ? ' is-today' : ''; ?>" title="<?php echo esc_attr($day['date'] . ': ' . $day['count']); ?>">
+                <span class="nmb-chart-bar" style="height:<?php echo esc_attr((string) max(4, (int) round($day['count'] / $maxUploads * 100))); ?>%"></span>
+                <span class="nmb-chart-label"><?php echo esc_html($day['label']); ?><span class="screen-reader-text">: <?php /* translators: %s: number of uploads */ echo esc_html(sprintf(_n('%s upload', '%s uploads', $day['count'], 'nimbus'), number_format_i18n($day['count']))); ?></span></span>
+              </li>
+            <?php endforeach; ?>
+          </ol>
+        </section>
+
+        <section class="nmb-card nmb-health-card" id="overview-setup-health" aria-labelledby="nmb-health-title">
+          <h2 id="nmb-health-title"><?php esc_html_e('Setup health', 'nimbus'); ?></h2>
+          <dl class="nmb-rows">
+            <div>
+              <dt><?php esc_html_e('Credentials', 'nimbus'); ?></dt>
+              <dd class="nmb-state <?php echo $credentialsOk ? 'nmb-state--ok' : 'nmb-state--error'; ?>"><?php echo $credentialsOk ? esc_html__('Configured', 'nimbus') : esc_html__('Needs attention', 'nimbus'); ?></dd>
+            </div>
+            <div>
+              <dt><?php esc_html_e('Delivery', 'nimbus'); ?></dt>
+              <dd class="nmb-state <?php echo $servingRemote ? 'nmb-state--ok' : ''; ?>"><?php echo $servingRemote ? esc_html__('Serving from storage', 'nimbus') : esc_html__('Serving local URLs', 'nimbus'); ?></dd>
+            </div>
+            <div>
+              <dt><?php esc_html_e('Pending URL updates', 'nimbus'); ?></dt>
+              <dd class="nmb-num"><?php echo esc_html(number_format_i18n($pendingUrls)); ?></dd>
+            </div>
+            <div>
+              <dt><?php esc_html_e('Plugin conflicts', 'nimbus'); ?></dt>
+              <dd class="nmb-state <?php echo $hasConflicts ? 'nmb-state--error' : 'nmb-state--ok'; ?>"><?php echo $hasConflicts ? esc_html__('Review required', 'nimbus') : esc_html__('None', 'nimbus'); ?></dd>
+            </div>
+            <div>
+              <dt><?php esc_html_e('Integrations', 'nimbus'); ?></dt>
+              <dd class="nmb-integration-logos">
+                <?php foreach ($detectedIntegrations as $item) :
+                  $key = sanitize_key((string) ($item['key'] ?? ''));
+                  if (!in_array($key, ['woocommerce', 'elementor'], true)) {
+                    continue;
+                  }
+                  ?>
+                  <img src="<?php echo esc_url(NIMBUS_URL . 'assets/img/logos/' . $key . '.svg'); ?>" width="18" height="18" alt="" />
+                <?php endforeach; ?>
+                <?php /* translators: %s: number of detected integrations */ echo esc_html(sprintf(__('%s detected', 'nimbus'), number_format_i18n(count($detectedIntegrations)))); ?>
+              </dd>
+            </div>
+          </dl>
+          <?php if ($hasConflicts) : ?>
+            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Review conflicts', 'nimbus'); ?></a>
+          <?php elseif (!$credentialsOk) : ?>
+            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Add credentials', 'nimbus'); ?></a>
           <?php endif; ?>
-        </div>
-
-        <div class="nmb-card">
-          <h3><?php esc_html_e('Recent monthly trend', 'nimbus'); ?></h3>
-          <?php if (empty($monthlyBreakdown)) : ?>
-            <p><?php esc_html_e('No monthly attachment trend available yet.', 'nimbus'); ?></p>
-          <?php else : ?>
-            <ul class="nmb-status-list">
-              <?php foreach ($monthlyBreakdown as $row) : ?>
-                <li>
-                  <span class="dashicons dashicons-calendar-alt"></span>
-                  <strong><?php echo esc_html((string) ($row['month'] ?? '')); ?></strong>
-                  <span class="nmb-spacer"></span>
-                  <?php echo esc_html(sprintf('%d offloaded / %d total', (int) ($row['offloaded'] ?? 0), (int) ($row['total'] ?? 0))); ?>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          <?php endif; ?>
-        </div>
+        </section>
       </div>
 
       <?php if (!empty($costComparison['scenarios'])) : ?>
-      <div class="nmb-card nmb-card--full">
+      <section class="nmb-card nmb-card--flush nmb-cost-card" aria-labelledby="nmb-cost-title">
         <div class="nmb-cost-card-header">
-          <div>
-            <h3><?php esc_html_e('Provider Cost Comparison', 'nimbus'); ?></h3>
-            <p class="nmb-muted" style="margin:4px 0 0;"><?php echo esc_html(sprintf(
-              /* translators: 1: GB stored, 2: number of files, 3: GB egress estimate */
-              __('Based on %1$.1f GB stored · %2$s files · est. %3$.1f GB monthly egress', 'nimbus'),
-              (float) ($costComparison['storage_gb'] ?? 0),
-              number_format((int) ($costComparison['offloaded_count'] ?? 0)),
-              (float) ($costComparison['egress_gb_est'] ?? 0)
-            )); ?></p>
-          </div>
-          <?php if ($currentScenario !== null && $currentScenario['estimated_monthly_total'] !== null) :
-            // Find the cheapest non-null, non-minio scenario to surface a savings callout
-            $cheapestTotal = null;
-            $cheapestLabel = '';
-            foreach ($costComparison['scenarios'] as $sc) {
-              if ($sc['estimated_monthly_total'] === null || $sc['provider_key'] === 'minio') {
-                continue;
-              }
-              if ($cheapestTotal === null || $sc['estimated_monthly_total'] < $cheapestTotal) {
-                $cheapestTotal = $sc['estimated_monthly_total'];
-                $cheapestLabel = $sc['label'];
-              }
-            }
-            $savings = $currentScenario['estimated_monthly_total'] - ($cheapestTotal ?? $currentScenario['estimated_monthly_total']);
-            if ($savings > 0.50 && ($cheapestTotal !== null && $cheapestLabel !== ($currentScenario['label'] ?? ''))) : ?>
-            <div class="nmb-cost-savings-badge">
-              <span class="dashicons dashicons-money-alt"></span>
-              <?php echo esc_html(sprintf(
-                /* translators: 1: monthly savings, 2: cheapest provider name */
-                __('Save ~$%1$s/mo with %2$s', 'nimbus'),
-                number_format($savings, 2),
-                $cheapestLabel
-              )); ?>
-            </div>
-          <?php endif; ?>
-          <?php endif; ?>
+          <h2 id="nmb-cost-title"><?php esc_html_e('Provider cost comparison', 'nimbus'); ?></h2>
+          <p class="nmb-muted"><?php echo esc_html(sprintf(
+            /* translators: 1: GB stored, 2: number of files, 3: GB egress estimate */
+            __('%1$s GB stored · %2$s files · est. %3$s GB monthly egress', 'nimbus'),
+            number_format_i18n((float) ($costComparison['storage_gb'] ?? 0), 1),
+            number_format_i18n((int) ($costComparison['offloaded_count'] ?? 0)),
+            number_format_i18n((float) ($costComparison['egress_gb_est'] ?? 0), 1)
+          )); ?></p>
         </div>
 
         <div class="nmb-cost-table-wrap">
           <table class="nmb-cost-table">
             <thead>
               <tr>
-                <th><?php esc_html_e('Provider', 'nimbus'); ?></th>
-                <th class="nmb-cost-table__num"><?php esc_html_e('Storage', 'nimbus'); ?></th>
-                <th class="nmb-cost-table__num"><?php esc_html_e('Egress', 'nimbus'); ?></th>
-                <th class="nmb-cost-table__num"><?php esc_html_e('Requests', 'nimbus'); ?></th>
-                <th class="nmb-cost-table__num"><?php esc_html_e('Base Fee', 'nimbus'); ?></th>
-                <th class="nmb-cost-table__num"><?php esc_html_e('Est. Monthly', 'nimbus'); ?></th>
+                <th scope="col"><?php esc_html_e('Provider', 'nimbus'); ?></th>
+                <th scope="col"><?php esc_html_e('Storage', 'nimbus'); ?></th>
+                <th scope="col"><?php esc_html_e('Egress', 'nimbus'); ?></th>
+                <th scope="col" class="nmb-cost-table__num"><?php esc_html_e('Est. monthly', 'nimbus'); ?></th>
               </tr>
             </thead>
             <tbody>
               <?php foreach ($costComparison['scenarios'] as $scenario) :
-                $isCurrent = ($scenario['provider_key'] ?? '') === $currentProvider;
-                $rowClass  = $isCurrent ? 'nmb-cost-table__row--current' : '';
+                $scenarioKey = (string) ($scenario['provider_key'] ?? '');
+                $isCurrent = $scenarioKey === $currentProvider;
               ?>
-                <tr class="<?php echo esc_attr($rowClass); ?>">
-                  <td class="nmb-cost-table__provider">
+                <tr class="<?php echo $isCurrent ? 'nmb-cost-table__row--current' : ''; ?>">
+                  <th scope="row" class="nmb-cost-table__provider">
+                    <?php $this->renderProviderIcon($scenarioKey); ?>
                     <?php if (!empty($scenario['pricing_url'])) : ?>
-                      <a href="<?php echo esc_url($scenario['pricing_url']); ?>" target="_blank" rel="noopener noreferrer">
-                        <?php echo esc_html($scenario['label']); ?>
-                      </a>
+                      <a href="<?php echo esc_url($scenario['pricing_url']); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($scenario['label']); ?></a>
                     <?php else : ?>
                       <?php echo esc_html($scenario['label']); ?>
                     <?php endif; ?>
                     <?php if ($isCurrent) : ?>
-                      <span class="nmb-badge nmb-badge--active"><?php esc_html_e('active', 'nimbus'); ?></span>
+                      <span class="nmb-badge nmb-badge--active"><?php esc_html_e('Active', 'nimbus'); ?></span>
                     <?php endif; ?>
-                    <?php if (!empty($scenario['notes'])) : ?>
-                      <span class="nmb-cost-table__note"><?php echo esc_html($scenario['notes']); ?></span>
-                    <?php endif; ?>
-                  </td>
+                  </th>
                   <?php if ($scenario['estimated_monthly_total'] === null) : ?>
-                    <td colspan="5" class="nmb-muted nmb-cost-table__num"><?php esc_html_e('Custom pricing — varies by vendor', 'nimbus'); ?></td>
+                    <td colspan="3" class="nmb-muted"><?php esc_html_e('Custom pricing, varies by vendor', 'nimbus'); ?></td>
                   <?php else : ?>
-                    <td class="nmb-cost-table__num">$<?php echo number_format((float) $scenario['storage_cost'], 2); ?></td>
-                    <td class="nmb-cost-table__num">
-                      <?php if ($scenario['egress_cost'] == 0.0) : ?>
-                        <span class="nmb-free"><?php esc_html_e('FREE', 'nimbus'); ?></span>
+                    <td>
+                      <?php if ((float) $scenario['flat_monthly'] > 0) : ?>
+                        <?php /* translators: %s: flat monthly fee */ echo esc_html(sprintf(__('$%s base', 'nimbus'), number_format((float) $scenario['flat_monthly'], 2))); ?>
                       <?php else : ?>
-                        $<?php echo number_format((float) $scenario['egress_cost'], 2); ?>
+                        $<?php echo esc_html(number_format((float) $scenario['storage_cost'], 2)); ?>
                       <?php endif; ?>
                     </td>
-                    <td class="nmb-cost-table__num">
-                      <?php if ($scenario['request_cost'] == 0.0) : ?>
-                        <span class="nmb-free"><?php esc_html_e('FREE', 'nimbus'); ?></span>
+                    <td>
+                      <?php if ((float) $scenario['egress_cost'] === 0.0) : ?>
+                        <?php echo (float) $scenario['flat_monthly'] > 0 ? esc_html__('Included', 'nimbus') : esc_html__('Free', 'nimbus'); ?>
                       <?php else : ?>
-                        $<?php echo number_format((float) $scenario['request_cost'], 2); ?>
+                        $<?php echo esc_html(number_format((float) $scenario['egress_cost'], 2)); ?>
                       <?php endif; ?>
                     </td>
-                    <td class="nmb-cost-table__num">
-                      <?php echo $scenario['flat_monthly'] > 0 ? '$' . number_format((float) $scenario['flat_monthly'], 2) : '—'; ?>
-                    </td>
-                    <td class="nmb-cost-table__num nmb-cost-table__total">
-                      <strong>$<?php echo number_format((float) $scenario['estimated_monthly_total'], 2); ?></strong>
-                    </td>
+                    <td class="nmb-cost-table__num nmb-cost-table__total">$<?php echo esc_html(number_format((float) $scenario['estimated_monthly_total'], 2)); ?></td>
                   <?php endif; ?>
                 </tr>
               <?php endforeach; ?>
             </tbody>
           </table>
         </div>
-        <p class="nmb-muted nmb-cost-disclaimer">
-          <?php // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment -- The "%" here is literal prose ("1% monthly new uploads"), not a printf placeholder; there is nothing for a translator to reorder. ?>
-          <?php esc_html_e('Estimates assume 10 monthly GET requests/file and 1% monthly new uploads. Prices sourced from provider websites and may change — always verify directly with your provider.', 'nimbus'); ?>
-        </p>
-      </div>
+        <p class="nmb-muted nmb-cost-disclaimer"><?php esc_html_e('Estimates only. Check current pricing with each provider.', 'nimbus'); ?></p>
+      </section>
       <?php endif; ?>
     </div>
     <?php
@@ -1460,60 +1293,6 @@ final class PageRenderer
     <?php
   }
 
-  private function renderAdminShellHeader(string $activeTab): void
-  {
-    $settings = $this->settings->all();
-    $providerKey = (string) ($settings['provider'] ?? 's3');
-    $providerLabel = $this->settings->provider_profile($providerKey)->label();
-    $deliveryLabel = $providerKey === 'local'
-      ? __('Local debug mode', 'nimbus')
-      : (!empty($settings['serve_from_storage']) ? __('Serving from storage', 'nimbus') : __('Serving from local URLs', 'nimbus'));
-    $loggingLabel = !empty($settings['logging_enabled']) ? __('Logging enabled', 'nimbus') : __('Logging disabled', 'nimbus');
-
-    $headerContent = match ($activeTab) {
-      'settings' => [
-        'kicker' => __('Settings', 'nimbus'),
-        'description' => __('Designated for provider setup, delivery behavior, caching rules, and automation—without burying the important controls under a wall of unrelated tools.', 'nimbus'),
-      ],
-      'tools' => [
-        'kicker' => __('Tools', 'nimbus'),
-        'description' => __('The operational workbench for jobs, migration recovery, URL repair, integrations, and logging—built for confidence instead of guesswork.', 'nimbus'),
-      ],
-      default => [
-        'kicker' => __('Overview', 'nimbus'),
-        'description' => __('A clean command center for checking readiness, volume, pipeline health, and the next actions worth taking on your media stack.', 'nimbus'),
-      ],
-    };
-    ?>
-    <section class="nmb-shell-header">
-      <div class="nmb-shell-header__content">
-        <p class="nmb-shell-kicker"><?php echo esc_html($headerContent['kicker']); ?></p>
-        <h1><?php esc_html_e('Nimbus', 'nimbus'); ?></h1>
-        <p class="nmb-shell-lede"><?php echo esc_html($headerContent['description']); ?></p>
-      </div>
-
-      <div class="nmb-shell-header__meta">
-        <div class="nmb-shell-meta-card">
-          <span class="nmb-shell-meta-card__label"><?php esc_html_e('Active view', 'nimbus'); ?></span>
-          <strong><?php echo esc_html(ucfirst($activeTab)); ?></strong>
-        </div>
-        <div class="nmb-shell-meta-card">
-          <span class="nmb-shell-meta-card__label"><?php esc_html_e('Provider', 'nimbus'); ?></span>
-          <strong id="nmb-shell-meta-provider"><?php echo esc_html($providerLabel); ?></strong>
-        </div>
-        <div class="nmb-shell-meta-card">
-          <span class="nmb-shell-meta-card__label"><?php esc_html_e('Delivery', 'nimbus'); ?></span>
-          <strong id="nmb-shell-meta-delivery"><?php echo esc_html($deliveryLabel); ?></strong>
-        </div>
-        <div class="nmb-shell-meta-card">
-          <span class="nmb-shell-meta-card__label"><?php esc_html_e('Diagnostics', 'nimbus'); ?></span>
-          <strong id="nmb-shell-meta-diagnostics"><?php echo esc_html($loggingLabel); ?></strong>
-        </div>
-      </div>
-    </section>
-    <?php
-  }
-
   /**
    * @param array<int, array{label:string, value:string, substat?:string, value_id?:string, substat_id?:string}> $items
    */
@@ -1651,5 +1430,87 @@ final class PageRenderer
       'rewrite_ready' => 0,
       'items' => [],
     ]);
+  }
+
+  /** Logo file in assets/img/logos for a provider key, or '' when there is none. */
+  private function providerLogo(string $providerKey): string
+  {
+    $map = [
+      's3' => 's3',
+      'r2' => 'cloudflare',
+      'gcs' => 'gcs',
+      'backblaze_b2' => 'backblaze',
+      'digitalocean_spaces' => 'digitalocean',
+      'wasabi' => 'wasabi',
+      'minio' => 'minio',
+    ];
+
+    return isset($map[$providerKey]) ? NIMBUS_URL . 'assets/img/logos/' . $map[$providerKey] . '.svg' : '';
+  }
+
+  /** Short provider names for the setup picker. */
+  private function providerShortLabel(string $providerKey): string
+  {
+    $labels = [
+      's3' => __('Amazon S3', 'nimbus'),
+      'r2' => __('Cloudflare R2', 'nimbus'),
+      'gcs' => __('Google Cloud', 'nimbus'),
+      'backblaze_b2' => __('Backblaze B2', 'nimbus'),
+      'digitalocean_spaces' => __('DO Spaces', 'nimbus'),
+      'wasabi' => __('Wasabi', 'nimbus'),
+      'minio' => __('MinIO', 'nimbus'),
+      's3_compatible' => __('Other S3-compatible', 'nimbus'),
+      'local' => __('Local (debug)', 'nimbus'),
+    ];
+
+    return $labels[$providerKey] ?? $this->settings->provider_profile($providerKey)->label();
+  }
+
+  private function renderProviderIcon(string $providerKey): void
+  {
+    $logo = $this->providerLogo($providerKey);
+    if ($logo !== '') {
+      echo '<img class="nmb-provider-icon" src="' . esc_url($logo) . '" width="22" height="22" alt="" />';
+      return;
+    }
+
+    echo '<span class="nmb-provider-icon nmb-provider-icon--text" aria-hidden="true">' . ($providerKey === 'local' ? 'L' : 'S3') . '</span>';
+  }
+
+  private function renderMark(): void
+  {
+    echo '<img class="nmb-mark" src="' . esc_url(NIMBUS_URL . 'assets/img/mark.svg') . '" width="36" height="36" alt="" />';
+  }
+
+  /** Brand row above the tabs: mark, name, version and the storage connection. */
+  private function renderBrandHeader(): void
+  {
+    $settings = $this->settings->all();
+    $providerKey = (string) ($settings['provider'] ?? 's3');
+    $bucket = (string) ($settings['bucket'] ?? '');
+    $ready = $providerKey === 'local' || $this->settings->has_valid_credentials();
+    ?>
+    <header class="nmb-brand-header">
+      <div class="nmb-brand">
+        <?php $this->renderMark(); ?>
+        <h1><?php esc_html_e('Nimbus', 'nimbus'); ?></h1>
+        <span class="nmb-brand__version"><?php echo esc_html(NIMBUS_VERSION); ?></span>
+      </div>
+      <p class="nmb-connection">
+        <?php $this->renderProviderIcon($providerKey); ?>
+        <span><?php echo esc_html($this->settings->provider_profile($providerKey)->label()); ?></span>
+        <?php if ($bucket !== '' && $providerKey !== 'local') : ?>
+          <span aria-hidden="true">&middot;</span>
+          <code><?php echo esc_html($bucket); ?></code>
+        <?php endif; ?>
+        <?php if ($ready) : ?>
+          <span class="nmb-state nmb-state--ok"><?php esc_html_e('Configured', 'nimbus'); ?></span>
+        <?php else : ?>
+          <span class="nmb-state nmb-state--warn"><?php esc_html_e('Needs credentials', 'nimbus'); ?></span>
+        <?php endif; ?>
+      </p>
+    </header>
+    <hr class="wp-header-end" />
+    <?php
   }
 }
