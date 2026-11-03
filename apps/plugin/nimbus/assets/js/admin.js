@@ -612,9 +612,20 @@ jQuery(document).ready(function ($) {
       setGroupVisible('prefix', !isLocal);
 
       updateProviderTip(provider);
+      applyQuickMode();
     }
 
     function validateStep(step) {
+      var message = validateFields(step);
+
+      if (message && step === 'storage' && isQuickMode()) {
+        return 'Connect your storage first, or enter keys by hand.';
+      }
+
+      return message;
+    }
+
+    function validateFields(step) {
       var provider = providerValue();
 
       if (step !== 'storage' || provider === 'local') {
@@ -777,6 +788,212 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Quick connect: one pasted token or key sets up the bucket and fills the
+    // storage fields. The manual fields stay in the form and are what gets saved.
+    var $storage = $form.find('[data-step="storage"]');
+    var $quickToggle = $wizard.find('[data-quick-toggle]');
+    var tickSvg = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    function quickPanel(provider) {
+      return $wizard.find('[data-quick-for="' + provider + '"]');
+    }
+
+    function isQuickMode() {
+      return $storage.attr('data-quick-mode') === 'quick' && quickPanel(providerValue()).length > 0;
+    }
+
+    function applyQuickMode() {
+      var provider = providerValue();
+      var quick = isQuickMode();
+
+      $wizard.find('[data-quick-for]').each(function () {
+        $(this).prop('hidden', !quick || $(this).attr('data-quick-for') !== provider);
+      });
+      $storage.find('[data-manual-fields], [data-manual-only]').prop('hidden', quick);
+      $quickToggle
+        .prop('hidden', steps[currentStep] !== 'storage' || !quickPanel(provider).length)
+        .text($quickToggle.attr(quick ? 'data-label-manual' : 'data-label-quick'));
+    }
+
+    function setQuickMode(quick) {
+      $storage.attr('data-quick-mode', quick ? 'quick' : 'manual');
+      applyQuickMode();
+    }
+
+    function fillCommand($panel) {
+      var region = $panel.find('select[data-quick-input="region"]').val() || '';
+      $panel.find('[data-quick-command]').each(function () {
+        $(this).text(($(this).attr('data-template') || '').split('__REGION__').join(region));
+      });
+    }
+
+    function fillStorageFields(result) {
+      var values = result.values || {};
+
+      $.each(values, function (key, value) {
+        if (key === 'provider' || key === 'use_path_style_endpoint') { return; }
+        var $field = fieldByName(key);
+        if ($field.length) {
+          $field.val(value);
+        }
+      });
+
+      fieldByName('use_path_style_endpoint').prop('checked', !!values.use_path_style_endpoint);
+      fieldByName('enabled').prop('checked', true);
+      // Serving straight from a bucket visitors cannot read would break images.
+      fieldByName('serve_from_storage').prop('checked', !!result.public);
+    }
+
+    function renderQuickResult($panel, result) {
+      var values = result.values || {};
+      var buckets = result.buckets || [];
+      var accounts = result.accounts || [];
+      var $checks = $panel.find('[data-quick-checks]').empty();
+      var $bucketChoice = $panel.find('[data-quick-buckets]');
+      var $accountChoice = $panel.find('[data-quick-accounts]');
+
+      $.each(result.steps || [], function (_index, step) {
+        var $item = $('<li/>').append($('<span class="nmb-quick__tick"/>').html(tickSvg));
+        $item.append($('<span class="nmb-quick__label"/>').text(step.label));
+        if (step.detail) {
+          $item.append($('<code class="nmb-quick__detail"/>').text(step.detail));
+        }
+        if (values.bucket && step.detail === values.bucket && buckets.length > 1 && $bucketChoice.prop('hidden')) {
+          $item.append($('<button type="button" class="nmb-link nmb-quick__pick" data-quick-pick-bucket/>').text('Use an existing bucket'));
+        }
+        $checks.append($item);
+      });
+
+      var $bucketSelect = $bucketChoice.find('select').empty();
+      $.each(buckets, function (_index, name) {
+        $bucketSelect.append($('<option/>').val(name).text(name));
+      });
+      $bucketSelect.val(values.bucket || '');
+
+      var $accountSelect = $accountChoice.find('select');
+      if (accounts.length) {
+        $accountSelect.empty().append($('<option value=""/>').text('Choose an account'));
+        $.each(accounts, function (_index, account) {
+          $accountSelect.append($('<option/>').val(account.id).text(account.name));
+        });
+      }
+      $accountChoice.prop('hidden', !accounts.length && !$accountSelect.val());
+
+      $panel.find('[data-quick-note]').text(result.note || '').prop('hidden', !result.note);
+      $panel.find('[data-quick-result]').prop('hidden', false);
+    }
+
+    function runQuickConnect($panel) {
+      var cfg = adminConfig.onboarding || {};
+      var provider = $panel.attr('data-quick-for');
+      var $button = $panel.find('[data-quick-connect]');
+      var $status = $wizard.find('#nmb-wizard-status');
+      var strings = adminConfig.strings || {};
+      var data = {
+        action: cfg.quickConnectAction,
+        nonce: cfg.quickConnectNonce,
+        provider: provider
+      };
+
+      if ($button.prop('disabled')) { return; }
+
+      $panel.find('[data-quick-input]').each(function () {
+        var $input = $(this);
+        if ($input.closest('[hidden]').length || $.trim($input.val() || '') === '') { return; }
+        data['input[' + $input.attr('data-quick-input') + ']'] = $input.val();
+      });
+
+      clearNotice();
+      $panel.find('[data-quick-input], [data-quick-connect]').prop('disabled', true);
+      $status.removeClass('is-ok is-error').text('Setting up your storage. This can take up to a minute…');
+
+      $.post(adminConfig.ajaxUrl || ajaxurl, data)
+        .done(function (response) {
+          if (!response || !response.success) {
+            $status.addClass('is-error').text((response && response.data && response.data.message) || strings.serverError || 'Could not connect.');
+            return;
+          }
+
+          var result = response.data || {};
+          renderQuickResult($panel, result);
+
+          if (result.values && result.values.bucket) {
+            fillStorageFields(result);
+            $panel.find('.nmb-quick__step').addClass('is-done');
+            $status.addClass('is-ok').text('Connected to ' + result.values.bucket);
+          } else {
+            $status.text('');
+          }
+        })
+        .fail(function (xhr) {
+          var body = xhr.responseJSON && xhr.responseJSON.data;
+          $status.addClass('is-error').text((body && body.message) || strings.serverError || 'Server error occurred.');
+        })
+        .always(function () {
+          $panel.find('[data-quick-input], [data-quick-connect]').prop('disabled', false);
+        });
+    }
+
+    $wizard.on('click', '[data-quick-connect]', function () {
+      runQuickConnect($(this).closest('[data-quick-for]'));
+    });
+
+    $wizard.on('keydown', 'input[data-quick-input]', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        runQuickConnect($(this).closest('[data-quick-for]'));
+      }
+    });
+
+    $wizard.on('change', '[data-quick-buckets] select, [data-quick-accounts] select', function () {
+      if ($(this).val()) {
+        runQuickConnect($(this).closest('[data-quick-for]'));
+      }
+    });
+
+    $wizard.on('click', '[data-quick-pick-bucket]', function () {
+      var $panel = $(this).closest('[data-quick-for]');
+      $(this).remove();
+      $panel.find('[data-quick-buckets]').prop('hidden', false).find('select').trigger('focus');
+    });
+
+    $wizard.on('click', '.nmb-quick__open', function () {
+      $(this).closest('.nmb-quick__step').addClass('is-done');
+    });
+
+    $wizard.on('change', 'select[data-quick-input="region"]', function () {
+      fillCommand($(this).closest('[data-quick-for]'));
+    });
+
+    $wizard.on('click', '[data-quick-copy]', function () {
+      var $button = $(this);
+      var text = $button.closest('.nmb-quick__step').find('[data-quick-command]').text();
+      var done = function () {
+        $button.text('Copied');
+        setTimeout(function () { $button.text('Copy command'); }, 2000);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done);
+        return;
+      }
+
+      var $temp = $('<textarea class="screen-reader-text"/>').val(text).appendTo('body');
+      $temp[0].select();
+      document.execCommand('copy');
+      $temp.remove();
+      done();
+    });
+
+    $quickToggle.on('click', function () {
+      clearNotice();
+      setQuickMode(!isQuickMode());
+    });
+
+    $wizard.find('[data-quick-for]').each(function () {
+      fillCommand($(this));
+    });
+
     $form.on('submit', function (event) {
       var blockingSteps = ['storage'];
 
@@ -842,6 +1059,7 @@ jQuery(document).ready(function ($) {
             }
           }
 
+          setQuickMode(false);
           $hint.text('Configuration loaded — review the fields below, then continue.').css('color', '#00a32a');
         } catch (_err) {
           $hint.text('Could not read file. Make sure it is a valid Nimbus JSON export.').css('color', '#d63638');

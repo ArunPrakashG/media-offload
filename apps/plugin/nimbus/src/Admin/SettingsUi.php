@@ -50,6 +50,7 @@ final class SettingsUi
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
     add_action('wp_ajax_' . NIMBUS_AJAX_ONBOARDING_SAVE_STEP, [$this, 'handle_save_onboarding_step']);
+    add_action('wp_ajax_' . NIMBUS_AJAX_QUICK_CONNECT, [$this, 'handle_quick_connect']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_CLEAR_LOGS, [$this, 'handle_clear_logs']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RESUME_MIGRATION, [$this, 'handle_resume_migration']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES, [$this, 'handle_run_url_updates']);
@@ -116,6 +117,8 @@ final class SettingsUi
       'onboarding' => [
         'saveStepAction' => NIMBUS_AJAX_ONBOARDING_SAVE_STEP,
         'saveStepNonce'  => wp_create_nonce(NIMBUS_AJAX_ONBOARDING_SAVE_STEP),
+        'quickConnectAction' => NIMBUS_AJAX_QUICK_CONNECT,
+        'quickConnectNonce' => wp_create_nonce(NIMBUS_AJAX_QUICK_CONNECT),
       ],
     ];
 
@@ -125,6 +128,11 @@ final class SettingsUi
   public function handle_test_connection(): void
   {
     $this->actionsController->handleTestConnection();
+  }
+
+  public function handle_quick_connect(): void
+  {
+    $this->actionsController->handleQuickConnect();
   }
 
   public function handle_save_onboarding_step(): void

@@ -135,6 +135,8 @@ final class PageRenderer
     $isLocalDefault = $savedProvider === 'local';
     $isR2Default    = $savedProvider === 'r2';
     $isS3CDefault   = in_array($savedProvider, ['s3_compatible', 'minio'], true);
+    // Start on quick connect unless storage is already set up or the provider has no quick connect.
+    $quickMode = !$isLocalDefault && (string) ($settings['access_key'] ?? '') === '' ? 'quick' : 'manual';
 
     // Picker order follows the mockup. Local is a debug mode and only shows when already chosen.
     $pickerKeys = array_values(array_filter(
@@ -162,7 +164,7 @@ final class PageRenderer
         <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>
         <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING); ?>" />
 
-        <section class="nmb-onboarding-step" data-step="storage" aria-labelledby="nmb-step-storage">
+        <section class="nmb-onboarding-step" data-step="storage" aria-labelledby="nmb-step-storage" data-quick-mode="<?php echo esc_attr($quickMode); ?>">
           <fieldset class="nmb-provider-picker">
             <legend id="nmb-step-storage"><?php esc_html_e('Where should your media live?', 'nimbus'); ?></legend>
             <div class="nmb-provider-grid">
@@ -176,7 +178,9 @@ final class PageRenderer
             </div>
           </fieldset>
 
-          <div class="nmb-wizard-fields">
+          <?php (new QuickConnectPanel($this->settings, $this->logger))->render($savedProvider); ?>
+
+          <div class="nmb-wizard-fields" data-manual-fields>
             <div data-provider-group="bucket-location"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
                 <span><?php esc_html_e('Bucket', 'nimbus'); ?></span>
@@ -233,7 +237,7 @@ final class PageRenderer
 
           <div class="nmb-onboarding-actions">
             <p class="nmb-wizard-status" id="nmb-wizard-status" role="status"></p>
-            <button type="button" class="button" data-wizard-test><?php esc_html_e('Test connection', 'nimbus'); ?></button>
+            <button type="button" class="button" data-wizard-test data-manual-only><?php esc_html_e('Test connection', 'nimbus'); ?></button>
             <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', 'nimbus'); ?></button>
           </div>
         </section>
@@ -317,6 +321,7 @@ final class PageRenderer
       </form>
 
       <p class="nmb-wizard-import">
+        <button type="button" class="nmb-link" data-quick-toggle data-label-quick="<?php esc_attr_e('Use quick connect', 'nimbus'); ?>" data-label-manual="<?php esc_attr_e('Enter keys by hand', 'nimbus'); ?>"><?php $quickMode === 'quick' ? esc_html_e('Enter keys by hand', 'nimbus') : esc_html_e('Use quick connect', 'nimbus'); ?></button>
         <label for="nmb-onboarding-config-file" class="nmb-link"><?php esc_html_e('Import settings from a Nimbus .json export', 'nimbus'); ?></label>
         <input type="file" id="nmb-onboarding-config-file" accept=".json,application/json" class="screen-reader-text" data-config-import />
         <span class="nmb-config-import-hint nmb-muted" role="status"></span>
