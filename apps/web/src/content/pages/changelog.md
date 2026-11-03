@@ -12,6 +12,15 @@ Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, ope
 
 - Quick connect in the setup wizard. Paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test. Works with every provider; Backblaze B2, Wasabi and DigitalOcean Spaces also get a new key limited to the media bucket.
 
+## 0.3.1 · November 2026
+
+Your storage keys are now encrypted in the database. Nothing to set up: existing keys are encrypted the next time an admin opens the dashboard.
+
+### Fixed
+
+- Storage credentials are now encrypted in the database, with a key derived from your site's security keys or a `NIMBUS_ENCRYPTION_KEY` constant. Existing settings are encrypted automatically.
+- The notice shown before deactivating Nimbus points to the restore job and `wp nimbus revert`, instead of a Tools panel that did not exist.
+
 ## 0.3.0 · November 2026
 
 A new look for the plugin admin and a more permissive license. Settings and offloaded files carry over unchanged.

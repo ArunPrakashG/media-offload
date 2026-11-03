@@ -1,10 +1,11 @@
 === Nimbus ===
 Contributors: arunprakashg
+Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -83,15 +84,19 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Screenshots ==
 
-1. Nimbus settings dashboard.
-2. Provider connection settings.
-3. Bulk offload job status.
-4. Per-attachment offload controls in the Media Library.
+1. Overview: offload totals, setup health and a storage cost comparison.
+2. Storage connection settings for the selected provider.
+3. Bulk jobs to offload the existing library, restore local copies or retry failures.
+4. Offload status for each file in the Media Library.
 
 == Changelog ==
 
 = Unreleased =
 * Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
+
+= 0.3.1 =
+* Storage credentials are encrypted in the database, using your site's security keys or a NIMBUS_ENCRYPTION_KEY constant.
+* The deactivation notice points to the restore job and wp nimbus revert.
 
 = 0.3.0 =
 * Relicensed under the MIT License.
@@ -123,6 +128,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.1 =
+Your storage keys are now encrypted in the database. Nothing to do: Nimbus encrypts them the next time you open the admin.
 
 = 0.3.0 =
 New admin design and an MIT license. Your settings and offloaded files are unchanged.

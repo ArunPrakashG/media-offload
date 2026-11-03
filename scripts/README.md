@@ -10,14 +10,11 @@ All scripts are run from the repo root.
 bash scripts/<script-name>.sh
 ```
 
-## Scripts (to be added)
+## Scripts
 
-| Script              | Purpose                                                       |
-| ------------------- | ------------------------------------------------------------- |
-| `bootstrap.sh`      | One-command dev environment setup (install deps for all apps) |
-| `build-all.sh`      | Build every app in dependency order                           |
-| `lint.sh`           | Run linters across all apps and packages                      |
-| `release-plugin.sh` | Package `apps/plugin/` into a distributable `.zip`            |
+| Script              | Purpose                                                                         |
+| ------------------- | ------------------------------------------------------------------------------- |
+| `release-plugin.sh` | Package `apps/plugin/nimbus` into `dist/nimbus-<version>.zip` and a `.sha256` file |
 
 ## Guidelines
 

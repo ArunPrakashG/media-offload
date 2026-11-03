@@ -15,6 +15,9 @@ if (!defined('ABSPATH')) {
 
 final class SettingsUi
 {
+  private const RESTORE_DOCS_URL = 'https://usenimbus.dev/docs/guides/restoring-files/';
+  private const DONATE_URL = 'https://buymeacoffee.com/arunprakashg';
+
   private ProviderCatalog $providerCatalog;
   private FieldRenderer $fieldRenderer;
   private SettingsRegistrar $settingsRegistrar;
@@ -45,7 +48,8 @@ final class SettingsUi
     add_action('admin_init', [$this, 'handle_onboarding_redirect'], 5);
     add_action('admin_notices', [$this, 'render_admin_notices']);
     add_action('admin_notices', [$this, 'render_deactivation_hint']);
-    add_filter('plugin_action_links_nimbus/nimbus.php', [$this, 'add_plugin_action_links']);
+    add_filter('plugin_action_links_' . plugin_basename(NIMBUS_FILE), [$this, 'add_plugin_action_links']);
+    add_filter('plugin_row_meta', [$this, 'add_plugin_row_meta'], 10, 2);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
     add_action('admin_post_' . NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION, [$this, 'handle_toggle_integration']);
     add_action('wp_ajax_' . NIMBUS_AJAX_TEST_CONNECTION, [$this, 'handle_test_connection']);
@@ -289,10 +293,12 @@ final class SettingsUi
         <strong><?php esc_html_e('Nimbus – Before you deactivate', 'nimbus'); ?></strong><br>
         <?php
         printf(
-          /* translators: %1$s: offloaded file count, %2$s: Tools link */
-          esc_html__('%1$s media file(s) have their URLs stored as CDN paths in the database. Deactivating Nimbus without reverting these first will break image delivery site-wide. Go to %2$s to revert all URLs back to local paths before deactivating.', 'nimbus'),
+          /* translators: %1$s: offloaded file count, %2$s: Tools link, %3$s: WP-CLI command, %4$s: docs link */
+          esc_html__('%1$s media file(s) are offloaded to your bucket. Deactivating Nimbus without restoring them can break images across the site. First run Restore local copies from %2$s, then run %3$s to put post content back on local URLs. See %4$s.', 'nimbus'),
           '<strong>' . esc_html(number_format_i18n($offloaded)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools → Revert URLs', 'nimbus') . '</a>'
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'nimbus') . '</a>',
+          '<code>wp nimbus revert</code>',
+          '<a href="' . esc_url(self::RESTORE_DOCS_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Restoring files', 'nimbus') . '</a>'
         );
         ?>
       </p>
@@ -301,12 +307,30 @@ final class SettingsUi
   }
 
   /**
-   * Adds a "⚠ Revert URLs first" action link next to Nimbus on the Plugins screen
+   * Adds a "⚠ Restore files first" action link next to Nimbus on the Plugins screen
    * when the DB contains CDN-rewritten attachments.
    *
    * @param array<string> $links Existing action links.
    * @return array<string>
    */
+  /**
+   * Adds Docs and Donate links under the plugin description on the Plugins screen.
+   *
+   * @param array<string> $links Existing row meta links.
+   * @return array<string>
+   */
+  public function add_plugin_row_meta(array $links, string $file): array
+  {
+    if ($file !== plugin_basename(NIMBUS_FILE)) {
+      return $links;
+    }
+
+    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'nimbus') . '</a>';
+    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'nimbus') . '</a>';
+
+    return $links;
+  }
+
   public function add_plugin_action_links(array $links): array
   {
     $settingsUrl = add_query_arg(['page' => NIMBUS_SLUG], admin_url('upload.php'));
@@ -328,7 +352,7 @@ final class SettingsUi
     if ($offloaded > 0) {
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       $links[] = '<a href="' . esc_url($toolsUrl) . '" style="color:#d63638;font-weight:600;">'
-        . esc_html__('⚠ Revert URLs before deactivating', 'nimbus')
+        . esc_html__('⚠ Restore files before deactivating', 'nimbus')
         . '</a>';
     }
 
