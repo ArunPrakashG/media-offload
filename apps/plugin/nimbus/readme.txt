@@ -81,6 +81,10 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Changelog ==
 
+= Unreleased =
+* Storage credentials are encrypted in the database, using your site's security keys or a NIMBUS_ENCRYPTION_KEY constant.
+* The deactivation notice points to the restore job and wp nimbus revert.
+
 = 0.3.0 =
 * Relicensed under the MIT License.
 * New Nimbus brand across the admin: header with connection status, a reworked overview and a guided setup wizard.

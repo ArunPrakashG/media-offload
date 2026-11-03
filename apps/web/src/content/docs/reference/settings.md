@@ -21,9 +21,9 @@ Open **Media → Nimbus → Settings**.
 | Bucket | `bucket` | Empty | Bucket or Space name. |
 | Account ID | `r2_account_id` | Empty | Cloudflare R2 only. |
 | Region | `region` | Empty | Fixed to `auto` for R2. |
-| Access Key | `access_key` | Empty | Stored as plain text in the option. |
-| Secret Key | `secret_key` | Empty | Stored as plain text in the option. |
-| Session Token | `session_token` | Empty | Optional. Hidden under **Show advanced connection fields**. |
+| Access Key | `access_key` | Empty | Stored encrypted. See [How credentials are stored](#how-credentials-are-stored). |
+| Secret Key | `secret_key` | Empty | Stored encrypted. |
+| Session Token | `session_token` | Empty | Optional. Hidden under **Show advanced connection fields**. Stored encrypted. |
 | Path Prefix | `prefix` | Empty | Folder inside the bucket. |
 | Custom Endpoint | `endpoint` | Empty | Built for you on most providers. Always shown for S3-compatible and MinIO. |
 | Use Path Style | `use_path_style_endpoint` | Off | Forced on for R2, GCS and MinIO. |
@@ -85,6 +85,20 @@ Open **Media → Nimbus → Logs** and expand **Logging settings**.
 | Minimum Log Level | `log_level` | `info` | `debug`, `info`, `notice`, `warning`, `error`, `critical` |
 | Retained Entries | `log_max_entries` | 2000 | 100 to 10000 |
 | Mirror To PHP Error Log | `log_to_error_log` | On | |
+
+## How credentials are stored
+
+Nimbus encrypts the access key, secret key, session token and Cloudflare API token before it saves them in the `nimbus_settings` option. Someone who reads the database or a backup of it sees only ciphertext.
+
+The encryption key comes from `LOGGED_IN_KEY` and `LOGGED_IN_SALT` in `wp-config.php`. To use a key of your own, add this line to `wp-config.php` before the "stop editing" line:
+
+```php
+define('NIMBUS_ENCRYPTION_KEY', 'a long random string');
+```
+
+If that key or the site's security keys change, Nimbus can no longer read the saved credentials. It shows a notice, and you enter the keys again in **Media → Nimbus → Settings**. Settings saved by older versions are encrypted the next time an admin opens the dashboard.
+
+A [config export](/docs/reference/config-export/) still contains the credentials in plain text, so keep export files private.
 
 ## Settings without a screen
 

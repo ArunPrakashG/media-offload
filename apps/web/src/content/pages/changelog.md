@@ -6,6 +6,13 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
+## Unreleased
+
+### Fixed
+
+- Storage credentials are now encrypted in the database, with a key derived from your site's security keys or a `NIMBUS_ENCRYPTION_KEY` constant. Existing settings are encrypted automatically.
+- The notice shown before deactivating Nimbus points to the restore job and `wp nimbus revert`, instead of a Tools panel that did not exist.
+
 ## 0.3.0 · November 2026
 
 A new look for the plugin admin and a more permissive license. Settings and offloaded files carry over unchanged.
