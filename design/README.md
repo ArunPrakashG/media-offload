@@ -54,6 +54,9 @@ Only what the screens use.
 | Docs | Docs page template, provider guide |
 | WP admin: Overview | Plugin dashboard in the brand |
 | WP admin: Connect storage | Setup wizard, provider picker |
+| WP admin: Quick connect, token | R2 from one pasted token: account, bucket, public URL found for you |
+| WP admin: Quick connect, key | B2, Wasabi, Spaces, MinIO: one admin key in, bucket-only key out |
+| WP admin: Quick connect, command | S3 and Google Cloud: one command in the provider's browser shell, paste back one line |
 | Open Graph 1200x630 | Social card |
 | WordPress.org banner 1544x500 | Plugin directory banner |
 | Plugin icon 256 | Plugin directory icon |
