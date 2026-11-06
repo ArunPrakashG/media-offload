@@ -8,11 +8,11 @@ Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, ope
 
 ## 0.3.4 · November 2026
 
-The plugin is now called Arun Prakash Media Offload in WordPress, after feedback from the WordPress.org plugin review.
+The plugin is now called UseNimbus Media Offload in WordPress, after feedback from the WordPress.org plugin review.
 
 ### Changed
 
-- The plugin name is **Arun Prakash Media Offload**, and the plugin folder and text domain are `arun-prakash-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
+- The plugin name is **UseNimbus Media Offload**, and the plugin folder and text domain are `usenimbus-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
 - Installed an earlier version? Follow [Upgrading from 0.3.3 or earlier](/docs/#upgrading-from-033-or-earlier) so the old copy's uninstall cleanup does not remove your settings.
 - Updated the AWS SDK to 3.401.5 and its dependencies.
 

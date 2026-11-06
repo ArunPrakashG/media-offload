@@ -27,10 +27,10 @@ After activation you land in the setup wizard at **Media → Nimbus**. Nimbus is
 
 ### Upgrading from 0.3.3 or earlier
 
-From 0.3.4 the plugin is called **Arun Prakash Media Offload** and lives in an `arun-prakash-media-offload` folder, to match its WordPress.org name. Before that it was **Nimbus** (folder `nimbus`) and, in 0.3.3, **Nimbus Media Offload**. Uploading the new ZIP installs it next to the old copy. Both copies share the same settings and offloaded files, so:
+From 0.3.4 the plugin is called **UseNimbus Media Offload** and lives in an `usenimbus-media-offload` folder, to match its WordPress.org name. Before that it was **Nimbus** (folder `nimbus`) and, in 0.3.3, **Nimbus Media Offload**. Uploading the new ZIP installs it next to the old copy. Both copies share the same settings and offloaded files, so:
 
 1. Deactivate the old plugin (**Nimbus** or **Nimbus Media Offload**).
-2. Activate **Arun Prakash Media Offload**.
+2. Activate **UseNimbus Media Offload**.
 3. Remove the old plugin folder, `wp-content/plugins/nimbus` or `wp-content/plugins/nimbus-media-offload`, over SFTP or SSH.
 
 Do not use **Delete** on the old copy in the Plugins screen. That runs its uninstall cleanup, which removes the settings and offload records the new copy uses.

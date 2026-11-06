@@ -31,8 +31,8 @@ final class NetworkAdminPage
   public function addNetworkMenu(): void
   {
     add_menu_page(
-      __('Nimbus Network', 'arun-prakash-media-offload'),
-      __('Nimbus', 'arun-prakash-media-offload'),
+      __('Nimbus Network', 'usenimbus-media-offload'),
+      __('Nimbus', 'usenimbus-media-offload'),
       'manage_network',
       self::MENU_SLUG,
       [$this, 'renderPage'],
@@ -44,26 +44,26 @@ final class NetworkAdminPage
   public function renderPage(): void
   {
     if (!current_user_can('manage_network')) {
-      wp_die(esc_html__('You do not have permission to access this page.', 'arun-prakash-media-offload'));
+      wp_die(esc_html__('You do not have permission to access this page.', 'usenimbus-media-offload'));
     }
 
     $sites = $this->getSiteStats();
     ?>
     <div class="wrap">
-      <h1><?php esc_html_e('Nimbus — Network Overview', 'arun-prakash-media-offload'); ?></h1>
+      <h1><?php esc_html_e('Nimbus — Network Overview', 'usenimbus-media-offload'); ?></h1>
 
-      <h2><?php esc_html_e('Per-site offload statistics', 'arun-prakash-media-offload'); ?></h2>
+      <h2><?php esc_html_e('Per-site offload statistics', 'usenimbus-media-offload'); ?></h2>
       <?php if (empty($sites)) : ?>
-        <p><?php esc_html_e('No sites found in this network.', 'arun-prakash-media-offload'); ?></p>
+        <p><?php esc_html_e('No sites found in this network.', 'usenimbus-media-offload'); ?></p>
       <?php else : ?>
         <table class="widefat striped">
           <thead>
             <tr>
-              <th><?php esc_html_e('Site', 'arun-prakash-media-offload'); ?></th>
-              <th><?php esc_html_e('Provider', 'arun-prakash-media-offload'); ?></th>
-              <th><?php esc_html_e('Offloaded files', 'arun-prakash-media-offload'); ?></th>
-              <th><?php esc_html_e('Pending', 'arun-prakash-media-offload'); ?></th>
-              <th><?php esc_html_e('Settings', 'arun-prakash-media-offload'); ?></th>
+              <th><?php esc_html_e('Site', 'usenimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Provider', 'usenimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Offloaded files', 'usenimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Pending', 'usenimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Settings', 'usenimbus-media-offload'); ?></th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +72,7 @@ final class NetworkAdminPage
                 <td>
                   <strong><?php echo esc_html($site['name']); ?></strong>
                   <div class="row-actions">
-                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'arun-prakash-media-offload'); ?></a></span>
+                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'usenimbus-media-offload'); ?></a></span>
                   </div>
                 </td>
                 <td><?php echo esc_html($site['provider']); ?></td>
@@ -80,7 +80,7 @@ final class NetworkAdminPage
                 <td><?php echo esc_html((string) $site['pending_count']); ?></td>
                 <td>
                   <a href="<?php echo esc_url($site['settings_url']); ?>" target="_blank">
-                    <?php esc_html_e('Open', 'arun-prakash-media-offload'); ?>
+                    <?php esc_html_e('Open', 'usenimbus-media-offload'); ?>
                   </a>
                 </td>
               </tr>

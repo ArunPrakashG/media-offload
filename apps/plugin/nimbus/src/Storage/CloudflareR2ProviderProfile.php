@@ -19,36 +19,36 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile implemen
 
   public function label(): string
   {
-    return __('Cloudflare R2', 'arun-prakash-media-offload');
+    return __('Cloudflare R2', 'usenimbus-media-offload');
   }
 
   public function title(): string
   {
-    return __('Cloudflare R2', 'arun-prakash-media-offload');
+    return __('Cloudflare R2', 'usenimbus-media-offload');
   }
 
   public function summary(): string
   {
-    return __('R2 uses account-scoped endpoints, region=auto, and path-style signing. Provide your bucket and either an account ID or a custom R2 endpoint.', 'arun-prakash-media-offload');
+    return __('R2 uses account-scoped endpoints, region=auto, and path-style signing. Provide your bucket and either an account ID or a custom R2 endpoint.', 'usenimbus-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', 'arun-prakash-media-offload'),
-      'access_key' => __('Access Key', 'arun-prakash-media-offload'),
-      'secret_key' => __('Secret Key', 'arun-prakash-media-offload'),
+      'bucket' => __('Bucket', 'usenimbus-media-offload'),
+      'access_key' => __('Access Key', 'usenimbus-media-offload'),
+      'secret_key' => __('Secret Key', 'usenimbus-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'       => __('Your Cloudflare R2 bucket name.', 'arun-prakash-media-offload'),
-      'r2_account_id' => __('Your Cloudflare account ID (found in the dashboard → Overview). Used to auto-build the R2 endpoint when no custom endpoint is set.', 'arun-prakash-media-offload'),
-      'access_key'   => __('Access Key ID from your R2 API token — create one under R2 → Manage API tokens.', 'arun-prakash-media-offload'),
-      'secret_key'   => __('Secret Access Key from your R2 API token, paired with the Access Key ID above.', 'arun-prakash-media-offload'),
-      'endpoint'     => __('Leave empty to auto-build from Account ID, or enter a full custom R2 endpoint URL.', 'arun-prakash-media-offload'),
+      'bucket'       => __('Your Cloudflare R2 bucket name.', 'usenimbus-media-offload'),
+      'r2_account_id' => __('Your Cloudflare account ID (found in the dashboard → Overview). Used to auto-build the R2 endpoint when no custom endpoint is set.', 'usenimbus-media-offload'),
+      'access_key'   => __('Access Key ID from your R2 API token — create one under R2 → Manage API tokens.', 'usenimbus-media-offload'),
+      'secret_key'   => __('Secret Access Key from your R2 API token, paired with the Access Key ID above.', 'usenimbus-media-offload'),
+      'endpoint'     => __('Leave empty to auto-build from Account ID, or enter a full custom R2 endpoint URL.', 'usenimbus-media-offload'),
       'session_token' => '',
     ];
   }
@@ -56,7 +56,7 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile implemen
   public function fieldLabels(): array
   {
     return [
-      'r2_account_id' => __('R2 Account ID', 'arun-prakash-media-offload'),
+      'r2_account_id' => __('R2 Account ID', 'usenimbus-media-offload'),
     ];
   }
 
@@ -66,7 +66,7 @@ final class CloudflareR2ProviderProfile extends AbstractProviderProfile implemen
     $missing = parent::missingCredentialLabels($values);
 
     if ($values['r2_account_id'] === '' && $values['endpoint'] === '') {
-      $missing[] = __('R2 Account ID or Custom Endpoint', 'arun-prakash-media-offload');
+      $missing[] = __('R2 Account ID or Custom Endpoint', 'usenimbus-media-offload');
     }
 
     return $missing;

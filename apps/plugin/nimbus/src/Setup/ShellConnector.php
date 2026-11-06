@@ -93,11 +93,11 @@ final class ShellConnector
 
     $data = json_decode($output, true);
     if (!is_array($data) || (int) ($data['nimbus'] ?? 0) !== 1) {
-      throw new QuickConnectException(esc_html__('Paste the line the command printed. It starts with {"nimbus":1', 'arun-prakash-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste the line the command printed. It starts with {"nimbus":1', 'usenimbus-media-offload'));
     }
 
     if (($data['provider'] ?? '') !== $this->provider) {
-      throw new QuickConnectException(esc_html__('That line was made for a different provider. Run the command shown above.', 'arun-prakash-media-offload'));
+      throw new QuickConnectException(esc_html__('That line was made for a different provider. Run the command shown above.', 'usenimbus-media-offload'));
     }
 
     $bucket = (string) ($data['bucket'] ?? '');
@@ -106,19 +106,19 @@ final class ShellConnector
     $secret = trim((string) ($data['secret_key'] ?? ''));
 
     if (!self::validBucket($bucket) || $key === '' || $secret === '' || !preg_match('/^[a-z0-9-]+$/', $region)) {
-      throw new QuickConnectException(esc_html__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'arun-prakash-media-offload'));
+      throw new QuickConnectException(esc_html__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'usenimbus-media-offload'));
     }
 
     $result = new ConnectResult();
     $result->buckets = [$bucket];
     $result->public = !empty($data['public']);
-    $result->step(__('Bucket found', 'arun-prakash-media-offload'), $bucket . ' · ' . $region);
-    $result->step(__('Keys belong to a user that can only reach this bucket', 'arun-prakash-media-offload'));
+    $result->step(__('Bucket found', 'usenimbus-media-offload'), $bucket . ' · ' . $region);
+    $result->step(__('Keys belong to a user that can only reach this bucket', 'usenimbus-media-offload'));
 
     if (!$result->public) {
       $result->note = $this->provider === 'gcs'
-        ? __('Your organization blocks public buckets, so visitors cannot load files straight from it. Serve media through a CDN, or allow public access for this bucket.', 'arun-prakash-media-offload')
-        : __('Your AWS account blocks public buckets, so visitors cannot load files straight from it. Turn off "Block public access" for this bucket, or serve media through CloudFront.', 'arun-prakash-media-offload');
+        ? __('Your organization blocks public buckets, so visitors cannot load files straight from it. Serve media through a CDN, or allow public access for this bucket.', 'usenimbus-media-offload')
+        : __('Your AWS account blocks public buckets, so visitors cannot load files straight from it. Turn off "Block public access" for this bucket, or serve media through CloudFront.', 'usenimbus-media-offload');
     }
 
     $result->values = [

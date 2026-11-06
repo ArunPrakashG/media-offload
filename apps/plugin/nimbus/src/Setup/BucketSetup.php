@@ -31,10 +31,10 @@ final class BucketSetup
     try {
       $listing = $this->client->listBuckets();
     } catch (\Throwable $exception) {
-      throw new QuickConnectException(esc_html(__('These keys were not accepted', 'arun-prakash-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
+      throw new QuickConnectException(esc_html(__('These keys were not accepted', 'usenimbus-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
     }
 
-    $result->step(__('Keys verified', 'arun-prakash-media-offload'));
+    $result->step(__('Keys verified', 'usenimbus-media-offload'));
 
     foreach ((array) ($listing['Buckets'] ?? []) as $bucket) {
       $result->buckets[] = (string) $bucket['Name'];
@@ -46,7 +46,7 @@ final class BucketSetup
     }
 
     if (in_array($name, $result->buckets, true)) {
-      $result->step(__('Using bucket', 'arun-prakash-media-offload'), $name);
+      $result->step(__('Using bucket', 'usenimbus-media-offload'), $name);
       return $name;
     }
 
@@ -60,23 +60,23 @@ final class BucketSetup
     } catch (\Aws\S3\Exception\S3Exception $exception) {
       if ($exception->getAwsErrorCode() === 'BucketAlreadyOwnedByYou') {
         $result->buckets[] = $name;
-        $result->step(__('Using bucket', 'arun-prakash-media-offload'), $name);
+        $result->step(__('Using bucket', 'usenimbus-media-offload'), $name);
         return $name;
       }
       if ($exception->getAwsErrorCode() === 'BucketAlreadyExists') {
         throw new QuickConnectException(esc_html(sprintf(
           /* translators: %s: bucket name */
-          __('The bucket name %s is taken by another account. Choose another name.', 'arun-prakash-media-offload'),
+          __('The bucket name %s is taken by another account. Choose another name.', 'usenimbus-media-offload'),
           $name
         )));
       }
-      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'arun-prakash-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
+      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'usenimbus-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
     } catch (\Throwable $exception) {
-      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'arun-prakash-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
+      throw new QuickConnectException(esc_html(__('Could not create the bucket', 'usenimbus-media-offload') . ': ' . $this->quickConnect->errorMessage($exception)));
     }
 
     $result->buckets[] = $name;
-    $result->step(__('Bucket created', 'arun-prakash-media-offload'), $name);
+    $result->step(__('Bucket created', 'usenimbus-media-offload'), $name);
 
     return $name;
   }
@@ -98,10 +98,10 @@ final class BucketSetup
 
     try {
       $this->client->putBucketPolicy(['Bucket' => $bucket, 'Policy' => $this->quickConnect->publicReadPolicy($bucket)]);
-      $result->step(__('Public reads on', 'arun-prakash-media-offload'), __('Files can be loaded by visitors', 'arun-prakash-media-offload'));
+      $result->step(__('Public reads on', 'usenimbus-media-offload'), __('Files can be loaded by visitors', 'usenimbus-media-offload'));
     } catch (\Throwable $exception) {
       $result->public = false;
-      $result->note = __('The provider refused a public-read policy for this bucket. Make it public in the provider console, or serve media through a CDN.', 'arun-prakash-media-offload');
+      $result->note = __('The provider refused a public-read policy for this bucket. Make it public in the provider console, or serve media through a CDN.', 'usenimbus-media-offload');
       $this->quickConnect->logger()->warning('Quick connect could not make {bucket} public: {error}', [
         'bucket' => $bucket,
         'error' => $this->quickConnect->errorMessage($exception),

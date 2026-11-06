@@ -1,4 +1,4 @@
-=== Arun Prakash Media Offload ===
+=== UseNimbus Media Offload ===
 Contributors: arunprakashg
 Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
@@ -72,7 +72,7 @@ This plugin bundles the following third-party libraries:
 
 == Installation ==
 
-1. In WordPress, go to **Plugins → Add New**, search for Arun Prakash Media Offload, then install and activate it. To install by hand, upload the `arun-prakash-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
+1. In WordPress, go to **Plugins → Add New**, search for UseNimbus Media Offload, then install and activate it. To install by hand, upload the `usenimbus-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
 2. Go to **Media → Nimbus** to open the setup wizard.
 3. Connect your storage provider with quick connect, or enter the bucket, region and keys by hand.
 4. New uploads are offloaded automatically. To move the existing library, use **Offload existing library** on the **Tools** tab.
@@ -105,7 +105,7 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 == Changelog ==
 
 = 0.3.4 =
-* Renamed to Arun Prakash Media Offload for the WordPress.org directory. The plugin folder and text domain are now arun-prakash-media-offload.
+* Renamed to UseNimbus Media Offload for the WordPress.org directory. The plugin folder and text domain are now usenimbus-media-offload.
 * Media Library offload, restore and retry now check that you can edit that attachment.
 * Image URLs inserted into post content are escaped.
 * Updated the AWS SDK to 3.401.5 and its dependencies.
@@ -155,7 +155,7 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 == Upgrade Notice ==
 
 = 0.3.4 =
-Renamed to Arun Prakash Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.
+Renamed to UseNimbus Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.
 
 = 0.3.3 =
 Renamed to Nimbus Media Offload.

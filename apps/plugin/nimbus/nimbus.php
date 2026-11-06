@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Arun Prakash Media Offload
+ * Plugin Name: UseNimbus Media Offload
  * Plugin URI: https://usenimbus.dev
  * Description: Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.
  * Version: 0.3.4
@@ -8,7 +8,7 @@
  * Requires PHP: 8.1
  * Author: Arun Prakash
  * Author URI: https://arunprakashg.com
- * Text Domain: arun-prakash-media-offload
+ * Text Domain: usenimbus-media-offload
  * License: MIT
  * License URI: https://opensource.org/license/mit
  */
@@ -35,7 +35,7 @@ foreach ($nimbus_active_plugins as $nimbus_active_plugin) {
       }
       printf(
         '<div class="notice notice-warning"><p>%s</p></div>',
-        esc_html__('Arun Prakash Media Offload is waiting for another copy of this plugin (Nimbus or Nimbus Media Offload) that is still active. Deactivate that copy on the Plugins screen and this one takes over with the same settings. Then remove the old plugin folder over SFTP: its Delete button would also erase the settings both copies share.', 'arun-prakash-media-offload')
+        esc_html__('UseNimbus Media Offload is waiting for another copy of this plugin (Nimbus or Nimbus Media Offload) that is still active. Deactivate that copy on the Plugins screen and this one takes over with the same settings. Then remove the old plugin folder over SFTP: its Delete button would also erase the settings both copies share.', 'usenimbus-media-offload')
       );
     };
     add_action('admin_notices', $nimbus_waiting_notice);
@@ -49,7 +49,7 @@ define('NIMBUS_VERSION', '0.3.4');
 define('NIMBUS_FILE', __FILE__);
 define('NIMBUS_PATH', plugin_dir_path(__FILE__));
 define('NIMBUS_URL', plugin_dir_url(__FILE__));
-define('NIMBUS_TEXT_DOMAIN', 'arun-prakash-media-offload');
+define('NIMBUS_TEXT_DOMAIN', 'usenimbus-media-offload');
 define('NIMBUS_SLUG', 'nimbus');
 define('NIMBUS_SETTINGS_GROUP', 'nimbus');
 define('NIMBUS_SCRIPT_HANDLE', 'nimbus-admin');

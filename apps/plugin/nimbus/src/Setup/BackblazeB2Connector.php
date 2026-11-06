@@ -27,7 +27,7 @@ final class BackblazeB2Connector
     $key = trim((string) ($input['key'] ?? ''));
 
     if ($keyId === '' || $key === '') {
-      throw new QuickConnectException(esc_html__('Paste both the keyID and the applicationKey.', 'arun-prakash-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste both the keyID and the applicationKey.', 'usenimbus-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -36,7 +36,7 @@ final class BackblazeB2Connector
     ]);
 
     if ($auth['status'] !== 200 || empty($auth['body']['authorizationToken'])) {
-      throw new QuickConnectException(esc_html(__('Backblaze did not accept this key', 'arun-prakash-media-offload') . ': ' . $this->apiError($auth['body'])));
+      throw new QuickConnectException(esc_html(__('Backblaze did not accept this key', 'usenimbus-media-offload') . ': ' . $this->apiError($auth['body'])));
     }
 
     $storage = (array) ($auth['body']['apiInfo']['storageApi'] ?? []);
@@ -47,7 +47,7 @@ final class BackblazeB2Connector
     $capabilities = (array) ($storage['allowed']['capabilities'] ?? []);
     $restrictedTo = (array) ($storage['allowed']['buckets'] ?? []);
 
-    $result->step(__('Key verified', 'arun-prakash-media-offload'), $region);
+    $result->step(__('Key verified', 'usenimbus-media-offload'), $region);
 
     $values = [
       'provider' => 'backblaze_b2',
@@ -60,14 +60,14 @@ final class BackblazeB2Connector
     if (count($restrictedTo) === 1 && !in_array('writeKeys', $capabilities, true)) {
       $bucket = (string) ($restrictedTo[0]['name'] ?? '');
       $result->buckets = [$bucket];
-      $result->step(__('Using bucket', 'arun-prakash-media-offload'), $bucket);
+      $result->step(__('Using bucket', 'usenimbus-media-offload'), $bucket);
       $result->values = $values + ['bucket' => $bucket, 'access_key' => $keyId, 'secret_key' => $key];
       return $result;
     }
 
     foreach (['listBuckets', 'writeBuckets', 'writeKeys'] as $needed) {
       if (!in_array($needed, $capabilities, true)) {
-        throw new QuickConnectException(esc_html__('This key cannot create buckets and keys. In Backblaze, create a key for All buckets with Read and Write access.', 'arun-prakash-media-offload'));
+        throw new QuickConnectException(esc_html__('This key cannot create buckets and keys. In Backblaze, create a key for All buckets with Read and Write access.', 'usenimbus-media-offload'));
       }
     }
 
@@ -84,7 +84,7 @@ final class BackblazeB2Connector
     if ($name !== '' && isset($buckets[$name])) {
       $bucket = $buckets[$name];
       $result->public = ($bucket['bucketType'] ?? '') === 'allPublic';
-      $result->step(__('Using bucket', 'arun-prakash-media-offload'), $name);
+      $result->step(__('Using bucket', 'usenimbus-media-offload'), $name);
     } else {
       $bucket = $this->createBucket($name !== '' ? $name : $this->quickConnect->defaultBucketName(true), $result);
       $result->buckets[] = (string) $bucket['bucketName'];
@@ -96,7 +96,7 @@ final class BackblazeB2Connector
       'capabilities' => ['listBuckets', 'listFiles', 'readFiles', 'writeFiles', 'deleteFiles'],
       'bucketIds' => [(string) $bucket['bucketId']],
     ]);
-    $result->step(__('New key made for this bucket only', 'arun-prakash-media-offload'), __('The key you pasted is not saved', 'arun-prakash-media-offload'));
+    $result->step(__('New key made for this bucket only', 'usenimbus-media-offload'), __('The key you pasted is not saved', 'usenimbus-media-offload'));
 
     $result->values = $values + [
       'bucket' => (string) $bucket['bucketName'],
@@ -130,14 +130,14 @@ final class BackblazeB2Connector
 
     try {
       $bucket = $this->api('b2_create_bucket', $request);
-      $result->step(__('Public bucket created', 'arun-prakash-media-offload'), $name);
+      $result->step(__('Public bucket created', 'usenimbus-media-offload'), $name);
       return $bucket;
     } catch (QuickConnectException $exception) {
       $request['bucketType'] = 'allPrivate';
       $bucket = $this->api('b2_create_bucket', $request);
       $result->public = false;
-      $result->step(__('Private bucket created', 'arun-prakash-media-offload'), $name);
-      $result->note = __('Backblaze only allows public buckets once the account has a payment history. Make the bucket public in Backblaze before serving media from it.', 'arun-prakash-media-offload');
+      $result->step(__('Private bucket created', 'usenimbus-media-offload'), $name);
+      $result->note = __('Backblaze only allows public buckets once the account has a payment history. Make the bucket public in Backblaze before serving media from it.', 'usenimbus-media-offload');
       return $bucket;
     }
   }
@@ -165,6 +165,6 @@ final class BackblazeB2Connector
 
   private function apiError(?array $body): string
   {
-    return (string) ($body['message'] ?? $body['code'] ?? __('unexpected response from Backblaze', 'arun-prakash-media-offload'));
+    return (string) ($body['message'] ?? $body['code'] ?? __('unexpected response from Backblaze', 'usenimbus-media-offload'));
   }
 }

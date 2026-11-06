@@ -33,37 +33,37 @@ final class DigitalOceanSpacesProviderProfile extends AbstractProviderProfile im
 
   public function label(): string
   {
-    return __('DigitalOcean Spaces', 'arun-prakash-media-offload');
+    return __('DigitalOcean Spaces', 'usenimbus-media-offload');
   }
 
   public function title(): string
   {
-    return __('DigitalOcean Spaces', 'arun-prakash-media-offload');
+    return __('DigitalOcean Spaces', 'usenimbus-media-offload');
   }
 
   public function summary(): string
   {
-    return __('DigitalOcean Spaces Object Storage — S3-compatible. Enter your Space name as the bucket and select the datacenter region. Optionally enable the built-in Spaces CDN from your DigitalOcean control panel and enter the CDN URL here.', 'arun-prakash-media-offload');
+    return __('DigitalOcean Spaces Object Storage — S3-compatible. Enter your Space name as the bucket and select the datacenter region. Optionally enable the built-in Spaces CDN from your DigitalOcean control panel and enter the CDN URL here.', 'usenimbus-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Space Name (bucket)', 'arun-prakash-media-offload'),
-      'region' => __('Region (e.g. nyc3, ams3, sgp1)', 'arun-prakash-media-offload'),
-      'access_key' => __('Spaces Access Key', 'arun-prakash-media-offload'),
-      'secret_key' => __('Spaces Secret Key', 'arun-prakash-media-offload'),
+      'bucket' => __('Space Name (bucket)', 'usenimbus-media-offload'),
+      'region' => __('Region (e.g. nyc3, ams3, sgp1)', 'usenimbus-media-offload'),
+      'access_key' => __('Spaces Access Key', 'usenimbus-media-offload'),
+      'secret_key' => __('Spaces Secret Key', 'usenimbus-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your DigitalOcean Space name (used as the bucket).', 'arun-prakash-media-offload'),
-      'region'        => __('Spaces region slug, e.g. nyc3, ams3, sgp1, fra1, blr1. Found in your Space URL.', 'arun-prakash-media-offload'),
-      'access_key'    => __('Spaces access key from the DigitalOcean control panel → API → Spaces Keys.', 'arun-prakash-media-offload'),
-      'secret_key'    => __('Spaces secret key paired with the access key above.', 'arun-prakash-media-offload'),
-      'endpoint'      => __('Leave empty to use the auto-built Spaces endpoint, or enter a Spaces CDN URL for edge delivery.', 'arun-prakash-media-offload'),
+      'bucket'        => __('Your DigitalOcean Space name (used as the bucket).', 'usenimbus-media-offload'),
+      'region'        => __('Spaces region slug, e.g. nyc3, ams3, sgp1, fra1, blr1. Found in your Space URL.', 'usenimbus-media-offload'),
+      'access_key'    => __('Spaces access key from the DigitalOcean control panel → API → Spaces Keys.', 'usenimbus-media-offload'),
+      'secret_key'    => __('Spaces secret key paired with the access key above.', 'usenimbus-media-offload'),
+      'endpoint'      => __('Leave empty to use the auto-built Spaces endpoint, or enter a Spaces CDN URL for edge delivery.', 'usenimbus-media-offload'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

@@ -19,38 +19,38 @@ final class S3CompatibleProviderProfile extends AbstractProviderProfile implemen
 
   public function label(): string
   {
-    return __('S3-compatible', 'arun-prakash-media-offload');
+    return __('S3-compatible', 'usenimbus-media-offload');
   }
 
   public function title(): string
   {
-    return __('S3-compatible storage', 'arun-prakash-media-offload');
+    return __('S3-compatible storage', 'usenimbus-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'arun-prakash-media-offload');
+    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'usenimbus-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', 'arun-prakash-media-offload'),
-      'region' => __('Region', 'arun-prakash-media-offload'),
-      'endpoint' => __('Custom Endpoint', 'arun-prakash-media-offload'),
-      'access_key' => __('Access Key', 'arun-prakash-media-offload'),
-      'secret_key' => __('Secret Key', 'arun-prakash-media-offload'),
+      'bucket' => __('Bucket', 'usenimbus-media-offload'),
+      'region' => __('Region', 'usenimbus-media-offload'),
+      'endpoint' => __('Custom Endpoint', 'usenimbus-media-offload'),
+      'access_key' => __('Access Key', 'usenimbus-media-offload'),
+      'secret_key' => __('Secret Key', 'usenimbus-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'arun-prakash-media-offload'),
-      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'arun-prakash-media-offload'),
-      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'arun-prakash-media-offload'),
-      'secret_key'    => __('Secret Access Key paired with the access key above.', 'arun-prakash-media-offload'),
-      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'arun-prakash-media-offload'),
+      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'usenimbus-media-offload'),
+      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'usenimbus-media-offload'),
+      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'usenimbus-media-offload'),
+      'secret_key'    => __('Secret Access Key paired with the access key above.', 'usenimbus-media-offload'),
+      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'usenimbus-media-offload'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

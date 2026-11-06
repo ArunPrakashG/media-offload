@@ -93,22 +93,22 @@ final class BulkJobManager
   {
     $type = sanitize_key($type);
     if (!isset(self::JOB_TYPES[$type])) {
-      return new \WP_Error('nimbus_invalid_job_type', __('Unsupported bulk job type.', 'arun-prakash-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid_job_type', __('Unsupported bulk job type.', 'usenimbus-media-offload'), ['status' => 400]);
     }
 
     $current = $this->currentJob();
     if ($this->isActiveStatus((string) ($current['status'] ?? ''))) {
-      return new \WP_Error('nimbus_job_active', __('A bulk media job is already running. Pause or wait for it to finish first.', 'arun-prakash-media-offload'), ['status' => 409]);
+      return new \WP_Error('nimbus_job_active', __('A bulk media job is already running. Pause or wait for it to finish first.', 'usenimbus-media-offload'), ['status' => 409]);
     }
 
     if ($type === 'offload_existing' || $type === 'retry_failed') {
       if (!$this->settings->is_enabled() || !$this->settings->has_valid_credentials()) {
-        return new \WP_Error('nimbus_not_ready', __('Storage credentials and enabled offloading are required before starting an offload job.', 'arun-prakash-media-offload'), ['status' => 400]);
+        return new \WP_Error('nimbus_not_ready', __('Storage credentials and enabled offloading are required before starting an offload job.', 'usenimbus-media-offload'), ['status' => 400]);
       }
     }
 
     if ($type === 'restore_local' && !$this->settings->has_valid_credentials()) {
-      return new \WP_Error('nimbus_restore_not_ready', __('Storage credentials are required before restoring local copies from remote storage.', 'arun-prakash-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_restore_not_ready', __('Storage credentials are required before restoring local copies from remote storage.', 'usenimbus-media-offload'), ['status' => 400]);
     }
 
     $batchSize = max(1, min(self::MAX_BATCH_SIZE, (int) ($args['batch_size'] ?? self::MAX_BATCH_SIZE)));
@@ -125,7 +125,7 @@ final class BulkJobManager
       $totalItems = count($retryIds);
 
       if ($totalItems < 1) {
-        return new \WP_Error('nimbus_no_failed_items', __('There are no failed items available to retry.', 'arun-prakash-media-offload'), ['status' => 400]);
+        return new \WP_Error('nimbus_no_failed_items', __('There are no failed items available to retry.', 'usenimbus-media-offload'), ['status' => 400]);
       }
     }
 
@@ -148,7 +148,7 @@ final class BulkJobManager
       'percent_complete' => $totalItems > 0 ? 0 : 100,
       'failed_ids' => [],
       'retry_ids' => $retryIds,
-      'last_message' => $totalItems > 0 ? __('Bulk media job queued.', 'arun-prakash-media-offload') : __('No matching attachments were found for this bulk job.', 'arun-prakash-media-offload'),
+      'last_message' => $totalItems > 0 ? __('Bulk media job queued.', 'usenimbus-media-offload') : __('No matching attachments were found for this bulk job.', 'usenimbus-media-offload'),
     ]);
 
     $this->persistCurrentJob($job);
@@ -168,12 +168,12 @@ final class BulkJobManager
   {
     $job = $this->currentJob();
     if (($job['status'] ?? '') !== 'running') {
-      return new \WP_Error('nimbus_job_not_running', __('There is no running bulk job to pause.', 'arun-prakash-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_job_not_running', __('There is no running bulk job to pause.', 'usenimbus-media-offload'), ['status' => 400]);
     }
 
     $job['status'] = 'paused';
     $job['updated_at'] = time();
-    $job['last_message'] = __('Bulk media job paused.', 'arun-prakash-media-offload');
+    $job['last_message'] = __('Bulk media job paused.', 'usenimbus-media-offload');
     $this->persistCurrentJob($job);
 
     return $job;
@@ -186,12 +186,12 @@ final class BulkJobManager
   {
     $job = $this->currentJob();
     if (($job['status'] ?? '') !== 'paused') {
-      return new \WP_Error('nimbus_job_not_paused', __('There is no paused bulk job to resume.', 'arun-prakash-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_job_not_paused', __('There is no paused bulk job to resume.', 'usenimbus-media-offload'), ['status' => 400]);
     }
 
     $job['status'] = 'running';
     $job['updated_at'] = time();
-    $job['last_message'] = __('Bulk media job resumed.', 'arun-prakash-media-offload');
+    $job['last_message'] = __('Bulk media job resumed.', 'usenimbus-media-offload');
     $this->persistCurrentJob($job);
     $this->scheduleNextTick((string) $job['id']);
 
@@ -258,7 +258,7 @@ final class BulkJobManager
       $job['percent_complete'] = $this->calculatePercent((int) $job['processed_items'], (int) $job['total_items']);
       $job['last_message'] = sprintf(
         /* translators: 1: number of attachments processed so far, 2: total attachments in this job */
-        __('Processed %1$d of %2$d attachments.', 'arun-prakash-media-offload'),
+        __('Processed %1$d of %2$d attachments.', 'usenimbus-media-offload'),
         (int) $job['processed_items'],
         (int) $job['total_items']
       );
@@ -278,7 +278,7 @@ final class BulkJobManager
       $job['updated_at'] = time();
       $job['finished_at'] = time();
       /* translators: %s: exception message describing why the job failed */
-      $job['last_message'] = sprintf(__('Bulk media job failed: %s', 'arun-prakash-media-offload'), $exception->getMessage());
+      $job['last_message'] = sprintf(__('Bulk media job failed: %s', 'usenimbus-media-offload'), $exception->getMessage());
       $this->persistCurrentJob($job);
       $this->persistLastJob($job);
       $this->logger->error('Bulk media job {job} failed: {error}', [
@@ -460,12 +460,12 @@ final class BulkJobManager
       $job['status'] = 'completed_with_errors';
       $job['last_message'] = sprintf(
         /* translators: %d: number of items that failed in this job */
-        __('Bulk media job finished with %d failed items.', 'arun-prakash-media-offload'),
+        __('Bulk media job finished with %d failed items.', 'usenimbus-media-offload'),
         (int) $job['failed_count']
       );
     } else {
       $job['status'] = 'completed';
-      $job['last_message'] = __('Bulk media job completed.', 'arun-prakash-media-offload');
+      $job['last_message'] = __('Bulk media job completed.', 'usenimbus-media-offload');
     }
 
     $this->persistCurrentJob($job);
@@ -541,12 +541,12 @@ final class BulkJobManager
   private function statusLabel(string $status): string
   {
     return match ($status) {
-      'running' => __('Running', 'arun-prakash-media-offload'),
-      'paused' => __('Paused', 'arun-prakash-media-offload'),
-      'completed' => __('Completed', 'arun-prakash-media-offload'),
-      'completed_with_errors' => __('Completed with errors', 'arun-prakash-media-offload'),
-      'failed' => __('Failed', 'arun-prakash-media-offload'),
-      default => __('Idle', 'arun-prakash-media-offload'),
+      'running' => __('Running', 'usenimbus-media-offload'),
+      'paused' => __('Paused', 'usenimbus-media-offload'),
+      'completed' => __('Completed', 'usenimbus-media-offload'),
+      'completed_with_errors' => __('Completed with errors', 'usenimbus-media-offload'),
+      'failed' => __('Failed', 'usenimbus-media-offload'),
+      default => __('Idle', 'usenimbus-media-offload'),
     };
   }
 }
