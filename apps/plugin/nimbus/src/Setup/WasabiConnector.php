@@ -28,10 +28,10 @@ final class WasabiConnector
     $region = sanitize_key((string) ($input['region'] ?? 'us-east-1'));
 
     if ($key === '' || $secret === '') {
-      throw new QuickConnectException(esc_html__('Paste both the access key and the secret key.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste both the access key and the secret key.', 'arun-prakash-media-offload'));
     }
     if (!in_array($region, self::REGIONS, true)) {
-      throw new QuickConnectException(esc_html__('Pick a Wasabi region.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Pick a Wasabi region.', 'arun-prakash-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -58,13 +58,13 @@ final class WasabiConnector
       [$scopedKey, $scopedSecret] = $this->createScopedUser($bucket, $key, $secret);
       $result->values['access_key'] = $scopedKey;
       $result->values['secret_key'] = $scopedSecret;
-      $result->step(__('New key made for this bucket only', 'nimbus-media-offload'), __('The key you pasted is not saved', 'nimbus-media-offload'));
+      $result->step(__('New key made for this bucket only', 'arun-prakash-media-offload'), __('The key you pasted is not saved', 'arun-prakash-media-offload'));
     } catch (\Throwable $exception) {
       // A sub-user without IAM rights can still run Nimbus with its own key.
       $this->quickConnect->logger()->warning('Wasabi quick connect could not create a bucket-only user: {error}', ['error' => $this->quickConnect->errorMessage($exception)]);
       $result->values['access_key'] = $key;
       $result->values['secret_key'] = $secret;
-      $result->step(__('Using the key you pasted', 'nimbus-media-offload'), __('It cannot create users, so Nimbus saves it', 'nimbus-media-offload'));
+      $result->step(__('Using the key you pasted', 'arun-prakash-media-offload'), __('It cannot create users, so Nimbus saves it', 'arun-prakash-media-offload'));
     }
 
     return $result;

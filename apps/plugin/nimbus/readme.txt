@@ -1,11 +1,11 @@
-=== Nimbus Media Offload ===
+=== Arun Prakash Media Offload ===
 Contributors: arunprakashg
 Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.3
+Stable tag: 0.3.4
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -36,16 +36,30 @@ Nimbus is completely free and open source. There is no license key, no paid tier
 
 == External Services ==
 
-Nimbus does not communicate with any Nimbus-operated service. The only outbound network calls this plugin makes are directly from your server to the storage provider you configure (Amazon S3, Cloudflare R2, Backblaze B2, DigitalOcean Spaces, Wasabi, MinIO, Google Cloud Storage, or any other S3-compatible endpoint you enter), and, if you enable it, to your configured cache-purge provider (e.g. the Cloudflare API when Cloudflare cache purging is turned on). No license activation, telemetry, or update-check calls are made to any third-party service beyond WordPress.org's own plugin-update mechanism.
+This plugin connects to the object storage service you choose, from your server, to store and serve your media. It does not connect to any service run by the plugin author. It makes no license, telemetry or update-check calls other than WordPress.org's own plugin updates.
 
-Quick connect in the setup wizard also calls the provider's account API, only when you select Connect. It sends the token or key you paste, from your server, to create or find the bucket and a key for it:
+**Storage provider (required, you pick one).** Every upload you offload is sent to the provider's storage API together with the access key you entered, so the provider can sign the request. Files are also read, listed and deleted there when you restore, bulk-process or delete media. The provider you select in the settings is the only one contacted.
 
-* Cloudflare API (api.cloudflare.com), for Cloudflare R2. [Terms](https://www.cloudflare.com/website-terms/), [Privacy](https://www.cloudflare.com/privacypolicy/)
-* Backblaze B2 API (api.backblazeb2.com). [Terms](https://www.backblaze.com/company/policy/terms-of-service), [Privacy](https://www.backblaze.com/company/policy/privacy)
-* DigitalOcean API (api.digitalocean.com), for Spaces. [Terms](https://www.digitalocean.com/legal/terms-of-service-agreement), [Privacy](https://www.digitalocean.com/legal/privacy-policy)
-* Wasabi IAM API (iam.wasabisys.com). [Terms](https://wasabi.com/legal/customer-agreement), [Privacy](https://wasabi.com/legal/privacy-policy)
+* Amazon S3 (amazonaws.com). [Terms](https://aws.amazon.com/service-terms/), [Privacy](https://aws.amazon.com/privacy/)
+* Cloudflare R2 (r2.cloudflarestorage.com). [Terms](https://www.cloudflare.com/website-terms/), [Privacy](https://www.cloudflare.com/privacypolicy/)
+* Google Cloud Storage (storage.googleapis.com). [Terms](https://cloud.google.com/terms), [Privacy](https://policies.google.com/privacy)
+* Backblaze B2 (backblazeb2.com). [Terms](https://www.backblaze.com/company/policy/terms-of-service), [Privacy](https://www.backblaze.com/company/policy/privacy)
+* DigitalOcean Spaces (digitaloceanspaces.com). [Terms](https://www.digitalocean.com/legal/terms-of-service-agreement), [Privacy](https://www.digitalocean.com/legal/privacy-policy)
+* Wasabi (wasabisys.com). [Terms](https://wasabi.com/legal/customer-agreement), [Privacy](https://wasabi.com/legal/privacy-policy)
+* MinIO or any other S3-compatible endpoint: the server address you enter. Its terms and privacy policy are those of whoever runs it.
 
-For Amazon S3 and Google Cloud Storage, quick connect gives you a command to run in your own AWS CloudShell or Google Cloud Shell. Nimbus only reads the line you paste back.
+**Quick connect (optional, only when you select Connect in the setup wizard).** The token or key you paste is sent once, from your server, to the provider's account API to find or create the bucket and a key limited to it. The pasted value is not saved.
+
+* Cloudflare API (api.cloudflare.com), for R2. Same terms and privacy links as above.
+* Backblaze B2 API (api.backblazeb2.com). Same links as above.
+* DigitalOcean API (api.digitalocean.com), for Spaces. Same links as above.
+* Wasabi IAM API (iam.wasabisys.com). Same links as above.
+
+For Amazon S3 and Google Cloud Storage, quick connect gives you a command to run in your own AWS CloudShell or Google Cloud Shell. The plugin only reads the line you paste back.
+
+**Cache purge (optional, off by default).** If you turn on Cloudflare cache purging, the plugin sends the URLs of changed or deleted media and the Cloudflare API token you entered to the Cloudflare API (api.cloudflare.com), so Cloudflare clears its cached copies. Terms and privacy as above. Proxy cache purging sends a purge request to the address you configure.
+
+**Documentation links.** Links in the admin screens to the plugin documentation at usenimbus.dev open in your browser when you click them. The plugin itself sends no data to that site.
 
 == Third-Party Libraries ==
 
@@ -54,11 +68,11 @@ This plugin bundles the following third-party libraries:
 * **AWS SDK for PHP** (aws/aws-sdk-php) — Apache License 2.0. Used to communicate with Amazon S3 and S3-compatible storage providers.
 * **Guzzle HTTP** (guzzlehttp/guzzle) — MIT License.
 * **PSR interfaces** (psr/http-client, psr/http-factory, psr/http-message) — MIT License.
-* **Symfony Polyfill** (symfony/polyfill-mbstring) — MIT License.
+* **Symfony** (symfony/filesystem, symfony/deprecation-contracts and the polyfill-mbstring, polyfill-php80 and polyfill-php82 packages) — MIT License.
 
 == Installation ==
 
-1. In WordPress, go to **Plugins → Add New**, search for Nimbus Media Offload, then install and activate it. To install by hand, upload the `nimbus-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
+1. In WordPress, go to **Plugins → Add New**, search for Arun Prakash Media Offload, then install and activate it. To install by hand, upload the `arun-prakash-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
 2. Go to **Media → Nimbus** to open the setup wizard.
 3. Connect your storage provider with quick connect, or enter the bucket, region and keys by hand.
 4. New uploads are offloaded automatically. To move the existing library, use **Offload existing library** on the **Tools** tab.
@@ -90,8 +104,15 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Changelog ==
 
+= 0.3.4 =
+* Renamed to Arun Prakash Media Offload for the WordPress.org directory. The plugin folder and text domain are now arun-prakash-media-offload.
+* Media Library offload, restore and retry now check that you can edit that attachment.
+* Image URLs inserted into post content are escaped.
+* Updated the AWS SDK to 3.401.5 and its dependencies.
+* The External Services section now covers every storage provider with terms and privacy links.
+
 = 0.3.3 =
-* Renamed to Nimbus Media Offload for the WordPress.org directory. The plugin folder and text domain are now nimbus-media-offload.
+* Renamed to Nimbus Media Offload. The plugin folder and text domain were nimbus-media-offload.
 
 = 0.3.2 =
 * Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
@@ -133,8 +154,11 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 == Upgrade Notice ==
 
+= 0.3.4 =
+Renamed to Arun Prakash Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.
+
 = 0.3.3 =
-Renamed to Nimbus Media Offload. If you installed from GitHub, deactivate the old Nimbus, activate the new copy, then remove the old nimbus folder by SFTP rather than with Delete.
+Renamed to Nimbus Media Offload.
 
 = 0.3.2 =
 Adds quick connect to the setup wizard. Your settings and offloaded files are unchanged.

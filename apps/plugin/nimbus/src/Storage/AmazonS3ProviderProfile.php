@@ -19,38 +19,38 @@ final class AmazonS3ProviderProfile extends AbstractProviderProfile implements P
 
   public function label(): string
   {
-    return __('Amazon S3', 'nimbus-media-offload');
+    return __('Amazon S3', 'arun-prakash-media-offload');
   }
 
   public function title(): string
   {
-    return __('Amazon S3', 'nimbus-media-offload');
+    return __('Amazon S3', 'arun-prakash-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', 'nimbus-media-offload');
+    return __('Use this when your media is stored directly in Amazon S3 with a standard AWS region and optional CDN/custom domain on top.', 'arun-prakash-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', 'nimbus-media-offload'),
-      'region' => __('Region', 'nimbus-media-offload'),
-      'access_key' => __('Access Key', 'nimbus-media-offload'),
-      'secret_key' => __('Secret Key', 'nimbus-media-offload'),
+      'bucket' => __('Bucket', 'arun-prakash-media-offload'),
+      'region' => __('Region', 'arun-prakash-media-offload'),
+      'access_key' => __('Access Key', 'arun-prakash-media-offload'),
+      'secret_key' => __('Secret Key', 'arun-prakash-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The S3 bucket where your media files will be stored.', 'nimbus-media-offload'),
-      'region'        => __('AWS region code, e.g. us-east-1, eu-west-2, ap-southeast-1.', 'nimbus-media-offload'),
-      'access_key'    => __('AWS IAM Access Key ID.', 'nimbus-media-offload'),
-      'secret_key'    => __('AWS IAM Secret Access Key.', 'nimbus-media-offload'),
-      'session_token' => __('Optional — only needed for temporary STS credentials. Leave empty for standard IAM keys.', 'nimbus-media-offload'),
-      'endpoint'      => __('Leave empty to use the standard AWS S3 endpoint. Override only for VPC or custom configurations.', 'nimbus-media-offload'),
+      'bucket'        => __('The S3 bucket where your media files will be stored.', 'arun-prakash-media-offload'),
+      'region'        => __('AWS region code, e.g. us-east-1, eu-west-2, ap-southeast-1.', 'arun-prakash-media-offload'),
+      'access_key'    => __('AWS IAM Access Key ID.', 'arun-prakash-media-offload'),
+      'secret_key'    => __('AWS IAM Secret Access Key.', 'arun-prakash-media-offload'),
+      'session_token' => __('Optional — only needed for temporary STS credentials. Leave empty for standard IAM keys.', 'arun-prakash-media-offload'),
+      'endpoint'      => __('Leave empty to use the standard AWS S3 endpoint. Override only for VPC or custom configurations.', 'arun-prakash-media-offload'),
       'r2_account_id' => '',
     ];
   }

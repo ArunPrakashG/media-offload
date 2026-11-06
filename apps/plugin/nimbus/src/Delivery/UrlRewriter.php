@@ -115,7 +115,7 @@ final class UrlRewriter
         $key = buildStorageKey($relative, (string) $this->settings->get('prefix', ''));
         $remoteUrl = $this->resolve_url($key);
         if ($remoteUrl) {
-          $replacements[$localUrl] = $remoteUrl;
+          $replacements[$localUrl] = esc_url($remoteUrl);
         }
       }
 

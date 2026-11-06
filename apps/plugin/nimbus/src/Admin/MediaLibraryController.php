@@ -65,7 +65,7 @@ final class MediaLibraryController
 
   public function addStatusColumn(array $columns): array
   {
-    $columns['nimbus_status'] = __('Offload Status', 'nimbus-media-offload');
+    $columns['nimbus_status'] = __('Offload Status', 'arun-prakash-media-offload');
     return $columns;
   }
 
@@ -79,7 +79,7 @@ final class MediaLibraryController
     printf(
       '<span class="nmb-inline-badge %1$s">%2$s</span>',
       esc_attr($this->badgeClass((string) ($status['status'] ?? 'local'))),
-      esc_html((string) ($status['label'] ?? __('Unknown', 'nimbus-media-offload')))
+      esc_html((string) ($status['label'] ?? __('Unknown', 'arun-prakash-media-offload')))
     );
 
     if (!empty($status['reason'])) {
@@ -111,13 +111,13 @@ final class MediaLibraryController
       $actions['nimbus_restore'] = sprintf(
         '<a href="%s">%s</a>',
         esc_url($this->actionUrl(NIMBUS_ADMIN_ACTION_ATTACHMENT_RESTORE, (int) $post->ID)),
-        esc_html__('Restore local', 'nimbus-media-offload')
+        esc_html__('Restore local', 'arun-prakash-media-offload')
       );
     } elseif ($statusKey !== 'ignored') {
       $actions['nimbus_offload'] = sprintf(
         '<a href="%s">%s</a>',
         esc_url($this->actionUrl(NIMBUS_ADMIN_ACTION_ATTACHMENT_OFFLOAD, (int) $post->ID)),
-        esc_html($statusKey === 'failed' ? __('Retry offload', 'nimbus-media-offload') : __('Offload now', 'nimbus-media-offload'))
+        esc_html($statusKey === 'failed' ? __('Retry offload', 'arun-prakash-media-offload') : __('Offload now', 'arun-prakash-media-offload'))
       );
     }
 
@@ -125,7 +125,7 @@ final class MediaLibraryController
       $actions['nimbus_retry'] = sprintf(
         '<a href="%s">%s</a>',
         esc_url($this->actionUrl(NIMBUS_ADMIN_ACTION_ATTACHMENT_RETRY, (int) $post->ID)),
-        esc_html__('Retry', 'nimbus-media-offload')
+        esc_html__('Retry', 'arun-prakash-media-offload')
       );
     }
 
@@ -136,7 +136,7 @@ final class MediaLibraryController
         'tab' => 'tools',
         'attachment_id' => (int) $post->ID,
       ], admin_url('upload.php'))),
-      esc_html__('View status', 'nimbus-media-offload')
+      esc_html__('View status', 'arun-prakash-media-offload')
     );
 
     return $actions;
@@ -152,7 +152,7 @@ final class MediaLibraryController
     $html = sprintf(
       '<span class="nmb-inline-badge %1$s">%2$s</span>',
       esc_attr($this->badgeClass((string) ($status['status'] ?? 'local'))),
-      esc_html((string) ($status['label'] ?? __('Unknown', 'nimbus-media-offload')))
+      esc_html((string) ($status['label'] ?? __('Unknown', 'arun-prakash-media-offload')))
     );
 
     if (!empty($status['reason'])) {
@@ -166,11 +166,11 @@ final class MediaLibraryController
         'tab' => 'tools',
         'attachment_id' => (int) $post->ID,
       ], admin_url('upload.php'))),
-      esc_html__('Open Nimbus tools', 'nimbus-media-offload')
+      esc_html__('Open Nimbus tools', 'arun-prakash-media-offload')
     );
 
     $formFields['nimbus_status'] = [
-      'label' => __('Nimbus', 'nimbus-media-offload'),
+      'label' => __('Nimbus', 'arun-prakash-media-offload'),
       'input' => 'html',
       'html' => $html,
       'show_in_edit' => true,
@@ -188,7 +188,7 @@ final class MediaLibraryController
 
     $current = $this->currentStatusFilter();
 
-    echo '<label class="screen-reader-text" for="nimbus-status-filter">' . esc_html__('Filter by Nimbus status', 'nimbus-media-offload') . '</label>';
+    echo '<label class="screen-reader-text" for="nimbus-status-filter">' . esc_html__('Filter by Nimbus status', 'arun-prakash-media-offload') . '</label>';
     echo '<select id="nimbus-status-filter" name="' . esc_attr(self::STATUS_FILTER_QUERY_ARG) . '">';
 
     foreach ($this->statusOptions() as $value => $label) {
@@ -235,9 +235,9 @@ final class MediaLibraryController
 
   public function registerBulkActions(array $actions): array
   {
-    $actions[self::BULK_ACTION_OFFLOAD] = __('Offload to storage', 'nimbus-media-offload');
-    $actions[self::BULK_ACTION_RESTORE] = __('Restore local copies', 'nimbus-media-offload');
-    $actions[self::BULK_ACTION_RETRY] = __('Retry failed offloads', 'nimbus-media-offload');
+    $actions[self::BULK_ACTION_OFFLOAD] = __('Offload to storage', 'arun-prakash-media-offload');
+    $actions[self::BULK_ACTION_RESTORE] = __('Restore local copies', 'arun-prakash-media-offload');
+    $actions[self::BULK_ACTION_RETRY] = __('Retry failed offloads', 'arun-prakash-media-offload');
 
     return $actions;
   }
@@ -306,17 +306,17 @@ final class MediaLibraryController
 
   public function handleAttachmentOffload(): void
   {
-    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_OFFLOAD, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->offload_via_cli($attachmentId), __('Attachment offloaded successfully.', 'nimbus-media-offload'), __('Attachment could not be offloaded.', 'nimbus-media-offload'));
+    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_OFFLOAD, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->offload_via_cli($attachmentId), __('Attachment offloaded successfully.', 'arun-prakash-media-offload'), __('Attachment could not be offloaded.', 'arun-prakash-media-offload'));
   }
 
   public function handleAttachmentRestore(): void
   {
-    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_RESTORE, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->download_media($attachmentId), __('Attachment restored locally.', 'nimbus-media-offload'), __('Attachment could not be restored locally.', 'nimbus-media-offload'));
+    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_RESTORE, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->download_media($attachmentId), __('Attachment restored locally.', 'arun-prakash-media-offload'), __('Attachment could not be restored locally.', 'arun-prakash-media-offload'));
   }
 
   public function handleAttachmentRetry(): void
   {
-    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_RETRY, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->offload_via_cli($attachmentId), __('Attachment retry completed successfully.', 'nimbus-media-offload'), __('Attachment retry failed.', 'nimbus-media-offload'));
+    $this->handleAttachmentAction(NIMBUS_ADMIN_ACTION_ATTACHMENT_RETRY, static fn (UploadHandler $uploadHandler, int $attachmentId): bool => $uploadHandler->offload_via_cli($attachmentId), __('Attachment retry completed successfully.', 'arun-prakash-media-offload'), __('Attachment retry failed.', 'arun-prakash-media-offload'));
   }
 
   /**
@@ -325,15 +325,19 @@ final class MediaLibraryController
   private function handleAttachmentAction(string $action, callable $operation, string $successMessage, string $failureMessage): void
   {
     if (!current_user_can('upload_files')) {
-      wp_die(esc_html__('Permission denied.', 'nimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'arun-prakash-media-offload'));
     }
 
     check_admin_referer($action);
 
     $attachmentId = isset($_GET['attachment_id']) ? max(0, (int) $_GET['attachment_id']) : 0;
     if ($attachmentId <= 0 || get_post_type($attachmentId) !== 'attachment') {
-      pushAdminNotice(__('Attachment not found.', 'nimbus-media-offload'), 'error');
+      pushAdminNotice(__('Attachment not found.', 'arun-prakash-media-offload'), 'error');
       $this->redirectBack();
+    }
+
+    if (!current_user_can('edit_post', $attachmentId)) {
+      wp_die(esc_html__('You are not allowed to change this attachment.', 'arun-prakash-media-offload'), '', ['response' => 403]);
     }
 
     try {
@@ -376,13 +380,13 @@ final class MediaLibraryController
   private function statusOptions(): array
   {
     return [
-      '' => __('All Nimbus states', 'nimbus-media-offload'),
-      'local' => __('Local only', 'nimbus-media-offload'),
-      'offloaded' => __('Offloaded', 'nimbus-media-offload'),
-      'pending' => __('Pending', 'nimbus-media-offload'),
-      'processing' => __('Processing', 'nimbus-media-offload'),
-      'failed' => __('Needs attention', 'nimbus-media-offload'),
-      'ignored' => __('Ignored', 'nimbus-media-offload'),
+      '' => __('All Nimbus states', 'arun-prakash-media-offload'),
+      'local' => __('Local only', 'arun-prakash-media-offload'),
+      'offloaded' => __('Offloaded', 'arun-prakash-media-offload'),
+      'pending' => __('Pending', 'arun-prakash-media-offload'),
+      'processing' => __('Processing', 'arun-prakash-media-offload'),
+      'failed' => __('Needs attention', 'arun-prakash-media-offload'),
+      'ignored' => __('Ignored', 'arun-prakash-media-offload'),
     ];
   }
 
@@ -505,10 +509,10 @@ final class MediaLibraryController
   private function bulkNoticeMessage(string $action, int $success, int $failed, int $skipped): string
   {
     $prefix = match ($action) {
-      self::BULK_ACTION_OFFLOAD => __('Bulk offload finished.', 'nimbus-media-offload'),
-      self::BULK_ACTION_RESTORE => __('Bulk restore finished.', 'nimbus-media-offload'),
-      self::BULK_ACTION_RETRY => __('Bulk retry finished.', 'nimbus-media-offload'),
-      default => __('Bulk media action finished.', 'nimbus-media-offload'),
+      self::BULK_ACTION_OFFLOAD => __('Bulk offload finished.', 'arun-prakash-media-offload'),
+      self::BULK_ACTION_RESTORE => __('Bulk restore finished.', 'arun-prakash-media-offload'),
+      self::BULK_ACTION_RETRY => __('Bulk retry finished.', 'arun-prakash-media-offload'),
+      default => __('Bulk media action finished.', 'arun-prakash-media-offload'),
     };
 
     return trim(sprintf(
@@ -516,11 +520,11 @@ final class MediaLibraryController
       '%1$s %2$s %3$s %4$s',
       $prefix,
       /* translators: %d: number of attachments successfully updated */
-      sprintf(_n('%d attachment updated.', '%d attachments updated.', $success, 'nimbus-media-offload'), $success),
+      sprintf(_n('%d attachment updated.', '%d attachments updated.', $success, 'arun-prakash-media-offload'), $success),
       /* translators: %d: number of attachments that failed */
-      sprintf(_n('%d failed.', '%d failed.', $failed, 'nimbus-media-offload'), $failed),
+      sprintf(_n('%d failed.', '%d failed.', $failed, 'arun-prakash-media-offload'), $failed),
       /* translators: %d: number of attachments skipped */
-      sprintf(_n('%d skipped.', '%d skipped.', $skipped, 'nimbus-media-offload'), $skipped)
+      sprintf(_n('%d skipped.', '%d skipped.', $skipped, 'arun-prakash-media-offload'), $skipped)
     ));
   }
 

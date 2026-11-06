@@ -127,7 +127,7 @@ final class IntegrationDiscovery
         'directories' => $directories,
         'rewrite_supported' => !empty($definition['rewrite_supported']),
         'rewrite_ready' => $this->isRewriteReady($definition, $tableCount),
-        'rewrite_action_label' => (string) ($definition['rewrite_action_label'] ?? __('Run rewrite', 'nimbus-media-offload')),
+        'rewrite_action_label' => (string) ($definition['rewrite_action_label'] ?? __('Run rewrite', 'arun-prakash-media-offload')),
         'table_count' => $tableCount,
         'tables' => $tables,
         'notes' => (string) ($definition['notes'] ?? ''),

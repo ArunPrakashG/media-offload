@@ -6,9 +6,25 @@ updated: 2026-11-03
 
 Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
+## 0.3.4 · November 2026
+
+The plugin is now called Arun Prakash Media Offload in WordPress, after feedback from the WordPress.org plugin review.
+
+### Changed
+
+- The plugin name is **Arun Prakash Media Offload**, and the plugin folder and text domain are `arun-prakash-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
+- Installed an earlier version? Follow [Upgrading from 0.3.3 or earlier](/docs/#upgrading-from-033-or-earlier) so the old copy's uninstall cleanup does not remove your settings.
+- Updated the AWS SDK to 3.401.5 and its dependencies.
+
+### Fixed
+
+- Media Library offload, restore and retry now check that you can edit that attachment, not only that you can upload files.
+- Image URLs the plugin inserts into post content are escaped.
+- The delete-remote-files setting is always saved as on or off.
+
 ## 0.3.3 · November 2026
 
-Nimbus is now called Nimbus Media Offload in WordPress, ready for the WordPress.org plugin directory.
+Nimbus was renamed Nimbus Media Offload in WordPress, ready for the WordPress.org plugin directory.
 
 ### Changed
 

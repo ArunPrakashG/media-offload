@@ -40,7 +40,7 @@ final class PageRenderer
 
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Read-only GET parameter used for display/navigation only (tab, filter, or self-generated redirect notice) -- no state-changing action is performed, so no nonce applies.
     if (isset($_GET['nimbus_logs_cleared']) && $_GET['nimbus_logs_cleared'] === '1') {
-      echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Plugin logs cleared.', 'nimbus-media-offload') . '</p></div>';
+      echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Plugin logs cleared.', 'arun-prakash-media-offload') . '</p></div>';
     }
 
     $onboarding = $this->onboardingManager->state();
@@ -60,13 +60,13 @@ final class PageRenderer
 
       <?php settings_errors(NIMBUS_SETTINGS_GROUP); ?>
 
-      <nav class="nav-tab-wrapper nmb-shell-tabs" aria-label="<?php esc_attr_e('Nimbus navigation', 'nimbus-media-offload'); ?>">
-        <a href="<?php echo esc_url($this->adminTabUrl('overview')); ?>" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Overview', 'nimbus-media-offload'); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('settings')); ?>" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Settings', 'nimbus-media-offload'); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('advanced')); ?>" class="nav-tab <?php echo $activeTab === 'advanced' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Advanced', 'nimbus-media-offload'); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>" class="nav-tab <?php echo $activeTab === 'integrations' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Integrations', 'nimbus-media-offload'); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Tools', 'nimbus-media-offload'); ?></a>
-        <a href="<?php echo esc_url($this->adminTabUrl('logs')); ?>" class="nav-tab <?php echo $activeTab === 'logs' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Logs', 'nimbus-media-offload'); ?></a>
+      <nav class="nav-tab-wrapper nmb-shell-tabs" aria-label="<?php esc_attr_e('Nimbus navigation', 'arun-prakash-media-offload'); ?>">
+        <a href="<?php echo esc_url($this->adminTabUrl('overview')); ?>" class="nav-tab <?php echo $activeTab === 'overview' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Overview', 'arun-prakash-media-offload'); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('settings')); ?>" class="nav-tab <?php echo $activeTab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Settings', 'arun-prakash-media-offload'); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('advanced')); ?>" class="nav-tab <?php echo $activeTab === 'advanced' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Advanced', 'arun-prakash-media-offload'); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>" class="nav-tab <?php echo $activeTab === 'integrations' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Integrations', 'arun-prakash-media-offload'); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('tools')); ?>" class="nav-tab <?php echo $activeTab === 'tools' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Tools', 'arun-prakash-media-offload'); ?></a>
+        <a href="<?php echo esc_url($this->adminTabUrl('logs')); ?>" class="nav-tab <?php echo $activeTab === 'logs' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e('Logs', 'arun-prakash-media-offload'); ?></a>
       </nav>
 
       <?php if ($activeTab === 'overview') : ?>
@@ -111,9 +111,9 @@ final class PageRenderer
     $state = $this->onboardingManager->state();
     $stepKeys = ['storage', 'delivery', 'review'];
     $stepLabels = [
-      'storage' => __('Storage', 'nimbus-media-offload'),
-      'delivery' => __('Delivery', 'nimbus-media-offload'),
-      'review' => __('Review', 'nimbus-media-offload'),
+      'storage' => __('Storage', 'arun-prakash-media-offload'),
+      'delivery' => __('Delivery', 'arun-prakash-media-offload'),
+      'review' => __('Review', 'arun-prakash-media-offload'),
     ];
 
     // If a step was explicitly saved (user progressed mid-wizard and navigated
@@ -148,9 +148,9 @@ final class PageRenderer
       <header class="nmb-wizard-header">
         <div class="nmb-brand">
           <?php $this->renderMark(); ?>
-          <h1><?php esc_html_e('Set up Nimbus', 'nimbus-media-offload'); ?></h1>
+          <h1><?php esc_html_e('Set up Nimbus', 'arun-prakash-media-offload'); ?></h1>
         </div>
-        <ol class="nmb-stepper" aria-label="<?php esc_attr_e('Setup steps', 'nimbus-media-offload'); ?>">
+        <ol class="nmb-stepper" aria-label="<?php esc_attr_e('Setup steps', 'arun-prakash-media-offload'); ?>">
           <?php foreach ($stepKeys as $index => $stepKey) : ?>
             <li class="nmb-onboarding-step-item" data-step-item="<?php echo esc_attr($stepKey); ?>">
               <button type="button"><span class="nmb-stepper__n"><?php echo esc_html((string) ($index + 1)); ?></span><?php echo esc_html($stepLabels[$stepKey]); ?></button>
@@ -166,7 +166,7 @@ final class PageRenderer
 
         <section class="nmb-onboarding-step" data-step="storage" aria-labelledby="nmb-step-storage" data-quick-mode="<?php echo esc_attr($quickMode); ?>">
           <fieldset class="nmb-provider-picker">
-            <legend id="nmb-step-storage"><?php esc_html_e('Where should your media live?', 'nimbus-media-offload'); ?></legend>
+            <legend id="nmb-step-storage"><?php esc_html_e('Where should your media live?', 'arun-prakash-media-offload'); ?></legend>
             <div class="nmb-provider-grid">
               <?php foreach ($pickerKeys as $providerKey) : ?>
                 <label class="nmb-provider-option<?php echo $providerKey === 's3_compatible' ? ' nmb-provider-option--other' : ''; ?>">
@@ -183,53 +183,53 @@ final class PageRenderer
           <div class="nmb-wizard-fields" data-manual-fields>
             <div data-provider-group="bucket-location"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Bucket', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Bucket', 'arun-prakash-media-offload'); ?></span>
                 <input type="text" name="bucket" value="<?php echo esc_attr((string) ($settings['bucket'] ?? '')); ?>" placeholder="my-media-bucket" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
               <label class="nmb-onboarding-field" data-hide-for="r2">
-                <span><?php esc_html_e('Region', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Region', 'arun-prakash-media-offload'); ?></span>
                 <input type="text" id="nimbus-region" name="region" value="<?php echo esc_attr((string) ($settings['region'] ?? '')); ?>" placeholder="us-east-1" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
             </div>
 
             <div data-provider-group="r2-extra"<?php if (! $isR2Default) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Account ID', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Account ID', 'arun-prakash-media-offload'); ?></span>
                 <input type="text" name="r2_account_id" value="<?php echo esc_attr((string) ($settings['r2_account_id'] ?? '')); ?>" autocomplete="off" spellcheck="false"<?php if (! $isR2Default) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('Cloudflare dashboard, right sidebar of the home page.', 'nimbus-media-offload'); ?></small>
+                <small class="nmb-field-hint"><?php esc_html_e('Cloudflare dashboard, right sidebar of the home page.', 'arun-prakash-media-offload'); ?></small>
               </label>
             </div>
 
             <div data-provider-group="s3c-endpoint"<?php if (! $isS3CDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Endpoint', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Endpoint', 'arun-prakash-media-offload'); ?></span>
                 <input type="url" name="endpoint" value="<?php echo esc_attr((string) ($settings['endpoint'] ?? '')); ?>" placeholder="https://s3.example.com" autocomplete="off" spellcheck="false"<?php if (! $isS3CDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('The S3 API base URL from your provider.', 'nimbus-media-offload'); ?></small>
+                <small class="nmb-field-hint"><?php esc_html_e('The S3 API base URL from your provider.', 'arun-prakash-media-offload'); ?></small>
               </label>
             </div>
 
             <div data-provider-group="credentials"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Access key', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Access key', 'arun-prakash-media-offload'); ?></span>
                 <input type="text" name="access_key" value="<?php echo esc_attr((string) ($settings['access_key'] ?? '')); ?>" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Secret key', 'nimbus-media-offload'); ?></span>
+                <span><?php esc_html_e('Secret key', 'arun-prakash-media-offload'); ?></span>
                 <input type="password" name="secret_key" value="<?php echo esc_attr((string) ($settings['secret_key'] ?? '')); ?>" autocomplete="new-password"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
             </div>
 
             <div data-provider-group="session"<?php if ($isR2Default || $isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Session token', 'nimbus-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus-media-offload'); ?></em></span>
+                <span><?php esc_html_e('Session token', 'arun-prakash-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'arun-prakash-media-offload'); ?></em></span>
                 <input type="password" name="session_token" value="<?php echo esc_attr((string) ($settings['session_token'] ?? '')); ?>" autocomplete="new-password"<?php if ($isR2Default || $isLocalDefault) echo ' disabled'; ?> />
-                <small class="nmb-field-hint"><?php esc_html_e('Only for temporary AWS STS credentials.', 'nimbus-media-offload'); ?></small>
+                <small class="nmb-field-hint"><?php esc_html_e('Only for temporary AWS STS credentials.', 'arun-prakash-media-offload'); ?></small>
               </label>
             </div>
 
             <div data-provider-group="prefix"<?php if ($isLocalDefault) echo ' hidden'; ?>>
               <label class="nmb-onboarding-field">
-                <span><?php esc_html_e('Path prefix', 'nimbus-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus-media-offload'); ?></em></span>
+                <span><?php esc_html_e('Path prefix', 'arun-prakash-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'arun-prakash-media-offload'); ?></em></span>
                 <input type="text" name="prefix" value="<?php echo esc_attr((string) ($settings['prefix'] ?? '')); ?>" placeholder="wp-media" autocomplete="off" spellcheck="false"<?php if ($isLocalDefault) echo ' disabled'; ?> />
               </label>
             </div>
@@ -237,42 +237,42 @@ final class PageRenderer
 
           <div class="nmb-onboarding-actions">
             <p class="nmb-wizard-status" id="nmb-wizard-status" role="status"></p>
-            <button type="button" class="button" data-wizard-test data-manual-only><?php esc_html_e('Test connection', 'nimbus-media-offload'); ?></button>
-            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', 'nimbus-media-offload'); ?></button>
+            <button type="button" class="button" data-wizard-test data-manual-only><?php esc_html_e('Test connection', 'arun-prakash-media-offload'); ?></button>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to delivery', 'arun-prakash-media-offload'); ?></button>
           </div>
         </section>
 
         <section class="nmb-onboarding-step" data-step="delivery" aria-labelledby="nmb-step-delivery" hidden>
-          <h2 id="nmb-step-delivery"><?php esc_html_e('How should visitors get your media?', 'nimbus-media-offload'); ?></h2>
+          <h2 id="nmb-step-delivery"><?php esc_html_e('How should visitors get your media?', 'arun-prakash-media-offload'); ?></h2>
 
           <div class="nmb-onboarding-preference-grid">
             <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="enabled" value="1" <?php checked(!empty($settings['enabled'])); ?> />
               <div>
-                <strong><?php esc_html_e('Turn on offloading', 'nimbus-media-offload'); ?></strong>
-                <p><?php esc_html_e('New uploads are copied to your bucket once setup is done.', 'nimbus-media-offload'); ?></p>
+                <strong><?php esc_html_e('Turn on offloading', 'arun-prakash-media-offload'); ?></strong>
+                <p><?php esc_html_e('New uploads are copied to your bucket once setup is done.', 'arun-prakash-media-offload'); ?></p>
               </div>
             </label>
 
             <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="serve_from_storage" value="1" <?php checked(!empty($settings['serve_from_storage'])); ?> />
               <div>
-                <strong><?php esc_html_e('Serve media from storage', 'nimbus-media-offload'); ?></strong>
-                <p><?php esc_html_e('Rewrite media URLs so visitors load files from your bucket or CDN.', 'nimbus-media-offload'); ?></p>
+                <strong><?php esc_html_e('Serve media from storage', 'arun-prakash-media-offload'); ?></strong>
+                <p><?php esc_html_e('Rewrite media URLs so visitors load files from your bucket or CDN.', 'arun-prakash-media-offload'); ?></p>
               </div>
             </label>
 
             <label class="nmb-onboarding-choice-card">
               <input type="checkbox" name="use_path_style_endpoint" value="1" <?php checked(!empty($settings['use_path_style_endpoint'])); ?> />
               <div>
-                <strong><?php esc_html_e('Use path-style requests', 'nimbus-media-offload'); ?></strong>
-                <p><?php esc_html_e('Needed by R2 and most S3-compatible services. Not needed for Amazon S3.', 'nimbus-media-offload'); ?></p>
+                <strong><?php esc_html_e('Use path-style requests', 'arun-prakash-media-offload'); ?></strong>
+                <p><?php esc_html_e('Needed by R2 and most S3-compatible services. Not needed for Amazon S3.', 'arun-prakash-media-offload'); ?></p>
               </div>
             </label>
           </div>
 
           <label class="nmb-onboarding-field">
-            <span><?php esc_html_e('Custom domain', 'nimbus-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'nimbus-media-offload'); ?></em></span>
+            <span><?php esc_html_e('Custom domain', 'arun-prakash-media-offload'); ?> <em class="nmb-optional"><?php esc_html_e('optional', 'arun-prakash-media-offload'); ?></em></span>
             <?php
               $siteDomain = wp_parse_url(home_url(), PHP_URL_HOST) ?: 'example.com';
               $cdnPlaceholder = 'https://media.' . $siteDomain;
@@ -281,14 +281,14 @@ final class PageRenderer
           </label>
 
           <div class="nmb-onboarding-actions">
-            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to review', 'nimbus-media-offload'); ?></button>
+            <button type="button" class="button button-primary" data-onboarding-next><?php esc_html_e('Continue to review', 'arun-prakash-media-offload'); ?></button>
           </div>
         </section>
 
         <section class="nmb-onboarding-step" data-step="review" aria-labelledby="nmb-step-review" hidden>
-          <h2 id="nmb-step-review"><?php esc_html_e('Review and finish', 'nimbus-media-offload'); ?></h2>
+          <h2 id="nmb-step-review"><?php esc_html_e('Review and finish', 'arun-prakash-media-offload'); ?></h2>
 
-          <h3><?php esc_html_e('Other media plugins', 'nimbus-media-offload'); ?></h3>
+          <h3><?php esc_html_e('Other media plugins', 'arun-prakash-media-offload'); ?></h3>
           <?php if (!empty($state['conflicts'])) : ?>
             <ul class="nmb-status-list">
               <?php foreach ($state['conflicts'] as $plugin) : ?>
@@ -302,27 +302,27 @@ final class PageRenderer
               <?php endforeach; ?>
             </ul>
           <?php else : ?>
-            <p class="nmb-state nmb-state--ok"><?php esc_html_e('No other media offload plugins found.', 'nimbus-media-offload'); ?></p>
+            <p class="nmb-state nmb-state--ok"><?php esc_html_e('No other media offload plugins found.', 'arun-prakash-media-offload'); ?></p>
           <?php endif; ?>
 
           <?php if (!empty($state['has_active_conflicts'])) : ?>
             <label class="nmb-onboarding-checkbox-note">
               <input type="checkbox" name="conflict_acknowledged" value="1" />
-              <span><?php esc_html_e('I understand another media offload plugin is active and I will review the warnings after setup.', 'nimbus-media-offload'); ?></span>
+              <span><?php esc_html_e('I understand another media offload plugin is active and I will review the warnings after setup.', 'arun-prakash-media-offload'); ?></span>
             </label>
           <?php endif; ?>
 
-          <p class="nmb-muted"><?php esc_html_e('You can change every choice later from Settings.', 'nimbus-media-offload'); ?></p>
+          <p class="nmb-muted"><?php esc_html_e('You can change every choice later from Settings.', 'arun-prakash-media-offload'); ?></p>
 
           <div class="nmb-onboarding-actions">
-            <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup', 'nimbus-media-offload'); ?></button>
+            <button type="submit" class="button button-primary"><?php esc_html_e('Finish setup', 'arun-prakash-media-offload'); ?></button>
           </div>
         </section>
       </form>
 
       <p class="nmb-wizard-import">
-        <button type="button" class="nmb-link" data-quick-toggle data-label-quick="<?php esc_attr_e('Use quick connect', 'nimbus-media-offload'); ?>" data-label-manual="<?php esc_attr_e('Enter keys by hand', 'nimbus-media-offload'); ?>"><?php $quickMode === 'quick' ? esc_html_e('Enter keys by hand', 'nimbus-media-offload') : esc_html_e('Use quick connect', 'nimbus-media-offload'); ?></button>
-        <label for="nmb-onboarding-config-file" class="nmb-link"><?php esc_html_e('Import settings from a Nimbus .json export', 'nimbus-media-offload'); ?></label>
+        <button type="button" class="nmb-link" data-quick-toggle data-label-quick="<?php esc_attr_e('Use quick connect', 'arun-prakash-media-offload'); ?>" data-label-manual="<?php esc_attr_e('Enter keys by hand', 'arun-prakash-media-offload'); ?>"><?php $quickMode === 'quick' ? esc_html_e('Enter keys by hand', 'arun-prakash-media-offload') : esc_html_e('Use quick connect', 'arun-prakash-media-offload'); ?></button>
+        <label for="nmb-onboarding-config-file" class="nmb-link"><?php esc_html_e('Import settings from a Nimbus .json export', 'arun-prakash-media-offload'); ?></label>
         <input type="file" id="nmb-onboarding-config-file" accept=".json,application/json" class="screen-reader-text" data-config-import />
         <span class="nmb-config-import-hint nmb-muted" role="status"></span>
       </p>
@@ -351,33 +351,33 @@ final class PageRenderer
     $providerLabel = $this->settings->provider_profile($providerKey)->label();
     $isLocalProvider = $providerKey === 'local';
     $deliveryLabel = $isLocalProvider
-      ? __('Local debug', 'nimbus-media-offload')
-      : (!empty($settings['serve_from_storage']) ? __('Remote', 'nimbus-media-offload') : __('Local', 'nimbus-media-offload'));
+      ? __('Local debug', 'arun-prakash-media-offload')
+      : (!empty($settings['serve_from_storage']) ? __('Remote', 'arun-prakash-media-offload') : __('Local', 'arun-prakash-media-offload'));
     $providerSubstat = $isLocalProvider
-      ? __('No bucket required in local mode', 'nimbus-media-offload')
-      : (string) ($settings['bucket'] ?? __('Bucket not set', 'nimbus-media-offload'));
+      ? __('No bucket required in local mode', 'arun-prakash-media-offload')
+      : (string) ($settings['bucket'] ?? __('Bucket not set', 'arun-prakash-media-offload'));
     ?>
     <div class="nmb-settings-shell">
       <?php $this->renderSummaryStrip([
         [
-          'label' => __('Provider', 'nimbus-media-offload'),
+          'label' => __('Provider', 'arun-prakash-media-offload'),
           'value' => $providerLabel,
           'value_id' => 'nmb-settings-provider-label',
           'substat' => $providerSubstat,
           'substat_id' => 'nmb-settings-provider-substat',
         ],
         [
-          'label' => __('Delivery', 'nimbus-media-offload'),
+          'label' => __('Delivery', 'arun-prakash-media-offload'),
           'value' => $deliveryLabel,
           'value_id' => 'nmb-settings-delivery-label',
-          'substat' => !empty($settings['custom_domain']) ? (string) $settings['custom_domain'] : __('No custom domain configured', 'nimbus-media-offload'),
+          'substat' => !empty($settings['custom_domain']) ? (string) $settings['custom_domain'] : __('No custom domain configured', 'arun-prakash-media-offload'),
           'substat_id' => 'nmb-settings-delivery-substat',
         ],
         [
-          'label' => __('Off-hours batch', 'nimbus-media-offload'),
-          'value' => !empty($settings['off_hours_batch_enabled']) ? __('On', 'nimbus-media-offload') : __('Off', 'nimbus-media-offload'),
+          'label' => __('Off-hours batch', 'arun-prakash-media-offload'),
+          'value' => !empty($settings['off_hours_batch_enabled']) ? __('On', 'arun-prakash-media-offload') : __('Off', 'arun-prakash-media-offload'),
           'value_id' => 'nmb-settings-batch-label',
-          'substat' => !empty($settings['off_hours_batch_time']) ? (string) $settings['off_hours_batch_time'] : __('No schedule set', 'nimbus-media-offload'),
+          'substat' => !empty($settings['off_hours_batch_time']) ? (string) $settings['off_hours_batch_time'] : __('No schedule set', 'arun-prakash-media-offload'),
           'substat_id' => 'nmb-settings-batch-substat',
         ],
       ], 'nmb-settings-summary-strip'); ?>
@@ -388,34 +388,34 @@ final class PageRenderer
         <div class="nmb-settings-main">
             <section id="settings-core" class="nmb-settings-cluster">
               <div class="nmb-settings-cluster-header">
-                <p class="nmb-eyebrow"><?php esc_html_e('Core setup', 'nimbus-media-offload'); ?></p>
-                <h2><?php esc_html_e('Connection and delivery', 'nimbus-media-offload'); ?></h2>
-                <p><?php esc_html_e('Everything required to connect a provider, define the bucket, and decide how media URLs are served.', 'nimbus-media-offload'); ?></p>
+                <p class="nmb-eyebrow"><?php esc_html_e('Core setup', 'arun-prakash-media-offload'); ?></p>
+                <h2><?php esc_html_e('Connection and delivery', 'arun-prakash-media-offload'); ?></h2>
+                <p><?php esc_html_e('Everything required to connect a provider, define the bucket, and decide how media URLs are served.', 'arun-prakash-media-offload'); ?></p>
               </div>
               <?php $this->settingsRegistrar->renderSections(['nimbus_connection', 'nimbus_delivery']); ?>
             </section>
 
             <section id="settings-automation" class="nmb-settings-cluster">
               <div class="nmb-settings-cluster-header">
-                <p class="nmb-eyebrow"><?php esc_html_e('Automation', 'nimbus-media-offload'); ?></p>
-                <h2><?php esc_html_e('Scheduling', 'nimbus-media-offload'); ?></h2>
-                <p><?php esc_html_e('Configure the off-hours batch window for background offloading. Path filters and cache purging can be found on the Advanced tab.', 'nimbus-media-offload'); ?></p>
+                <p class="nmb-eyebrow"><?php esc_html_e('Automation', 'arun-prakash-media-offload'); ?></p>
+                <h2><?php esc_html_e('Scheduling', 'arun-prakash-media-offload'); ?></h2>
+                <p><?php esc_html_e('Configure the off-hours batch window for background offloading. Path filters and cache purging can be found on the Advanced tab.', 'arun-prakash-media-offload'); ?></p>
               </div>
               <?php $this->settingsRegistrar->renderSections(['nimbus_off_hours']); ?>
             </section>
 
             <div class="nmb-settings-submit">
-              <?php submit_button(__('Save Settings', 'nimbus-media-offload')); ?>
+              <?php submit_button(__('Save Settings', 'arun-prakash-media-offload')); ?>
             </div>
           </div>
       </form>
 
       <div class="nmb-secondary-surface-grid">
         <div class="nmb-card">
-          <h3><?php esc_html_e('Integration rewrites', 'nimbus-media-offload'); ?></h3>
-          <p class="nmb-muted"><?php esc_html_e('Plugin-specific asset roots and rewrite actions are now grouped with operational tools, where you can test and execute them without cluttering configuration.', 'nimbus-media-offload'); ?></p>
+          <h3><?php esc_html_e('Integration rewrites', 'arun-prakash-media-offload'); ?></h3>
+          <p class="nmb-muted"><?php esc_html_e('Plugin-specific asset roots and rewrite actions are now grouped with operational tools, where you can test and execute them without cluttering configuration.', 'arun-prakash-media-offload'); ?></p>
           <div class="nmb-actions nmb-actions-left">
-            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Manage integrations', 'nimbus-media-offload'); ?></a>
+            <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Manage integrations', 'arun-prakash-media-offload'); ?></a>
           </div>
         </div>
       </div>
@@ -433,24 +433,24 @@ final class PageRenderer
         <div class="nmb-settings-main">
           <section id="advanced-path-filters" class="nmb-settings-cluster">
             <div class="nmb-settings-cluster-header">
-              <p class="nmb-eyebrow"><?php esc_html_e('Offload rules', 'nimbus-media-offload'); ?></p>
-              <h2><?php esc_html_e('Path filters', 'nimbus-media-offload'); ?></h2>
-              <p><?php esc_html_e('Limit which uploads paths are eligible for offload using allow and ignore pattern lists.', 'nimbus-media-offload'); ?></p>
+              <p class="nmb-eyebrow"><?php esc_html_e('Offload rules', 'arun-prakash-media-offload'); ?></p>
+              <h2><?php esc_html_e('Path filters', 'arun-prakash-media-offload'); ?></h2>
+              <p><?php esc_html_e('Limit which uploads paths are eligible for offload using allow and ignore pattern lists.', 'arun-prakash-media-offload'); ?></p>
             </div>
             <?php $this->settingsRegistrar->renderSections(['nimbus_path_filters']); ?>
           </section>
 
           <section id="advanced-cache-purging" class="nmb-settings-cluster">
             <div class="nmb-settings-cluster-header">
-              <p class="nmb-eyebrow"><?php esc_html_e('Delivery', 'nimbus-media-offload'); ?></p>
-              <h2><?php esc_html_e('Cache purging', 'nimbus-media-offload'); ?></h2>
-              <p><?php esc_html_e('Automatically invalidate CDN and server-side page caches when media is offloaded or URLs are rewritten.', 'nimbus-media-offload'); ?></p>
+              <p class="nmb-eyebrow"><?php esc_html_e('Delivery', 'arun-prakash-media-offload'); ?></p>
+              <h2><?php esc_html_e('Cache purging', 'arun-prakash-media-offload'); ?></h2>
+              <p><?php esc_html_e('Automatically invalidate CDN and server-side page caches when media is offloaded or URLs are rewritten.', 'arun-prakash-media-offload'); ?></p>
             </div>
             <?php $this->settingsRegistrar->renderSections(['nimbus_cache_purging']); ?>
           </section>
 
           <div class="nmb-settings-submit">
-            <?php submit_button(__('Save Advanced Settings', 'nimbus-media-offload')); ?>
+            <?php submit_button(__('Save Advanced Settings', 'arun-prakash-media-offload')); ?>
           </div>
         </div>
       </form>
@@ -464,8 +464,8 @@ final class PageRenderer
     ?>
     <div class="nmb-settings-shell">
       <div class="nmb-panel-toolbar nmb-card" style="display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:4px;">
-        <strong><?php esc_html_e('Connectivity', 'nimbus-media-offload'); ?></strong>
-        <button type="button" id="nmb-test-connection" class="button button-secondary"><?php esc_html_e('Test Connection', 'nimbus-media-offload'); ?></button>
+        <strong><?php esc_html_e('Connectivity', 'arun-prakash-media-offload'); ?></strong>
+        <button type="button" id="nmb-test-connection" class="button button-secondary"><?php esc_html_e('Test Connection', 'arun-prakash-media-offload'); ?></button>
         <span id="nmb-connection-status"></span>
       </div>
       <div id="mo-connection-results" class="nmb-connection-results" hidden></div>
@@ -496,41 +496,41 @@ final class PageRenderer
     <section class="nmb-card nmb-bulk-job-shell" id="nmb-bulk-job-app">
       <div class="nmb-bulk-job-header">
         <div>
-          <h3><?php esc_html_e('Bulk media jobs', 'nimbus-media-offload'); ?></h3>
-          <p class="nmb-muted"><?php esc_html_e('This panel polls the current queue state and lets you start, pause, resume, or retry background jobs.', 'nimbus-media-offload'); ?></p>
+          <h3><?php esc_html_e('Bulk media jobs', 'arun-prakash-media-offload'); ?></h3>
+          <p class="nmb-muted"><?php esc_html_e('This panel polls the current queue state and lets you start, pause, resume, or retry background jobs.', 'arun-prakash-media-offload'); ?></p>
         </div>
-        <span id="nmb-job-status-badge" class="nmb-inline-badge <?php echo $hasJob ? esc_attr($this->jobBadgeClass((string) ($job['status'] ?? 'idle'))) : ''; ?>"><?php echo esc_html($hasJob ? (string) ($job['status_label'] ?? __('Idle', 'nimbus-media-offload')) : __('Idle', 'nimbus-media-offload')); ?></span>
+        <span id="nmb-job-status-badge" class="nmb-inline-badge <?php echo $hasJob ? esc_attr($this->jobBadgeClass((string) ($job['status'] ?? 'idle'))) : ''; ?>"><?php echo esc_html($hasJob ? (string) ($job['status_label'] ?? __('Idle', 'arun-prakash-media-offload')) : __('Idle', 'arun-prakash-media-offload')); ?></span>
       </div>
 
       <div class="nmb-bulk-job-grid">
         <div class="nmb-bulk-job-pane">
-          <h3><?php esc_html_e('Current job', 'nimbus-media-offload'); ?></h3>
-          <div class="nmb-stat" id="nmb-job-label"><?php echo esc_html($hasJob ? (string) ($job['type_label'] ?? __('No active job', 'nimbus-media-offload')) : __('No active job', 'nimbus-media-offload')); ?></div>
-          <div class="nmb-substat" id="nmb-job-message"><?php echo esc_html($hasJob ? (string) ($job['last_message'] ?? '') : __('Choose a bulk task to begin.', 'nimbus-media-offload')); ?></div>
+          <h3><?php esc_html_e('Current job', 'arun-prakash-media-offload'); ?></h3>
+          <div class="nmb-stat" id="nmb-job-label"><?php echo esc_html($hasJob ? (string) ($job['type_label'] ?? __('No active job', 'arun-prakash-media-offload')) : __('No active job', 'arun-prakash-media-offload')); ?></div>
+          <div class="nmb-substat" id="nmb-job-message"><?php echo esc_html($hasJob ? (string) ($job['last_message'] ?? '') : __('Choose a bulk task to begin.', 'arun-prakash-media-offload')); ?></div>
           <div class="nmb-progress nmb-bulk-job-progress"><div id="nmb-job-progress-bar" class="nmb-bar" style="width: <?php echo esc_attr((string) ($job['percent_complete'] ?? 0)); ?>%"></div></div>
-          <div class="nmb-substat" id="nmb-job-progress-text"><?php /* translators: %1$d: job completion percentage */ echo esc_html(sprintf(__('%1$d%% complete', 'nimbus-media-offload'), (int) ($job['percent_complete'] ?? 0))); ?></div>
+          <div class="nmb-substat" id="nmb-job-progress-text"><?php /* translators: %1$d: job completion percentage */ echo esc_html(sprintf(__('%1$d%% complete', 'arun-prakash-media-offload'), (int) ($job['percent_complete'] ?? 0))); ?></div>
         </div>
 
         <div class="nmb-bulk-job-pane">
-          <h3><?php esc_html_e('Queue state', 'nimbus-media-offload'); ?></h3>
+          <h3><?php esc_html_e('Queue state', 'arun-prakash-media-offload'); ?></h3>
           <ul class="nmb-status-list">
-            <li><strong><?php esc_html_e('Processed', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-processed"><?php echo number_format((int) ($job['processed_items'] ?? 0)); ?></span> / <span id="nmb-job-total"><?php echo number_format((int) ($job['total_items'] ?? 0)); ?></span></li>
-            <li><strong><?php esc_html_e('Succeeded', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-success"><?php echo number_format((int) ($job['success_count'] ?? 0)); ?></span></li>
-            <li><strong><?php esc_html_e('Failed', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-failed"><?php echo number_format((int) ($job['failed_count'] ?? 0)); ?></span></li>
-            <li><strong><?php esc_html_e('Skipped', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-skipped"><?php echo number_format((int) ($job['skipped_count'] ?? 0)); ?></span></li>
+            <li><strong><?php esc_html_e('Processed', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-processed"><?php echo number_format((int) ($job['processed_items'] ?? 0)); ?></span> / <span id="nmb-job-total"><?php echo number_format((int) ($job['total_items'] ?? 0)); ?></span></li>
+            <li><strong><?php esc_html_e('Succeeded', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-success"><?php echo number_format((int) ($job['success_count'] ?? 0)); ?></span></li>
+            <li><strong><?php esc_html_e('Failed', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-failed"><?php echo number_format((int) ($job['failed_count'] ?? 0)); ?></span></li>
+            <li><strong><?php esc_html_e('Skipped', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><span id="nmb-job-skipped"><?php echo number_format((int) ($job['skipped_count'] ?? 0)); ?></span></li>
           </ul>
         </div>
 
         <div class="nmb-bulk-job-pane">
-          <h3><?php esc_html_e('Actions', 'nimbus-media-offload'); ?></h3>
+          <h3><?php esc_html_e('Actions', 'arun-prakash-media-offload'); ?></h3>
           <div class="nmb-bulk-job-actions">
-            <button type="button" class="button button-primary" data-job-action="start" data-job-type="offload_existing"><?php esc_html_e('Offload existing library', 'nimbus-media-offload'); ?></button>
-            <button type="button" class="button" data-job-action="start" data-job-type="restore_local"><?php esc_html_e('Restore local copies', 'nimbus-media-offload'); ?></button>
-            <button type="button" class="button" data-job-action="pause"><?php esc_html_e('Pause', 'nimbus-media-offload'); ?></button>
-            <button type="button" class="button" data-job-action="resume"><?php esc_html_e('Resume', 'nimbus-media-offload'); ?></button>
-            <button type="button" class="button" data-job-action="retry-failed"><?php esc_html_e('Retry failed items', 'nimbus-media-offload'); ?></button>
+            <button type="button" class="button button-primary" data-job-action="start" data-job-type="offload_existing"><?php esc_html_e('Offload existing library', 'arun-prakash-media-offload'); ?></button>
+            <button type="button" class="button" data-job-action="start" data-job-type="restore_local"><?php esc_html_e('Restore local copies', 'arun-prakash-media-offload'); ?></button>
+            <button type="button" class="button" data-job-action="pause"><?php esc_html_e('Pause', 'arun-prakash-media-offload'); ?></button>
+            <button type="button" class="button" data-job-action="resume"><?php esc_html_e('Resume', 'arun-prakash-media-offload'); ?></button>
+            <button type="button" class="button" data-job-action="retry-failed"><?php esc_html_e('Retry failed items', 'arun-prakash-media-offload'); ?></button>
           </div>
-          <p class="nmb-muted"><?php esc_html_e('Pause/resume works on the current job. Retry failed items uses the failed subset from the most recent completed job.', 'nimbus-media-offload'); ?></p>
+          <p class="nmb-muted"><?php esc_html_e('Pause/resume works on the current job. Retry failed items uses the failed subset from the most recent completed job.', 'arun-prakash-media-offload'); ?></p>
         </div>
       </div>
     </section>
@@ -546,36 +546,36 @@ final class PageRenderer
     <section class="nmb-card nmb-activation-recovery-shell">
       <div class="nmb-bulk-job-header">
         <div>
-          <h3><?php esc_html_e('Activation recovery', 'nimbus-media-offload'); ?></h3>
-          <p class="nmb-muted"><?php esc_html_e('An earlier activation/upgrade migration did not finish. Resume it here in small batches instead of forcing the entire site through one heavy request.', 'nimbus-media-offload'); ?></p>
+          <h3><?php esc_html_e('Activation recovery', 'arun-prakash-media-offload'); ?></h3>
+          <p class="nmb-muted"><?php esc_html_e('An earlier activation/upgrade migration did not finish. Resume it here in small batches instead of forcing the entire site through one heavy request.', 'arun-prakash-media-offload'); ?></p>
         </div>
-        <span class="nmb-inline-badge is-warning"><?php esc_html_e('Recovery needed', 'nimbus-media-offload'); ?></span>
+        <span class="nmb-inline-badge is-warning"><?php esc_html_e('Recovery needed', 'arun-prakash-media-offload'); ?></span>
       </div>
 
       <ul class="nmb-status-list">
         <li>
           <span class="dashicons <?php echo !empty($migration['scheduled']) ? 'dashicons-clock status-warning' : 'dashicons-update status-warning'; ?>"></span>
-          <strong><?php esc_html_e('Background follow-up', 'nimbus-media-offload'); ?></strong>
+          <strong><?php esc_html_e('Background follow-up', 'arun-prakash-media-offload'); ?></strong>
           <span class="nmb-spacer"></span>
-          <?php echo !empty($migration['scheduled']) ? esc_html__('Scheduled', 'nimbus-media-offload') : esc_html__('Not scheduled yet', 'nimbus-media-offload'); ?>
+          <?php echo !empty($migration['scheduled']) ? esc_html__('Scheduled', 'arun-prakash-media-offload') : esc_html__('Not scheduled yet', 'arun-prakash-media-offload'); ?>
         </li>
         <li>
           <span class="dashicons dashicons-database"></span>
-          <strong><?php esc_html_e('Legacy metadata keys', 'nimbus-media-offload'); ?></strong>
+          <strong><?php esc_html_e('Legacy metadata keys', 'arun-prakash-media-offload'); ?></strong>
           <span class="nmb-spacer"></span>
           <?php echo number_format(count($legacyMetaKeys)); ?>
         </li>
         <li>
           <span class="dashicons dashicons-admin-settings"></span>
-          <strong><?php esc_html_e('Legacy options', 'nimbus-media-offload'); ?></strong>
+          <strong><?php esc_html_e('Legacy options', 'arun-prakash-media-offload'); ?></strong>
           <span class="nmb-spacer"></span>
           <?php echo number_format(count($legacyOptions)); ?>
         </li>
         <li>
           <span class="dashicons dashicons-format-image"></span>
-          <strong><?php esc_html_e('Attachment metadata payloads', 'nimbus-media-offload'); ?></strong>
+          <strong><?php esc_html_e('Attachment metadata payloads', 'arun-prakash-media-offload'); ?></strong>
           <span class="nmb-spacer"></span>
-          <?php echo $hasAttachmentPayloads ? esc_html__('Still pending', 'nimbus-media-offload') : esc_html__('Clear', 'nimbus-media-offload'); ?>
+          <?php echo $hasAttachmentPayloads ? esc_html__('Still pending', 'arun-prakash-media-offload') : esc_html__('Clear', 'arun-prakash-media-offload'); ?>
         </li>
       </ul>
 
@@ -583,7 +583,7 @@ final class PageRenderer
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
           <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_RESUME_MIGRATION); ?>
           <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_RESUME_MIGRATION); ?>" />
-          <button type="submit" class="button button-primary"><?php esc_html_e('Resume activation recovery', 'nimbus-media-offload'); ?></button>
+          <button type="submit" class="button button-primary"><?php esc_html_e('Resume activation recovery', 'arun-prakash-media-offload'); ?></button>
         </form>
       </div>
     </section>
@@ -601,10 +601,10 @@ final class PageRenderer
     $status = $this->uploadHandler->get_attachment_status($attachmentId);
     ?>
     <section class="nmb-card nmb-attachment-inspector">
-      <h3><?php esc_html_e('Attachment status', 'nimbus-media-offload'); ?></h3>
+      <h3><?php esc_html_e('Attachment status', 'arun-prakash-media-offload'); ?></h3>
       <ul class="nmb-status-list">
-        <li><strong><?php esc_html_e('Attachment ID', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><?php echo number_format($attachmentId); ?></li>
-        <li><strong><?php esc_html_e('Status', 'nimbus-media-offload'); ?></strong><span class="nmb-spacer"></span><span class="nmb-inline-badge <?php echo esc_attr($this->jobBadgeClass((string) ($status['status'] ?? 'local'))); ?>"><?php echo esc_html((string) ($status['label'] ?? __('Unknown', 'nimbus-media-offload'))); ?></span></li>
+        <li><strong><?php esc_html_e('Attachment ID', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><?php echo number_format($attachmentId); ?></li>
+        <li><strong><?php esc_html_e('Status', 'arun-prakash-media-offload'); ?></strong><span class="nmb-spacer"></span><span class="nmb-inline-badge <?php echo esc_attr($this->jobBadgeClass((string) ($status['status'] ?? 'local'))); ?>"><?php echo esc_html((string) ($status['label'] ?? __('Unknown', 'arun-prakash-media-offload'))); ?></span></li>
       </ul>
       <?php if (!empty($status['reason'])) : ?>
         <p class="nmb-muted"><?php echo esc_html((string) $status['reason']); ?></p>
@@ -622,11 +622,11 @@ final class PageRenderer
       <div class="nmb-card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
           <div>
-            <h3 style="margin:0 0 4px;"><?php esc_html_e('Plugin integrations', 'nimbus-media-offload'); ?></h3>
-            <p class="nmb-muted" style="margin:0;"><?php esc_html_e('Nimbus detects active plugins that store assets outside the standard wp-content/uploads path. Enable or disable each integration below.', 'nimbus-media-offload'); ?></p>
+            <h3 style="margin:0 0 4px;"><?php esc_html_e('Plugin integrations', 'arun-prakash-media-offload'); ?></h3>
+            <p class="nmb-muted" style="margin:0;"><?php esc_html_e('Nimbus detects active plugins that store assets outside the standard wp-content/uploads path. Enable or disable each integration below.', 'arun-prakash-media-offload'); ?></p>
           </div>
           <span class="nmb-inline-badge">
-            <?php echo number_format((int) ($summary['detected'] ?? 0)); ?> <?php esc_html_e('detected', 'nimbus-media-offload'); ?>
+            <?php echo number_format((int) ($summary['detected'] ?? 0)); ?> <?php esc_html_e('detected', 'arun-prakash-media-offload'); ?>
           </span>
         </div>
       </div>
@@ -635,11 +635,11 @@ final class PageRenderer
         <table class="nmb-integrations-table widefat" style="border:none;">
           <thead>
             <tr>
-              <th><?php esc_html_e('Plugin', 'nimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('State', 'nimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Asset paths', 'nimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Coverage', 'nimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Actions', 'nimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Plugin', 'arun-prakash-media-offload'); ?></th>
+              <th><?php esc_html_e('State', 'arun-prakash-media-offload'); ?></th>
+              <th><?php esc_html_e('Asset paths', 'arun-prakash-media-offload'); ?></th>
+              <th><?php esc_html_e('Coverage', 'arun-prakash-media-offload'); ?></th>
+              <th><?php esc_html_e('Actions', 'arun-prakash-media-offload'); ?></th>
             </tr>
           </thead>
           <tbody>
@@ -655,16 +655,16 @@ final class PageRenderer
               }
               if ($isEnabled && $isActive) {
                 $stateClass = 'is-active';
-                $stateLabel = __('Active', 'nimbus-media-offload');
+                $stateLabel = __('Active', 'arun-prakash-media-offload');
               } elseif (!$isEnabled) {
                 $stateClass = 'is-disabled';
-                $stateLabel = __('Disabled', 'nimbus-media-offload');
+                $stateLabel = __('Disabled', 'arun-prakash-media-offload');
               } elseif ($isInstalled) {
                 $stateClass = 'is-installed';
-                $stateLabel = __('Installed', 'nimbus-media-offload');
+                $stateLabel = __('Installed', 'arun-prakash-media-offload');
               } else {
                 $stateClass = 'is-not-installed';
-                $stateLabel = __('Not installed', 'nimbus-media-offload');
+                $stateLabel = __('Not installed', 'arun-prakash-media-offload');
               }
               ?>
               <tr>
@@ -690,9 +690,9 @@ final class PageRenderer
                 </td>
                 <td>
                   <?php if (!empty($item['rewrite_supported'])) : ?>
-                    <span class="nmb-int-state-badge is-active"><?php esc_html_e('Rewrite supported', 'nimbus-media-offload'); ?></span>
+                    <span class="nmb-int-state-badge is-active"><?php esc_html_e('Rewrite supported', 'arun-prakash-media-offload'); ?></span>
                   <?php else : ?>
-                    <span class="nmb-muted"><?php esc_html_e('Detection only', 'nimbus-media-offload'); ?></span>
+                    <span class="nmb-muted"><?php esc_html_e('Detection only', 'arun-prakash-media-offload'); ?></span>
                   <?php endif; ?>
                 </td>
                 <td>
@@ -702,7 +702,7 @@ final class PageRenderer
                       <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION); ?>" />
                       <input type="hidden" name="integration" value="<?php echo esc_attr($itemKey); ?>" />
                       <button type="submit" class="button button-small">
-                        <?php echo $isEnabled ? esc_html__('Disable', 'nimbus-media-offload') : esc_html__('Enable', 'nimbus-media-offload'); ?>
+                        <?php echo $isEnabled ? esc_html__('Disable', 'arun-prakash-media-offload') : esc_html__('Enable', 'arun-prakash-media-offload'); ?>
                       </button>
                     </form>
                     <?php if (!empty($item['rewrite_supported']) && !empty($item['rewrite_action_label'])) : ?>
@@ -711,7 +711,7 @@ final class PageRenderer
                         <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION); ?>" />
                         <input type="hidden" name="integration" value="<?php echo esc_attr($itemKey); ?>" />
                         <button type="submit" class="button button-small button-primary" <?php disabled(empty($item['rewrite_ready'])); ?>>
-                          <?php echo esc_html((string) ($item['rewrite_action_label'] ?? __('Run rewrite', 'nimbus-media-offload'))); ?>
+                          <?php echo esc_html((string) ($item['rewrite_action_label'] ?? __('Run rewrite', 'arun-prakash-media-offload'))); ?>
                         </button>
                       </form>
                     <?php endif; ?>
@@ -722,7 +722,7 @@ final class PageRenderer
             <?php if (empty($items)) : ?>
               <tr>
                 <td colspan="5" style="text-align:center;color:var(--mo-text-soft);padding:24px;">
-                  <?php esc_html_e('No integrations detected. Install a supported plugin to see it listed here.', 'nimbus-media-offload'); ?>
+                  <?php esc_html_e('No integrations detected. Install a supported plugin to see it listed here.', 'arun-prakash-media-offload'); ?>
                 </td>
               </tr>
             <?php endif; ?>
@@ -772,7 +772,7 @@ final class PageRenderer
       $timestamp = $today - ($offset * DAY_IN_SECONDS);
       $date = gmdate('Y-m-d', $timestamp);
       $days[] = [
-        'label' => $offset === 0 ? __('Today', 'nimbus-media-offload') : wp_date('D', $timestamp),
+        'label' => $offset === 0 ? __('Today', 'arun-prakash-media-offload') : wp_date('D', $timestamp),
         'date' => $date,
         'count' => $uploadsByDate[$date] ?? 0,
         'today' => $offset === 0,
@@ -790,24 +790,24 @@ final class PageRenderer
     <div class="nmb-dashboard">
       <div class="nmb-stats-bar">
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Library assets', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Library assets', 'arun-prakash-media-offload'); ?></span>
           <span class="nmb-stat-cell__value"><?php echo esc_html(number_format_i18n((int) $stats['total'])); ?></span>
-          <span class="nmb-stat-cell__sub"><?php esc_html_e('Attachments in WordPress', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-stat-cell__sub"><?php esc_html_e('Attachments in WordPress', 'arun-prakash-media-offload'); ?></span>
         </div>
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Offloaded', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Offloaded', 'arun-prakash-media-offload'); ?></span>
           <span class="nmb-stat-cell__value"><?php echo esc_html(number_format_i18n((int) $stats['offloaded'])); ?></span>
-          <span class="nmb-stat-cell__sub"><?php /* translators: %s: percentage of attachments linked to remote storage */ echo esc_html(sprintf(__('%s%% linked to storage', 'nimbus-media-offload'), number_format_i18n((float) $stats['percent']))); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: percentage of attachments linked to remote storage */ echo esc_html(sprintf(__('%s%% linked to storage', 'arun-prakash-media-offload'), number_format_i18n((float) $stats['percent']))); ?></span>
         </div>
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Remote storage', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Remote storage', 'arun-prakash-media-offload'); ?></span>
           <span class="nmb-stat-cell__value"><?php echo esc_html(size_format($storageSize) ?: '0 B'); ?></span>
-          <span class="nmb-stat-cell__sub"><?php /* translators: %s: number of remote objects tracked */ echo esc_html(sprintf(_n('%s object tracked', '%s objects tracked', (int) $storageCount, 'nimbus-media-offload'), number_format_i18n((int) $storageCount))); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: number of remote objects tracked */ echo esc_html(sprintf(_n('%s object tracked', '%s objects tracked', (int) $storageCount, 'arun-prakash-media-offload'), number_format_i18n((int) $storageCount))); ?></span>
         </div>
         <div class="nmb-stat-cell">
-          <span class="nmb-stat-cell__label"><?php esc_html_e('Est. monthly cost', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-stat-cell__label"><?php esc_html_e('Est. monthly cost', 'arun-prakash-media-offload'); ?></span>
           <span class="nmb-stat-cell__value">$<?php echo esc_html(number_format((float) $storageCost, 2)); ?></span>
-          <span class="nmb-stat-cell__sub"><?php /* translators: %s: storage provider name */ echo esc_html(sprintf(__('%s estimate', 'nimbus-media-offload'), $providerLabel)); ?></span>
+          <span class="nmb-stat-cell__sub"><?php /* translators: %s: storage provider name */ echo esc_html(sprintf(__('%s estimate', 'arun-prakash-media-offload'), $providerLabel)); ?></span>
         </div>
       </div>
 
@@ -815,58 +815,58 @@ final class PageRenderer
         <section class="nmb-card nmb-library-card" aria-labelledby="nmb-library-title">
           <div class="nmb-card-head">
             <div>
-              <h2 id="nmb-library-title"><?php esc_html_e('Library in storage', 'nimbus-media-offload'); ?></h2>
+              <h2 id="nmb-library-title"><?php esc_html_e('Library in storage', 'arun-prakash-media-offload'); ?></h2>
               <p class="nmb-muted">
                 <?php if ($localOnly > 0) : ?>
-                  <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('%s file is still served from this server.', '%s files are still served from this server.', $localOnly, 'nimbus-media-offload'), number_format_i18n($localOnly))); ?>
+                  <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('%s file is still served from this server.', '%s files are still served from this server.', $localOnly, 'arun-prakash-media-offload'), number_format_i18n($localOnly))); ?>
                 <?php else : ?>
-                  <?php esc_html_e('Every file is in storage.', 'nimbus-media-offload'); ?>
+                  <?php esc_html_e('Every file is in storage.', 'arun-prakash-media-offload'); ?>
                 <?php endif; ?>
               </p>
             </div>
             <?php if ($localOnly > 0 && $currentProvider !== 'local') : ?>
               <a class="button button-primary" href="<?php echo esc_url($this->adminTabUrl('tools', 'nmb-bulk-job-app')); ?>">
-                <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('Offload %s file', 'Offload %s files', $localOnly, 'nimbus-media-offload'), number_format_i18n($localOnly))); ?>
+                <?php /* translators: %s: number of files */ echo esc_html(sprintf(_n('Offload %s file', 'Offload %s files', $localOnly, 'arun-prakash-media-offload'), number_format_i18n($localOnly))); ?>
               </a>
             <?php endif; ?>
           </div>
 
-          <div class="nmb-meter" role="progressbar" aria-label="<?php esc_attr_e('Share of the library in storage', 'nimbus-media-offload'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr((string) (int) $stats['percent']); ?>">
+          <div class="nmb-meter" role="progressbar" aria-label="<?php esc_attr_e('Share of the library in storage', 'arun-prakash-media-offload'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?php echo esc_attr((string) (int) $stats['percent']); ?>">
             <span class="nmb-meter__fill" style="width:<?php echo esc_attr((string) (float) $stats['percent']); ?>%"></span>
           </div>
 
-          <h3 class="nmb-chart-title"><?php esc_html_e('Uploads, last 7 days', 'nimbus-media-offload'); ?></h3>
+          <h3 class="nmb-chart-title"><?php esc_html_e('Uploads, last 7 days', 'arun-prakash-media-offload'); ?></h3>
           <ol class="nmb-chart">
             <?php foreach ($days as $day) : ?>
               <li class="nmb-bar-group<?php echo $day['today'] ? ' is-today' : ''; ?>" title="<?php echo esc_attr($day['date'] . ': ' . $day['count']); ?>">
                 <span class="nmb-chart-bar" style="height:<?php echo esc_attr((string) max(4, (int) round($day['count'] / $maxUploads * 100))); ?>%"></span>
-                <span class="nmb-chart-label"><?php echo esc_html($day['label']); ?><span class="screen-reader-text">: <?php /* translators: %s: number of uploads */ echo esc_html(sprintf(_n('%s upload', '%s uploads', $day['count'], 'nimbus-media-offload'), number_format_i18n($day['count']))); ?></span></span>
+                <span class="nmb-chart-label"><?php echo esc_html($day['label']); ?><span class="screen-reader-text">: <?php /* translators: %s: number of uploads */ echo esc_html(sprintf(_n('%s upload', '%s uploads', $day['count'], 'arun-prakash-media-offload'), number_format_i18n($day['count']))); ?></span></span>
               </li>
             <?php endforeach; ?>
           </ol>
         </section>
 
         <section class="nmb-card nmb-health-card" id="overview-setup-health" aria-labelledby="nmb-health-title">
-          <h2 id="nmb-health-title"><?php esc_html_e('Setup health', 'nimbus-media-offload'); ?></h2>
+          <h2 id="nmb-health-title"><?php esc_html_e('Setup health', 'arun-prakash-media-offload'); ?></h2>
           <dl class="nmb-rows">
             <div>
-              <dt><?php esc_html_e('Credentials', 'nimbus-media-offload'); ?></dt>
-              <dd class="nmb-state <?php echo $credentialsOk ? 'nmb-state--ok' : 'nmb-state--error'; ?>"><?php echo $credentialsOk ? esc_html__('Configured', 'nimbus-media-offload') : esc_html__('Needs attention', 'nimbus-media-offload'); ?></dd>
+              <dt><?php esc_html_e('Credentials', 'arun-prakash-media-offload'); ?></dt>
+              <dd class="nmb-state <?php echo $credentialsOk ? 'nmb-state--ok' : 'nmb-state--error'; ?>"><?php echo $credentialsOk ? esc_html__('Configured', 'arun-prakash-media-offload') : esc_html__('Needs attention', 'arun-prakash-media-offload'); ?></dd>
             </div>
             <div>
-              <dt><?php esc_html_e('Delivery', 'nimbus-media-offload'); ?></dt>
-              <dd class="nmb-state <?php echo $servingRemote ? 'nmb-state--ok' : ''; ?>"><?php echo $servingRemote ? esc_html__('Serving from storage', 'nimbus-media-offload') : esc_html__('Serving local URLs', 'nimbus-media-offload'); ?></dd>
+              <dt><?php esc_html_e('Delivery', 'arun-prakash-media-offload'); ?></dt>
+              <dd class="nmb-state <?php echo $servingRemote ? 'nmb-state--ok' : ''; ?>"><?php echo $servingRemote ? esc_html__('Serving from storage', 'arun-prakash-media-offload') : esc_html__('Serving local URLs', 'arun-prakash-media-offload'); ?></dd>
             </div>
             <div>
-              <dt><?php esc_html_e('Pending URL updates', 'nimbus-media-offload'); ?></dt>
+              <dt><?php esc_html_e('Pending URL updates', 'arun-prakash-media-offload'); ?></dt>
               <dd class="nmb-num"><?php echo esc_html(number_format_i18n($pendingUrls)); ?></dd>
             </div>
             <div>
-              <dt><?php esc_html_e('Plugin conflicts', 'nimbus-media-offload'); ?></dt>
-              <dd class="nmb-state <?php echo $hasConflicts ? 'nmb-state--error' : 'nmb-state--ok'; ?>"><?php echo $hasConflicts ? esc_html__('Review required', 'nimbus-media-offload') : esc_html__('None', 'nimbus-media-offload'); ?></dd>
+              <dt><?php esc_html_e('Plugin conflicts', 'arun-prakash-media-offload'); ?></dt>
+              <dd class="nmb-state <?php echo $hasConflicts ? 'nmb-state--error' : 'nmb-state--ok'; ?>"><?php echo $hasConflicts ? esc_html__('Review required', 'arun-prakash-media-offload') : esc_html__('None', 'arun-prakash-media-offload'); ?></dd>
             </div>
             <div>
-              <dt><?php esc_html_e('Integrations', 'nimbus-media-offload'); ?></dt>
+              <dt><?php esc_html_e('Integrations', 'arun-prakash-media-offload'); ?></dt>
               <dd class="nmb-integration-logos">
                 <?php foreach ($detectedIntegrations as $item) :
                   $key = sanitize_key((string) ($item['key'] ?? ''));
@@ -876,14 +876,14 @@ final class PageRenderer
                   ?>
                   <img src="<?php echo esc_url(NIMBUS_URL . 'assets/img/logos/' . $key . '.svg'); ?>" width="18" height="18" alt="" />
                 <?php endforeach; ?>
-                <?php /* translators: %s: number of detected integrations */ echo esc_html(sprintf(__('%s detected', 'nimbus-media-offload'), number_format_i18n(count($detectedIntegrations)))); ?>
+                <?php /* translators: %s: number of detected integrations */ echo esc_html(sprintf(__('%s detected', 'arun-prakash-media-offload'), number_format_i18n(count($detectedIntegrations)))); ?>
               </dd>
             </div>
           </dl>
           <?php if ($hasConflicts) : ?>
-            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Review conflicts', 'nimbus-media-offload'); ?></a>
+            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('integrations')); ?>"><?php esc_html_e('Review conflicts', 'arun-prakash-media-offload'); ?></a>
           <?php elseif (!$credentialsOk) : ?>
-            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Add credentials', 'nimbus-media-offload'); ?></a>
+            <a class="nmb-link" href="<?php echo esc_url($this->adminTabUrl('settings', 'settings-core')); ?>"><?php esc_html_e('Add credentials', 'arun-prakash-media-offload'); ?></a>
           <?php endif; ?>
         </section>
       </div>
@@ -891,10 +891,10 @@ final class PageRenderer
       <?php if (!empty($costComparison['scenarios'])) : ?>
       <section class="nmb-card nmb-card--flush nmb-cost-card" aria-labelledby="nmb-cost-title">
         <div class="nmb-cost-card-header">
-          <h2 id="nmb-cost-title"><?php esc_html_e('Provider cost comparison', 'nimbus-media-offload'); ?></h2>
+          <h2 id="nmb-cost-title"><?php esc_html_e('Provider cost comparison', 'arun-prakash-media-offload'); ?></h2>
           <p class="nmb-muted"><?php echo esc_html(sprintf(
             /* translators: 1: GB stored, 2: number of files, 3: GB egress estimate */
-            __('%1$s GB stored · %2$s files · est. %3$s GB monthly egress', 'nimbus-media-offload'),
+            __('%1$s GB stored · %2$s files · est. %3$s GB monthly egress', 'arun-prakash-media-offload'),
             number_format_i18n((float) ($costComparison['storage_gb'] ?? 0), 1),
             number_format_i18n((int) ($costComparison['offloaded_count'] ?? 0)),
             number_format_i18n((float) ($costComparison['egress_gb_est'] ?? 0), 1)
@@ -905,10 +905,10 @@ final class PageRenderer
           <table class="nmb-cost-table">
             <thead>
               <tr>
-                <th scope="col"><?php esc_html_e('Provider', 'nimbus-media-offload'); ?></th>
-                <th scope="col"><?php esc_html_e('Storage', 'nimbus-media-offload'); ?></th>
-                <th scope="col"><?php esc_html_e('Egress', 'nimbus-media-offload'); ?></th>
-                <th scope="col" class="nmb-cost-table__num"><?php esc_html_e('Est. monthly', 'nimbus-media-offload'); ?></th>
+                <th scope="col"><?php esc_html_e('Provider', 'arun-prakash-media-offload'); ?></th>
+                <th scope="col"><?php esc_html_e('Storage', 'arun-prakash-media-offload'); ?></th>
+                <th scope="col"><?php esc_html_e('Egress', 'arun-prakash-media-offload'); ?></th>
+                <th scope="col" class="nmb-cost-table__num"><?php esc_html_e('Est. monthly', 'arun-prakash-media-offload'); ?></th>
               </tr>
             </thead>
             <tbody>
@@ -925,22 +925,22 @@ final class PageRenderer
                       <?php echo esc_html($scenario['label']); ?>
                     <?php endif; ?>
                     <?php if ($isCurrent) : ?>
-                      <span class="nmb-badge nmb-badge--active"><?php esc_html_e('Active', 'nimbus-media-offload'); ?></span>
+                      <span class="nmb-badge nmb-badge--active"><?php esc_html_e('Active', 'arun-prakash-media-offload'); ?></span>
                     <?php endif; ?>
                   </th>
                   <?php if ($scenario['estimated_monthly_total'] === null) : ?>
-                    <td colspan="3" class="nmb-muted"><?php esc_html_e('Custom pricing, varies by vendor', 'nimbus-media-offload'); ?></td>
+                    <td colspan="3" class="nmb-muted"><?php esc_html_e('Custom pricing, varies by vendor', 'arun-prakash-media-offload'); ?></td>
                   <?php else : ?>
                     <td>
                       <?php if ((float) $scenario['flat_monthly'] > 0) : ?>
-                        <?php /* translators: %s: flat monthly fee */ echo esc_html(sprintf(__('$%s base', 'nimbus-media-offload'), number_format((float) $scenario['flat_monthly'], 2))); ?>
+                        <?php /* translators: %s: flat monthly fee */ echo esc_html(sprintf(__('$%s base', 'arun-prakash-media-offload'), number_format((float) $scenario['flat_monthly'], 2))); ?>
                       <?php else : ?>
                         $<?php echo esc_html(number_format((float) $scenario['storage_cost'], 2)); ?>
                       <?php endif; ?>
                     </td>
                     <td>
                       <?php if ((float) $scenario['egress_cost'] === 0.0) : ?>
-                        <?php echo (float) $scenario['flat_monthly'] > 0 ? esc_html__('Included', 'nimbus-media-offload') : esc_html__('Free', 'nimbus-media-offload'); ?>
+                        <?php echo (float) $scenario['flat_monthly'] > 0 ? esc_html__('Included', 'arun-prakash-media-offload') : esc_html__('Free', 'arun-prakash-media-offload'); ?>
                       <?php else : ?>
                         $<?php echo esc_html(number_format((float) $scenario['egress_cost'], 2)); ?>
                       <?php endif; ?>
@@ -952,7 +952,7 @@ final class PageRenderer
             </tbody>
           </table>
         </div>
-        <p class="nmb-muted nmb-cost-disclaimer"><?php esc_html_e('Estimates only. Check current pricing with each provider.', 'nimbus-media-offload'); ?></p>
+        <p class="nmb-muted nmb-cost-disclaimer"><?php esc_html_e('Estimates only. Check current pricing with each provider.', 'arun-prakash-media-offload'); ?></p>
       </section>
       <?php endif; ?>
     </div>
@@ -989,22 +989,22 @@ final class PageRenderer
         <div class="nmb-log-header-chips">
           <span class="nmb-log-chip">
             <strong class="nmb-log-chip-value"><?php echo esc_html(number_format($total)); ?></strong>
-            <span class="nmb-log-chip-label"><?php esc_html_e('entries', 'nimbus-media-offload'); ?></span>
+            <span class="nmb-log-chip-label"><?php esc_html_e('entries', 'arun-prakash-media-offload'); ?></span>
           </span>
           <?php if ($warningCount > 0) : ?>
           <span class="nmb-log-chip is-warn">
             <strong class="nmb-log-chip-value"><?php echo esc_html(number_format($warningCount)); ?></strong>
-            <span class="nmb-log-chip-label"><?php esc_html_e('warnings', 'nimbus-media-offload'); ?></span>
+            <span class="nmb-log-chip-label"><?php esc_html_e('warnings', 'arun-prakash-media-offload'); ?></span>
           </span>
           <?php endif; ?>
           <?php if ($errorCount > 0) : ?>
           <span class="nmb-log-chip is-error">
             <strong class="nmb-log-chip-value"><?php echo esc_html(number_format($errorCount)); ?></strong>
-            <span class="nmb-log-chip-label"><?php esc_html_e('errors', 'nimbus-media-offload'); ?></span>
+            <span class="nmb-log-chip-label"><?php esc_html_e('errors', 'arun-prakash-media-offload'); ?></span>
           </span>
           <?php endif; ?>
           <span class="nmb-log-chip <?php echo $loggerOn ? 'is-ok' : 'is-muted'; ?>">
-            <?php echo $loggerOn ? esc_html__('Logging on', 'nimbus-media-offload') : esc_html__('Logging off', 'nimbus-media-offload'); ?>
+            <?php echo $loggerOn ? esc_html__('Logging on', 'arun-prakash-media-offload') : esc_html__('Logging off', 'arun-prakash-media-offload'); ?>
             <span class="nmb-log-chip-label">· <?php echo esc_html($minLevel); ?></span>
           </span>
         </div>
@@ -1013,15 +1013,15 @@ final class PageRenderer
                   class="button button-secondary nmb-log-settings-toggle"
                   aria-expanded="false"
                   aria-controls="nmb-log-settings-panel">
-            <?php esc_html_e('Logging settings', 'nimbus-media-offload'); ?>
+            <?php esc_html_e('Logging settings', 'arun-prakash-media-offload'); ?>
           </button>
           <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_CLEAR_LOGS); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_CLEAR_LOGS); ?>" />
             <button type="submit"
                     class="button button-link nmb-log-clear-btn"
-                    onclick="return confirm('<?php echo esc_js(__('Delete all plugin log entries? This cannot be undone.', 'nimbus-media-offload')); ?>');">
-              <?php esc_html_e('Clear logs', 'nimbus-media-offload'); ?>
+                    onclick="return confirm('<?php echo esc_js(__('Delete all plugin log entries? This cannot be undone.', 'arun-prakash-media-offload')); ?>');">
+              <?php esc_html_e('Clear logs', 'arun-prakash-media-offload'); ?>
             </button>
           </form>
         </div>
@@ -1035,7 +1035,7 @@ final class PageRenderer
           $this->settingsRegistrar->renderSections($this->settingsRegistrar->getSectionIdsForTab('logs'));
           ?>
           <div class="nmb-settings-submit">
-            <?php submit_button(__('Save Logging Settings', 'nimbus-media-offload')); ?>
+            <?php submit_button(__('Save Logging Settings', 'arun-prakash-media-offload')); ?>
           </div>
         </form>
       </div>
@@ -1046,29 +1046,29 @@ final class PageRenderer
           <input type="hidden" name="page" value="<?php echo esc_attr(NIMBUS_SLUG); ?>" />
           <input type="hidden" name="tab" value="logs" />
           <label class="nmb-log-filter-item">
-            <span><?php esc_html_e('Level', 'nimbus-media-offload'); ?></span>
+            <span><?php esc_html_e('Level', 'arun-prakash-media-offload'); ?></span>
             <select name="log_level">
-              <option value=""><?php esc_html_e('All levels', 'nimbus-media-offload'); ?></option>
+              <option value=""><?php esc_html_e('All levels', 'arun-prakash-media-offload'); ?></option>
               <?php foreach (['debug', 'info', 'notice', 'warning', 'error', 'critical'] as $level) : ?>
                 <option value="<?php echo esc_attr($level); ?>" <?php selected($selectedLevel, $level); ?>><?php echo esc_html(strtoupper($level)); ?></option>
               <?php endforeach; ?>
             </select>
           </label>
           <label class="nmb-log-filter-item">
-            <span><?php esc_html_e('Source', 'nimbus-media-offload'); ?></span>
+            <span><?php esc_html_e('Source', 'arun-prakash-media-offload'); ?></span>
             <select name="log_source">
-              <option value=""><?php esc_html_e('All sources', 'nimbus-media-offload'); ?></option>
+              <option value=""><?php esc_html_e('All sources', 'arun-prakash-media-offload'); ?></option>
               <?php foreach ($sources as $src) : ?>
                 <option value="<?php echo esc_attr((string) $src); ?>" <?php selected($selectedSource, (string) $src); ?>><?php echo esc_html((string) $src); ?></option>
               <?php endforeach; ?>
             </select>
           </label>
           <label class="nmb-log-filter-item nmb-log-filter-item--search">
-            <span><?php esc_html_e('Search', 'nimbus-media-offload'); ?></span>
-            <input type="search" name="log_search" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('message, event, code…', 'nimbus-media-offload'); ?>" />
+            <span><?php esc_html_e('Search', 'arun-prakash-media-offload'); ?></span>
+            <input type="search" name="log_search" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('message, event, code…', 'arun-prakash-media-offload'); ?>" />
           </label>
           <label class="nmb-log-filter-item">
-            <span><?php esc_html_e('Rows', 'nimbus-media-offload'); ?></span>
+            <span><?php esc_html_e('Rows', 'arun-prakash-media-offload'); ?></span>
             <select name="log_limit">
               <?php foreach ([50, 100, 200, 500, 1000] as $option) : ?>
                 <option value="<?php echo esc_attr((string) $option); ?>" <?php selected($limit, $option); ?>><?php echo esc_html((string) $option); ?></option>
@@ -1078,8 +1078,8 @@ final class PageRenderer
           <div class="nmb-log-filter-item nmb-log-filter-btns">
             <span aria-hidden="true"></span>
             <div>
-              <button type="submit" class="button button-primary"><?php esc_html_e('Apply', 'nimbus-media-offload'); ?></button>
-              <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('logs')); ?>"><?php esc_html_e('Reset', 'nimbus-media-offload'); ?></a>
+              <button type="submit" class="button button-primary"><?php esc_html_e('Apply', 'arun-prakash-media-offload'); ?></button>
+              <a class="button button-secondary" href="<?php echo esc_url($this->adminTabUrl('logs')); ?>"><?php esc_html_e('Reset', 'arun-prakash-media-offload'); ?></a>
             </div>
           </div>
         </form>
@@ -1088,18 +1088,18 @@ final class PageRenderer
       <!-- ─── Log table ────────────────────────────────────────── -->
       <section class="nmb-card nmb-log-viewer-card">
         <?php if (empty($entries)) : ?>
-          <p class="nmb-muted"><?php esc_html_e('No log entries match the current filters.', 'nimbus-media-offload'); ?></p>
+          <p class="nmb-muted"><?php esc_html_e('No log entries match the current filters.', 'arun-prakash-media-offload'); ?></p>
         <?php else : ?>
           <div class="nmb-log-table-wrap">
             <table class="widefat striped nmb-log-table">
               <thead>
                 <tr>
-                  <th style="width:155px;"><?php esc_html_e('Time', 'nimbus-media-offload'); ?></th>
-                  <th style="width:90px;"><?php esc_html_e('Level', 'nimbus-media-offload'); ?></th>
-                  <th style="width:120px;"><?php esc_html_e('Source', 'nimbus-media-offload'); ?></th>
-                  <th style="width:160px;"><?php esc_html_e('Event / code', 'nimbus-media-offload'); ?></th>
-                  <th><?php esc_html_e('Message', 'nimbus-media-offload'); ?></th>
-                  <th style="width:200px;"><?php esc_html_e('Context', 'nimbus-media-offload'); ?></th>
+                  <th style="width:155px;"><?php esc_html_e('Time', 'arun-prakash-media-offload'); ?></th>
+                  <th style="width:90px;"><?php esc_html_e('Level', 'arun-prakash-media-offload'); ?></th>
+                  <th style="width:120px;"><?php esc_html_e('Source', 'arun-prakash-media-offload'); ?></th>
+                  <th style="width:160px;"><?php esc_html_e('Event / code', 'arun-prakash-media-offload'); ?></th>
+                  <th><?php esc_html_e('Message', 'arun-prakash-media-offload'); ?></th>
+                  <th style="width:200px;"><?php esc_html_e('Context', 'arun-prakash-media-offload'); ?></th>
                 </tr>
               </thead>
               <tbody>
@@ -1120,7 +1120,7 @@ final class PageRenderer
                     <td>
                       <?php if (!empty($entry['context'])) : ?>
                         <details class="nmb-log-context-details">
-                          <summary><?php esc_html_e('View context', 'nimbus-media-offload'); ?></summary>
+                          <summary><?php esc_html_e('View context', 'arun-prakash-media-offload'); ?></summary>
                           <pre><?php echo esc_html(wp_json_encode($entry['context'] ?? [], JSON_PRETTY_PRINT)); ?></pre>
                         </details>
                       <?php else : ?>
@@ -1153,14 +1153,14 @@ final class PageRenderer
       <?php if (isset($_GET['ptmo_url_update']) && (string) $_GET['ptmo_url_update'] === 'error') : ?>
         <?php
         $reason = isset($_GET['ptmo_url_update_reason']) ? sanitize_key((string) wp_unslash($_GET['ptmo_url_update_reason'])) : '';
-        $message = __('URL update could not be started.', 'nimbus-media-offload');
+        $message = __('URL update could not be started.', 'arun-prakash-media-offload');
 
         if ($reason === 'disabled') {
-          $message = __('Media offload is currently disabled. Enable it first in Settings.', 'nimbus-media-offload');
+          $message = __('Media offload is currently disabled. Enable it first in Settings.', 'arun-prakash-media-offload');
         } elseif ($reason === 'credentials') {
-          $message = __('Missing or invalid storage credentials. Please verify your settings first.', 'nimbus-media-offload');
+          $message = __('Missing or invalid storage credentials. Please verify your settings first.', 'arun-prakash-media-offload');
         } elseif ($reason === 'connection') {
-          $message = __('Storage connection test failed (authentication/signing). Verify provider, endpoint, region, and keys before retrying.', 'nimbus-media-offload');
+          $message = __('Storage connection test failed (authentication/signing). Verify provider, endpoint, region, and keys before retrying.', 'arun-prakash-media-offload');
         }
         ?>
         <div class="notice notice-error"><p><?php echo esc_html($message); ?></p></div>
@@ -1178,7 +1178,7 @@ final class PageRenderer
         $remaining = isset($_GET['ptmo_url_update_remaining']) ? max(0, (int) $_GET['ptmo_url_update_remaining']) : $pending;
       // phpcs:enable WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing
 
-        $modeLabel = $mode === 'full' ? __('full run', 'nimbus-media-offload') : __('single update', 'nimbus-media-offload');
+        $modeLabel = $mode === 'full' ? __('full run', 'arun-prakash-media-offload') : __('single update', 'arun-prakash-media-offload');
         $noticeClass = 'notice notice-' . ($status === 'warning' ? 'warning' : ($status === 'info' ? 'info' : 'success'));
         ?>
         <div class="<?php echo esc_attr($noticeClass); ?>">
@@ -1186,7 +1186,7 @@ final class PageRenderer
             <?php
             echo esc_html(sprintf(
               /* translators: 1: run mode label, 2: processed count, 3: success count, 4: failed count, 5: remaining pending count */
-              __('URL update %1$s finished. Processed: %2$d, Success: %3$d, Failed: %4$d, Remaining pending: %5$d.', 'nimbus-media-offload'),
+              __('URL update %1$s finished. Processed: %2$d, Success: %3$d, Failed: %4$d, Remaining pending: %5$d.', 'arun-prakash-media-offload'),
               $modeLabel,
               $processed,
               $success,
@@ -1200,38 +1200,38 @@ final class PageRenderer
 
       <?php $this->renderSummaryStrip([
         [
-          'label' => __('Pending URL updates', 'nimbus-media-offload'),
+          'label' => __('Pending URL updates', 'arun-prakash-media-offload'),
           'value' => number_format($pending),
-          'substat' => __('Attachments waiting for URL/offload metadata update', 'nimbus-media-offload'),
+          'substat' => __('Attachments waiting for URL/offload metadata update', 'arun-prakash-media-offload'),
         ],
         [
-          'label' => __('Offloaded attachments', 'nimbus-media-offload'),
+          'label' => __('Offloaded attachments', 'arun-prakash-media-offload'),
           'value' => number_format((int) ($stats['offloaded'] ?? 0)),
-          'substat' => __('Already linked with offload metadata', 'nimbus-media-offload'),
+          'substat' => __('Already linked with offload metadata', 'arun-prakash-media-offload'),
         ],
         [
-          'label' => __('Plugin status', 'nimbus-media-offload'),
-          'value' => $isEnabled ? __('Enabled', 'nimbus-media-offload') : __('Disabled', 'nimbus-media-offload'),
-          'substat' => $hasCredentials ? __('Credentials configured', 'nimbus-media-offload') : __('Credentials missing', 'nimbus-media-offload'),
+          'label' => __('Plugin status', 'arun-prakash-media-offload'),
+          'value' => $isEnabled ? __('Enabled', 'arun-prakash-media-offload') : __('Disabled', 'arun-prakash-media-offload'),
+          'substat' => $hasCredentials ? __('Credentials configured', 'arun-prakash-media-offload') : __('Credentials missing', 'arun-prakash-media-offload'),
         ],
         [
-          'label' => __('Total attachments', 'nimbus-media-offload'),
+          'label' => __('Total attachments', 'arun-prakash-media-offload'),
           'value' => number_format((int) ($stats['total'] ?? 0)),
-          'substat' => __('In media library', 'nimbus-media-offload'),
+          'substat' => __('In media library', 'arun-prakash-media-offload'),
         ],
       ], 'nmb-url-update-summary-strip'); ?>
 
       <div class="nmb-card">
-        <h3><?php esc_html_e('Run URL Updates', 'nimbus-media-offload'); ?></h3>
-        <p><?php esc_html_e('Use one-by-one for safer/manual progression, or full run to process all pending attachments in one go from this admin panel.', 'nimbus-media-offload'); ?></p>
-        <p><em><?php esc_html_e('Tip: attachments marked “Ignore from Nimbus” and files outside your allowed path filters are skipped automatically here.', 'nimbus-media-offload'); ?></em></p>
+        <h3><?php esc_html_e('Run URL Updates', 'arun-prakash-media-offload'); ?></h3>
+        <p><?php esc_html_e('Use one-by-one for safer/manual progression, or full run to process all pending attachments in one go from this admin panel.', 'arun-prakash-media-offload'); ?></p>
+        <p><em><?php esc_html_e('Tip: attachments marked “Ignore from Nimbus” and files outside your allowed path filters are skipped automatically here.', 'arun-prakash-media-offload'); ?></em></p>
 
         <?php if (!$isEnabled) : ?>
-          <p><strong><?php esc_html_e('Media offload is disabled.', 'nimbus-media-offload'); ?></strong></p>
+          <p><strong><?php esc_html_e('Media offload is disabled.', 'arun-prakash-media-offload'); ?></strong></p>
         <?php endif; ?>
 
         <?php if (!$hasCredentials) : ?>
-          <p><strong><?php esc_html_e('Valid storage credentials are required before URL updates can run.', 'nimbus-media-offload'); ?></strong></p>
+          <p><strong><?php esc_html_e('Valid storage credentials are required before URL updates can run.', 'arun-prakash-media-offload'); ?></strong></p>
         <?php endif; ?>
 
         <div class="nmb-inline-actions">
@@ -1240,16 +1240,16 @@ final class PageRenderer
             <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES); ?>" />
             <input type="hidden" name="mode" value="single" />
             <button type="submit" class="button button-secondary" <?php disabled(!$isEnabled || !$hasCredentials || $pending <= 0); ?>>
-              <?php esc_html_e('Update One Entry', 'nimbus-media-offload'); ?>
+              <?php esc_html_e('Update One Entry', 'arun-prakash-media-offload'); ?>
             </button>
           </form>
 
-          <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js(__('Run full URL update for all pending entries now?', 'nimbus-media-offload')); ?>');">
+          <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('<?php echo esc_js(__('Run full URL update for all pending entries now?', 'arun-prakash-media-offload')); ?>');">
             <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES); ?>" />
             <input type="hidden" name="mode" value="full" />
             <button type="submit" class="button button-primary" <?php disabled(!$isEnabled || !$hasCredentials || $pending <= 0); ?>>
-              <?php esc_html_e('Update All Pending Entries', 'nimbus-media-offload'); ?>
+              <?php esc_html_e('Update All Pending Entries', 'arun-prakash-media-offload'); ?>
             </button>
           </form>
         </div>
@@ -1262,33 +1262,33 @@ final class PageRenderer
   {
     ?>
     <section class="nmb-card" id="nmb-config-port-panel">
-      <h3><?php esc_html_e('Configuration backup', 'nimbus-media-offload'); ?></h3>
-      <p class="nmb-muted"><?php esc_html_e('Export your current settings as a portable JSON file, or import a previously exported file to restore them on another site. Credentials are included in the export — handle the file like a password.', 'nimbus-media-offload'); ?></p>
+      <h3><?php esc_html_e('Configuration backup', 'arun-prakash-media-offload'); ?></h3>
+      <p class="nmb-muted"><?php esc_html_e('Export your current settings as a portable JSON file, or import a previously exported file to restore them on another site. Credentials are included in the export — handle the file like a password.', 'arun-prakash-media-offload'); ?></p>
 
       <div class="nmb-config-port-grid">
 
         <!-- Export form -->
         <div class="nmb-config-port-block">
-          <h4><?php esc_html_e('Export configuration', 'nimbus-media-offload'); ?></h4>
-          <p class="nmb-muted"><?php esc_html_e('Downloads a .json file with all current provider, bucket, and delivery settings.', 'nimbus-media-offload'); ?></p>
+          <h4><?php esc_html_e('Export configuration', 'arun-prakash-media-offload'); ?></h4>
+          <p class="nmb-muted"><?php esc_html_e('Downloads a .json file with all current provider, bucket, and delivery settings.', 'arun-prakash-media-offload'); ?></p>
           <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG); ?>" />
-            <button type="submit" class="button button-secondary"><?php esc_html_e('Download config.json', 'nimbus-media-offload'); ?></button>
+            <button type="submit" class="button button-secondary"><?php esc_html_e('Download config.json', 'arun-prakash-media-offload'); ?></button>
           </form>
         </div>
 
         <!-- Import form -->
         <div class="nmb-config-port-block">
-          <h4><?php esc_html_e('Import configuration', 'nimbus-media-offload'); ?></h4>
-          <p class="nmb-muted"><?php esc_html_e('Upload a Nimbus JSON export to overwrite the current settings immediately. Existing settings will be replaced.', 'nimbus-media-offload'); ?></p>
+          <h4><?php esc_html_e('Import configuration', 'arun-prakash-media-offload'); ?></h4>
+          <p class="nmb-muted"><?php esc_html_e('Upload a Nimbus JSON export to overwrite the current settings immediately. Existing settings will be replaced.', 'arun-prakash-media-offload'); ?></p>
           <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data">
             <?php wp_nonce_field(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG); ?>" />
             <input type="hidden" name="redirect_tab" value="tools" />
             <div class="nmb-config-port-file-row">
               <input type="file" name="nimbus_config_file" accept=".json,application/json" required />
-              <button type="submit" class="button button-primary"><?php esc_html_e('Import', 'nimbus-media-offload'); ?></button>
+              <button type="submit" class="button button-primary"><?php esc_html_e('Import', 'arun-prakash-media-offload'); ?></button>
             </div>
           </form>
         </div>
@@ -1457,15 +1457,15 @@ final class PageRenderer
   private function providerShortLabel(string $providerKey): string
   {
     $labels = [
-      's3' => __('Amazon S3', 'nimbus-media-offload'),
-      'r2' => __('Cloudflare R2', 'nimbus-media-offload'),
-      'gcs' => __('Google Cloud', 'nimbus-media-offload'),
-      'backblaze_b2' => __('Backblaze B2', 'nimbus-media-offload'),
-      'digitalocean_spaces' => __('DO Spaces', 'nimbus-media-offload'),
-      'wasabi' => __('Wasabi', 'nimbus-media-offload'),
-      'minio' => __('MinIO', 'nimbus-media-offload'),
-      's3_compatible' => __('Other S3-compatible', 'nimbus-media-offload'),
-      'local' => __('Local (debug)', 'nimbus-media-offload'),
+      's3' => __('Amazon S3', 'arun-prakash-media-offload'),
+      'r2' => __('Cloudflare R2', 'arun-prakash-media-offload'),
+      'gcs' => __('Google Cloud', 'arun-prakash-media-offload'),
+      'backblaze_b2' => __('Backblaze B2', 'arun-prakash-media-offload'),
+      'digitalocean_spaces' => __('DO Spaces', 'arun-prakash-media-offload'),
+      'wasabi' => __('Wasabi', 'arun-prakash-media-offload'),
+      'minio' => __('MinIO', 'arun-prakash-media-offload'),
+      's3_compatible' => __('Other S3-compatible', 'arun-prakash-media-offload'),
+      'local' => __('Local (debug)', 'arun-prakash-media-offload'),
     ];
 
     return $labels[$providerKey] ?? $this->settings->provider_profile($providerKey)->label();
@@ -1498,7 +1498,7 @@ final class PageRenderer
     <header class="nmb-brand-header">
       <div class="nmb-brand">
         <?php $this->renderMark(); ?>
-        <h1><?php esc_html_e('Nimbus', 'nimbus-media-offload'); ?></h1>
+        <h1><?php esc_html_e('Nimbus', 'arun-prakash-media-offload'); ?></h1>
         <span class="nmb-brand__version"><?php echo esc_html(NIMBUS_VERSION); ?></span>
       </div>
       <p class="nmb-connection">
@@ -1509,9 +1509,9 @@ final class PageRenderer
           <code><?php echo esc_html($bucket); ?></code>
         <?php endif; ?>
         <?php if ($ready) : ?>
-          <span class="nmb-state nmb-state--ok"><?php esc_html_e('Configured', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-state nmb-state--ok"><?php esc_html_e('Configured', 'arun-prakash-media-offload'); ?></span>
         <?php else : ?>
-          <span class="nmb-state nmb-state--warn"><?php esc_html_e('Needs credentials', 'nimbus-media-offload'); ?></span>
+          <span class="nmb-state nmb-state--warn"><?php esc_html_e('Needs credentials', 'arun-prakash-media-offload'); ?></span>
         <?php endif; ?>
       </p>
     </header>

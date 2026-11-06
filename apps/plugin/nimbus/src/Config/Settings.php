@@ -478,6 +478,7 @@ final class Settings
         case 'purge_proxy_cache':
         case 'logging_enabled':
         case 'log_to_error_log':
+        case 'delete_remote_on_wp_delete':
           $clean[$key] = (bool) $value;
           break;
         case 'off_hours_batch_time':
