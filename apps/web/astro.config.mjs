@@ -2,7 +2,7 @@ import node from '@astrojs/node';
 import { defineConfig, fontProviders } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://usenimbus.dev',
+  site: 'https://plume.arunprakashg.com',
   trailingSlash: 'always',
   compressHTML: true,
   adapter: node({ mode: 'standalone' }),

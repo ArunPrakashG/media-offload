@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Plume Media Offload
- * Plugin URI: https://usenimbus.dev
+ * Plugin URI: https://plume.arunprakashg.com
  * Description: Plume offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.
- * Version: 0.3.4
+ * Version: 0.3.5
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author: Arun Prakash
@@ -45,7 +45,7 @@ foreach ($nimbus_active_plugins as $nimbus_active_plugin) {
 }
 unset($nimbus_active_plugins, $nimbus_active_plugin);
 
-define('NIMBUS_VERSION', '0.3.4');
+define('NIMBUS_VERSION', '0.3.5');
 define('NIMBUS_FILE', __FILE__);
 define('NIMBUS_PATH', plugin_dir_path(__FILE__));
 define('NIMBUS_URL', plugin_dir_url(__FILE__));

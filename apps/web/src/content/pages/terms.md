@@ -1,10 +1,10 @@
 ---
 title: "Terms of Use"
-description: "Terms for using the Plume WordPress plugin and the usenimbus.dev website, including the MIT License grant, support, warranty and liability."
+description: "Terms for using the Plume WordPress plugin and the plume.arunprakashg.com website, including the MIT License grant, support, warranty and liability."
 updated: 2026-11-03
 ---
 
-These terms apply to the Plume WordPress plugin ("Software") and the website usenimbus.dev. By downloading or using the Software, you agree to them. If you do not agree, do not use the Software.
+These terms apply to the Plume WordPress plugin ("Software") and the website plume.arunprakashg.com. By downloading or using the Software, you agree to them. If you do not agree, do not use the Software.
 
 ## License
 

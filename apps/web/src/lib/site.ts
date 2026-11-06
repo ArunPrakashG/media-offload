@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export const SITE = {
   name: 'Plume',
-  url: 'https://usenimbus.dev',
+  url: 'https://plume.arunprakashg.com',
   tagline: 'Move your media to the cloud. Keep your workflow.',
   description:
     'Plume is a free, open source WordPress plugin that offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible storage and rewrites every URL.',
@@ -10,7 +10,7 @@ export const SITE = {
   releases: 'https://github.com/ArunPrakashG/media-offload/releases',
   contributing: 'https://github.com/ArunPrakashG/media-offload/blob/main/CONTRIBUTING.md',
   author: { name: 'Arun Prakash', url: 'https://arunprakashg.com', email: 'hello@usenimbus.dev' },
-  version: '0.3.4',
+  version: '0.3.5',
 } as const;
 
 export const NAV = [

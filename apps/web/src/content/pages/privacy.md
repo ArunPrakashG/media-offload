@@ -1,10 +1,10 @@
 ---
 title: "Privacy Policy"
-description: "How Plume handles data: the plugin sends nothing to Plume, and the usenimbus.dev website uses no analytics, cookies or third-party scripts."
+description: "How Plume handles data: the plugin sends nothing to Plume, and the plume.arunprakashg.com website uses no analytics, cookies or third-party scripts."
 updated: 2026-11-03
 ---
 
-Plume is a free, open-source WordPress plugin for offloading media to cloud storage. This policy covers the plugin and the website usenimbus.dev. In it, "Plume", "we" and "us" mean the maintainer of the plugin and the website, Arun Prakash.
+Plume is a free, open-source WordPress plugin for offloading media to cloud storage. This policy covers the plugin and the website plume.arunprakashg.com. In it, "Plume", "we" and "us" mean the maintainer of the plugin and the website, Arun Prakash.
 
 ## The plugin
 
@@ -20,7 +20,7 @@ These calls use credentials you enter and control. We never see your storage cre
 
 ## The website
 
-The website usenimbus.dev has no analytics and sets no cookies. It loads no third-party fonts or scripts.
+The website plume.arunprakashg.com has no analytics and sets no cookies. It loads no third-party fonts or scripts.
 
 The site is served through Cloudflare. Cloudflare processes request data, such as IP addresses, to deliver and protect the site. How Cloudflare handles that data is described in its [privacy policy](https://www.cloudflare.com/privacypolicy/). We do not use that data for any other purpose.
 
