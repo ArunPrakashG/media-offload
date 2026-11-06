@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * MinIO and other S3-compatible services: endpoint plus keys. Nimbus lists the
+ * MinIO and other S3-compatible services: endpoint plus keys. Plume lists the
  * buckets, creates one when needed and opens it for public media.
  */
 final class S3EndpointConnector
@@ -23,7 +23,7 @@ final class S3EndpointConnector
     $region = sanitize_text_field((string) ($input['region'] ?? ''));
 
     if ($endpoint === '' || $key === '' || $secret === '') {
-      throw new QuickConnectException(esc_html__('Enter the endpoint, access key and secret key.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Enter the endpoint, access key and secret key.', 'plume-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -56,7 +56,7 @@ final class S3EndpointConnector
     ];
 
     if ($this->provider === 'minio') {
-      $result->note = __('Nimbus is using the keys you entered. To give it a key limited to this bucket, run: mc admin user svcacct add ALIAS USER', 'usenimbus-media-offload');
+      $result->note = __('Plume is using the keys you entered. To give it a key limited to this bucket, run: mc admin user svcacct add ALIAS USER', 'plume-media-offload');
     }
 
     return $result;

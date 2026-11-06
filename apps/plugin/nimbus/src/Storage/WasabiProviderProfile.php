@@ -34,38 +34,38 @@ final class WasabiProviderProfile extends AbstractProviderProfile implements Pro
 
   public function label(): string
   {
-    return __('Wasabi', 'usenimbus-media-offload');
+    return __('Wasabi', 'plume-media-offload');
   }
 
   public function title(): string
   {
-    return __('Wasabi Hot Cloud Storage', 'usenimbus-media-offload');
+    return __('Wasabi Hot Cloud Storage', 'plume-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Wasabi is an S3-compatible cloud storage service with no egress fees. Select the region matching your Wasabi bucket and enter the access/secret keys from your Wasabi console.', 'usenimbus-media-offload');
+    return __('Wasabi is an S3-compatible cloud storage service with no egress fees. Select the region matching your Wasabi bucket and enter the access/secret keys from your Wasabi console.', 'plume-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'     => __('Bucket', 'usenimbus-media-offload'),
-      'region'     => __('Region (e.g. us-east-1, eu-central-1)', 'usenimbus-media-offload'),
-      'access_key' => __('Wasabi Access Key', 'usenimbus-media-offload'),
-      'secret_key' => __('Wasabi Secret Key', 'usenimbus-media-offload'),
+      'bucket'     => __('Bucket', 'plume-media-offload'),
+      'region'     => __('Region (e.g. us-east-1, eu-central-1)', 'plume-media-offload'),
+      'access_key' => __('Wasabi Access Key', 'plume-media-offload'),
+      'secret_key' => __('Wasabi Secret Key', 'plume-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your Wasabi bucket name.', 'usenimbus-media-offload'),
-      'region'        => __('Wasabi region code, e.g. us-east-1, us-east-2, us-central-1, eu-central-1, ap-northeast-1.', 'usenimbus-media-offload'),
-      'access_key'    => __('Access Key from the Wasabi console (IAM → Access Keys).', 'usenimbus-media-offload'),
-      'secret_key'    => __('Secret Key paired with the access key above from the Wasabi console.', 'usenimbus-media-offload'),
+      'bucket'        => __('Your Wasabi bucket name.', 'plume-media-offload'),
+      'region'        => __('Wasabi region code, e.g. us-east-1, us-east-2, us-central-1, eu-central-1, ap-northeast-1.', 'plume-media-offload'),
+      'access_key'    => __('Access Key from the Wasabi console (IAM → Access Keys).', 'plume-media-offload'),
+      'secret_key'    => __('Secret Key paired with the access key above from the Wasabi console.', 'plume-media-offload'),
       'session_token' => '',
-      'endpoint'      => __('Leave empty — Wasabi endpoints are built automatically from the region.', 'usenimbus-media-offload'),
+      'endpoint'      => __('Leave empty — Wasabi endpoints are built automatically from the region.', 'plume-media-offload'),
       'r2_account_id' => '',
     ];
   }

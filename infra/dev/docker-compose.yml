@@ -54,7 +54,7 @@ services:
       WORDPRESS_DB_PASSWORD: wordpress
       WP_PATH: /var/www/html
       SITE_URL: http://localhost:8080
-      SITE_TITLE: Nimbus Dev
+      SITE_TITLE: Plume Dev
       ADMIN_USER: admin
       ADMIN_PASSWORD: password
       ADMIN_EMAIL: admin@example.com

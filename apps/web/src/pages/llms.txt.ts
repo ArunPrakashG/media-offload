@@ -14,9 +14,9 @@ export const GET = async () => {
 
 > ${SITE.description}
 
-Nimbus is MIT licensed and has no paid tier, license server or telemetry. It needs WordPress 6.0+ and PHP 8.1+. Every page on this site is also available as Markdown by adding \`.md\` to its path. The full site in one file is at ${SITE.url}/llms-full.txt.
+Plume is MIT licensed and has no paid tier, license server or telemetry. It needs WordPress 6.0+ and PHP 8.1+. Every page on this site is also available as Markdown by adding \`.md\` to its path. The full site in one file is at ${SITE.url}/llms-full.txt.
 
-- [Home](${SITE.url}/index.md): what Nimbus does, supported storage and features
+- [Home](${SITE.url}/index.md): what Plume does, supported storage and features
 - [Source code](${SITE.repo})
 
 ${sections.join('\n\n')}

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish dist/usenimbus-media-offload-<version>.zip to the WordPress.org plugin SVN repository.
+# Publish dist/plume-media-offload-<version>.zip to the WordPress.org plugin SVN repository.
 #
 # Run `bash scripts/release-plugin.sh` first. This checks out the plugin's SVN
 # repo, replaces trunk with the zip contents, copies trunk to tags/<version>
@@ -7,13 +7,13 @@
 # changes and asks before committing; svn prompts for your WordPress.org
 # username and SVN password. Needs svn and unzip.
 #
-# Env: WPORG_SVN_URL overrides the repo URL (default: the usenimbus-media-offload plugin).
+# Env: WPORG_SVN_URL overrides the repo URL (default: the plume-media-offload plugin).
 set -euo pipefail
 
 root="$(git rev-parse --show-toplevel)"
 plugin="$root/apps/plugin/nimbus"
 version="$(sed -n "s/^define('NIMBUS_VERSION', '\([^']*\)');/\1/p" "$plugin/nimbus.php")"
-slug="usenimbus-media-offload"
+slug="plume-media-offload"
 zip_path="$root/dist/$slug-$version.zip"
 svn_url="${WPORG_SVN_URL:-https://plugins.svn.wordpress.org/$slug}"
 
@@ -45,7 +45,7 @@ done
 svn copy -q trunk "tags/$version"
 
 svn status | sed -n '1,40p'
-echo "$(svn status | wc -l) changes for Nimbus $version."
+echo "$(svn status | wc -l) changes for Plume $version."
 read -r -p "Commit to $svn_url? [y/N] " answer
 [ "$answer" = "y" ] || { echo "Nothing committed."; exit 0; }
 

@@ -1,4 +1,4 @@
-=== UseNimbus Media Offload ===
+=== Plume Media Offload ===
 Contributors: arunprakashg
 Donate link: https://buymeacoffee.com/arunprakashg
 Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
@@ -13,9 +13,9 @@ Offload WordPress media to Amazon S3, Cloudflare R2, or any S3-compatible storag
 
 == Description ==
 
-Nimbus offloads your WordPress media library to cloud object storage — Amazon S3, Cloudflare R2, or any S3-compatible provider — and rewrites attachment URLs so your visitors are served files directly from your storage or CDN.
+Plume offloads your WordPress media library to cloud object storage — Amazon S3, Cloudflare R2, or any S3-compatible provider — and rewrites attachment URLs so your visitors are served files directly from your storage or CDN.
 
-Nimbus is completely free and open source. There is no license key, no paid tier, and no feature is held back — everything below is available out of the box.
+Plume is completely free and open source. There is no license key, no paid tier, and no feature is held back — everything below is available out of the box.
 
 **Key features:**
 
@@ -72,8 +72,8 @@ This plugin bundles the following third-party libraries:
 
 == Installation ==
 
-1. In WordPress, go to **Plugins → Add New**, search for UseNimbus Media Offload, then install and activate it. To install by hand, upload the `usenimbus-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
-2. Go to **Media → Nimbus** to open the setup wizard.
+1. In WordPress, go to **Plugins → Add New**, search for Plume Media Offload, then install and activate it. To install by hand, upload the `plume-media-offload` folder to `/wp-content/plugins/` and activate it on the **Plugins** screen.
+2. Go to **Media → Plume** to open the setup wizard.
 3. Connect your storage provider with quick connect, or enter the bucket, region and keys by hand.
 4. New uploads are offloaded automatically. To move the existing library, use **Offload existing library** on the **Tools** tab.
 
@@ -89,7 +89,7 @@ No. Local copies stay on your server unless you turn on Remove Local Copies in S
 
 = Is a paid license required? =
 
-No. Nimbus is free and open source under the MIT license. Every feature, including bulk migration, cache purging, WP-CLI and multisite support, is available with no license key.
+No. Plume is free and open source under the MIT license. Every feature, including bulk migration, cache purging, WP-CLI and multisite support, is available with no license key.
 
 = Where can I get support? =
 
@@ -105,17 +105,17 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 == Changelog ==
 
 = 0.3.4 =
-* Renamed to UseNimbus Media Offload for the WordPress.org directory. The plugin folder and text domain are now usenimbus-media-offload.
+* Renamed from Nimbus to Plume Media Offload for the WordPress.org directory. The plugin folder and text domain are now plume-media-offload.
 * Media Library offload, restore and retry now check that you can edit that attachment.
 * Image URLs inserted into post content are escaped.
 * Updated the AWS SDK to 3.401.5 and its dependencies.
 * The External Services section now covers every storage provider with terms and privacy links.
 
 = 0.3.3 =
-* Renamed to Nimbus Media Offload. The plugin folder and text domain were nimbus-media-offload.
+* Renamed from Nimbus to Nimbus Media Offload. The plugin folder and text domain were nimbus-media-offload.
 
 = 0.3.2 =
-* Quick connect in the setup wizard: paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
+* Quick connect in the setup wizard: paste one token, key or line of command output and Plume creates the bucket, sets it up for public media, fills in the settings and runs an upload test.
 * Docs and donate links on the Plugins screen.
 * Tested with WordPress 7.1.
 
@@ -125,14 +125,14 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 
 = 0.3.0 =
 * Relicensed under the MIT License.
-* New Nimbus brand across the admin: header with connection status, a reworked overview and a guided setup wizard.
+* New Plume brand across the admin: header with connection status, a reworked overview and a guided setup wizard.
 * The setup wizard can test a connection with the values on screen before you save them.
 * Fonts and provider logos are bundled with the plugin, so the admin makes no external requests.
 
 = 0.2.0 =
-* Nimbus is now 100% free and open source — the Nimbus Pro add-on has been merged into this plugin and all licensing has been removed.
+* Plume is now 100% free and open source — the Plume Pro add-on has been merged into this plugin and all licensing has been removed.
 * Bulk migration, cache purging (Cloudflare, LiteSpeed, WP Fastest Cache, proxy caches), WP-CLI, page-builder/gallery database URL rewriting, WooCommerce protected downloads, multisite network admin, selective offload rules, and nightly batch offload are now available to everyone at no cost.
-* Removed the license key requirement, license activation UI, and all calls to the former Nimbus licensing backend.
+* Removed the license key requirement, license activation UI, and all calls to the former Plume licensing backend.
 
 = 0.1.4 =
 * Improved inline script handling for admin notices.
@@ -155,7 +155,7 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 == Upgrade Notice ==
 
 = 0.3.4 =
-Renamed to UseNimbus Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.
+Renamed to Plume Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.
 
 = 0.3.3 =
 Renamed to Nimbus Media Offload.
@@ -164,10 +164,10 @@ Renamed to Nimbus Media Offload.
 Adds quick connect to the setup wizard. Your settings and offloaded files are unchanged.
 
 = 0.3.1 =
-Your storage keys are now encrypted in the database. Nothing to do: Nimbus encrypts them the next time you open the admin.
+Your storage keys are now encrypted in the database. Nothing to do: Plume encrypts them the next time you open the admin.
 
 = 0.3.0 =
 New admin design and an MIT license. Your settings and offloaded files are unchanged.
 
 = 0.2.0 =
-Nimbus is now fully free — no license key needed. All former Pro features are unlocked automatically after updating.
+Plume is now fully free — no license key needed. All former Pro features are unlocked automatically after updating.

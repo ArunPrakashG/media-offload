@@ -919,7 +919,7 @@ final class UploadHandler
   public function get_attachment_status(int $attachment_id): array
   {
     if ($attachment_id <= 0 || get_post_type($attachment_id) !== 'attachment') {
-      return ['status' => 'unknown', 'label' => __('Unknown', 'usenimbus-media-offload'), 'reason' => __('Attachment could not be found.', 'usenimbus-media-offload')];
+      return ['status' => 'unknown', 'label' => __('Unknown', 'plume-media-offload'), 'reason' => __('Attachment could not be found.', 'plume-media-offload')];
     }
 
     $offloadMeta = get_post_meta($attachment_id, NIMBUS_META_KEY, true);
@@ -928,26 +928,26 @@ final class UploadHandler
     $missingSourceAt = (int) get_post_meta($attachment_id, NIMBUS_MISSING_SOURCE_AT_META_KEY, true);
 
     if ($this->is_ignored_attachment($attachment_id)) {
-      return ['status' => 'ignored', 'label' => __('Ignored', 'usenimbus-media-offload'), 'reason' => __('This attachment is marked to stay local-only.', 'usenimbus-media-offload')];
+      return ['status' => 'ignored', 'label' => __('Ignored', 'plume-media-offload'), 'reason' => __('This attachment is marked to stay local-only.', 'plume-media-offload')];
     }
 
     if (!empty($offloadMeta['key'])) {
-      return ['status' => 'offloaded', 'label' => __('Offloaded', 'usenimbus-media-offload'), 'reason' => __('Remote object metadata is present for this attachment.', 'usenimbus-media-offload')];
+      return ['status' => 'offloaded', 'label' => __('Offloaded', 'plume-media-offload'), 'reason' => __('Remote object metadata is present for this attachment.', 'plume-media-offload')];
     }
 
     if ($pendingAt > 0 && $claimedBy !== '') {
-      return ['status' => 'processing', 'label' => __('Processing', 'usenimbus-media-offload'), 'reason' => __('This attachment is currently claimed by a background worker.', 'usenimbus-media-offload')];
+      return ['status' => 'processing', 'label' => __('Processing', 'plume-media-offload'), 'reason' => __('This attachment is currently claimed by a background worker.', 'plume-media-offload')];
     }
 
     if ($pendingAt > 0) {
-      return ['status' => 'pending', 'label' => __('Pending', 'usenimbus-media-offload'), 'reason' => __('This attachment is queued for a future offload.', 'usenimbus-media-offload')];
+      return ['status' => 'pending', 'label' => __('Pending', 'plume-media-offload'), 'reason' => __('This attachment is queued for a future offload.', 'plume-media-offload')];
     }
 
     if ($missingSourceAt > 0) {
-      return ['status' => 'failed', 'label' => __('Needs attention', 'usenimbus-media-offload'), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', 'usenimbus-media-offload')];
+      return ['status' => 'failed', 'label' => __('Needs attention', 'plume-media-offload'), 'reason' => __('The expected local source file is missing, so the attachment could not be offloaded.', 'plume-media-offload')];
     }
 
-    return ['status' => 'local', 'label' => __('Local only', 'usenimbus-media-offload'), 'reason' => __('This attachment is still being served from local storage.', 'usenimbus-media-offload')];
+    return ['status' => 'local', 'label' => __('Local only', 'plume-media-offload'), 'reason' => __('This attachment is still being served from local storage.', 'plume-media-offload')];
   }
 
   private function dispatch_nightly_workers(string $run_token, int $worker_count, int $hours, int $limit): void

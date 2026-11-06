@@ -188,7 +188,7 @@ final class Logger
 
     if ($this->shouldMirrorToPhpErrorLog() && function_exists('error_log')) {
       // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Intentional, user-configurable "mirror log entries to the PHP error log" feature (Settings > Logging), not leftover debug code.
-      error_log('[Nimbus][' . strtoupper($level) . '][' . $entry['source'] . '] ' . $interpolated);
+      error_log('[Plume][' . strtoupper($level) . '][' . $entry['source'] . '] ' . $interpolated);
     }
 
     do_action('nimbus_log', strtoupper($level), $message, $context);

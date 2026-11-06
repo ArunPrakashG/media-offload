@@ -1,7 +1,7 @@
 ---
 title: Nightly batch
 nav: Nightly batch
-description: Offload new uploads in one off-hours run with Nimbus. Set the batch time, worker count, batch size and claim timeout, or turn it off to offload right away.
+description: Offload new uploads in one off-hours run with Plume. Set the batch time, worker count, batch size and claim timeout, or turn it off to offload right away.
 section: guides
 order: 9
 ---
@@ -10,7 +10,7 @@ The off-hours batch queues new uploads during the day and offloads them in one r
 
 ## Settings
 
-Go to **Media → Nimbus → Settings → Off-hours Batch Offload**.
+Go to **Media → Plume → Settings → Off-hours Batch Offload**.
 
 | Setting | Default | Notes |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ Select **Save Settings** after you change them.
 1. An upload finishes and is marked pending.
 2. At the Batch Time, WP-Cron starts the workers.
 3. Each worker claims a batch, offloads it and updates URLs in post content.
-4. When nothing is pending, Nimbus clears the schedule.
+4. When nothing is pending, Plume clears the schedule.
 
 A lock stops two runs from overlapping. It expires after 30 minutes if a run dies.
 

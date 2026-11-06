@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  * Network Admin panel shown in WordPress Multisite installations.
  *
  * Registers a top-level menu item under "My Sites → Network Admin" that
- * gives the super admin a bird's-eye view of Nimbus settings and per-site
+ * gives the super admin a bird's-eye view of Plume settings and per-site
  * offload statistics without leaving the network dashboard.
  */
 final class NetworkAdminPage
@@ -31,8 +31,8 @@ final class NetworkAdminPage
   public function addNetworkMenu(): void
   {
     add_menu_page(
-      __('Nimbus Network', 'usenimbus-media-offload'),
-      __('Nimbus', 'usenimbus-media-offload'),
+      __('Plume Network', 'plume-media-offload'),
+      __('Plume', 'plume-media-offload'),
       'manage_network',
       self::MENU_SLUG,
       [$this, 'renderPage'],
@@ -44,26 +44,26 @@ final class NetworkAdminPage
   public function renderPage(): void
   {
     if (!current_user_can('manage_network')) {
-      wp_die(esc_html__('You do not have permission to access this page.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('You do not have permission to access this page.', 'plume-media-offload'));
     }
 
     $sites = $this->getSiteStats();
     ?>
     <div class="wrap">
-      <h1><?php esc_html_e('Nimbus — Network Overview', 'usenimbus-media-offload'); ?></h1>
+      <h1><?php esc_html_e('Plume — Network Overview', 'plume-media-offload'); ?></h1>
 
-      <h2><?php esc_html_e('Per-site offload statistics', 'usenimbus-media-offload'); ?></h2>
+      <h2><?php esc_html_e('Per-site offload statistics', 'plume-media-offload'); ?></h2>
       <?php if (empty($sites)) : ?>
-        <p><?php esc_html_e('No sites found in this network.', 'usenimbus-media-offload'); ?></p>
+        <p><?php esc_html_e('No sites found in this network.', 'plume-media-offload'); ?></p>
       <?php else : ?>
         <table class="widefat striped">
           <thead>
             <tr>
-              <th><?php esc_html_e('Site', 'usenimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Provider', 'usenimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Offloaded files', 'usenimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Pending', 'usenimbus-media-offload'); ?></th>
-              <th><?php esc_html_e('Settings', 'usenimbus-media-offload'); ?></th>
+              <th><?php esc_html_e('Site', 'plume-media-offload'); ?></th>
+              <th><?php esc_html_e('Provider', 'plume-media-offload'); ?></th>
+              <th><?php esc_html_e('Offloaded files', 'plume-media-offload'); ?></th>
+              <th><?php esc_html_e('Pending', 'plume-media-offload'); ?></th>
+              <th><?php esc_html_e('Settings', 'plume-media-offload'); ?></th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +72,7 @@ final class NetworkAdminPage
                 <td>
                   <strong><?php echo esc_html($site['name']); ?></strong>
                   <div class="row-actions">
-                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'usenimbus-media-offload'); ?></a></span>
+                    <span><a href="<?php echo esc_url($site['dashboard_url']); ?>" target="_blank"><?php esc_html_e('Dashboard', 'plume-media-offload'); ?></a></span>
                   </div>
                 </td>
                 <td><?php echo esc_html($site['provider']); ?></td>
@@ -80,7 +80,7 @@ final class NetworkAdminPage
                 <td><?php echo esc_html((string) $site['pending_count']); ?></td>
                 <td>
                   <a href="<?php echo esc_url($site['settings_url']); ?>" target="_blank">
-                    <?php esc_html_e('Open', 'usenimbus-media-offload'); ?>
+                    <?php esc_html_e('Open', 'plume-media-offload'); ?>
                   </a>
                 </td>
               </tr>

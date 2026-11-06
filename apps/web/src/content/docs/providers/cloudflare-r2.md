@@ -1,13 +1,13 @@
 ---
 title: Connect Cloudflare R2
 nav: Cloudflare R2
-description: Create an R2 bucket and API token, enter your Account ID and keys in Nimbus, and set a public domain so offloaded WordPress media loads for visitors.
+description: Create an R2 bucket and API token, enter your Account ID and keys in Plume, and set a public domain so offloaded WordPress media loads for visitors.
 section: providers
 order: 2
 logo: cloudflare
 ---
 
-Cloudflare R2 is S3-compatible storage with no egress fees. Nimbus has a dedicated R2 profile, so you only need an Account ID and an API token.
+Cloudflare R2 is S3-compatible storage with no egress fees. Plume has a dedicated R2 profile, so you only need an Account ID and an API token.
 
 ## 1. Create an API token
 
@@ -21,7 +21,7 @@ Then make the bucket public. Under the bucket's **Settings**, either connect a c
 
 ## 2. Fill in the setup wizard
 
-Open **Media → Nimbus** and choose **Cloudflare R2**.
+Open **Media → Plume** and choose **Cloudflare R2**.
 
 | Field | Where to find it |
 | --- | --- |
@@ -33,7 +33,7 @@ Open **Media → Nimbus** and choose **Cloudflare R2**.
 | Custom Endpoint (optional) | Leave empty to build the endpoint from the Account ID, or enter a full R2 endpoint URL. |
 | Custom Domain | Your R2 custom domain or `r2.dev` URL, for example `https://media.example.com`. |
 
-Nimbus sets the region to `auto`, builds the endpoint as `https://<account-id>.r2.cloudflarestorage.com`, and turns on path-style requests for you.
+Plume sets the region to `auto`, builds the endpoint as `https://<account-id>.r2.cloudflarestorage.com`, and turns on path-style requests for you.
 
 ## 3. Test and offload
 
@@ -48,8 +48,8 @@ wp nimbus process-pending --limit=500
 
 ## Notes
 
-- Without a Custom Domain, Nimbus generates URLs from the account endpoint. That endpoint is not public, so images will not load. Always set the Custom Domain for R2.
+- Without a Custom Domain, Plume generates URLs from the account endpoint. That endpoint is not public, so images will not load. Always set the Custom Domain for R2.
 - `r2.dev` URLs are rate limited and meant for testing. Use a custom domain on a Cloudflare zone for production.
 - If your domain is on Cloudflare, you can also [purge the cache](/docs/guides/cache-purge/) when files change.
 
-> **Tip:** Scope the API token to the single bucket Nimbus uses.
+> **Tip:** Scope the API token to the single bucket Plume uses.

@@ -1,13 +1,13 @@
 ---
 title: Connect Wasabi
 nav: Wasabi
-description: Create a Wasabi bucket and access keys, choose the matching region in Nimbus, test the connection, and offload your WordPress media to Wasabi storage.
+description: Create a Wasabi bucket and access keys, choose the matching region in Plume, test the connection, and offload your WordPress media to Wasabi storage.
 section: providers
 order: 6
 logo: wasabi
 ---
 
-Wasabi is S3-compatible storage that advertises no egress fees. Nimbus builds the endpoint from the region you select.
+Wasabi is S3-compatible storage that advertises no egress fees. Plume builds the endpoint from the region you select.
 
 ## 1. Create access keys
 
@@ -19,7 +19,7 @@ Wasabi buckets are private by default. For visitors to load files, add a public-
 
 ## 2. Fill in the setup wizard
 
-Open **Media → Nimbus** and choose **Wasabi**.
+Open **Media → Plume** and choose **Wasabi**.
 
 | Field | Where to find it |
 | --- | --- |
@@ -28,7 +28,7 @@ Open **Media → Nimbus** and choose **Wasabi**.
 | Wasabi Access Key | Wasabi console → IAM → Access Keys. |
 | Wasabi Secret Key | Shown once when you create the key. |
 | Path Prefix (optional) | A folder inside the bucket, for example `media`. |
-| Custom Endpoint (optional) | Leave empty. Nimbus builds `https://s3.<region>.wasabisys.com`. |
+| Custom Endpoint (optional) | Leave empty. Plume builds `https://s3.<region>.wasabisys.com`. |
 | Custom Domain (optional) | A CDN or custom domain for public URLs. |
 
 ## 3. Test and offload
@@ -44,7 +44,7 @@ wp nimbus process-pending --limit=500
 
 ## Notes
 
-- Path-style requests are off for Wasabi. Nimbus sets this for you.
-- The region in Nimbus must match the region of the bucket. A mismatch fails the connection test.
+- Path-style requests are off for Wasabi. Plume sets this for you.
+- The region in Plume must match the region of the bucket. A mismatch fails the connection test.
 
-> **Tip:** Create a dedicated Wasabi user for Nimbus and limit it to this one bucket.
+> **Tip:** Create a dedicated Wasabi user for Plume and limit it to this one bucket.

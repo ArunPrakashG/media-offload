@@ -1,16 +1,16 @@
 ---
 title: Troubleshooting
 nav: Troubleshooting
-description: "Fix common Nimbus problems: failed connection tests, images that do not load, uploads that never offload, stuck bulk jobs, WP-Cron issues and purge errors."
+description: "Fix common Plume problems: failed connection tests, images that do not load, uploads that never offload, stuck bulk jobs, WP-Cron issues and purge errors."
 section: reference
 order: 5
 ---
 
-Start with the **Logs** tab under **Media → Nimbus**. It filters by level, source and search text, and it shows the reason for most failures.
+Start with the **Logs** tab under **Media → Plume**. It filters by level, source and search text, and it shows the reason for most failures.
 
 ## Test Connection fails
 
-Go to **Tools** and select **Test Connection**. Nimbus writes a small `connection-test-<time>.txt` object, reads it back and deletes it. On failure it shows "Connection failed" with the provider's message, plus **Connection details** and **Suggested checks**.
+Go to **Tools** and select **Test Connection**. Plume writes a small `connection-test-<time>.txt` object, reads it back and deletes it. On failure it shows "Connection failed" with the provider's message, plus **Connection details** and **Suggested checks**.
 
 Check these in order:
 
@@ -23,15 +23,15 @@ Check these in order:
 
 ## Images do not load after offload
 
-- Open the image URL in a private window. A `403` means the object is not public. Fix the bucket policy or CDN. Nimbus does not set object ACLs.
-- On Cloudflare R2, set the **Custom Domain** to your public R2 domain. Without it, Nimbus builds URLs from the account endpoint, which is not public.
+- Open the image URL in a private window. A `403` means the object is not public. Fix the bucket policy or CDN. Plume does not set object ACLs.
+- On Cloudflare R2, set the **Custom Domain** to your public R2 domain. Without it, Plume builds URLs from the account endpoint, which is not public.
 - If the Custom Domain has a path or prefix mismatch, the key will not resolve. See [custom domain](/docs/guides/custom-domain/).
 - If old pages still show broken URLs, [purge the cache](/docs/guides/cache-purge/).
-- If **Serve From Storage** is off, Nimbus does not rewrite URLs.
+- If **Serve From Storage** is off, Plume does not rewrite URLs.
 
 ## New uploads stay Pending
 
-By default Nimbus waits for the nightly run at `03:00`. This is expected. To offload at upload time, turn off **Enable Off-hours Batch**. See [nightly batch](/docs/guides/scheduling/).
+By default Plume waits for the nightly run at `03:00`. This is expected. To offload at upload time, turn off **Enable Off-hours Batch**. See [nightly batch](/docs/guides/scheduling/).
 
 If it still does not move, check that **Enable Offloading** is on and credentials are complete. Also check that the file is not excluded by Ignored Paths, a minimum size or a MIME rule. See [offloading media](/docs/guides/offloading/).
 
@@ -54,15 +54,15 @@ Only one bulk job runs at a time. If you see "A bulk media job is already runnin
 
 ## An item shows Needs attention
 
-Open the **Logs** tab and search for the attachment ID. Then use **Retry offload** in the Media Library, or **Retry failed items** under Tools. When the local source file is missing, Nimbus waits 12 hours before it tries again.
+Open the **Logs** tab and search for the attachment ID. Then use **Retry offload** in the Media Library, or **Retry failed items** under Tools. When the local source file is missing, Plume waits 12 hours before it tries again.
 
 ## Cloudflare purge turned itself off
 
-Nimbus disables it when the Zone ID or the API token is missing, and logs "Cloudflare purge was disabled because Zone ID or API token is missing." Enter both and turn it back on. The token needs the Zone: Cache Purge permission.
+Plume disables it when the Zone ID or the API token is missing, and logs "Cloudflare purge was disabled because Zone ID or API token is missing." Enter both and turn it back on. The token needs the Zone: Cache Purge permission.
 
 ## Another plugin conflicts
 
-Two offload plugins at once can break URLs. Deactivate the other plugin before you enable Nimbus. See [integrations](/docs/guides/integrations/).
+Two offload plugins at once can break URLs. Deactivate the other plugin before you enable Plume. See [integrations](/docs/guides/integrations/).
 
 ## Going back to local files
 
@@ -72,10 +72,10 @@ Run the restore job, then put URLs back in post content:
 wp nimbus revert --limit=500
 ```
 
-Nimbus shows a notice on deactivation that points to a Revert URLs button in Tools. Use the command above for this step. See [restoring files](/docs/guides/restoring-files/).
+Plume shows a notice on deactivation that points to a Revert URLs button in Tools. Use the command above for this step. See [restoring files](/docs/guides/restoring-files/).
 
 ## Still stuck
 
-Open an issue at [github.com/ArunPrakashG/media-offload/issues](https://github.com/ArunPrakashG/media-offload/issues). Include the Nimbus version, your provider, the steps you took and the relevant log lines. Remove keys and tokens first.
+Open an issue at [github.com/ArunPrakashG/media-offload/issues](https://github.com/ArunPrakashG/media-offload/issues). Include the Plume version, your provider, the steps you took and the relevant log lines. Remove keys and tokens first.
 
 > **Tip:** Set Minimum Log Level to `debug` while you reproduce a problem, then set it back to `info`.

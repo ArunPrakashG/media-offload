@@ -10,7 +10,7 @@
       "Nimbus\\Plugin\\": "src/"
     }
   },
-  "description": "Nimbus offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.",
+  "description": "Plume offloads WordPress media to Amazon S3, Cloudflare R2, and S3-compatible storage with automatic URL rewriting.",
   "license": "MIT",
   "minimum-stability": "stable",
   "name": "arun-prakash/nimbus",

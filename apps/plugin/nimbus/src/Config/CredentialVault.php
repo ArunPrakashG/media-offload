@@ -119,7 +119,7 @@ final class CredentialVault
 
     printf(
       '<div class="notice notice-error"><p>%s</p></div>',
-      esc_html__('Nimbus could not read its saved storage credentials. This happens when the security keys in wp-config.php change. Enter your storage keys again in Media → Nimbus → Settings.', 'usenimbus-media-offload')
+      esc_html__('Plume could not read its saved storage credentials. This happens when the security keys in wp-config.php change. Enter your storage keys again in Media → Plume → Settings.', 'plume-media-offload')
     );
   }
 

@@ -127,7 +127,7 @@ $content .= "</ul>";
 if ($attachmentId > 0) {
   $content .= "<p>Sample media item:</p>" . wp_get_attachment_image($attachmentId, "full");
 }
-$content .= "<p>Next stop: <a href=\"/wp-admin/upload.php?page=nimbus\">Nimbus admin</a>.</p>";
+$content .= "<p>Next stop: <a href=\"/wp-admin/upload.php?page=nimbus\">Plume admin</a>.</p>";
 
 $postarr = [
   "post_type" => "page",

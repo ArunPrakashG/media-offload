@@ -1,11 +1,11 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export const SITE = {
-  name: 'Nimbus',
+  name: 'Plume',
   url: 'https://usenimbus.dev',
   tagline: 'Move your media to the cloud. Keep your workflow.',
   description:
-    'Nimbus is a free, open source WordPress plugin that offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible storage and rewrites every URL.',
+    'Plume is a free, open source WordPress plugin that offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible storage and rewrites every URL.',
   repo: 'https://github.com/ArunPrakashG/media-offload',
   releases: 'https://github.com/ArunPrakashG/media-offload/releases',
   contributing: 'https://github.com/ArunPrakashG/media-offload/blob/main/CONTRIBUTING.md',
@@ -58,14 +58,14 @@ export const FAQ = [
   },
   {
     q: 'Can I use my own CDN domain?',
-    a: 'Yes. Set a custom domain such as media.example.com and Nimbus builds every media URL with it, so files are served through your CDN.',
+    a: 'Yes. Set a custom domain such as media.example.com and Plume builds every media URL with it, so files are served through your CDN.',
   },
   {
-    q: 'What happens if I deactivate Nimbus?',
+    q: 'What happens if I deactivate Plume?',
     a: 'Scheduled jobs stop and your settings are kept. Files already in your bucket stay there. If you removed local copies, restore them first so your server can serve the Media Library on its own.',
   },
   {
-    q: 'Does Nimbus send any data to you?',
+    q: 'Does Plume send any data to you?',
     a: 'No. There is no license server and no telemetry. Your site talks only to the storage provider and cache services you configure.',
   },
 ];

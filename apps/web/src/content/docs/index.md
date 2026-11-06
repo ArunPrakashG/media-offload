@@ -1,12 +1,12 @@
 ---
-title: Install Nimbus
+title: Install Plume
 nav: Installation
-description: Install the Nimbus WordPress plugin from a ZIP file, activate it, and open the setup wizard under Media → Nimbus. Needs WordPress 6.0 and PHP 8.1 or newer.
+description: Install the Plume WordPress plugin from a ZIP file, activate it, and open the setup wizard under Media → Plume. Needs WordPress 6.0 and PHP 8.1 or newer.
 section: start
 order: 1
 ---
 
-Nimbus moves your WordPress media library to object storage and serves it from there. This page covers installing the plugin and what to expect on first launch.
+Plume moves your WordPress media library to object storage and serves it from there. This page covers installing the plugin and what to expect on first launch.
 
 ## Requirements
 
@@ -17,27 +17,27 @@ Nimbus moves your WordPress media library to object storage and serves it from t
 
 ## Install the plugin
 
-Nimbus is not listed in the WordPress.org directory. You install it from a ZIP file.
+Plume is not listed in the WordPress.org directory. You install it from a ZIP file.
 
 1. Download the plugin ZIP from [github.com/ArunPrakashG/media-offload/releases](https://github.com/ArunPrakashG/media-offload/releases).
 2. In WordPress, go to **Plugins → Add New → Upload Plugin**.
 3. Choose the ZIP, select **Install Now**, then **Activate Plugin**.
 
-After activation you land in the setup wizard at **Media → Nimbus**. Nimbus is open source under the MIT license.
+After activation you land in the setup wizard at **Media → Plume**. Plume is open source under the MIT license.
 
 ### Upgrading from 0.3.3 or earlier
 
-From 0.3.4 the plugin is called **UseNimbus Media Offload** and lives in an `usenimbus-media-offload` folder, to match its WordPress.org name. Before that it was **Nimbus** (folder `nimbus`) and, in 0.3.3, **Nimbus Media Offload**. Uploading the new ZIP installs it next to the old copy. Both copies share the same settings and offloaded files, so:
+From 0.3.4 the plugin is called **Plume Media Offload** and lives in a `plume-media-offload` folder, to match its WordPress.org name. Before that it was **Nimbus** (folder `nimbus`) and, in 0.3.3, **Nimbus Media Offload**. Uploading the new ZIP installs it next to the old copy. Both copies share the same settings and offloaded files, so:
 
 1. Deactivate the old plugin (**Nimbus** or **Nimbus Media Offload**).
-2. Activate **UseNimbus Media Offload**.
+2. Activate **Plume Media Offload**.
 3. Remove the old plugin folder, `wp-content/plugins/nimbus` or `wp-content/plugins/nimbus-media-offload`, over SFTP or SSH.
 
 Do not use **Delete** on the old copy in the Plugins screen. That runs its uninstall cleanup, which removes the settings and offload records the new copy uses.
 
 ## What happens on first launch
 
-Until you finish the wizard, the Nimbus page shows the **Set up Nimbus** wizard instead of the dashboard. The [setup wizard](/docs/setup-wizard/) has three steps: Storage, Delivery and Review.
+Until you finish the wizard, the Plume page shows the **Set up Plume** wizard instead of the dashboard. The [setup wizard](/docs/setup-wizard/) has three steps: Storage, Delivery and Review.
 
 Once the wizard is done, the page shows these tabs:
 

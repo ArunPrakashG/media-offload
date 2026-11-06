@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 
 /**
  * Amazon S3 and Google Cloud Storage: neither lets a self-hosted plugin sign
- * in on the user's behalf without a hosted OAuth broker. Instead Nimbus writes
+ * in on the user's behalf without a hosted OAuth broker. Instead Plume writes
  * one command for the provider's own browser shell (AWS CloudShell, Google
  * Cloud Shell). It creates the bucket and a bucket-only identity, then prints
  * one JSON line that the admin pastes back here.
@@ -56,7 +56,7 @@ final class ShellConnector
         'gcloud storage buckets add-iam-policy-binding "gs://$B" --member=allUsers --role=roles/storage.objectViewer --quiet >/dev/null || PUB=false',
         "echo '" . $cors . "' > /tmp/nimbus-cors.json",
         'gcloud storage buckets update "gs://$B" --cors-file=/tmp/nimbus-cors.json --quiet',
-        'gcloud iam service-accounts describe "$SA" >/dev/null 2>&1 || gcloud iam service-accounts create nimbus-media --display-name="Nimbus media" --quiet',
+        'gcloud iam service-accounts describe "$SA" >/dev/null 2>&1 || gcloud iam service-accounts create nimbus-media --display-name="Plume media" --quiet',
         'for i in 1 2 3 4 5 6; do gcloud storage buckets add-iam-policy-binding "gs://$B" --member="serviceAccount:$SA" --role=roles/storage.objectAdmin --quiet >/dev/null && break; sleep 5; done',
         'read K S < <(gcloud storage hmac create "$SA" --format="value(metadata.accessId,secret)")',
         'echo; echo "{\"nimbus\":1,\"provider\":\"gcs\",\"bucket\":\"$B\",\"region\":\"$L\",\"access_key\":\"$K\",\"secret_key\":\"$S\",\"public\":$PUB}"',
@@ -93,11 +93,11 @@ final class ShellConnector
 
     $data = json_decode($output, true);
     if (!is_array($data) || (int) ($data['nimbus'] ?? 0) !== 1) {
-      throw new QuickConnectException(esc_html__('Paste the line the command printed. It starts with {"nimbus":1', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste the line the command printed. It starts with {"nimbus":1', 'plume-media-offload'));
     }
 
     if (($data['provider'] ?? '') !== $this->provider) {
-      throw new QuickConnectException(esc_html__('That line was made for a different provider. Run the command shown above.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('That line was made for a different provider. Run the command shown above.', 'plume-media-offload'));
     }
 
     $bucket = (string) ($data['bucket'] ?? '');
@@ -106,19 +106,19 @@ final class ShellConnector
     $secret = trim((string) ($data['secret_key'] ?? ''));
 
     if (!self::validBucket($bucket) || $key === '' || $secret === '' || !preg_match('/^[a-z0-9-]+$/', $region)) {
-      throw new QuickConnectException(esc_html__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('The pasted line is incomplete. Run the command again and copy the whole last line.', 'plume-media-offload'));
     }
 
     $result = new ConnectResult();
     $result->buckets = [$bucket];
     $result->public = !empty($data['public']);
-    $result->step(__('Bucket found', 'usenimbus-media-offload'), $bucket . ' · ' . $region);
-    $result->step(__('Keys belong to a user that can only reach this bucket', 'usenimbus-media-offload'));
+    $result->step(__('Bucket found', 'plume-media-offload'), $bucket . ' · ' . $region);
+    $result->step(__('Keys belong to a user that can only reach this bucket', 'plume-media-offload'));
 
     if (!$result->public) {
       $result->note = $this->provider === 'gcs'
-        ? __('Your organization blocks public buckets, so visitors cannot load files straight from it. Serve media through a CDN, or allow public access for this bucket.', 'usenimbus-media-offload')
-        : __('Your AWS account blocks public buckets, so visitors cannot load files straight from it. Turn off "Block public access" for this bucket, or serve media through CloudFront.', 'usenimbus-media-offload');
+        ? __('Your organization blocks public buckets, so visitors cannot load files straight from it. Serve media through a CDN, or allow public access for this bucket.', 'plume-media-offload')
+        : __('Your AWS account blocks public buckets, so visitors cannot load files straight from it. Turn off "Block public access" for this bucket, or serve media through CloudFront.', 'plume-media-offload');
     }
 
     $result->values = [

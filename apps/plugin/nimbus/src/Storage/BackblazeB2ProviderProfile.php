@@ -33,38 +33,38 @@ final class BackblazeB2ProviderProfile extends AbstractProviderProfile implement
 
   public function label(): string
   {
-    return __('Backblaze B2', 'usenimbus-media-offload');
+    return __('Backblaze B2', 'plume-media-offload');
   }
 
   public function title(): string
   {
-    return __('Backblaze B2 Cloud Storage', 'usenimbus-media-offload');
+    return __('Backblaze B2 Cloud Storage', 'plume-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Backblaze B2 S3-compatible cloud storage. Enter the B2 region (e.g. us-west-004), bucket name, and your Application Key ID + Application Key from the Backblaze console.', 'usenimbus-media-offload');
+    return __('Backblaze B2 S3-compatible cloud storage. Enter the B2 region (e.g. us-west-004), bucket name, and your Application Key ID + Application Key from the Backblaze console.', 'plume-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'     => __('Bucket', 'usenimbus-media-offload'),
-      'region'     => __('Region (e.g. us-west-004, eu-central-003)', 'usenimbus-media-offload'),
-      'access_key' => __('Application Key ID', 'usenimbus-media-offload'),
-      'secret_key' => __('Application Key', 'usenimbus-media-offload'),
+      'bucket'     => __('Bucket', 'plume-media-offload'),
+      'region'     => __('Region (e.g. us-west-004, eu-central-003)', 'plume-media-offload'),
+      'access_key' => __('Application Key ID', 'plume-media-offload'),
+      'secret_key' => __('Application Key', 'plume-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your Backblaze B2 bucket name.', 'usenimbus-media-offload'),
-      'region'        => __('B2 region code visible in your bucket endpoint URL, e.g. us-west-004, eu-central-003.', 'usenimbus-media-offload'),
-      'access_key'    => __('Application Key ID — create one under App Keys in the Backblaze console (not your account ID).', 'usenimbus-media-offload'),
-      'secret_key'    => __('Application Key shown once at creation time, paired with the Key ID above.', 'usenimbus-media-offload'),
+      'bucket'        => __('Your Backblaze B2 bucket name.', 'plume-media-offload'),
+      'region'        => __('B2 region code visible in your bucket endpoint URL, e.g. us-west-004, eu-central-003.', 'plume-media-offload'),
+      'access_key'    => __('Application Key ID — create one under App Keys in the Backblaze console (not your account ID).', 'plume-media-offload'),
+      'secret_key'    => __('Application Key shown once at creation time, paired with the Key ID above.', 'plume-media-offload'),
       'session_token' => '',
-      'endpoint'      => __('Leave empty — B2 endpoints are built automatically from the region.', 'usenimbus-media-offload'),
+      'endpoint'      => __('Leave empty — B2 endpoints are built automatically from the region.', 'plume-media-offload'),
       'r2_account_id' => '',
     ];
   }

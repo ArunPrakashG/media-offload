@@ -1,18 +1,18 @@
 ---
 title: Setup wizard
 nav: Setup wizard
-description: "Walk through the three-step Nimbus setup wizard: connect storage, choose delivery behavior, and review before you finish. Includes the config import shortcut."
+description: "Walk through the three-step Plume setup wizard: connect storage, choose delivery behavior, and review before you finish. Includes the config import shortcut."
 section: start
 order: 2
 ---
 
-The setup wizard runs the first time you open **Media → Nimbus** after activation. It has three steps and saves your progress as you move forward.
+The setup wizard runs the first time you open **Media → Plume** after activation. It has three steps and saves your progress as you move forward.
 
 ## Step 1. Connect your storage provider
 
-Pick a provider. Nimbus then offers quick connect: you paste one token, key or line of output, and Nimbus creates or picks the bucket, sets it up for public media, fills in every field and runs an upload test.
+Pick a provider. Plume then offers quick connect: you paste one token, key or line of output, and Plume creates or picks the bucket, sets it up for public media, fills in every field and runs an upload test.
 
-| Provider | What you paste | What Nimbus sets up |
+| Provider | What you paste | What Plume sets up |
 | --- | --- | --- |
 | Cloudflare R2 | An API token. **Open Cloudflare** opens the token page with the R2 permission already filled in. | Finds your account, creates the bucket, sets CORS and turns on the r2.dev public URL. |
 | Backblaze B2 | An application key for all buckets with read and write access. | Finds the region, creates a public bucket and makes a new key that can only reach it. The key you paste is not saved. |
@@ -65,7 +65,7 @@ This step controls what happens after files are in storage.
 
 | Option | Meaning |
 | --- | --- |
-| Enable Nimbus after setup | Turns offloading on. Stored as `enabled`. |
+| Enable Plume after setup | Turns offloading on. Stored as `enabled`. |
 | Serve media from remote storage | Rewrites media URLs to point at storage. Stored as `serve_from_storage`. |
 | Use path-style requests | Sends `https://endpoint/bucket/key` instead of `https://bucket.endpoint/key`. Stored as `use_path_style_endpoint`. |
 | Custom delivery domain (optional) | A CDN or custom domain for public URLs. Stored as `custom_domain`. |
@@ -76,7 +76,7 @@ Select **Continue to review**. Quick connect has already tested an upload. If yo
 
 The last step shows a checklist of what you entered. If another offload plugin is active, it also shows a **Conflict review** with a checkbox you must tick to confirm you have handled it. Running two offload plugins at once can conflict and break media URLs.
 
-Select **Finish setup and unlock dashboard**. Nimbus saves your settings and shows "Setup complete. Your dashboard is now unlocked and your storage preferences have been saved."
+Select **Finish setup and unlock dashboard**. Plume saves your settings and shows "Setup complete. Your dashboard is now unlocked and your storage preferences have been saved."
 
 ## After the wizard
 

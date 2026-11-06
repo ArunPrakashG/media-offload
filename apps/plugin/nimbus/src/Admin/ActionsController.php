@@ -35,11 +35,11 @@ final class ActionsController
     $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field((string) wp_unslash($_REQUEST['nonce'])) : '';
 
     if (!$this->isValidNonce($nonce, NIMBUS_AJAX_TEST_CONNECTION)) {
-      wp_send_json_error(['message' => __('Security check failed.', 'usenimbus-media-offload')], 403);
+      wp_send_json_error(['message' => __('Security check failed.', 'plume-media-offload')], 403);
     }
 
     if (!current_user_can('manage_options')) {
-      wp_send_json_error(['message' => __('Permission denied.', 'usenimbus-media-offload')], 403);
+      wp_send_json_error(['message' => __('Permission denied.', 'plume-media-offload')], 403);
     }
 
     $factory = new StorageAdapterFactory($this->settings, $this->logger);
@@ -52,27 +52,27 @@ final class ActionsController
       if (method_exists($adapter, 'testConnection')) {
         if ($adapter->testConnection()) {
           wp_send_json_success([
-            'message' => __('Connection successful! Write access verified.', 'usenimbus-media-offload'),
+            'message' => __('Connection successful! Write access verified.', 'plume-media-offload'),
             'details' => $this->connectionDetails(),
             'hints' => $this->connectionHints(),
           ]);
         }
 
         wp_send_json_error([
-          'message' => __('Connection failed. Check logs for details.', 'usenimbus-media-offload'),
+          'message' => __('Connection failed. Check logs for details.', 'plume-media-offload'),
           'details' => $this->connectionDetails(),
           'hints' => $this->connectionHints(),
         ]);
       }
 
       wp_send_json_error([
-        'message' => __('Adapter does not support connection testing.', 'usenimbus-media-offload'),
+        'message' => __('Adapter does not support connection testing.', 'plume-media-offload'),
         'details' => $this->connectionDetails(),
       ]);
     } catch (\Throwable $exception) {
       wp_send_json_error([
         /* translators: %s: error message from the storage provider */
-        'message' => sprintf(__('Connection failed: %s', 'usenimbus-media-offload'), $exception->getMessage()),
+        'message' => sprintf(__('Connection failed: %s', 'plume-media-offload'), $exception->getMessage()),
         'details' => $this->connectionDetails(),
         'hints' => $this->connectionHints($exception),
       ]);
@@ -89,17 +89,17 @@ final class ActionsController
     $nonce = isset($_POST['nonce']) ? sanitize_text_field((string) wp_unslash($_POST['nonce'])) : '';
 
     if (!$this->isValidNonce($nonce, NIMBUS_AJAX_QUICK_CONNECT)) {
-      wp_send_json_error(['message' => __('Security check failed. Reload the page and try again.', 'usenimbus-media-offload')], 403);
+      wp_send_json_error(['message' => __('Security check failed. Reload the page and try again.', 'plume-media-offload')], 403);
     }
 
     if (!current_user_can('manage_options')) {
-      wp_send_json_error(['message' => __('Permission denied.', 'usenimbus-media-offload')], 403);
+      wp_send_json_error(['message' => __('Permission denied.', 'plume-media-offload')], 403);
     }
 
     // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
     $provider = isset($_POST['provider']) ? sanitize_key((string) wp_unslash($_POST['provider'])) : '';
     if (!in_array($provider, QuickConnect::PROVIDERS, true)) {
-      wp_send_json_error(['message' => __('Quick connect is not available for this provider.', 'usenimbus-media-offload')], 400);
+      wp_send_json_error(['message' => __('Quick connect is not available for this provider.', 'plume-media-offload')], 400);
     }
 
     try {
@@ -111,7 +111,7 @@ final class ActionsController
     } catch (\Throwable $exception) {
       $this->logger->error('Quick connect for {provider} failed: {error}', ['provider' => $provider, 'error' => $exception->getMessage()]);
       /* translators: %s: error message */
-      wp_send_json_error(['message' => sprintf(__('Quick connect failed: %s', 'usenimbus-media-offload'), $exception->getMessage())]);
+      wp_send_json_error(['message' => sprintf(__('Quick connect failed: %s', 'plume-media-offload'), $exception->getMessage())]);
     }
   }
 
@@ -177,7 +177,7 @@ final class ActionsController
   public function handleClearLogs(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_CLEAR_LOGS);
@@ -190,7 +190,7 @@ final class ActionsController
   public function handleResumeMigration(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_RESUME_MIGRATION);
@@ -199,28 +199,28 @@ final class ActionsController
     $after = DataMigration::resume();
 
     if (empty($before['needs_migration'])) {
-      pushAdminNotice(__('No unfinished activation recovery tasks were found.', 'usenimbus-media-offload'), 'info');
+      pushAdminNotice(__('No unfinished activation recovery tasks were found.', 'plume-media-offload'), 'info');
       $this->redirectToTab('overview');
     }
 
     if (empty($after['needs_migration'])) {
-      pushAdminNotice(__('Activation recovery completed successfully.', 'usenimbus-media-offload'), 'success');
+      pushAdminNotice(__('Activation recovery completed successfully.', 'plume-media-offload'), 'success');
       $this->redirectToTab('overview');
     }
 
     if (!empty($after['scheduled'])) {
-      pushAdminNotice(__('A recovery batch finished and more activation cleanup has been scheduled. You can click Resume again or let WordPress cron continue in the background.', 'usenimbus-media-offload'), 'warning');
+      pushAdminNotice(__('A recovery batch finished and more activation cleanup has been scheduled. You can click Resume again or let WordPress cron continue in the background.', 'plume-media-offload'), 'warning');
       $this->redirectToTab('overview');
     }
 
-    pushAdminNotice(__('A recovery batch ran, but more activation cleanup still appears to be pending. Click Resume again to continue.', 'usenimbus-media-offload'), 'warning');
+    pushAdminNotice(__('A recovery batch ran, but more activation cleanup still appears to be pending. Click Resume again to continue.', 'plume-media-offload'), 'warning');
     $this->redirectToTab('overview');
   }
 
   public function handleRunUrlUpdates(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_RUN_URL_UPDATES);
@@ -306,7 +306,7 @@ final class ActionsController
   public function handleCompleteOnboarding(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_COMPLETE_ONBOARDING);
@@ -336,13 +336,13 @@ final class ActionsController
 
     if ($provider !== 'local' && !empty($missing)) {
       /* translators: %s: comma-separated list of missing required setting names */
-      pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', 'usenimbus-media-offload'), implode(', ', $missing)), 'error');
+      pushAdminNotice(sprintf(__('Please complete the storage step before continuing: %s', 'plume-media-offload'), implode(', ', $missing)), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'storage']);
     }
 
     $activeConflicts = array_filter($this->onboardingManager->state()['conflicts'] ?? [], static fn (array $plugin): bool => !empty($plugin['active']));
     if (!empty($activeConflicts) && !$conflictAcknowledged) {
-      pushAdminNotice(__('Please review the active plugin conflicts and confirm you understand them before finishing setup.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('Please review the active plugin conflicts and confirm you understand them before finishing setup.', 'plume-media-offload'), 'error');
       $this->redirectToTab('onboarding', ['onboarding_step' => 'review']);
     }
 
@@ -350,9 +350,9 @@ final class ActionsController
     $this->onboardingManager->markCompleted();
 
     if (!empty($activeConflicts)) {
-      pushAdminNotice(__('Setup complete, but one or more other media offload plugins are still active. Review the integration warnings in Tools before enabling aggressive URL rewriting.', 'usenimbus-media-offload'), 'warning');
+      pushAdminNotice(__('Setup complete, but one or more other media offload plugins are still active. Review the integration warnings in Tools before enabling aggressive URL rewriting.', 'plume-media-offload'), 'warning');
     } else {
-      pushAdminNotice(__('Setup complete. Your dashboard is now unlocked and your storage preferences have been saved.', 'usenimbus-media-offload'), 'success');
+      pushAdminNotice(__('Setup complete. Your dashboard is now unlocked and your storage preferences have been saved.', 'plume-media-offload'), 'success');
     }
 
     $this->redirectToTab('overview');
@@ -383,7 +383,7 @@ final class ActionsController
   public function handleRewriteIntegration(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_REWRITE_INTEGRATION);
@@ -391,12 +391,12 @@ final class ActionsController
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Nonce verified via verifyAdminNonce()/isValidNonce() helper above; sniff cannot trace across the method call.
     $integration = isset($_POST['integration']) ? sanitize_key((string) wp_unslash($_POST['integration'])) : '';
     if ($integration === '' || !(bool) apply_filters('nimbus/integrations/can_rewrite', false, $integration)) {
-      pushAdminNotice(__('This integration does not yet support automated URL rewriting.', 'usenimbus-media-offload'), 'warning');
+      pushAdminNotice(__('This integration does not yet support automated URL rewriting.', 'plume-media-offload'), 'warning');
       $this->redirectToTab('integrations');
     }
 
     if (!$this->settings->has_valid_credentials()) {
-      pushAdminNotice(__('Configure storage credentials before rewriting external asset URLs.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('Configure storage credentials before rewriting external asset URLs.', 'plume-media-offload'), 'error');
       $this->redirectToTab('integrations');
     }
 
@@ -405,10 +405,10 @@ final class ActionsController
     $result = (array) apply_filters('nimbus/integrations/run_rewrite', [], $integration);
     if (($result['errors'] ?? 0) > 0) {
       /* translators: 1: integration name, 2: table count, 3: updated row count, 4: error count */
-      pushAdminNotice(sprintf(__('%1$s rewrite finished with warnings. Tables: %2$d, Updated rows: %3$d, Errors: %4$d.', 'usenimbus-media-offload'), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0), (int) ($result['errors'] ?? 0)), 'warning');
+      pushAdminNotice(sprintf(__('%1$s rewrite finished with warnings. Tables: %2$d, Updated rows: %3$d, Errors: %4$d.', 'plume-media-offload'), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0), (int) ($result['errors'] ?? 0)), 'warning');
     } else {
       /* translators: 1: integration name, 2: table count, 3: updated row count */
-      pushAdminNotice(sprintf(__('%1$s rewrite complete. Tables: %2$d, Updated rows: %3$d.', 'usenimbus-media-offload'), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0)), 'success');
+      pushAdminNotice(sprintf(__('%1$s rewrite complete. Tables: %2$d, Updated rows: %3$d.', 'plume-media-offload'), $label, (int) ($result['tables'] ?? 0), (int) ($result['updated_rows'] ?? 0)), 'success');
     }
 
     $this->redirectToTab('integrations');
@@ -417,7 +417,7 @@ final class ActionsController
   public function handleToggleIntegration(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_TOGGLE_INTEGRATION);
@@ -435,11 +435,11 @@ final class ActionsController
     if (in_array($key, $disabled, true)) {
       $disabled = array_values(array_filter($disabled, static fn ($k) => $k !== $key));
       /* translators: %s: integration name */
-      pushAdminNotice(sprintf(__('Integration "%s" enabled.', 'usenimbus-media-offload'), $key), 'success');
+      pushAdminNotice(sprintf(__('Integration "%s" enabled.', 'plume-media-offload'), $key), 'success');
     } else {
       $disabled[] = $key;
       /* translators: %s: integration name */
-      pushAdminNotice(sprintf(__('Integration "%s" disabled.', 'usenimbus-media-offload'), $key), 'success');
+      pushAdminNotice(sprintf(__('Integration "%s" disabled.', 'plume-media-offload'), $key), 'success');
     }
 
     update_option(NIMBUS_DISABLED_INTEGRATIONS_KEY, $disabled, false);
@@ -630,7 +630,7 @@ final class ActionsController
     $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field((string) wp_unslash($_REQUEST['_wpnonce'])) : '';
 
     if (!$this->isValidNonce($nonce, ...$actions)) {
-      wp_die(esc_html__('Security check failed.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Security check failed.', 'plume-media-offload'));
     }
   }
 
@@ -639,32 +639,32 @@ final class ActionsController
     $config = $this->settings->adapter_configuration();
     $details = [
       [
-        'label' => __('Provider', 'usenimbus-media-offload'),
+        'label' => __('Provider', 'plume-media-offload'),
         'value' => $this->settings->provider_profile()->label(),
       ],
       [
-        'label' => __('Bucket', 'usenimbus-media-offload'),
-        'value' => $config['bucket'] !== '' ? $config['bucket'] : __('Not set', 'usenimbus-media-offload'),
+        'label' => __('Bucket', 'plume-media-offload'),
+        'value' => $config['bucket'] !== '' ? $config['bucket'] : __('Not set', 'plume-media-offload'),
       ],
     ];
 
     if (!empty($config['region'])) {
       $details[] = [
-        'label' => __('Region', 'usenimbus-media-offload'),
+        'label' => __('Region', 'plume-media-offload'),
         'value' => (string) $config['region'],
       ];
     }
 
     if (!empty($config['endpoint'])) {
       $details[] = [
-        'label' => __('Endpoint', 'usenimbus-media-offload'),
+        'label' => __('Endpoint', 'plume-media-offload'),
         'value' => (string) $config['endpoint'],
       ];
     }
 
     $details[] = [
-      'label' => __('Path style', 'usenimbus-media-offload'),
-      'value' => !empty($config['use_path_style_endpoint']) ? __('Enabled', 'usenimbus-media-offload') : __('Disabled', 'usenimbus-media-offload'),
+      'label' => __('Path style', 'plume-media-offload'),
+      'value' => !empty($config['use_path_style_endpoint']) ? __('Enabled', 'plume-media-offload') : __('Disabled', 'plume-media-offload'),
     ];
 
     return $details;
@@ -676,17 +676,17 @@ final class ActionsController
     $hints = [];
 
     if ($provider === 'r2') {
-      $hints[] = __('For Cloudflare R2, keep region set to auto and use the account endpoint without appending the bucket name.', 'usenimbus-media-offload');
-      $hints[] = __('R2 typically requires path-style requests and API-token-derived access keys.', 'usenimbus-media-offload');
+      $hints[] = __('For Cloudflare R2, keep region set to auto and use the account endpoint without appending the bucket name.', 'plume-media-offload');
+      $hints[] = __('R2 typically requires path-style requests and API-token-derived access keys.', 'plume-media-offload');
     } elseif ($provider === 's3_compatible') {
-      $hints[] = __('For S3-compatible storage, confirm the custom endpoint is correct and includes the protocol.', 'usenimbus-media-offload');
-      $hints[] = __('If requests are signed incorrectly, try enabling path-style URLs when your provider recommends it.', 'usenimbus-media-offload');
+      $hints[] = __('For S3-compatible storage, confirm the custom endpoint is correct and includes the protocol.', 'plume-media-offload');
+      $hints[] = __('If requests are signed incorrectly, try enabling path-style URLs when your provider recommends it.', 'plume-media-offload');
     } else {
-      $hints[] = __('For Amazon S3, confirm the region exactly matches the bucket region and that the IAM credentials allow list, read, and write access.', 'usenimbus-media-offload');
+      $hints[] = __('For Amazon S3, confirm the region exactly matches the bucket region and that the IAM credentials allow list, read, and write access.', 'plume-media-offload');
     }
 
     if ($exception !== null && stripos($exception->getMessage(), 'signature') !== false) {
-      $hints[] = __('A signature error usually means the endpoint, region, or path-style setting does not match the provider requirements.', 'usenimbus-media-offload');
+      $hints[] = __('A signature error usually means the endpoint, region, or path-style setting does not match the provider requirements.', 'plume-media-offload');
     }
 
     return array_values(array_unique($hints));
@@ -747,7 +747,7 @@ final class ActionsController
   public function handleExportConfig(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_EXPORT_CONFIG);
@@ -778,7 +778,7 @@ final class ActionsController
     $json = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
     if ($json === false) {
-      wp_die(esc_html__('Failed to encode configuration.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Failed to encode configuration.', 'plume-media-offload'));
     }
 
     header('Content-Type: application/json; charset=utf-8');
@@ -794,7 +794,7 @@ final class ActionsController
   public function handleImportConfig(): void
   {
     if (!current_user_can('manage_options')) {
-      wp_die(esc_html__('Permission denied.', 'usenimbus-media-offload'));
+      wp_die(esc_html__('Permission denied.', 'plume-media-offload'));
     }
 
     $this->verifyAdminNonce(NIMBUS_ADMIN_ACTION_IMPORT_CONFIG);
@@ -803,7 +803,7 @@ final class ActionsController
     $redirectTab = isset($_POST['redirect_tab']) && $_POST['redirect_tab'] === 'settings' ? 'settings' : 'tools';
 
     if (empty($_FILES['nimbus_config_file']['tmp_name'])) {
-      pushAdminNotice(__('No file was uploaded. Please choose a JSON configuration file.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('No file was uploaded. Please choose a JSON configuration file.', 'plume-media-offload'), 'error');
       $this->redirectToTab($redirectTab);
     }
 
@@ -814,24 +814,24 @@ final class ActionsController
     // Validate file type by extension and MIME.
     $ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
     if ($ext !== 'json') {
-      pushAdminNotice(__('Invalid file type. Only .json files are accepted.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('Invalid file type. Only .json files are accepted.', 'plume-media-offload'), 'error');
       $this->redirectToTab($redirectTab);
     }
 
     $raw = file_get_contents((string) $file['tmp_name']); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
     if ($raw === false || strlen($raw) > 512 * 1024) {
-      pushAdminNotice(__('Could not read the uploaded file or file exceeds the 512 KB limit.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('Could not read the uploaded file or file exceeds the 512 KB limit.', 'plume-media-offload'), 'error');
       $this->redirectToTab($redirectTab);
     }
 
     $payload = json_decode((string) $raw, true);
     if (!is_array($payload)) {
-      pushAdminNotice(__('Invalid JSON: could not parse the configuration file.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('Invalid JSON: could not parse the configuration file.', 'plume-media-offload'), 'error');
       $this->redirectToTab($redirectTab);
     }
 
     if (($payload['plugin'] ?? '') !== 'nimbus') {
-      pushAdminNotice(__('This file does not appear to be a Nimbus configuration export.', 'usenimbus-media-offload'), 'error');
+      pushAdminNotice(__('This file does not appear to be a Plume configuration export.', 'plume-media-offload'), 'error');
       $this->redirectToTab($redirectTab);
     }
 
@@ -845,7 +845,7 @@ final class ActionsController
 
     $this->settings->update($normalized);
 
-    pushAdminNotice(__('Configuration imported successfully. Review the settings below and save if needed.', 'usenimbus-media-offload'), 'success');
+    pushAdminNotice(__('Configuration imported successfully. Review the settings below and save if needed.', 'plume-media-offload'), 'success');
     $this->redirectToTab($redirectTab);
   }
 }

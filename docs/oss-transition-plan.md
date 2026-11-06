@@ -1,4 +1,4 @@
-# Nimbus: Transition to Free & Open Source
+# Plume: Transition to Free & Open Source
 
 Decisions locked in:
 - Merge all `nimbus-pro` features into the single `nimbus` plugin. One free plugin, no tiers.
@@ -42,7 +42,7 @@ Goal: one plugin, zero license gates, all current pro features available to ever
 - Grep for any remaining `hasFeature(`, `isActive(`, `->tier()`, `nimbus_pro_status` references after the above and clean up stragglers.
 
 **1d. Update `readme.txt`**
-- Rewrite the `== External Services ==` section — after this phase the plugin should make **zero** calls to `api.usenimbus.dev`. If nothing else phones home, this section can likely be removed or reduced to just the storage-provider disclosure (S3/R2/etc., which is user-configured, not a Nimbus-operated service).
+- Rewrite the `== External Services ==` section — after this phase the plugin should make **zero** calls to `api.usenimbus.dev`. If nothing else phones home, this section can likely be removed or reduced to just the storage-provider disclosure (S3/R2/etc., which is user-configured, not a Plume-operated service).
 - Update the feature list to reflect the merged pro features now being standard.
 
 **Verification:** fresh WP install, activate plugin, confirm no license wall/banner appears anywhere, confirm bulk offload/cache-purge/page-builder rewrite features work without any key.
@@ -73,7 +73,7 @@ Since there are no existing paying customers, no billing wind-down or customer-r
 ## Phase 3 — Update `apps/web` marketing site ✅ done
 
 - ~~`src/components/Pricing.astro`: delete entirely~~ — done, along with `create-subscription.ts`/`verify-payment.ts`.
-- ~~`src/pages/{refund,terms}.astro`~~ — `refund.astro` now shows a short "Nimbus is free, nothing to refund" notice (route kept alive for old bookmarks); `terms.astro` rewritten around the GPL-2.0-or-later grant; `privacy.astro` rewritten to reflect that the plugin has no license server or telemetry.
+- ~~`src/pages/{refund,terms}.astro`~~ — `refund.astro` now shows a short "Plume is free, nothing to refund" notice (route kept alive for old bookmarks); `terms.astro` rewritten around the GPL-2.0-or-later grant; `privacy.astro` rewritten to reflect that the plugin has no license server or telemetry.
 - CTAs across `Hero`/`Cta`/`Navbar`/`Footer` now point at `/docs#installation` instead of `/#pricing`; the pricing nav entry and "cryptographically secured licensing" assurance are gone.
 - `compare.astro` and `docs.astro` (not originally scoped, but found to be just as stale) were also rewritten — pricing tables and every "Personal & above"/"Agency" qualifier removed.
 - `changelog.astro` gained a v0.2.0 entry documenting the free/OSS transition.
@@ -98,7 +98,7 @@ Since there are no existing paying customers, no billing wind-down or customer-r
 
 ## Phase 5 — WordPress.org submission
 
-- Check "Nimbus" for trademark/name collisions on WordPress.org (search the plugin directory and trademark databases — a fairly common name, may need a suffix like "Nimbus Media Offload" or similar; `readme.txt`'s existing plugin slug should be checked against this before submitting).
+- Check "Plume" for trademark/name collisions on WordPress.org (search the plugin directory and trademark databases — a fairly common name, may need a suffix like "Plume Media Offload" or similar; `readme.txt`'s existing plugin slug should be checked against this before submitting).
 - WordPress.org plugin review requirements to double check post-Phase-1: no remote phone-home without disclosure, no obfuscated code, proper sanitization/escaping (the review is manual and strict about security basics — worth a self-review pass on `Admin/ActionsController.php` and `Rest/ApiController.php` for nonce/capability checks now that gates are being removed/rewired).
 - Submit via the standard `svn` process once the above is clean; WordPress.org then handles update distribution, replacing the old `/v1/updates/check` mechanism entirely.
 

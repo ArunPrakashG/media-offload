@@ -1,6 +1,6 @@
 <?php
 /**
- * Nimbus E2E test helpers — mu-plugin (auto-loaded, NOT shipped in production).
+ * Plume E2E test helpers — mu-plugin (auto-loaded, NOT shipped in production).
  *
  * Provides lightweight REST endpoints used exclusively by the Playwright test
  * suite to drive the plugin without needing WP-CLI or browser UI interactions.
@@ -95,7 +95,7 @@ add_action( 'rest_api_init', function () {
         },
     ] );
 
-    // ── Nimbus settings manipulation ──────────────────────────────────────────
+    // ── Plume settings manipulation ──────────────────────────────────────────
 
     // POST /nimbus-test/v1/setting
     // Body: { "key": "remove_local_copies", "value": true }

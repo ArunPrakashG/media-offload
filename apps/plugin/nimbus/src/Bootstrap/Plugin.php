@@ -64,8 +64,8 @@ final class Plugin
   }
 
   /**
-   * Boot every feature that used to be gated behind the Nimbus Pro add-on.
-   * Now that Nimbus is a single, fully-free plugin, everything below is
+   * Boot every feature that used to be gated behind the Plume Pro add-on.
+   * Now that Plume is a single, fully-free plugin, everything below is
    * registered unconditionally. Runs at plugins_loaded priority 25.
    */
   public function bootFeatures(): void

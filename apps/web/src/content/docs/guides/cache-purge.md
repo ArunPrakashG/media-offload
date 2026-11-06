@@ -1,18 +1,18 @@
 ---
 title: Cache purge
 nav: Cache purge
-description: Configure Nimbus to purge Cloudflare, LiteSpeed, WP Fastest Cache or a reverse proxy when media is deleted or URLs are rewritten, and trigger purges by API.
+description: Configure Plume to purge Cloudflare, LiteSpeed, WP Fastest Cache or a reverse proxy when media is deleted or URLs are rewritten, and trigger purges by API.
 section: guides
 order: 6
 ---
 
-Cached pages and CDN copies can keep old media URLs after a change. Nimbus can ask your cache layer to purge them. Everything is off until you turn it on.
+Cached pages and CDN copies can keep old media URLs after a change. Plume can ask your cache layer to purge them. Everything is off until you turn it on.
 
 ## Where to find it
 
-Go to **Media → Nimbus → Advanced → Cache Purging**. Select **Save Advanced Settings** after you change anything.
+Go to **Media → Plume → Advanced → Cache Purging**. Select **Save Advanced Settings** after you change anything.
 
-## When Nimbus purges
+## When Plume purges
 
 | Event | What is purged |
 | --- | --- |
@@ -23,7 +23,7 @@ Go to **Media → Nimbus → Advanced → Cache Purging**. Select **Save Advance
 
 Offloading a file on its own does not purge. Changes made with the URL update tools in the admin do not purge automatically.
 
-Purge requests go into a queue. Nimbus sends five at a time with a short delay between batches, so large rewrites do not flood your cache service.
+Purge requests go into a queue. Plume sends five at a time with a short delay between batches, so large rewrites do not flood your cache service.
 
 ## Cloudflare
 
@@ -31,11 +31,11 @@ Purge requests go into a queue. Nimbus sends five at a time with a short delay b
 2. Enter the **Cloudflare Zone ID** from the zone's Overview page.
 3. Create an API token with the **Zone: Cache Purge** permission and enter it as **Cloudflare API Token**.
 
-The Cloudflare option appears when a Custom Domain is set. If the Zone ID or token is missing, Nimbus turns the option off and logs "Cloudflare purge was disabled because Zone ID or API token is missing."
+The Cloudflare option appears when a Custom Domain is set. If the Zone ID or token is missing, Plume turns the option off and logs "Cloudflare purge was disabled because Zone ID or API token is missing."
 
 ## LiteSpeed Cache and WP Fastest Cache
 
-Turn on **Enable LiteSpeed Cache Purging** or **Enable WP Fastest Cache Purging**. Nimbus calls the plugin's own purge functions, so the plugin must be active. If it is missing, the purge is skipped.
+Turn on **Enable LiteSpeed Cache Purging** or **Enable WP Fastest Cache Purging**. Plume calls the plugin's own purge functions, so the plugin must be active. If it is missing, the purge is skipped.
 
 ## Proxy or Nginx cache
 

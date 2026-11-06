@@ -1,16 +1,16 @@
 ---
 title: Multisite
 nav: Multisite
-description: "How Nimbus behaves on a WordPress multisite network: per-site settings, the read-only Network Overview page, and what to set up on each site."
+description: "How Plume behaves on a WordPress multisite network: per-site settings, the read-only Network Overview page, and what to set up on each site."
 section: guides
 order: 8
 ---
 
-On a multisite network, Nimbus keeps its settings separately for every site. Each site connects to its own bucket, or the same bucket with a different Path Prefix.
+On a multisite network, Plume keeps its settings separately for every site. Each site connects to its own bucket, or the same bucket with a different Path Prefix.
 
 ## Per-site setup
 
-1. Open the site's dashboard and go to **Media → Nimbus**.
+1. Open the site's dashboard and go to **Media → Plume**.
 2. Run the [setup wizard](/docs/setup-wizard/) for that site.
 3. Give each site its own Path Prefix if sites share a bucket, for example `site-2`.
 
@@ -22,7 +22,7 @@ wp --url=https://site2.example.com nimbus sync --limit=500
 
 ## Network Overview
 
-In **Network Admin**, Nimbus adds a top-level **Nimbus** menu. It opens a read-only **Network Overview** table with these columns:
+In **Network Admin**, Plume adds a top-level **Plume** menu. It opens a read-only **Network Overview** table with these columns:
 
 - Site
 - Provider

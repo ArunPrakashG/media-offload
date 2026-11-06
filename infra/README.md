@@ -1,6 +1,6 @@
 # infra/
 
-Infrastructure-as-code and environment configuration for the Nimbus platform.
+Infrastructure-as-code and environment configuration for the Plume platform.
 
 ## Structure (to be populated)
 

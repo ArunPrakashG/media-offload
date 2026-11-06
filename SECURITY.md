@@ -1,6 +1,6 @@
 # Security Policy
 
-Nimbus handles cloud storage credentials and WordPress media, so security
+Plume handles cloud storage credentials and WordPress media, so security
 reports are taken seriously.
 
 ## Reporting a vulnerability
@@ -19,16 +19,16 @@ release notes, unless you'd prefer to remain anonymous.
 ## Scope
 
 In scope:
-- The Nimbus WordPress plugin (`apps/plugin/nimbus`)
+- The Plume WordPress plugin (`apps/plugin/nimbus`)
 - The marketing/documentation website (`apps/web`)
 
 Out of scope:
 - Vulnerabilities in third-party storage providers (Amazon S3, Cloudflare
-  R2, etc.) or cache plugins Nimbus integrates with — report those to the
+  R2, etc.) or cache plugins Plume integrates with — report those to the
   relevant vendor.
 - Issues requiring physical access to a server or already-compromised
   WordPress admin credentials.
 
 ## Supported versions
 
-Only the latest released version of Nimbus receives security fixes.
+Only the latest released version of Plume receives security fixes.

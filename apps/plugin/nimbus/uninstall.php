@@ -1,6 +1,6 @@
 <?php
 /**
- * Uninstall handler for the Nimbus plugin.
+ * Uninstall handler for the Plume plugin.
  *
  * Runs when a site administrator deletes the plugin from the Plugins screen.
  * This file is called directly by WordPress and must guard against direct

@@ -37,7 +37,7 @@ final class CloudflareR2Connector
   {
     $this->token = trim((string) ($input['token'] ?? ''));
     if ($this->token === '') {
-      throw new QuickConnectException(esc_html__('Paste the Cloudflare API token first.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste the Cloudflare API token first.', 'plume-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -46,11 +46,11 @@ final class CloudflareR2Connector
 
     $account = $this->pickAccount($accounts, (string) ($input['account_id'] ?? ''), $result);
     if ($account === null) {
-      $result->step(__('Token verified', 'usenimbus-media-offload'));
+      $result->step(__('Token verified', 'plume-media-offload'));
       return $result;
     }
 
-    $result->step(__('Token verified', 'usenimbus-media-offload'), $account['name']);
+    $result->step(__('Token verified', 'plume-media-offload'), $account['name']);
     $accountId = $account['id'];
 
     $existing = $this->bucketNames($accountId);
@@ -62,11 +62,11 @@ final class CloudflareR2Connector
     }
 
     if (in_array($bucket, $existing, true)) {
-      $result->step(__('Using bucket', 'usenimbus-media-offload'), $bucket);
+      $result->step(__('Using bucket', 'plume-media-offload'), $bucket);
     } else {
-      $this->call('POST', "/accounts/{$accountId}/r2/buckets", ['name' => $bucket], __('Could not create the bucket', 'usenimbus-media-offload'));
+      $this->call('POST', "/accounts/{$accountId}/r2/buckets", ['name' => $bucket], __('Could not create the bucket', 'plume-media-offload'));
       $result->buckets[] = $bucket;
-      $result->step(__('Bucket created', 'usenimbus-media-offload'), $bucket);
+      $result->step(__('Bucket created', 'plume-media-offload'), $bucket);
     }
 
     $this->setCors($accountId, $bucket);
@@ -95,11 +95,11 @@ final class CloudflareR2Connector
   {
     $response = $this->request('GET', '/accounts?per_page=50');
     if (in_array($response['status'], [400, 401, 403], true)) {
-      throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'plume-media-offload'));
     }
 
     if ($response['status'] !== 200 || empty($response['body']['success'])) {
-      throw new QuickConnectException(esc_html(__('Could not reach Cloudflare', 'usenimbus-media-offload') . ': ' . $this->apiError($response['body'])));
+      throw new QuickConnectException(esc_html(__('Could not reach Cloudflare', 'plume-media-offload') . ': ' . $this->apiError($response['body'])));
     }
 
     $accounts = [];
@@ -111,7 +111,7 @@ final class CloudflareR2Connector
     }
 
     if ($accounts === []) {
-      throw new QuickConnectException(esc_html__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('This token cannot see any Cloudflare account. Create it with the link above so the R2 permission is included.', 'plume-media-offload'));
     }
 
     return $accounts;
@@ -135,13 +135,13 @@ final class CloudflareR2Connector
       $id = (string) ($response['body']['result']['id'] ?? '');
       if ($response['status'] === 200 && $id !== '') {
         if (($response['body']['result']['status'] ?? 'active') !== 'active') {
-          throw new QuickConnectException(esc_html__('This token is disabled or expired in Cloudflare.', 'usenimbus-media-offload'));
+          throw new QuickConnectException(esc_html__('This token is disabled or expired in Cloudflare.', 'plume-media-offload'));
         }
         return $id;
       }
     }
 
-    throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'usenimbus-media-offload'));
+    throw new QuickConnectException(esc_html__('Cloudflare did not accept this token. Copy it again, it is only shown once.', 'plume-media-offload'));
   }
 
   /**
@@ -171,11 +171,11 @@ final class CloudflareR2Connector
     }
 
     if ($usable === []) {
-      throw new QuickConnectException(esc_html__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'usenimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('This token has no R2 access. Create it with the link above so the R2 permission is included.', 'plume-media-offload'));
     }
 
     $result->accounts = $usable;
-    $result->note = __('This token can reach more than one Cloudflare account. Pick the one for your media.', 'usenimbus-media-offload');
+    $result->note = __('This token can reach more than one Cloudflare account. Pick the one for your media.', 'plume-media-offload');
 
     return null;
   }
@@ -185,7 +185,7 @@ final class CloudflareR2Connector
    */
   private function bucketNames(string $accountId): array
   {
-    $body = $this->call('GET', "/accounts/{$accountId}/r2/buckets?per_page=1000", null, __('Could not list R2 buckets', 'usenimbus-media-offload'));
+    $body = $this->call('GET', "/accounts/{$accountId}/r2/buckets?per_page=1000", null, __('Could not list R2 buckets', 'plume-media-offload'));
     $names = [];
 
     foreach ((array) ($body['result']['buckets'] ?? []) as $bucket) {
@@ -224,7 +224,7 @@ final class CloudflareR2Connector
     $custom = $this->request('GET', "/accounts/{$accountId}/r2/buckets/{$bucket}/domains/custom");
     foreach ((array) ($custom['body']['result']['domains'] ?? []) as $domain) {
       if (!empty($domain['enabled']) && !empty($domain['domain'])) {
-        $result->step(__('Public URL', 'usenimbus-media-offload'), (string) $domain['domain']);
+        $result->step(__('Public URL', 'plume-media-offload'), (string) $domain['domain']);
         return 'https://' . $domain['domain'];
       }
     }
@@ -233,13 +233,13 @@ final class CloudflareR2Connector
     $domain = (string) ($managed['body']['result']['domain'] ?? '');
 
     if ($managed['status'] === 200 && $domain !== '') {
-      $result->step(__('Public URL on', 'usenimbus-media-offload'), $domain);
-      $result->note = __('r2.dev links are rate limited by Cloudflare. Before going live, connect a custom domain to this bucket in Cloudflare and enter it on the next step.', 'usenimbus-media-offload');
+      $result->step(__('Public URL on', 'plume-media-offload'), $domain);
+      $result->note = __('r2.dev links are rate limited by Cloudflare. Before going live, connect a custom domain to this bucket in Cloudflare and enter it on the next step.', 'plume-media-offload');
       return 'https://' . $domain;
     }
 
     $result->public = false;
-    $result->note = __('Nimbus could not turn on public access for this bucket. Add a custom domain to it in Cloudflare, then enter it on the next step.', 'usenimbus-media-offload');
+    $result->note = __('Plume could not turn on public access for this bucket. Add a custom domain to it in Cloudflare, then enter it on the next step.', 'plume-media-offload');
     $this->quickConnect->logger()->warning('R2 quick connect could not enable the r2.dev URL on {bucket}: {error}', [
       'bucket' => $bucket,
       'error' => $this->apiError($managed['body']),
@@ -274,6 +274,6 @@ final class CloudflareR2Connector
   {
     $error = $body['errors'][0]['message'] ?? '';
 
-    return $error !== '' ? (string) $error : __('unexpected response from Cloudflare', 'usenimbus-media-offload');
+    return $error !== '' ? (string) $error : __('unexpected response from Cloudflare', 'plume-media-offload');
   }
 }

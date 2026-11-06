@@ -1,13 +1,13 @@
 ---
 title: Connect MinIO
 nav: MinIO
-description: Connect Nimbus to a self-hosted MinIO server with an endpoint URL, bucket and access key, then test the connection and offload your WordPress media.
+description: Connect Plume to a self-hosted MinIO server with an endpoint URL, bucket and access key, then test the connection and offload your WordPress media.
 section: providers
 order: 7
 logo: minio
 ---
 
-MinIO is self-hosted, S3-compatible storage. Nimbus needs the full URL of your server, a bucket and an access key.
+MinIO is self-hosted, S3-compatible storage. Plume needs the full URL of your server, a bucket and an access key.
 
 ## 1. Create credentials
 
@@ -20,7 +20,7 @@ For public delivery, set an anonymous download policy on the bucket, or put a re
 
 ## 2. Fill in the setup wizard
 
-Open **Media → Nimbus** and choose **MinIO**.
+Open **Media → Plume** and choose **MinIO**.
 
 | Field | Where to find it |
 | --- | --- |
@@ -32,7 +32,7 @@ Open **Media → Nimbus** and choose **MinIO**.
 | Path Prefix (optional) | A folder inside the bucket, for example `media`. |
 | Custom Domain (optional) | The public address for files, if different from the endpoint. |
 
-Nimbus turns on path-style requests for MinIO and ignores any session token.
+Plume turns on path-style requests for MinIO and ignores any session token.
 
 ## 3. Test and offload
 

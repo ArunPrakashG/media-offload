@@ -1,4 +1,4 @@
-# Nimbus design
+# Plume design
 
 Claude Design artifact: https://claude.ai/artifact/J118rUvLGZtnmQRiAyktX1 (private to the owner).
 Local copies of every board live in `mockups/`, with PNG renders in `mockups/renders/`.
@@ -9,7 +9,7 @@ Moves WordPress media to the storage you choose, and keeps every URL working.
 
 ## Brand
 
-- Name: Nimbus. Wordmark is lowercase `nimbus`, Geist 600, letter-spacing -0.03em.
+- Name: Plume. Wordmark is lowercase `nimbus`, Geist 600, letter-spacing -0.03em.
 - Mark: a volt cloud on an ink tile. One square corner, bottom left: the file inside the cloud.
   - `brand/mark.svg`: tile, for favicons, app icons and the wordpress.org icon.
   - `brand/mark-dark.svg`: tile with a 1px `#343B46` border, for dark backgrounds.

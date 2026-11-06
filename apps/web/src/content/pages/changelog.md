@@ -1,18 +1,18 @@
 ---
 title: "Changelog"
-description: "Release notes for every version of Nimbus, the free WordPress media offload plugin, listed from newest to oldest with added, changed, removed and fixed items."
+description: "Release notes for every version of Plume, the free WordPress media offload plugin, listed from newest to oldest with added, changed, removed and fixed items."
 updated: 2026-11-03
 ---
 
-Every release of Nimbus, newest first. Since 0.2.0, Nimbus is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
+Every release of Plume, newest first. Since 0.2.0, Plume is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
 ## 0.3.4 · November 2026
 
-The plugin is now called UseNimbus Media Offload in WordPress, after feedback from the WordPress.org plugin review.
+The plugin is now called Plume Media Offload (formerly Nimbus) in WordPress, after feedback from the WordPress.org plugin review.
 
 ### Changed
 
-- The plugin name is **UseNimbus Media Offload**, and the plugin folder and text domain are `usenimbus-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
+- The plugin name is **Plume Media Offload**, and the plugin folder and text domain are `plume-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Plume** page are unchanged.
 - Installed an earlier version? Follow [Upgrading from 0.3.3 or earlier](/docs/#upgrading-from-033-or-earlier) so the old copy's uninstall cleanup does not remove your settings.
 - Updated the AWS SDK to 3.401.5 and its dependencies.
 
@@ -24,21 +24,21 @@ The plugin is now called UseNimbus Media Offload in WordPress, after feedback fr
 
 ## 0.3.3 · November 2026
 
-Nimbus was renamed Nimbus Media Offload in WordPress, ready for the WordPress.org plugin directory.
+The WordPress plugin was renamed Nimbus Media Offload, ready for the WordPress.org plugin directory.
 
 ### Changed
 
-- The plugin name is **Nimbus Media Offload**, and the plugin folder and text domain are `nimbus-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Nimbus** page are unchanged.
+- The plugin name is **Plume Media Offload**, and the plugin folder and text domain are `nimbus-media-offload`. The release ZIP is named the same way. Settings, offloaded files and the **Media → Plume** page are unchanged.
 - Installed from GitHub? Follow [Upgrading from 0.3.2 or earlier](/docs/#upgrading-from-032-or-earlier) so the old copy's uninstall cleanup does not remove your settings.
 
 ## 0.3.2 · November 2026
 
-Set up storage by pasting one token or key. Nimbus creates the bucket and fills in the settings for you.
+Set up storage by pasting one token or key. Plume creates the bucket and fills in the settings for you.
 
 ### Added
 
-- Quick connect in the setup wizard. Paste one token, key or line of command output and Nimbus creates the bucket, sets it up for public media, fills in the settings and runs an upload test. Works with every provider; Backblaze B2, Wasabi and DigitalOcean Spaces also get a new key limited to the media bucket.
-- Docs and donate links next to Nimbus on the Plugins screen.
+- Quick connect in the setup wizard. Paste one token, key or line of command output and Plume creates the bucket, sets it up for public media, fills in the settings and runs an upload test. Works with every provider; Backblaze B2, Wasabi and DigitalOcean Spaces also get a new key limited to the media bucket.
+- Docs and donate links next to Plume on the Plugins screen.
 
 ### Changed
 
@@ -51,7 +51,7 @@ Your storage keys are now encrypted in the database. Nothing to set up: existing
 ### Fixed
 
 - Storage credentials are now encrypted in the database, with a key derived from your site's security keys or a `NIMBUS_ENCRYPTION_KEY` constant. Existing settings are encrypted automatically.
-- The notice shown before deactivating Nimbus points to the restore job and `wp nimbus revert`, instead of a Tools panel that did not exist.
+- The notice shown before deactivating Plume points to the restore job and `wp nimbus revert`, instead of a Tools panel that did not exist.
 
 ## 0.3.0 · November 2026
 
@@ -60,13 +60,13 @@ A new look for the plugin admin and a more permissive license. Settings and offl
 ### Changed
 
 - Relicensed under the MIT License.
-- New Nimbus brand across the admin: a header with connection status, a reworked overview and a guided setup wizard.
+- New Plume brand across the admin: a header with connection status, a reworked overview and a guided setup wizard.
 - The setup wizard tests a connection with the values on screen before you save them.
 - Fonts and provider logos ship with the plugin, so the admin makes no external requests.
 
 ## 0.2.0 · July 2026
 
-The Nimbus Pro add-on has been merged into this plugin and all licensing has been removed. Features that were split across free and paid tiers are now included on every install.
+The Plume Pro add-on has been merged into this plugin and all licensing has been removed. Features that were split across free and paid tiers are now included on every install.
 
 ### Now included
 
@@ -81,8 +81,8 @@ The Nimbus Pro add-on has been merged into this plugin and all licensing has bee
 
 ### Removed
 
-- The license key requirement, the license activation screen, and every call to the former Nimbus licensing backend.
-- The separate Nimbus Pro plugin. Its code is now part of this plugin.
+- The license key requirement, the license activation screen, and every call to the former Plume licensing backend.
+- The separate Plume Pro plugin. Its code is now part of this plugin.
 
 ## 0.1.4 · May 2025
 
@@ -103,16 +103,16 @@ Each supported storage provider now has its own provider profile, so you no long
 
 ### Multisite network admin panel
 
-- Super-admins on WordPress Multisite get a **Network Admin → Nimbus** screen. It shows license status and offload statistics for every site in the network.
+- Super-admins on WordPress Multisite get a **Network Admin → Plume** screen. It shows license status and offload statistics for every site in the network.
 - Each sub-site keeps its own settings and license activation. The network panel is a read-only overview.
 
 ### Create bucket from WordPress
 
-- A **Create bucket** button on the storage settings screen. Enter your credentials and a bucket name, and Nimbus creates the bucket through the provider API.
+- A **Create bucket** button on the storage settings screen. Enter your credentials and a bucket name, and Plume creates the bucket through the provider API.
 
 ### Config export and import
 
-- Export your Nimbus configuration (credentials, rules and integrations) as a JSON file.
+- Export your Plume configuration (credentials, rules and integrations) as a JSON file.
 - Import that file on another site or environment to copy the setup, for example from staging to production.
 
 ### Job progress stream
@@ -145,7 +145,7 @@ A nightly scheduler, three new cache purge integrations and a Smart Slider 3 rew
 
 ### Smart Slider 3 rewriter
 
-- Nimbus can rewrite URLs stored in the Nextend storage tables used by Smart Slider 3. Click **Rewrite URLs** on the Integrations screen after your first bulk migration.
+- Plume can rewrite URLs stored in the Nextend storage tables used by Smart Slider 3. Click **Rewrite URLs** on the Integrations screen after your first bulk migration.
 
 ### REST job control endpoints
 
@@ -165,7 +165,7 @@ The bulk job engine, integrations for Elementor, Slider Revolution and NextGEN G
 ### Bulk migration with pause and resume
 
 - A background bulk job processes your existing library in configurable batches on a 2-second cron interval. The batch size was set by plan at the time: 25 on Personal, 75 on Pro and 100 on Agency.
-- Pause a job at any time. Nimbus saves its exact position and resumes from the same file. Nothing is processed twice.
+- Pause a job at any time. Plume saves its exact position and resumes from the same file. Nothing is processed twice.
 - **Retry failed** re-runs only the files that failed in the last job.
 - The **Restore local** job type downloads all offloaded files back to your server, for example before changing providers.
 
@@ -195,8 +195,8 @@ Clearer offload status in the Media Library, automatic cache invalidation after 
 
 ### Media Library status column
 
-- A **Nimbus** column shows the status of every attachment: Offloaded, Pending, Failed, Ignored or Local.
-- A new Nimbus dropdown filters the Media Library by status.
+- A **Plume** column shows the status of every attachment: Offloaded, Pending, Failed, Ignored or Local.
+- A new Plume dropdown filters the Media Library by status.
 - Row actions for single files: offload, restore or retry.
 
 ### Cloudflare cache purge
@@ -218,13 +218,13 @@ Clearer offload status in the Media Library, automatic cache invalidation after 
 
 ## 0.1.0 · October 2024
 
-The first public version of Nimbus: automatic media offload to Amazon S3, Cloudflare R2 and S3-compatible providers, with URL rewriting and reversible database writes.
+The first public version of Plume: automatic media offload to Amazon S3, Cloudflare R2 and S3-compatible providers, with URL rewriting and reversible database writes.
 
 ### Core features
 
 - **Auto-offload on upload:** every file uploaded through WordPress is sent to your bucket.
 - **URL rewriting:** the **Serve From Storage** toggle rewrites attachment URLs to your bucket or CDN domain. Turn it off to return to local serving. This is a settings change and does not alter stored data.
-- **Reversible database writes:** Nimbus stores a relative storage key, not a full provider URL. Changing CDN domains or providers needs only a settings update.
+- **Reversible database writes:** Plume stores a relative storage key, not a full provider URL. Changing CDN domains or providers needs only a settings update.
 - **Remove local copies:** optionally delete files from your server after a successful offload.
 - **Custom CDN domain:** serve media from your own CDN subdomain instead of the bucket URL.
 - **Bucket path prefix:** keep uploads under a sub-folder of a shared bucket.

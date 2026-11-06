@@ -87,33 +87,33 @@ final class SettingsUi
       'actions' => ['testConnection' => NIMBUS_AJAX_TEST_CONNECTION],
       'restNamespace' => NIMBUS_REST_NAMESPACE,
       'strings' => [
-        'showAdvanced' => __('Show advanced connection fields', 'usenimbus-media-offload'),
-        'hideAdvanced' => __('Hide advanced connection fields', 'usenimbus-media-offload'),
-        'noExtraCredentials' => __('No extra credentials required', 'usenimbus-media-offload'),
-        'providerNoBucket' => __('No bucket required in local mode', 'usenimbus-media-offload'),
-        'providerBucketNotSet' => __('Bucket not set', 'usenimbus-media-offload'),
-        'deliveryLocalDebug' => __('Local debug', 'usenimbus-media-offload'),
-        'deliveryRemote' => __('Remote', 'usenimbus-media-offload'),
-        'deliveryLocal' => __('Local', 'usenimbus-media-offload'),
-        'deliveryNoCustomDomain' => __('No custom domain configured', 'usenimbus-media-offload'),
+        'showAdvanced' => __('Show advanced connection fields', 'plume-media-offload'),
+        'hideAdvanced' => __('Hide advanced connection fields', 'plume-media-offload'),
+        'noExtraCredentials' => __('No extra credentials required', 'plume-media-offload'),
+        'providerNoBucket' => __('No bucket required in local mode', 'plume-media-offload'),
+        'providerBucketNotSet' => __('Bucket not set', 'plume-media-offload'),
+        'deliveryLocalDebug' => __('Local debug', 'plume-media-offload'),
+        'deliveryRemote' => __('Remote', 'plume-media-offload'),
+        'deliveryLocal' => __('Local', 'plume-media-offload'),
+        'deliveryNoCustomDomain' => __('No custom domain configured', 'plume-media-offload'),
         /* translators: this string is used as a client-side JS template; 1: allowed-pattern count, 2: ignored-pattern count */
-        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', 'usenimbus-media-offload'),
-        'batchOn' => __('On', 'usenimbus-media-offload'),
-        'batchOff' => __('Off', 'usenimbus-media-offload'),
-        'batchNoSchedule' => __('No schedule set', 'usenimbus-media-offload'),
-        'shellLocalDebugMode' => __('Local debug mode', 'usenimbus-media-offload'),
-        'shellServingStorage' => __('Serving from storage', 'usenimbus-media-offload'),
-        'shellServingLocal' => __('Serving from local URLs', 'usenimbus-media-offload'),
-        'testing' => __('Testing…', 'usenimbus-media-offload'),
-        'testingMessage' => __('Testing connection…', 'usenimbus-media-offload'),
-        'testConnection' => __('Test Connection', 'usenimbus-media-offload'),
-        'serverError' => __('Server error occurred.', 'usenimbus-media-offload'),
-        'detailsHeading' => __('Connection details', 'usenimbus-media-offload'),
-        'hintsHeading' => __('Suggested checks', 'usenimbus-media-offload'),
-        'jobStartError' => __('Unable to start the requested bulk job.', 'usenimbus-media-offload'),
-        'jobPauseError' => __('Unable to pause the current bulk job.', 'usenimbus-media-offload'),
-        'jobResumeError' => __('Unable to resume the current bulk job.', 'usenimbus-media-offload'),
-        'jobRetryError' => __('Unable to retry failed items right now.', 'usenimbus-media-offload'),
+        'rulesTemplate' => __('Allowed: %1$d · Ignored: %2$d', 'plume-media-offload'),
+        'batchOn' => __('On', 'plume-media-offload'),
+        'batchOff' => __('Off', 'plume-media-offload'),
+        'batchNoSchedule' => __('No schedule set', 'plume-media-offload'),
+        'shellLocalDebugMode' => __('Local debug mode', 'plume-media-offload'),
+        'shellServingStorage' => __('Serving from storage', 'plume-media-offload'),
+        'shellServingLocal' => __('Serving from local URLs', 'plume-media-offload'),
+        'testing' => __('Testing…', 'plume-media-offload'),
+        'testingMessage' => __('Testing connection…', 'plume-media-offload'),
+        'testConnection' => __('Test Connection', 'plume-media-offload'),
+        'serverError' => __('Server error occurred.', 'plume-media-offload'),
+        'detailsHeading' => __('Connection details', 'plume-media-offload'),
+        'hintsHeading' => __('Suggested checks', 'plume-media-offload'),
+        'jobStartError' => __('Unable to start the requested bulk job.', 'plume-media-offload'),
+        'jobPauseError' => __('Unable to pause the current bulk job.', 'plume-media-offload'),
+        'jobResumeError' => __('Unable to resume the current bulk job.', 'plume-media-offload'),
+        'jobRetryError' => __('Unable to retry failed items right now.', 'plume-media-offload'),
       ],
       'providers' => $this->providerCatalog->scriptData(),
       'assetRoots' => $this->statistics->get_attachment_roots(),
@@ -150,8 +150,8 @@ final class SettingsUi
     $glyph = '<svg class="nmb-menu-glyph" viewBox="6 6 20 20" width="13" height="13" aria-hidden="true" style="vertical-align:-1px;margin-right:6px"><g fill="currentColor" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"/><circle cx="18.5" cy="13" r="6.5"/><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"/></g></svg>';
 
     $hook = add_media_page(
-      __('Nimbus', 'usenimbus-media-offload'),
-      $glyph . esc_html__('Nimbus', 'usenimbus-media-offload'),
+      __('Plume', 'plume-media-offload'),
+      $glyph . esc_html__('Plume', 'plume-media-offload'),
       'manage_options',
       NIMBUS_SLUG,
       [$this, 'render_page']
@@ -232,12 +232,12 @@ final class SettingsUi
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       printf(
         '<div class="notice notice-warning"><p><strong>%s</strong> %s</p></div>',
-        esc_html__('Nimbus – URL integrity check recommended', 'usenimbus-media-offload'),
+        esc_html__('Plume – URL integrity check recommended', 'plume-media-offload'),
         sprintf(
           /* translators: %1$s: file count, %2$s: Tools link */
-          esc_html__('Nimbus was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', 'usenimbus-media-offload'),
+          esc_html__('Plume was previously deactivated while %1$s media file(s) had CDN URLs written to the database. Those URLs may have been served broken while the plugin was inactive. Verify and resync them from %2$s.', 'plume-media-offload'),
           '<strong>' . esc_html(number_format_i18n($reactivationCount)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'usenimbus-media-offload') . '</a>'
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Plume → Tools', 'plume-media-offload') . '</a>'
         )
       );
     }
@@ -254,7 +254,7 @@ final class SettingsUi
   }
 
   /**
-   * Notice shown on the Plugins screen when Nimbus has rewritten attachment URLs
+   * Notice shown on the Plugins screen when Plume has rewritten attachment URLs
    * into the database.  Deactivating without reverting first will leave broken
    * CDN URLs in post_content once the plugin is gone.
    */
@@ -290,15 +290,15 @@ final class SettingsUi
     ?>
     <div class="notice notice-warning nimbus-deactivation-hint">
       <p>
-        <strong><?php esc_html_e('Nimbus – Before you deactivate', 'usenimbus-media-offload'); ?></strong><br>
+        <strong><?php esc_html_e('Plume – Before you deactivate', 'plume-media-offload'); ?></strong><br>
         <?php
         printf(
           /* translators: %1$s: offloaded file count, %2$s: Tools link, %3$s: WP-CLI command, %4$s: docs link */
-          esc_html__('%1$s media file(s) are offloaded to your bucket. Deactivating Nimbus without restoring them can break images across the site. First run Restore local copies from %2$s, then run %3$s to put post content back on local URLs. See %4$s.', 'usenimbus-media-offload'),
+          esc_html__('%1$s media file(s) are offloaded to your bucket. Deactivating Plume without restoring them can break images across the site. First run Restore local copies from %2$s, then run %3$s to put post content back on local URLs. See %4$s.', 'plume-media-offload'),
           '<strong>' . esc_html(number_format_i18n($offloaded)) . '</strong>',
-          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Nimbus → Tools', 'usenimbus-media-offload') . '</a>',
+          '<a href="' . esc_url($toolsUrl) . '">' . esc_html__('Plume → Tools', 'plume-media-offload') . '</a>',
           '<code>wp nimbus revert</code>',
-          '<a href="' . esc_url(self::RESTORE_DOCS_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Restoring files', 'usenimbus-media-offload') . '</a>'
+          '<a href="' . esc_url(self::RESTORE_DOCS_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Restoring files', 'plume-media-offload') . '</a>'
         );
         ?>
       </p>
@@ -307,7 +307,7 @@ final class SettingsUi
   }
 
   /**
-   * Adds a "⚠ Restore files first" action link next to Nimbus on the Plugins screen
+   * Adds a "⚠ Restore files first" action link next to Plume on the Plugins screen
    * when the DB contains CDN-rewritten attachments.
    *
    * @param array<string> $links Existing action links.
@@ -325,8 +325,8 @@ final class SettingsUi
       return $links;
     }
 
-    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'usenimbus-media-offload') . '</a>';
-    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'usenimbus-media-offload') . '</a>';
+    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'plume-media-offload') . '</a>';
+    $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'plume-media-offload') . '</a>';
 
     return $links;
   }
@@ -334,7 +334,7 @@ final class SettingsUi
   public function add_plugin_action_links(array $links): array
   {
     $settingsUrl = add_query_arg(['page' => NIMBUS_SLUG], admin_url('upload.php'));
-    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', 'usenimbus-media-offload') . '</a>');
+    array_unshift($links, '<a href="' . esc_url($settingsUrl) . '">' . esc_html__('Settings', 'plume-media-offload') . '</a>');
 
     $offloaded = (int) get_transient('nimbus_offloaded_count_cache');
     if ($offloaded === 0) {
@@ -352,7 +352,7 @@ final class SettingsUi
     if ($offloaded > 0) {
       $toolsUrl = add_query_arg(['page' => NIMBUS_SLUG, 'tab' => 'tools'], admin_url('upload.php'));
       $links[] = '<a href="' . esc_url($toolsUrl) . '" style="color:#d63638;font-weight:600;">'
-        . esc_html__('⚠ Restore files before deactivating', 'usenimbus-media-offload')
+        . esc_html__('⚠ Restore files before deactivating', 'plume-media-offload')
         . '</a>';
     }
 
