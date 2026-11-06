@@ -69,7 +69,7 @@ final class ApiController
           'type'              => 'string',
           'required'          => true,
           'sanitize_callback' => 'sanitize_key',
-          'description'       => __('The type of bulk job to start.', 'nimbus-media-offload'),
+          'description'       => __('The type of bulk job to start.', 'plume-media-offload'),
         ],
         'batch_size' => [
           'type'              => 'integer',
@@ -77,7 +77,7 @@ final class ApiController
           'minimum'           => 1,
           'maximum'           => 1000,
           'sanitize_callback' => 'absint',
-          'description'       => __('Number of attachments to process per worker batch.', 'nimbus-media-offload'),
+          'description'       => __('Number of attachments to process per worker batch.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -110,7 +110,7 @@ final class ApiController
           'default'           => 24,
           'minimum'           => 1,
           'sanitize_callback' => 'absint',
-          'description'       => __('Process attachments uploaded within this many hours.', 'nimbus-media-offload'),
+          'description'       => __('Process attachments uploaded within this many hours.', 'plume-media-offload'),
         ],
         'limit' => [
           'type'              => 'integer',
@@ -118,12 +118,12 @@ final class ApiController
           'minimum'           => 1,
           'maximum'           => 1000,
           'sanitize_callback' => 'absint',
-          'description'       => __('Maximum number of attachments to process in one request.', 'nimbus-media-offload'),
+          'description'       => __('Maximum number of attachments to process in one request.', 'plume-media-offload'),
         ],
         'background' => [
           'type'        => 'boolean',
           'default'     => true,
-          'description' => __('When true the offload is queued as a scheduled event and the request returns immediately.', 'nimbus-media-offload'),
+          'description' => __('When true the offload is queued as a scheduled event and the request returns immediately.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -138,12 +138,12 @@ final class ApiController
           'required'          => true,
           'minimum'           => 1,
           'sanitize_callback' => 'absint',
-          'description'       => __('Attachment post ID to offload.', 'nimbus-media-offload'),
+          'description'       => __('Attachment post ID to offload.', 'plume-media-offload'),
         ],
         'background' => [
           'type'        => 'boolean',
           'default'     => false,
-          'description' => __('When true the offload is queued as a scheduled event.', 'nimbus-media-offload'),
+          'description' => __('When true the offload is queued as a scheduled event.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -157,7 +157,7 @@ final class ApiController
           'type'              => 'string',
           'required'          => true,
           'sanitize_callback' => 'sanitize_key',
-          'description'       => __('Integration slug whose asset URLs should be rewritten.', 'nimbus-media-offload'),
+          'description'       => __('Integration slug whose asset URLs should be rewritten.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -171,13 +171,13 @@ final class ApiController
           'type'              => 'string',
           'required'          => true,
           'sanitize_callback' => 'sanitize_text_field',
-          'description'       => __('Bucket name to create.', 'nimbus-media-offload'),
+          'description'       => __('Bucket name to create.', 'plume-media-offload'),
         ],
         'region' => [
           'type'              => 'string',
           'default'           => '',
           'sanitize_callback' => 'sanitize_text_field',
-          'description'       => __('Storage region for the new bucket.', 'nimbus-media-offload'),
+          'description'       => __('Storage region for the new bucket.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -192,7 +192,7 @@ final class ApiController
           'required'          => true,
           'minimum'           => 1,
           'sanitize_callback' => 'absint',
-          'description'       => __('Attachment post ID to generate a presigned URL for.', 'nimbus-media-offload'),
+          'description'       => __('Attachment post ID to generate a presigned URL for.', 'plume-media-offload'),
         ],
         'ttl' => [
           'type'              => 'integer',
@@ -200,7 +200,7 @@ final class ApiController
           'minimum'           => 60,
           'maximum'           => 86400,
           'sanitize_callback' => 'absint',
-          'description'       => __('Signed URL lifetime in seconds (60–86400).', 'nimbus-media-offload'),
+          'description'       => __('Signed URL lifetime in seconds (60–86400).', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -214,18 +214,18 @@ final class ApiController
           'type'        => 'array',
           'default'     => [],
           'items'       => ['type' => 'string', 'format' => 'uri'],
-          'description' => __('Specific URLs to purge. When empty and purge_all is true, all cached URLs are purged.', 'nimbus-media-offload'),
+          'description' => __('Specific URLs to purge. When empty and purge_all is true, all cached URLs are purged.', 'plume-media-offload'),
         ],
         'purge_all' => [
           'type'        => 'boolean',
           'default'     => false,
-          'description' => __('When true, purge all cached URLs regardless of the urls list.', 'nimbus-media-offload'),
+          'description' => __('When true, purge all cached URLs regardless of the urls list.', 'plume-media-offload'),
         ],
         'reason' => [
           'type'              => 'string',
           'default'           => 'manual_api',
           'sanitize_callback' => 'sanitize_key',
-          'description'       => __('Reason code recorded in the purge log.', 'nimbus-media-offload'),
+          'description'       => __('Reason code recorded in the purge log.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -241,7 +241,7 @@ final class ApiController
           'minimum'           => 5,
           'maximum'           => 55,
           'sanitize_callback' => 'absint',
-          'description'       => __('Maximum number of seconds to hold the SSE connection open.', 'nimbus-media-offload'),
+          'description'       => __('Maximum number of seconds to hold the SSE connection open.', 'plume-media-offload'),
         ],
       ],
     ]);
@@ -346,7 +346,7 @@ final class ApiController
     $background = $this->toBool($request->get_param('background'), true);
 
     if (!$this->settings->is_enabled() || !$this->settings->has_valid_credentials()) {
-      return new \WP_Error('nimbus_not_ready', __('Storage is not configured well enough to process offloads.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_not_ready', __('Storage is not configured well enough to process offloads.', 'plume-media-offload'), ['status' => 400]);
     }
 
     if ($background) {
@@ -371,7 +371,7 @@ final class ApiController
     $background = $this->toBool($request->get_param('background'), false);
 
     if ($attachmentId <= 0) {
-      return new \WP_Error('nimbus_invalid_attachment', __('Attachment ID is required.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid_attachment', __('Attachment ID is required.', 'plume-media-offload'), ['status' => 400]);
     }
 
     if ($background) {
@@ -395,11 +395,11 @@ final class ApiController
     $key = sanitize_key((string) $request['key']);
 
     if ($key === '' || !$this->integrationDiscovery->canRewrite($key)) {
-      return new \WP_Error('nimbus_integration_unsupported', __('Rewrite automation is not available for this integration.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_integration_unsupported', __('Rewrite automation is not available for this integration.', 'plume-media-offload'), ['status' => 400]);
     }
 
     if (!$this->settings->has_valid_credentials()) {
-      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before rewriting integration asset URLs.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before rewriting integration asset URLs.', 'plume-media-offload'), ['status' => 400]);
     }
 
     return rest_ensure_response([
@@ -450,18 +450,18 @@ final class ApiController
       : null;
 
     if ($adapter === null) {
-      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before creating a bucket.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before creating a bucket.', 'plume-media-offload'), ['status' => 400]);
     }
 
     if (!method_exists($adapter, 'createBucket')) {
-      return new \WP_Error('nimbus_unsupported', __('The active storage provider does not support creating buckets via API.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_unsupported', __('The active storage provider does not support creating buckets via API.', 'plume-media-offload'), ['status' => 400]);
     }
 
     $name = sanitize_text_field((string) ($request->get_param('name') ?: ''));
     $region = sanitize_text_field((string) ($request->get_param('region') ?: ''));
 
     if ($name === '') {
-      return new \WP_Error('nimbus_invalid', __('Bucket name is required.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid', __('Bucket name is required.', 'plume-media-offload'), ['status' => 400]);
     }
 
     try {
@@ -480,23 +480,23 @@ final class ApiController
       : null;
 
     if ($adapter === null) {
-      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before generating signed URLs.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_credentials_missing', __('Configure storage credentials before generating signed URLs.', 'plume-media-offload'), ['status' => 400]);
     }
 
     if (!method_exists($adapter, 'presign')) {
-      return new \WP_Error('nimbus_unsupported', __('The active storage provider does not support signed URLs.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_unsupported', __('The active storage provider does not support signed URLs.', 'plume-media-offload'), ['status' => 400]);
     }
 
     $attachmentId = (int) ($request->get_param('attachment_id') ?? 0);
     $ttl = min(86400, max(60, (int) ($request->get_param('ttl') ?? 3600)));
 
     if ($attachmentId <= 0) {
-      return new \WP_Error('nimbus_invalid', __('attachment_id is required.', 'nimbus-media-offload'), ['status' => 400]);
+      return new \WP_Error('nimbus_invalid', __('attachment_id is required.', 'plume-media-offload'), ['status' => 400]);
     }
 
     $meta = get_post_meta($attachmentId, NIMBUS_META_KEY, true);
     if (!is_array($meta) || empty($meta['key'])) {
-      return new \WP_Error('nimbus_not_offloaded', __('This attachment has not been offloaded.', 'nimbus-media-offload'), ['status' => 404]);
+      return new \WP_Error('nimbus_not_offloaded', __('This attachment has not been offloaded.', 'plume-media-offload'), ['status' => 404]);
     }
 
     try {

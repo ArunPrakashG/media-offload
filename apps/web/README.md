@@ -1,6 +1,6 @@
-# Nimbus — Website
+# Plume — Website
 
-Marketing and documentation site for the Nimbus WordPress plugin.
+Marketing and documentation site for the Plume WordPress plugin.
 
 ## Stack (to be decided)
 

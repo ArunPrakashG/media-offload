@@ -1,16 +1,16 @@
 ---
-title: "Nimbus compared"
-description: "A factual comparison of Nimbus with other WordPress media offload plugins: price, limits, storage providers, migration, cache purging and integrations."
+title: "Plume compared"
+description: "A factual comparison of Plume with other WordPress media offload plugins: price, limits, storage providers, migration, cache purging and integrations."
 updated: 2026-11-03
 ---
 
-Nimbus is free and released under the MIT License. Every feature is included on every install, with no media cap and no limit on sites. This page compares it with other WordPress media offload plugins, both paid and free.
+Plume is free and released under the MIT License. Every feature is included on every install, with no media cap and no limit on sites. This page compares it with other WordPress media offload plugins, both paid and free.
 
 ## Free tiers of other plugins
 
-Some other offload plugins now have a free tier. This table shows what Nimbus includes compared with a typical free-tier plugin.
+Some other offload plugins now have a free tier. This table shows what Plume includes compared with a typical free-tier plugin.
 
-| In the free tier | Nimbus | Typical free-tier plugin |
+| In the free tier | Plume | Typical free-tier plugin |
 | --- | --- | --- |
 | Bulk migration of existing library | Yes. Unlimited, with pause, resume and live progress | Often a paid add-on, or a capped batch size |
 | Cache purge automation | Yes. Cloudflare, LiteSpeed, WP Fastest Cache and proxy | Rarely included |
@@ -26,7 +26,7 @@ This is based on the published feature lists and pricing pages of active WordPre
 
 Competitor figures are representative of the leading per-file pricing plugins at regular, non-promotional rates, shown per year.
 
-| Plan | Nimbus | Other plugins |
+| Plan | Plume | Other plugins |
 | --- | --- | --- |
 | Price | $0. Unlimited sites, unlimited media, every feature | $99 to $1,199 per year, depending on media volume |
 | Media file cap | None | Hard cap per plan, from 2K to 500K items, with unlimited as a paid extra |
@@ -35,7 +35,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Pricing and limits
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Media file cap | None | Hard cap per plan (2K, 500K, then paid extra for unlimited) |
 | Free plan | Yes. Unlimited sites and media, no time limit | No. Paid only |
@@ -43,7 +43,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Storage providers
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Amazon S3 | Yes | Yes |
 | Cloudflare R2 | Yes. Dedicated profile: endpoint, region and path-style are set from your Account ID | Manual S3-compatible setup |
@@ -58,7 +58,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Media delivery
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Automatic URL rewriting | Yes | Yes |
 | Custom CDN delivery domain | Yes. Any CDN edge or subdomain | Varies by plugin |
@@ -66,7 +66,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Migration and scheduling
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Bulk migrate existing library | Yes | Yes |
 | Pause and resume bulk migration | Yes. Survives server restarts | Background process only, no pause or resume |
@@ -76,7 +76,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Offload rules
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Filter by MIME type | Yes | Varies by plugin |
 | Filter by minimum file size | Yes | No |
@@ -84,7 +84,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Cache purging
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Cloudflare cache purge | Yes. Automatic after every offload | No |
 | LiteSpeed and WP Fastest Cache purge | Yes | No |
@@ -92,14 +92,14 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Analytics
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Storage usage dashboard | Yes. MIME breakdown and trend charts | No |
 | S3 and R2 cost comparison | Yes. Estimate based on your library size | No |
 
 ### Integrations
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Page-builder URL rewriting (Elementor and others) | Yes | Separate paid add-ons |
 | WooCommerce signed download URLs | Yes | Paid add-on required |
@@ -108,7 +108,7 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Developer and automation
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | WP-CLI commands | Yes. Full `wp nimbus` command suite | Yes. Basic commands |
 | REST API (read and job control) | Yes. Trigger jobs and query status | No |
@@ -118,15 +118,15 @@ Competitor figures are representative of the leading per-file pricing plugins at
 
 ### Support
 
-| Feature | Nimbus | Other plugins |
+| Feature | Plume | Other plugins |
 | --- | --- | --- |
 | Community support | Yes. GitHub issues and email | Yes, paid plans only |
 
-## Nimbus and the market leader
+## Plume and the market leader
 
-The market leader here is the most widely installed WordPress media offload plugin. This table compares it with Nimbus on specific capabilities.
+The market leader here is the most widely installed WordPress media offload plugin. This table compares it with Plume on specific capabilities.
 
-| Capability | Nimbus | Market leader |
+| Capability | Plume | Market leader |
 | --- | --- | --- |
 | Cloudflare R2 dedicated profile | Yes. Enter Account ID, bucket and API token. Endpoint, region and path-style are filled in | Manual S3-compatible setup, no R2-specific guidance |
 | Switching providers | Change a setting | Full database search-replace required |
@@ -145,22 +145,22 @@ The market leader here is the most widely installed WordPress media offload plug
 
 ## Frequently asked questions
 
-### Is Nimbus free?
+### Is Plume free?
 
 Yes. Bulk migration, nightly scheduling, cache purge, cost analytics, page-builder rewriting, WooCommerce signed downloads and multisite network admin are all included. There is no license key and no paid tier.
 
 ### Is there a limit on sites or media files?
 
-No. You can run Nimbus on as many WordPress installations as you like, with any amount of media. There is no activation limit and no per-file cap.
+No. You can run Plume on as many WordPress installations as you like, with any amount of media. There is no activation limit and no per-file cap.
 
-### Is Nimbus open source?
+### Is Plume open source?
 
-Yes. Nimbus is released under the MIT License and its source is public on [GitHub](https://github.com/ArunPrakashG/media-offload). Contributions, bug reports and feature requests are welcome.
+Yes. Plume is released under the MIT License and its source is public on [GitHub](https://github.com/ArunPrakashG/media-offload). Contributions, bug reports and feature requests are welcome.
 
 ### Do updates and support require payment?
 
 No. Every release is free on GitHub. Support is community-based, through GitHub issues and email. No license or subscription is needed.
 
-### Which storage providers does Nimbus support?
+### Which storage providers does Plume support?
 
-Nimbus has nine provider profiles: Amazon S3, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces, Backblaze B2, Wasabi, MinIO, a generic S3-compatible option for any other S3-speaking provider, and local disk for development. Setup for Cloudflare R2 and Google Cloud Storage is shortened: enter your Account ID or HMAC key and the rest is filled in. See the [documentation](/docs/) and the [Cloudflare R2 guide](/docs/providers/cloudflare-r2/) for setup steps.
+Plume has nine provider profiles: Amazon S3, Cloudflare R2, Google Cloud Storage, DigitalOcean Spaces, Backblaze B2, Wasabi, MinIO, a generic S3-compatible option for any other S3-speaking provider, and local disk for development. Setup for Cloudflare R2 and Google Cloud Storage is shortened: enter your Account ID or HMAC key and the rest is filled in. See the [documentation](/docs/) and the [Cloudflare R2 guide](/docs/providers/cloudflare-r2/) for setup steps.

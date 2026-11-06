@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Nimbus docs: Cloudflare R2</title>
+<title>Plume docs: Cloudflare R2</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -30,13 +30,13 @@ body{margin:0}
 <header style="border-bottom: 1px solid var(--nmb-border)">
 <div style="max-width: 1280px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
 <div style="display: flex; align-items: center; gap: 16px">
-<a href="#" aria-label="Nimbus home" style="display: flex; align-items: center; gap: 10px; text-decoration: none"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="7.5" fill="#0E1014" stroke="#343B46"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.03em">nimbus</span></a>
+<a href="#" aria-label="Plume home" style="display: flex; align-items: center; gap: 10px; text-decoration: none"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="7.5" fill="#0E1014" stroke="#343B46"></rect><g fill="#C6F135" transform="translate(0 1)"><circle cx="11.5" cy="16.5" r="4.5"></circle><circle cx="18.5" cy="13" r="6.5"></circle><path d="M7 16.5H21.75A3.25 3.25 0 0 1 21.75 23H7Z"></path></g></svg><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.03em">plume</span></a>
 <span style="font-size: 15px; color: var(--nmb-text-3)">Docs</span>
 </div>
 <div style="display: flex; align-items: center; gap: 8px">
 <label for="doc-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search docs</label>
 <input id="doc-search" type="search" placeholder="Search docs" style="height: 40px; width: 220px; border-radius: 6px; border: 1px solid var(--nmb-border-strong); background: var(--nmb-surface); color: inherit; padding: 0 12px; font: inherit; font-size: 14px; box-sizing: border-box">
-<a href="#" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; background: #C6F135; color: #0E1014; text-decoration: none; font-size: 14px; font-weight: 600">Get Nimbus</a>
+<a href="#" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; background: #C6F135; color: #0E1014; text-decoration: none; font-size: 14px; font-weight: 600">Get Plume</a>
 </div>
 </div>
 </header>
@@ -71,14 +71,14 @@ body{margin:0}
 <thead><tr style="background: var(--nmb-surface-2); text-align: left"><th scope="col" style="padding: 12px 16px; font-weight: 500">Field</th><th scope="col" style="padding: 12px 16px; font-weight: 500">Where to find it</th></tr></thead>
 <tbody>
 <tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Bucket</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Your R2 bucket name, for example <code class="i">nimbus-media</code></td></tr>
-<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">R2 Account ID</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Dashboard → Overview. Nimbus builds the endpoint from it.</td></tr>
+<tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">R2 Account ID</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Dashboard → Overview. Plume builds the endpoint from it.</td></tr>
 <tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Access Key</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Access Key ID from the token</td></tr>
 <tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Secret Key</td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Secret Access Key from the token</td></tr>
 <tr style="border-top: 1px solid var(--nmb-border)"><td style="padding: 12px 16px; font-weight: 500">Endpoint <span style="font-weight: 400; color: var(--nmb-text-3)">(optional)</span></td><td style="padding: 12px 16px; color: var(--nmb-text-2)">Leave empty unless you use a custom R2 endpoint</td></tr>
 </tbody>
 </table>
 </div>
-<div role="note" style="display: flex; gap: 12px; padding: 16px; border-radius: 10px; background: var(--nmb-volt-tint); font-size: 15px; line-height: 24px"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"></circle><path d="M10 9v5M10 6.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><p style="margin: 0"><strong style="font-weight: 600">Tip:</strong> connect a custom domain to the bucket in Cloudflare, then set it as the delivery domain in Nimbus so files are cached at the edge.</p></div>
+<div role="note" style="display: flex; gap: 12px; padding: 16px; border-radius: 10px; background: var(--nmb-volt-tint); font-size: 15px; line-height: 24px"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"></circle><path d="M10 9v5M10 6.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><p style="margin: 0"><strong style="font-weight: 600">Tip:</strong> connect a custom domain to the bucket in Cloudflare, then set it as the delivery domain in Plume so files are cached at the edge.</p></div>
 
 <h2 id="test" style="margin: 16px 0 0; font-size: 24px; letter-spacing: -0.02em; font-weight: 600">3. Test and offload</h2>
 <p style="margin: 0; font-size: 16px; line-height: 27px; color: var(--nmb-text-2)">Select <strong style="color: var(--nmb-text); font-weight: 500">Test connection</strong>. When it passes, new uploads go to R2. To move existing files, start a bulk job from <strong style="color: var(--nmb-text); font-weight: 500">Tools</strong> or run:</p>

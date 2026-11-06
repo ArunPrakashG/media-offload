@@ -1,48 +1,48 @@
-# Nimbus — Feature & Plan Reference
+# Plume — Feature & Plan Reference
 
 > **Internal notes:**
 >
 > - Token tier keys are `personal`, `pro`, `agency`. Rename to match final marketing names before launch. Free tier token uses `free` (or equivalent) — issued during onboarding when the site registers with our server.
 > - **Free requires a license key** obtained by registering during onboarding (site connects to our licensing server). This is different from a no-key anonymous install. `isActive()` returns `true` for free users; feature flags are just absent from the token.
 > - Multisite: works per-site (each sub-site has independent settings + license via `get_option`/`home_url()`). No network-admin panel exists yet — each sub-site must be configured individually. Do not market as "full multisite support" without a network admin screen.
-> - **DB writes after offload:** After a successful offload, Nimbus updates four things in the DB: (1) `_nimbus` postmeta — the storage key + per-size keys map; (2) `_wp_attached_file` — updated to the relative storage key (e.g. `2024/01/image.jpg`); (3) `_wp_attachment_metadata['file']` — also updated to the relative storage key; (4) `post_content` / `post_excerpt` in posts — local upload URL is search-replaced with the CDN URL. All four writes are **reversed** on restore via `revert_attachment_url_in_db()`. Never claim "no DB modification" — the plugin absolutely modifies the database.
-> - **Provider-portable vs WP Offload Media:** The critical difference is _what_ is stored. Nimbus stores the relative storage key (`2024/01/image.jpg`), not a full provider URL. WP Offload Media stores the full S3/CDN URL (`https://bucket.s3.amazonaws.com/2024/01/image.jpg`). This means Nimbus DB content is provider-agnostic — switching CDN domain or provider requires only a settings change, no DB find-replace. WP Offload Media requires a full DB migration on every provider switch. Lead with "reversible, provider-portable writes" not "non-destructive" or "no DB modification."
+> - **DB writes after offload:** After a successful offload, Plume updates four things in the DB: (1) `_nimbus` postmeta — the storage key + per-size keys map; (2) `_wp_attached_file` — updated to the relative storage key (e.g. `2024/01/image.jpg`); (3) `_wp_attachment_metadata['file']` — also updated to the relative storage key; (4) `post_content` / `post_excerpt` in posts — local upload URL is search-replaced with the CDN URL. All four writes are **reversed** on restore via `revert_attachment_url_in_db()`. Never claim "no DB modification" — the plugin absolutely modifies the database.
+> - **Provider-portable vs WP Offload Media:** The critical difference is _what_ is stored. Plume stores the relative storage key (`2024/01/image.jpg`), not a full provider URL. WP Offload Media stores the full S3/CDN URL (`https://bucket.s3.amazonaws.com/2024/01/image.jpg`). This means Plume DB content is provider-agnostic — switching CDN domain or provider requires only a settings change, no DB find-replace. WP Offload Media requires a full DB migration on every provider switch. Lead with "reversible, provider-portable writes" not "non-destructive" or "no DB modification."
 
 ---
 
 ---
 
-## Why Nimbus vs WP Offload Media
+## Why Plume vs WP Offload Media
 
 WP Offload Media (Delicious Brains / WP Engine) is the market leader with 30,000+ active installs. Here is an honest feature-by-feature comparison to guide marketing positioning.
 
 ### Where WP Offload Media wins today
 
 - Longer track record and community trust
-- Google Cloud Storage and DigitalOcean Spaces support (Nimbus does not have these)
-- Assets Pull addon (offload CSS/JS/fonts to CDN) — Nimbus does not have this
+- Google Cloud Storage and DigitalOcean Spaces support (Plume does not have these)
+- Assets Pull addon (offload CSS/JS/fonts to CDN) — Plume does not have this
 - WooCommerce and Easy Digital Downloads protected-file integrations
 - "Create bucket from settings page" UX
 
-### Where Nimbus wins — the points to lead with
+### Where Plume wins — the points to lead with
 
 **1. Cloudflare R2 is a first-class citizen**
-WP Offload Media treats R2 as a generic S3-compatible endpoint — you need to manually figure out the right endpoint URL and settings. Nimbus has a dedicated R2 provider profile: just enter your Account ID, everything else (region `auto`, path-style, endpoint) is handled automatically. For most new users in 2024+ R2 is the obvious choice (zero egress fees), and Nimbus is the path of least resistance for it.
+WP Offload Media treats R2 as a generic S3-compatible endpoint — you need to manually figure out the right endpoint URL and settings. Plume has a dedicated R2 provider profile: just enter your Account ID, everything else (region `auto`, path-style, endpoint) is handled automatically. For most new users in 2024+ R2 is the obvious choice (zero egress fees), and Plume is the path of least resistance for it.
 
 **2. Reversible, provider-portable DB rewrites**
-WP Offload Media stores the full provider URL (e.g. `https://bucket.s3.amazonaws.com/2024/01/img.jpg`) in `_wp_attached_file`, permanently coupling your DB to a specific provider. Switching providers or CDN domains requires a full DB find-replace migration. Nimbus stores only the relative storage key (e.g. `2024/01/img.jpg`) — the CDN URL is reconstructed at render time from current settings. After offload, Nimbus writes four things to the DB (`_nimbus` postmeta, `_wp_attached_file`, `_wp_attachment_metadata[file]`, and replaces local URLs in `post_content`). Every write is fully reversed on restore — switch providers or revert to local with a settings change, no DB migration required.
+WP Offload Media stores the full provider URL (e.g. `https://bucket.s3.amazonaws.com/2024/01/img.jpg`) in `_wp_attached_file`, permanently coupling your DB to a specific provider. Switching providers or CDN domains requires a full DB find-replace migration. Plume stores only the relative storage key (e.g. `2024/01/img.jpg`) — the CDN URL is reconstructed at render time from current settings. After offload, Plume writes four things to the DB (`_nimbus` postmeta, `_wp_attached_file`, `_wp_attachment_metadata[file]`, and replaces local URLs in `post_content`). Every write is fully reversed on restore — switch providers or revert to local with a settings change, no DB migration required.
 
 **3. Cache purge automation is built-in**
-WP Offload Media offers no cache purge integration — you get stale CDN responses after offloads and bulk migrations and have to purge manually or write your own code. Nimbus includes automated purge for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and any Nginx/proxy via configurable PURGE templates — triggered automatically after every offload, rewrite, or bulk migration.
+WP Offload Media offers no cache purge integration — you get stale CDN responses after offloads and bulk migrations and have to purge manually or write your own code. Plume includes automated purge for Cloudflare, LiteSpeed Cache, WP Fastest Cache, and any Nginx/proxy via configurable PURGE templates — triggered automatically after every offload, rewrite, or bulk migration.
 
 **4. Intelligent background jobs with pauseable state**
-WP Offload Media runs bulk migration as a synchronous or simple background process. Nimbus has a full persistent job engine: pause mid-migration, see progress in real time, auto-retry failures, and resume from exactly where it stopped — all without touching WP-CLI.
+WP Offload Media runs bulk migration as a synchronous or simple background process. Plume has a full persistent job engine: pause mid-migration, see progress in real time, auto-retry failures, and resume from exactly where it stopped — all without touching WP-CLI.
 
 **5. Nightly off-hours batch processing**
-WP Offload Media has no configurable off-hours scheduling. Nimbus can be set to run heavy offload work at 3 AM with up to 8 parallel workers (Agency), avoiding peak-traffic performance hits.
+WP Offload Media has no configurable off-hours scheduling. Plume can be set to run heavy offload work at 3 AM with up to 8 parallel workers (Agency), avoiding peak-traffic performance hits.
 
 **6. Page-builder + gallery integration URL rewriting**
-WP Offload Media requires separate paid add-ons for Elementor, NextGEN, etc. Nimbus detects and handles Smart Slider 3, Elementor, Slider Revolution, and NextGEN Gallery URL rewriting out of the box on paid plans — database-level migration for legacy content.
+WP Offload Media requires separate paid add-ons for Elementor, NextGEN, etc. Plume detects and handles Smart Slider 3, Elementor, Slider Revolution, and NextGEN Gallery URL rewriting out of the box on paid plans — database-level migration for legacy content.
 
 **7. Transparent storage cost analytics**
 Built-in side-by-side S3 vs R2 cost comparison based on the user's actual library size. WP Offload Media shows no cost analytics.
@@ -96,7 +96,7 @@ Clean hook-based extension bus (`nimbus/extensions/register`), a published event
 
 ## Free Plan
 
-A free license is issued during onboarding — the site registers with Nimbus's licensing server and receives a free-tier token. No credit card required. The complete offload pipeline is available immediately after registration. The free tier is intentionally generous to earn trust and lower the barrier to switching from WP Offload Media.
+A free license is issued during onboarding — the site registers with Plume's licensing server and receives a free-tier token. No credit card required. The complete offload pipeline is available immediately after registration. The free tier is intentionally generous to earn trust and lower the barrier to switching from WP Offload Media.
 
 ### Storage & offload
 
@@ -109,7 +109,7 @@ A free license is issued during onboarding — the site registers with Nimbus's 
 
 ### URL delivery
 
-- After a successful offload, Nimbus updates `_wp_attached_file`, `_wp_attachment_metadata['file']`, and `post_content` URLs to the CDN URL. The storage key stored is a relative path (e.g. `2024/01/image.jpg`), not a provider-specific URL — so switching CDN domains or providers requires only a settings change.
+- After a successful offload, Plume updates `_wp_attached_file`, `_wp_attachment_metadata['file']`, and `post_content` URLs to the CDN URL. The storage key stored is a relative path (e.g. `2024/01/image.jpg`), not a provider-specific URL — so switching CDN domains or providers requires only a settings change.
 - All DB writes are reversed on restore via the built-in restore flow
 - Custom CDN / delivery domain (e.g. `cdn.yourdomain.com`)
 - `serve_from_storage` toggle — flip a switch to serve from local or remote without changing any data

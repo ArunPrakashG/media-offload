@@ -1,10 +1,10 @@
 /**
- * Nimbus E2E test suite – full offload lifecycle via MinIO (S3-compatible).
+ * Plume E2E test suite – full offload lifecycle via MinIO (S3-compatible).
  *
  * Prerequisites (handled by the dev docker-compose):
  *   - WordPress running at http://localhost:8080
  *   - MinIO running at http://localhost:9000  (bucket: nimbus-test)
- *   - Nimbus plugin installed and active
+ *   - Plume plugin installed and active
  *
  * Run:
  *   cd tests/e2e && pnpm install && pnpm test
@@ -66,7 +66,7 @@ test.describe("Authentication", () => {
 // ── Plugin activation ─────────────────────────────────────────────────────────
 
 test.describe("Plugin status", () => {
-  test("Nimbus plugin is active", async ({ page }) => {
+  test("Plume plugin is active", async ({ page }) => {
     await wpLogin(page);
     await page.goto("/wp-admin/plugins.php");
     const row = page.locator('#the-list tr[data-slug="nimbus"]');
@@ -93,7 +93,7 @@ test.describe("Plugin status", () => {
 // ── Credential setup ──────────────────────────────────────────────────────────
 
 test.describe("Storage configuration", () => {
-  test("Nimbus settings page is accessible", async ({ page }) => {
+  test("Plume settings page is accessible", async ({ page }) => {
     await wpLogin(page);
     await openNimbusSettings(page);
     await expect(page).toHaveURL(/page=nimbus/);
@@ -189,7 +189,7 @@ test.describe("Offload lifecycle", () => {
         "X-WP-Nonce": nonce,
       },
       data: {
-        title: "Nimbus test post",
+        title: "Plume test post",
         content: `<!-- wp:image {"id":${attachmentId}} --><figure><img src="${cdnUrl}" /></figure><!-- /wp:image -->`,
         status: "publish",
       },
@@ -335,7 +335,7 @@ test.describe("Deactivation hints", () => {
     );
   });
 
-  test('"Revert URLs before deactivating" action link appears for Nimbus', async ({
+  test('"Revert URLs before deactivating" action link appears for Plume', async ({
     page,
   }) => {
     await wpLogin(page);
@@ -399,9 +399,9 @@ test.describe("Nightly batch configuration", () => {
   });
 });
 
-// ── Nimbus REST API ───────────────────────────────────────────────────────────
+// ── Plume REST API ───────────────────────────────────────────────────────────
 
-test.describe("Nimbus REST API", () => {
+test.describe("Plume REST API", () => {
   test("/status returns plugin + statistics shape", async ({ page }) => {
     await wpLogin(page);
     const { ok, body } = await callNimbusApi(page, "/status");
@@ -700,7 +700,7 @@ test.describe("Attachment edit screen", () => {
     expect(editAttachmentId).toBeGreaterThan(0);
   });
 
-  test("edit screen shows Nimbus status badge for an offloaded attachment", async ({
+  test("edit screen shows Plume status badge for an offloaded attachment", async ({
     page,
   }) => {
     test.skip(editAttachmentId === 0, "Depends on setup test");
@@ -716,7 +716,7 @@ test.describe("Attachment edit screen", () => {
 });
 
 // ── Non-destructive DB invariants ─────────────────────────────────────────────
-// Core architectural promise: Nimbus rewrites attachment metadata to point at
+// Core architectural promise: Plume rewrites attachment metadata to point at
 // the bucket key (not a full provider URL), and replaces local URLs with CDN
 // URLs in post_content at the DB level so no runtime filter is required.
 
@@ -1125,7 +1125,7 @@ test.describe("Idempotency & edge cases", () => {
       { headers: { "X-WP-Nonce": nonce } },
     );
     // The endpoint fires the action but the attachment doesn't exist;
-    // WP may return 200 with empty nimbus_meta, or the Nimbus handler returns
+    // WP may return 200 with empty nimbus_meta, or the Plume handler returns
     // early. Either way it must NOT crash with 5xx.
     expect(resp.status()).toBeLessThan(500);
   });

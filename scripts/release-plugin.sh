@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Package apps/plugin/nimbus into dist/nimbus-media-offload-<version>.zip plus a
-# .sha256 file. The zip holds one nimbus-media-offload/ folder, the WordPress.org slug.
+# Package apps/plugin/nimbus into dist/plume-media-offload-<version>.zip plus a
+# .sha256 file. The zip holds one plume-media-offload/ folder, the WordPress.org slug.
 #
 # Copies the tracked plugin files, runs `composer install --no-dev` in Docker
 # (the AWS SDK is trimmed to the S3 client by composer.json), drops everything
@@ -16,7 +16,7 @@ version="$(sed -n "s/^define('NIMBUS_VERSION', '\([^']*\)');/\1/p" "$plugin/nimb
 dist="$root/dist"
 build="$(mktemp -d)"
 trap 'rm -rf "$build"' EXIT
-slug="nimbus-media-offload"
+slug="plume-media-offload"
 mkdir -p "$dist" "$build/$slug"
 
 (cd "$plugin" && git ls-files -z . | xargs -0 -I{} cp --parents {} "$build/$slug/")

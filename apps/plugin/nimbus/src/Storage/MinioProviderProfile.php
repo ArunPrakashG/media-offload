@@ -33,37 +33,37 @@ final class MinioProviderProfile extends AbstractProviderProfile implements Prov
 
   public function label(): string
   {
-    return __('MinIO', 'nimbus-media-offload');
+    return __('MinIO', 'plume-media-offload');
   }
 
   public function title(): string
   {
-    return __('MinIO', 'nimbus-media-offload');
+    return __('MinIO', 'plume-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Self-hosted S3-compatible object storage. Enter the full URL of your MinIO server as the custom endpoint. Path-style requests are enabled automatically.', 'nimbus-media-offload');
+    return __('Self-hosted S3-compatible object storage. Enter the full URL of your MinIO server as the custom endpoint. Path-style requests are enabled automatically.', 'plume-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket'   => __('Bucket', 'nimbus-media-offload'),
-      'endpoint' => __('MinIO Endpoint URL', 'nimbus-media-offload'),
-      'access_key' => __('Access Key', 'nimbus-media-offload'),
-      'secret_key' => __('Secret Key', 'nimbus-media-offload'),
+      'bucket'   => __('Bucket', 'plume-media-offload'),
+      'endpoint' => __('MinIO Endpoint URL', 'plume-media-offload'),
+      'access_key' => __('Access Key', 'plume-media-offload'),
+      'secret_key' => __('Secret Key', 'plume-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The bucket name on your MinIO server.', 'nimbus-media-offload'),
-      'endpoint'      => __('Full URL of your MinIO server, e.g. https://minio.example.com. Required — MinIO does not use a shared cloud endpoint.', 'nimbus-media-offload'),
-      'access_key'    => __('MinIO access key (root user or a policy-scoped key from the MinIO console).', 'nimbus-media-offload'),
-      'secret_key'    => __('MinIO secret key paired with the access key above.', 'nimbus-media-offload'),
-      'region'        => __('MinIO does not enforce regions — leave as us-east-1 or any value your server accepts.', 'nimbus-media-offload'),
+      'bucket'        => __('The bucket name on your MinIO server.', 'plume-media-offload'),
+      'endpoint'      => __('Full URL of your MinIO server, e.g. https://minio.example.com. Required — MinIO does not use a shared cloud endpoint.', 'plume-media-offload'),
+      'access_key'    => __('MinIO access key (root user or a policy-scoped key from the MinIO console).', 'plume-media-offload'),
+      'secret_key'    => __('MinIO secret key paired with the access key above.', 'plume-media-offload'),
+      'region'        => __('MinIO does not enforce regions — leave as us-east-1 or any value your server accepts.', 'plume-media-offload'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

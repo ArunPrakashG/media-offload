@@ -1,12 +1,12 @@
 ---
 title: Restoring files
 nav: Restoring files
-description: Bring offloaded media back to your server with Nimbus, for one attachment or the whole library, and put post content back on local URLs.
+description: Bring offloaded media back to your server with Plume, for one attachment or the whole library, and put post content back on local URLs.
 section: guides
 order: 4
 ---
 
-Restoring downloads offloaded files back into `wp-content/uploads` and clears the Nimbus offload record. Use it before you uninstall Nimbus or switch providers.
+Restoring downloads offloaded files back into `wp-content/uploads` and clears the Plume offload record. Use it before you uninstall Plume or switch providers.
 
 ## Restore one attachment
 
@@ -24,7 +24,7 @@ wp nimbus download --limit=200
 
 ## Restore the whole library
 
-1. Go to **Media → Nimbus → Tools**.
+1. Go to **Media → Plume → Tools**.
 2. Under **Bulk media jobs**, select **Restore local copies**.
 3. Wait for the job to finish. Use **Retry failed items** if some files failed.
 
@@ -46,7 +46,7 @@ wp nimbus replace-urls --from=https://cdn.example.com/media --to=https://example
 
 `replace-urls` changes `post_content` only, and stops after `--limit` posts. The default is 500.
 
-## Uninstalling Nimbus
+## Uninstalling Plume
 
 Before you deactivate the plugin, run the restore job and `wp nimbus revert`. Otherwise posts may still point at the bucket.
 

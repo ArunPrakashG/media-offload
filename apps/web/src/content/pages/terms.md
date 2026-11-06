@@ -1,14 +1,14 @@
 ---
 title: "Terms of Use"
-description: "Terms for using the Nimbus WordPress plugin and the usenimbus.dev website, including the MIT License grant, support, warranty and liability."
+description: "Terms for using the Plume WordPress plugin and the usenimbus.dev website, including the MIT License grant, support, warranty and liability."
 updated: 2026-11-03
 ---
 
-These terms apply to the Nimbus WordPress plugin ("Software") and the website usenimbus.dev. By downloading or using the Software, you agree to them. If you do not agree, do not use the Software.
+These terms apply to the Plume WordPress plugin ("Software") and the website usenimbus.dev. By downloading or using the Software, you agree to them. If you do not agree, do not use the Software.
 
 ## License
 
-Nimbus is free and open-source software released under the MIT License. Copyright (c) 2026 Arun Prakash.
+Plume is free and open-source software released under the MIT License. Copyright (c) 2026 Arun Prakash.
 
 Under the MIT License you may use, copy, modify, merge, publish, distribute, sublicense and sell copies of the Software. You may do this on any number of sites, free of charge. The one condition is that the copyright notice and the permission notice are included in all copies or substantial portions of the Software.
 
@@ -26,11 +26,11 @@ Support is community-based and given on a best-effort basis. You can use the Git
 
 ## Third-party services
 
-The Software works with cloud storage providers, such as Amazon S3 and Cloudflare R2, and with cache plugins that you configure yourself. Their own terms and privacy policies apply to your use of them. Nimbus is not responsible for the actions, availability or data handling of any third-party provider you connect.
+The Software works with cloud storage providers, such as Amazon S3 and Cloudflare R2, and with cache plugins that you configure yourself. Their own terms and privacy policies apply to your use of them. Plume is not responsible for the actions, availability or data handling of any third-party provider you connect.
 
 ## Trademarks
 
-"Nimbus" and the Nimbus logo identify this project. The MIT License covers the code. It does not give permission to use the name or logo to suggest endorsement of a competing or forked product.
+"Plume" and the Plume logo identify this project. The MIT License covers the code. It does not give permission to use the name or logo to suggest endorsement of a competing or forked product.
 
 ## No warranty
 

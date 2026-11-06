@@ -34,7 +34,7 @@ export async function wpLogin(page: Page): Promise<void> {
   await page.waitForURL(/wp-admin/);
 }
 
-// ── Nimbus settings helpers ───────────────────────────────────────────────────
+// ── Plume settings helpers ───────────────────────────────────────────────────
 
 export async function openNimbusSettings(page: Page, tab = ""): Promise<void> {
   const url = tab
@@ -44,7 +44,7 @@ export async function openNimbusSettings(page: Page, tab = ""): Promise<void> {
 }
 
 /**
- * Configure Nimbus storage credentials via the Settings tab to point at the
+ * Configure Plume storage credentials via the Settings tab to point at the
  * local MinIO S3-compatible bucket.
  *
  * Field names follow the pattern `nimbus_settings[key]` — keys come from
@@ -196,7 +196,7 @@ export async function runWpCron(page: Page): Promise<void> {
 }
 
 /**
- * Force-run the Nimbus offload synchronously for a given attachment ID by
+ * Force-run the Plume offload synchronously for a given attachment ID by
  * calling the test-only REST endpoint registered by mu-plugins/nimbus-test-helpers.php.
  * Returns the `source_url` after the offload completes.
  */
@@ -205,7 +205,7 @@ export async function forceOffload(
   attachmentId: number,
 ): Promise<string> {
   // Always use getWpNonce which navigates to /wp-admin/ if the nonce is not
-  // available on the current page (e.g. after visiting the Nimbus settings tab
+  // available on the current page (e.g. after visiting the Plume settings tab
   // which may not enqueue wp-api-settings on every sub-page).
   const nonce = await getWpNonce(page);
   const resp = await page.request.post(
@@ -236,7 +236,7 @@ export async function getWpNonce(page: Page): Promise<string> {
 }
 
 /**
- * Call a Nimbus REST API endpoint (`/nimbus/v1{endpoint}`) with the current
+ * Call a Plume REST API endpoint (`/nimbus/v1{endpoint}`) with the current
  * session nonce.  Returns `{ ok, status, body }` where `body` is the parsed
  * JSON value (object, array, or raw string on parse failure).
  */
@@ -331,7 +331,7 @@ export async function getAttachmentSourceUrl(
   return (json?.source_url as string) ?? "";
 }
 
-// ── Nimbus setting manipulation ───────────────────────────────────────────────
+// ── Plume setting manipulation ───────────────────────────────────────────────
 
 /**
  * Set a single `nimbus_settings` key via the test-helper REST endpoint.

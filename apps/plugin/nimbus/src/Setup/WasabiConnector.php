@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 
 /**
  * Wasabi from a root or admin access key. Wasabi speaks the AWS IAM API, so
- * Nimbus creates a user that can only reach the media bucket and saves its key.
+ * Plume creates a user that can only reach the media bucket and saves its key.
  */
 final class WasabiConnector
 {
@@ -28,10 +28,10 @@ final class WasabiConnector
     $region = sanitize_key((string) ($input['region'] ?? 'us-east-1'));
 
     if ($key === '' || $secret === '') {
-      throw new QuickConnectException(esc_html__('Paste both the access key and the secret key.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste both the access key and the secret key.', 'plume-media-offload'));
     }
     if (!in_array($region, self::REGIONS, true)) {
-      throw new QuickConnectException(esc_html__('Pick a Wasabi region.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Pick a Wasabi region.', 'plume-media-offload'));
     }
 
     $result = new ConnectResult();
@@ -58,13 +58,13 @@ final class WasabiConnector
       [$scopedKey, $scopedSecret] = $this->createScopedUser($bucket, $key, $secret);
       $result->values['access_key'] = $scopedKey;
       $result->values['secret_key'] = $scopedSecret;
-      $result->step(__('New key made for this bucket only', 'nimbus-media-offload'), __('The key you pasted is not saved', 'nimbus-media-offload'));
+      $result->step(__('New key made for this bucket only', 'plume-media-offload'), __('The key you pasted is not saved', 'plume-media-offload'));
     } catch (\Throwable $exception) {
-      // A sub-user without IAM rights can still run Nimbus with its own key.
+      // A sub-user without IAM rights can still run Plume with its own key.
       $this->quickConnect->logger()->warning('Wasabi quick connect could not create a bucket-only user: {error}', ['error' => $this->quickConnect->errorMessage($exception)]);
       $result->values['access_key'] = $key;
       $result->values['secret_key'] = $secret;
-      $result->step(__('Using the key you pasted', 'nimbus-media-offload'), __('It cannot create users, so Nimbus saves it', 'nimbus-media-offload'));
+      $result->step(__('Using the key you pasted', 'plume-media-offload'), __('It cannot create users, so Plume saves it', 'plume-media-offload'));
     }
 
     return $result;

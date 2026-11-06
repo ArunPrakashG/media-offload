@@ -1,6 +1,6 @@
-# Contributing to Nimbus
+# Contributing to Plume
 
-Thanks for your interest in contributing! Nimbus is a free, open-source
+Thanks for your interest in contributing! Plume is a free, open-source
 WordPress plugin, and contributions of all kinds are welcome — bug reports,
 feature requests, documentation fixes, and pull requests.
 
@@ -42,7 +42,7 @@ Open a GitHub issue with:
 - WordPress and PHP version
 - Storage provider in use
 - Steps to reproduce
-- Relevant entries from the Nimbus **Logs** admin tab, if applicable
+- Relevant entries from the Plume **Logs** admin tab, if applicable
 
 ## Submitting a pull request
 

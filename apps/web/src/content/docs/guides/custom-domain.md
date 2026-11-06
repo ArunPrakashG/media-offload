@@ -1,16 +1,16 @@
 ---
 title: Custom domain and CDN
 nav: Custom domain
-description: Serve offloaded WordPress media from your own domain or a CDN with the Nimbus Custom Domain setting, and learn how object keys map to URLs.
+description: Serve offloaded WordPress media from your own domain or a CDN with the Plume Custom Domain setting, and learn how object keys map to URLs.
 section: guides
 order: 5
 ---
 
-By default Nimbus builds public URLs from your provider's object address. Set a Custom Domain to serve media from your own hostname or a CDN instead.
+By default Plume builds public URLs from your provider's object address. Set a Custom Domain to serve media from your own hostname or a CDN instead.
 
 ## Set it
 
-1. Go to **Media → Nimbus → Settings**.
+1. Go to **Media → Plume → Settings**.
 2. Make sure **Serve From Storage** is on. The Custom Domain field appears under **Delivery**.
 3. Enter the full address, including `https://`, for example `https://cdn.example.com`.
 4. Select **Save Settings**.
@@ -19,7 +19,7 @@ You can also set it in the setup wizard as the custom delivery domain.
 
 ## How URLs are built
 
-Nimbus joins the Custom Domain and the object key with a single slash. The key includes your Path Prefix.
+Plume joins the Custom Domain and the object key with a single slash. The key includes your Path Prefix.
 
 ```text
 Custom Domain:  https://cdn.example.com

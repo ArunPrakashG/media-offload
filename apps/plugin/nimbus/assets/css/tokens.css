@@ -1,11 +1,11 @@
 /**
- * Nimbus design tokens for wp-admin.
+ * Plume design tokens for wp-admin.
  * Mirrors design/tokens.css. Volt means "in the cloud" and nothing else;
  * everyday interactive color is ink. admin.css consumes these variables.
  */
 
 @font-face {
-  font-family: "Nimbus Geist";
+  font-family: "Plume Geist";
   src: url("../fonts/geist-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -13,7 +13,7 @@
 }
 
 @font-face {
-  font-family: "Nimbus Geist";
+  font-family: "Plume Geist";
   src: url("../fonts/geist-500.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
@@ -21,7 +21,7 @@
 }
 
 @font-face {
-  font-family: "Nimbus Geist";
+  font-family: "Plume Geist";
   src: url("../fonts/geist-600.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
@@ -29,7 +29,7 @@
 }
 
 @font-face {
-  font-family: "Nimbus Geist Mono";
+  font-family: "Plume Geist Mono";
   src: url("../fonts/geist-mono-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -37,7 +37,7 @@
 }
 
 @font-face {
-  font-family: "Nimbus Geist Mono";
+  font-family: "Plume Geist Mono";
   src: url("../fonts/geist-mono-500.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
@@ -105,8 +105,8 @@
   --nmb-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Type */
-  --nmb-font: "Nimbus Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --nmb-mono: "Nimbus Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --nmb-font: "Plume Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --nmb-mono: "Plume Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 @media (prefers-reduced-motion: reduce) {

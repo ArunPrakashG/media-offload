@@ -1,12 +1,12 @@
 ---
 title: REST API
 nav: REST API
-description: Reference for the Nimbus REST API under /wp-json/nimbus/v1, with every route, method, parameter and permission, plus examples for jobs, offloads and purges.
+description: Reference for the Plume REST API under /wp-json/nimbus/v1, with every route, method, parameter and permission, plus examples for jobs, offloads and purges.
 section: reference
 order: 3
 ---
 
-Nimbus registers its REST routes under the `nimbus/v1` namespace. The admin screens use the same routes.
+Plume registers its REST routes under the `nimbus/v1` namespace. The admin screens use the same routes.
 
 ## Base URL and permissions
 
@@ -47,7 +47,7 @@ Every route requires a logged-in user with the `manage_options` capability. In p
 | Parameter | Type | Notes |
 | --- | --- | --- |
 | `type` | string | Required. `offload_existing`, `restore_local` or `retry_failed`. |
-| `batch_size` | integer | Optional. Default 50, from 1 to 1000. Nimbus caps each step at 100. |
+| `batch_size` | integer | Optional. Default 50, from 1 to 1000. Plume caps each step at 100. |
 
 Returns `202`. Only one job can run at a time. Starting another returns `409`. Offload and retry jobs need Enable Offloading on and valid credentials.
 

@@ -1,7 +1,7 @@
 ---
 title: Bulk migration
 nav: Bulk migration
-description: Move your existing WordPress media library to object storage with the Nimbus bulk job or WP-CLI, including pause, resume, retry and what to check afterward.
+description: Move your existing WordPress media library to object storage with the Plume bulk job or WP-CLI, including pause, resume, retry and what to check afterward.
 section: guides
 order: 2
 ---
@@ -17,7 +17,7 @@ New uploads move on their own. Files that were already in your library need a on
 
 ## Run the job from the admin
 
-1. Go to **Media → Nimbus → Tools**.
+1. Go to **Media → Plume → Tools**.
 2. Under **Bulk media jobs**, select **Offload existing library**.
 3. Watch the progress counts: Processed out of Total, Succeeded, Failed and Skipped.
 
@@ -54,7 +54,7 @@ wp nimbus offload-single 12
 
 ## Update URLs stored in content
 
-With **Serve From Storage** on, Nimbus rewrites media URLs when pages render. URLs saved inside post content, page builder data and sliders can also be rewritten in the database:
+With **Serve From Storage** on, Plume rewrites media URLs when pages render. URLs saved inside post content, page builder data and sliders can also be rewritten in the database:
 
 ```bash
 wp nimbus rewrite --limit=500

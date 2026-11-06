@@ -1,8 +1,8 @@
-# Nimbus
+# Plume
 
 > Your media, elevated.
 
-Monorepo for the Nimbus product — a free, open-source WordPress media offload plugin and its marketing/docs website. There is no subscription or licensing backend; Nimbus has no paid tier.
+Monorepo for the Plume product — a free, open-source WordPress media offload plugin and its marketing/docs website. There is no subscription or licensing backend; Plume has no paid tier.
 
 ## Structure
 

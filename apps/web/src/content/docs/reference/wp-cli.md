@@ -6,13 +6,13 @@ section: reference
 order: 2
 ---
 
-Nimbus adds a `wp nimbus` command group. All commands run against the site selected with `--url` on multisite. Run them from the WordPress root as a user that can write to the uploads folder.
+Plume adds a `wp nimbus` command group. All commands run against the site selected with `--url` on multisite. Run them from the WordPress root as a user that can write to the uploads folder.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `wp nimbus config` | Show or update Nimbus plugin settings. |
+| `wp nimbus config` | Show or update Plume plugin settings. |
 | `wp nimbus sync` | Queue attachments that are missing remote metadata. |
 | `wp nimbus process-pending` | Process queued pending offloads. |
 | `wp nimbus deploy` | Offload one or more attachments to remote storage. |

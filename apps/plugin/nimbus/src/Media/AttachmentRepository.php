@@ -6,9 +6,9 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Encapsulates all postmeta read/write operations for Nimbus attachment state.
+ * Encapsulates all postmeta read/write operations for Plume attachment state.
  *
- * This repository is the single point of truth for the six Nimbus meta keys:
+ * This repository is the single point of truth for the six Plume meta keys:
  *   - _nimbus              : offload data (key, sizes map, file_size_bytes)
  *   - _nimbus_ignore       : whether this attachment is excluded from offloading
  *   - _nimbus_pending_at   : timestamp when the attachment entered the pending queue

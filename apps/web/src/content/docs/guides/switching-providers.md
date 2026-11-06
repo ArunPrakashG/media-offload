@@ -1,12 +1,12 @@
 ---
 title: Switching providers
 nav: Switching providers
-description: Move a WordPress site from one storage provider to another with Nimbus by restoring files locally, updating credentials and offloading the library again.
+description: Move a WordPress site from one storage provider to another with Plume by restoring files locally, updating credentials and offloading the library again.
 section: guides
 order: 3
 ---
 
-Nimbus stores files under the provider and bucket in your settings. To change either one, bring the files back first, then offload them again to the new place.
+Plume stores files under the provider and bucket in your settings. To change either one, bring the files back first, then offload them again to the new place.
 
 ## Steps
 

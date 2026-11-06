@@ -1,16 +1,16 @@
 ---
 title: Config export and import
 nav: Config export
-description: Export Nimbus settings to a JSON file and import them on another site. Learn what the file contains, which settings are left out, and how to handle secrets.
+description: Export Plume settings to a JSON file and import them on another site. Learn what the file contains, which settings are left out, and how to handle secrets.
 section: reference
 order: 4
 ---
 
-You can save your Nimbus settings to a JSON file and load them on another site. This is useful for staging copies, multisite networks and moving to a new server.
+You can save your Plume settings to a JSON file and load them on another site. This is useful for staging copies, multisite networks and moving to a new server.
 
 ## Export
 
-1. Go to **Media → Nimbus → Tools**.
+1. Go to **Media → Plume → Tools**.
 2. Under **Configuration backup**, select **Download config.json**.
 
 The file is named like `nimbus-config-20261103-091500.json`.
@@ -45,7 +45,7 @@ The export contains your access key, secret key and Cloudflare token as plain te
 
 ## Import
 
-1. Go to **Media → Nimbus → Tools → Configuration backup**.
+1. Go to **Media → Plume → Tools → Configuration backup**.
 2. Choose a `.json` file and select **Import**.
 3. Check the settings, then save if you want to change anything.
 
@@ -54,7 +54,7 @@ Rules:
 - The file must be `.json` and no larger than 512 KB.
 - It must contain `"plugin": "nimbus"`.
 - Only known setting keys are read. Others are ignored.
-- The import replaces the current settings straight away. Nimbus reports "Configuration imported successfully. Review the settings below and save if needed."
+- The import replaces the current settings straight away. Plume reports "Configuration imported successfully. Review the settings below and save if needed."
 
 The first step of the [setup wizard](/docs/setup-wizard/) also accepts a config file to fill in the form.
 

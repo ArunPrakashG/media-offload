@@ -39,7 +39,7 @@ final class FieldRenderer
     $providers = $this->providerCatalog->selectOptions();
     $providerDetails = $this->providerCatalog->all();
     $currentProvider = $providerDetails[$provider] ?? ($providerDetails['s3'] ?? [
-      'title' => __('Storage provider', 'nimbus-media-offload'),
+      'title' => __('Storage provider', 'plume-media-offload'),
       'summary' => '',
       'required' => [],
     ]);
@@ -57,11 +57,11 @@ final class FieldRenderer
       <div class="nmb-provider-summary">
         <div class="nmb-provider-summary-header">
           <div>
-            <h3 id="nmb-provider-summary-title"><?php echo esc_html((string) ($currentProvider['title'] ?? __('Storage provider', 'nimbus-media-offload'))); ?></h3>
+            <h3 id="nmb-provider-summary-title"><?php echo esc_html((string) ($currentProvider['title'] ?? __('Storage provider', 'plume-media-offload'))); ?></h3>
             <p id="nmb-provider-summary-copy"><?php echo esc_html((string) ($currentProvider['summary'] ?? '')); ?></p>
           </div>
           <button type="button" class="button-link nmb-advanced-toggle" id="nmb-toggle-advanced" aria-expanded="false">
-            <?php esc_html_e('Show advanced connection fields', 'nimbus-media-offload'); ?>
+            <?php esc_html_e('Show advanced connection fields', 'plume-media-offload'); ?>
           </button>
         </div>
 
@@ -72,7 +72,7 @@ final class FieldRenderer
         </div>
       </div>
     </div>
-    <p class="description"><?php esc_html_e('The form below now focuses on required fields first. Provider-specific extras stay hidden until you need them.', 'nimbus-media-offload'); ?></p>
+    <p class="description"><?php esc_html_e('The form below now focuses on required fields first. Provider-specific extras stay hidden until you need them.', 'plume-media-offload'); ?></p>
     <?php
   }
 
@@ -85,7 +85,7 @@ final class FieldRenderer
     $labels = array_values(array_filter(array_map('strval', $labels)));
 
     if (count($labels) === 1 && strtolower($labels[0]) === 'provider') {
-      return [__('No extra credentials required', 'nimbus-media-offload')];
+      return [__('No extra credentials required', 'plume-media-offload')];
     }
 
     return $labels;
@@ -240,15 +240,15 @@ final class FieldRenderer
                 hidden><?php echo esc_textarea($value); ?></textarea>
 
       <!-- Suggestion strip — populated by JS from nimbusAdmin.assetRoots -->
-      <div class="nmb-path-pill-suggestions" id="<?php echo esc_attr($widgetId); ?>-suggestions" aria-label="<?php esc_attr_e('Discovered upload folders — click to add', 'nimbus-media-offload'); ?>" hidden></div>
+      <div class="nmb-path-pill-suggestions" id="<?php echo esc_attr($widgetId); ?>-suggestions" aria-label="<?php esc_attr_e('Discovered upload folders — click to add', 'plume-media-offload'); ?>" hidden></div>
 
       <!-- Active pill list -->
       <div class="nmb-path-pill-list" id="<?php echo esc_attr($widgetId); ?>-list" role="list"
-           aria-label="<?php esc_attr_e('Active path patterns', 'nimbus-media-offload'); ?>">
+           aria-label="<?php esc_attr_e('Active path patterns', 'plume-media-offload'); ?>">
         <?php foreach ($existing as $pattern) : ?>
           <span class="nmb-path-pill nmb-path-pill--active" role="listitem" data-value="<?php echo esc_attr($pattern); ?>">
             <span class="nmb-path-pill-label"><?php echo esc_html($pattern); ?></span><!--
-            --><button type="button" class="nmb-path-pill-remove" aria-label="<?php /* translators: %s: path pattern being removed */ echo esc_attr(sprintf(__('Remove %s', 'nimbus-media-offload'), $pattern)); ?>">×</button>
+            --><button type="button" class="nmb-path-pill-remove" aria-label="<?php /* translators: %s: path pattern being removed */ echo esc_attr(sprintf(__('Remove %s', 'plume-media-offload'), $pattern)); ?>">×</button>
           </span>
         <?php endforeach; ?>
       </div>
@@ -258,10 +258,10 @@ final class FieldRenderer
         <input type="text"
                id="<?php echo esc_attr($widgetId); ?>-input"
                class="nmb-path-pill-input"
-               placeholder="<?php esc_attr_e('Type a pattern and press Enter or comma…', 'nimbus-media-offload'); ?>"
+               placeholder="<?php esc_attr_e('Type a pattern and press Enter or comma…', 'plume-media-offload'); ?>"
                autocomplete="off"
                spellcheck="false" />
-        <button type="button" class="button nmb-path-pill-add-btn"><?php esc_html_e('Add', 'nimbus-media-offload'); ?></button>
+        <button type="button" class="button nmb-path-pill-add-btn"><?php esc_html_e('Add', 'plume-media-offload'); ?></button>
       </div>
 
     </div>

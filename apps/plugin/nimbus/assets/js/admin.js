@@ -1062,7 +1062,7 @@ jQuery(document).ready(function ($) {
           setQuickMode(false);
           $hint.text('Configuration loaded — review the fields below, then continue.').css('color', '#00a32a');
         } catch (_err) {
-          $hint.text('Could not read file. Make sure it is a valid Nimbus JSON export.').css('color', '#d63638');
+          $hint.text('Could not read file. Make sure it is a valid Plume JSON export.').css('color', '#d63638');
         }
 
         // Reset the file input so re-selecting the same file fires change again.

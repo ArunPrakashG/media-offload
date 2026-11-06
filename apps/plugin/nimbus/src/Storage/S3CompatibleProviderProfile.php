@@ -19,38 +19,38 @@ final class S3CompatibleProviderProfile extends AbstractProviderProfile implemen
 
   public function label(): string
   {
-    return __('S3-compatible', 'nimbus-media-offload');
+    return __('S3-compatible', 'plume-media-offload');
   }
 
   public function title(): string
   {
-    return __('S3-compatible storage', 'nimbus-media-offload');
+    return __('S3-compatible storage', 'plume-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'nimbus-media-offload');
+    return __('Use this for providers that expose an S3-compatible API via a custom endpoint. Region is typically still required unless your provider documents otherwise.', 'plume-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket', 'nimbus-media-offload'),
-      'region' => __('Region', 'nimbus-media-offload'),
-      'endpoint' => __('Custom Endpoint', 'nimbus-media-offload'),
-      'access_key' => __('Access Key', 'nimbus-media-offload'),
-      'secret_key' => __('Secret Key', 'nimbus-media-offload'),
+      'bucket' => __('Bucket', 'plume-media-offload'),
+      'region' => __('Region', 'plume-media-offload'),
+      'endpoint' => __('Custom Endpoint', 'plume-media-offload'),
+      'access_key' => __('Access Key', 'plume-media-offload'),
+      'secret_key' => __('Secret Key', 'plume-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'nimbus-media-offload'),
-      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'nimbus-media-offload'),
-      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'nimbus-media-offload'),
-      'secret_key'    => __('Secret Access Key paired with the access key above.', 'nimbus-media-offload'),
-      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'nimbus-media-offload'),
+      'bucket'        => __('The bucket name on your S3-compatible storage provider.', 'plume-media-offload'),
+      'region'        => __('Region required by your provider. Some providers accept any string; check your provider\'s documentation.', 'plume-media-offload'),
+      'access_key'    => __('Access Key ID for your S3-compatible storage provider.', 'plume-media-offload'),
+      'secret_key'    => __('Secret Access Key paired with the access key above.', 'plume-media-offload'),
+      'endpoint'      => __('Full base URL of your provider\'s S3-compatible API, e.g. https://s3.example.com.', 'plume-media-offload'),
       'session_token' => '',
       'r2_account_id' => '',
     ];

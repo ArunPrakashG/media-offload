@@ -10,9 +10,9 @@ const isCurrent = (href: string) => href !== '/#features' && path.startsWith(hre
 ---
 <header class:list={['site-header', { 'is-wide': wide }]}>
   <div class="wrap">
-    <a href="/" class="brand" aria-label="Nimbus home">
+    <a href="/" class="brand" aria-label="Plume home">
       <Mark />
-      <span class="brand-name">nimbus</span>
+      <span class="brand-name">plume</span>
       {section && <span class="brand-sub">{section}</span>}
     </a>
     {!section && (
@@ -23,7 +23,7 @@ const isCurrent = (href: string) => href !== '/#features' && path.startsWith(hre
     <div class="header-actions">
       <slot name="actions" />
       <a href={SITE.repo} class="btn btn-secondary header-gh"><GitHubIcon />GitHub</a>
-      <a href="/docs/" class="btn btn-primary">Get Nimbus</a>
+      <a href="/docs/" class="btn btn-primary">Get Plume</a>
       <details class="menu">
         <summary aria-label="Menu">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>

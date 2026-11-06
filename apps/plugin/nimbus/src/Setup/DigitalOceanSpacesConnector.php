@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 /**
  * DigitalOcean Spaces from one personal access token with Spaces key scopes.
  *
- * Nimbus makes a short-lived full-access Spaces key to create and open the
+ * Plume makes a short-lived full-access Spaces key to create and open the
  * bucket, then a read/write key for that bucket only, and deletes the first.
  */
 final class DigitalOceanSpacesConnector
@@ -34,15 +34,15 @@ final class DigitalOceanSpacesConnector
     $region = sanitize_key((string) ($input['region'] ?? 'nyc3'));
 
     if ($this->token === '') {
-      throw new QuickConnectException(esc_html__('Paste the DigitalOcean token first.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Paste the DigitalOcean token first.', 'plume-media-offload'));
     }
     if (!in_array($region, self::REGIONS, true)) {
-      throw new QuickConnectException(esc_html__('Pick a Spaces region.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('Pick a Spaces region.', 'plume-media-offload'));
     }
 
     $result = new ConnectResult();
     $setupKey = $this->createKey('nimbus-setup', [['bucket' => '', 'permission' => 'fullaccess']]);
-    $result->step(__('Token verified', 'nimbus-media-offload'));
+    $result->step(__('Token verified', 'plume-media-offload'));
 
     try {
       $s3 = $this->quickConnect->s3Client([
@@ -57,7 +57,7 @@ final class DigitalOceanSpacesConnector
       $buckets->makePublic($bucket, $result);
 
       $scoped = $this->createKey('nimbus-' . $bucket, [['bucket' => $bucket, 'permission' => 'readwrite']]);
-      $result->step(__('New key made for this bucket only', 'nimbus-media-offload'), __('The token you pasted is not saved', 'nimbus-media-offload'));
+      $result->step(__('New key made for this bucket only', 'plume-media-offload'), __('The token you pasted is not saved', 'plume-media-offload'));
     } finally {
       $this->request('DELETE', '/spaces/keys/' . rawurlencode($setupKey['access_key']));
     }
@@ -85,11 +85,11 @@ final class DigitalOceanSpacesConnector
     $key = (array) ($response['body']['key'] ?? []);
 
     if ($response['status'] === 401 || $response['status'] === 403) {
-      throw new QuickConnectException(esc_html__('DigitalOcean did not accept this token. It needs the spaces_key create, read and delete scopes.', 'nimbus-media-offload'));
+      throw new QuickConnectException(esc_html__('DigitalOcean did not accept this token. It needs the spaces_key create, read and delete scopes.', 'plume-media-offload'));
     }
 
     if (empty($key['access_key']) || empty($key['secret_key'])) {
-      throw new QuickConnectException(esc_html(__('Could not create a Spaces key', 'nimbus-media-offload') . ': ' . (string) ($response['body']['message'] ?? $response['status'])));
+      throw new QuickConnectException(esc_html(__('Could not create a Spaces key', 'plume-media-offload') . ': ' . (string) ($response['body']['message'] ?? $response['status'])));
     }
 
     return ['access_key' => (string) $key['access_key'], 'secret_key' => (string) $key['secret_key']];

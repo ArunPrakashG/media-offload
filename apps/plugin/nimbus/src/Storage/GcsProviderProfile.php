@@ -35,38 +35,38 @@ final class GcsProviderProfile extends AbstractProviderProfile implements Provid
 
   public function label(): string
   {
-    return __('Google Cloud Storage', 'nimbus-media-offload');
+    return __('Google Cloud Storage', 'plume-media-offload');
   }
 
   public function title(): string
   {
-    return __('Google Cloud Storage', 'nimbus-media-offload');
+    return __('Google Cloud Storage', 'plume-media-offload');
   }
 
   public function summary(): string
   {
-    return __('Google Cloud Storage via the S3-compatible XML API. Requires an HMAC key pair generated from IAM → Service Accounts in the GCS console. Uniform bucket-level access must be enabled and the service account must have the Storage Object Admin role.', 'nimbus-media-offload');
+    return __('Google Cloud Storage via the S3-compatible XML API. Requires an HMAC key pair generated from IAM → Service Accounts in the GCS console. Uniform bucket-level access must be enabled and the service account must have the Storage Object Admin role.', 'plume-media-offload');
   }
 
   public function requiredFields(): array
   {
     return [
-      'bucket' => __('Bucket Name', 'nimbus-media-offload'),
-      'region' => __('Location (e.g. us-central1, europe-west1)', 'nimbus-media-offload'),
-      'access_key' => __('HMAC Access Key', 'nimbus-media-offload'),
-      'secret_key' => __('HMAC Secret', 'nimbus-media-offload'),
+      'bucket' => __('Bucket Name', 'plume-media-offload'),
+      'region' => __('Location (e.g. us-central1, europe-west1)', 'plume-media-offload'),
+      'access_key' => __('HMAC Access Key', 'plume-media-offload'),
+      'secret_key' => __('HMAC Secret', 'plume-media-offload'),
     ];
   }
 
   public function fieldHints(): array
   {
     return [
-      'bucket'        => __('Your GCS bucket name. Uniform bucket-level access must be enabled.', 'nimbus-media-offload'),
-      'region'        => __('GCS location for metadata, e.g. us-central1, europe-west1, US, EU. The API endpoint is always storage.googleapis.com.', 'nimbus-media-offload'),
-      'access_key'    => __('HMAC Access Key from the GCS console: IAM → Service Accounts → select account → HMAC Keys tab.', 'nimbus-media-offload'),
-      'secret_key'    => __('HMAC Secret shown once at creation time in the GCS console, paired with the access key above.', 'nimbus-media-offload'),
+      'bucket'        => __('Your GCS bucket name. Uniform bucket-level access must be enabled.', 'plume-media-offload'),
+      'region'        => __('GCS location for metadata, e.g. us-central1, europe-west1, US, EU. The API endpoint is always storage.googleapis.com.', 'plume-media-offload'),
+      'access_key'    => __('HMAC Access Key from the GCS console: IAM → Service Accounts → select account → HMAC Keys tab.', 'plume-media-offload'),
+      'secret_key'    => __('HMAC Secret shown once at creation time in the GCS console, paired with the access key above.', 'plume-media-offload'),
       'session_token' => '',
-      'endpoint'      => __('Pre-filled to https://storage.googleapis.com — change only if using a custom endpoint.', 'nimbus-media-offload'),
+      'endpoint'      => __('Pre-filled to https://storage.googleapis.com — change only if using a custom endpoint.', 'plume-media-offload'),
       'r2_account_id' => '',
     ];
   }

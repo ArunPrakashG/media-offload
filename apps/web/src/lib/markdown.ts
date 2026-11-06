@@ -9,13 +9,13 @@ export const txt = (body: string, type = 'text/plain') =>
 
 /** Markdown version of the home page. Keep in step with pages/index.astro. */
 export function homeMarkdown(): string {
-  return `# Nimbus
+  return `# Plume
 
 > ${SITE.description}
 
 ${SITE.tagline}
 
-Nimbus offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible bucket, and rewrites every URL so pages load from storage or your CDN.
+Plume offloads your Media Library to Amazon S3, Cloudflare R2 or any S3-compatible bucket, and rewrites every URL so pages load from storage or your CDN.
 
 - License: MIT. No license server, no telemetry, no paid tier.
 - Requirements: WordPress 6.0+, PHP 8.1+. Multisite ready.

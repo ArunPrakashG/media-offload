@@ -1,8 +1,8 @@
-# Nimbus
+# Plume
 
 > Your media, elevated.
 
-Nimbus is a free, open-source WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, or any S3-compatible storage provider, with automatic URL rewriting, optional CDN delivery, and a clean admin UI designed for developers and site operators. There is no license key and no paid tier — every feature is available out of the box.
+Plume is a free, open-source WordPress plugin that offloads uploaded media to Amazon S3, Cloudflare R2, or any S3-compatible storage provider, with automatic URL rewriting, optional CDN delivery, and a clean admin UI designed for developers and site operators. There is no license key and no paid tier — every feature is available out of the box.
 
 The plugin entry point is `nimbus.php`. Runtime and domain logic lives under `src/`, namespaced as `Nimbus\Plugin\*`.
 
@@ -58,7 +58,7 @@ Activate the plugin in WordPress. On first activation you will be redirected to 
 
 ## Configuration
 
-1. Activate Nimbus in WordPress.
+1. Activate Plume in WordPress.
 2. Complete the **Onboarding** tab: enter your bucket credentials.
 3. Review any conflict warnings for other media offload plugins you may have installed.
 4. Enable **Serve From Storage** to rewrite public URLs.
@@ -79,7 +79,7 @@ All endpoints require a user with `manage_options` capability.
 
 ### Hooks
 
-Nimbus emits standard WordPress actions for every core lifecycle operation. Each action receives a single associative array payload containing fields such as `source`, `scope`, `operation`, `attachment_id`, `urls`, `keys`, counts, and error details where applicable.
+Plume emits standard WordPress actions for every core lifecycle operation. Each action receives a single associative array payload containing fields such as `source`, `scope`, `operation`, `attachment_id`, `urls`, `keys`, counts, and error details where applicable.
 
 Key actions:
 
@@ -135,7 +135,7 @@ Add to the `nimbus_integrations` filter with these fields:
 
 Set **Custom Domain** to your CDN or public bucket domain for production delivery.
 
-> Some S3-compatible providers deny `HeadObject` while still allowing read access. Nimbus falls back to a byte-range `GetObject` probe for existence checks in that case.
+> Some S3-compatible providers deny `HeadObject` while still allowing read access. Plume falls back to a byte-range `GetObject` probe for existence checks in that case.
 
 ---
 
@@ -222,7 +222,7 @@ Each stored entry includes: `level`, `level_key`, `source`, `event`, `code`, `me
 ## Media Library Controls
 
 - **Offload Status** column with state badges
-- **Nimbus status** dropdown filter on `upload.php`
+- **Plume status** dropdown filter on `upload.php`
 - Native bulk actions: Offload to storage · Restore local copies · Retry failed offloads
 - Per-item ignore toggle in the attachment detail view
 

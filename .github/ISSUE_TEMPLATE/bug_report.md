@@ -16,13 +16,13 @@ Steps to reproduce the behavior.
 What you expected to happen instead.
 
 **Environment**
-- Nimbus version:
+- Plume version:
 - WordPress version:
 - PHP version:
 - Storage provider (S3 / R2 / GCS / etc.):
 
 **Logs**
-Paste relevant entries from the Nimbus **Logs** admin tab, if applicable.
+Paste relevant entries from the Plume **Logs** admin tab, if applicable.
 
 **Additional context**
 Anything else that might help — screenshots, other active plugins, etc.

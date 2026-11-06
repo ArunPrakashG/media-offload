@@ -1,16 +1,16 @@
 ---
 title: Settings reference
 nav: Settings
-description: Every Nimbus setting with its admin label, option key, default value and where to change it, including the settings that have no screen in the admin.
+description: Every Plume setting with its admin label, option key, default value and where to change it, including the settings that have no screen in the admin.
 section: reference
 order: 1
 ---
 
-Nimbus stores all settings in one WordPress option, `nimbus_settings`. This page lists each key, the label you see in the admin, and its default. Per-attachment data lives in the `_nimbus` post meta.
+Plume stores all settings in one WordPress option, `nimbus_settings`. This page lists each key, the label you see in the admin, and its default. Per-attachment data lives in the `_nimbus` post meta.
 
 ## Settings tab
 
-Open **Media → Nimbus → Settings**.
+Open **Media → Plume → Settings**.
 
 ### Storage Connection
 
@@ -50,7 +50,7 @@ See [nightly batch](/docs/guides/scheduling/).
 
 ## Advanced tab
 
-Open **Media → Nimbus → Advanced**.
+Open **Media → Plume → Advanced**.
 
 ### Path Filters
 
@@ -77,7 +77,7 @@ See [cache purge](/docs/guides/cache-purge/).
 
 ## Logs tab
 
-Open **Media → Nimbus → Logs** and expand **Logging settings**.
+Open **Media → Plume → Logs** and expand **Logging settings**.
 
 | Label | Key | Default | Range |
 | --- | --- | --- | --- |
@@ -88,7 +88,7 @@ Open **Media → Nimbus → Logs** and expand **Logging settings**.
 
 ## How credentials are stored
 
-Nimbus encrypts the access key, secret key, session token and Cloudflare API token before it saves them in the `nimbus_settings` option. Someone who reads the database or a backup of it sees only ciphertext.
+Plume encrypts the access key, secret key, session token and Cloudflare API token before it saves them in the `nimbus_settings` option. Someone who reads the database or a backup of it sees only ciphertext.
 
 The encryption key comes from `LOGGED_IN_KEY` and `LOGGED_IN_SALT` in `wp-config.php`. To use a key of your own, add this line to `wp-config.php` before the "stop editing" line:
 
@@ -96,7 +96,7 @@ The encryption key comes from `LOGGED_IN_KEY` and `LOGGED_IN_SALT` in `wp-config
 define('NIMBUS_ENCRYPTION_KEY', 'a long random string');
 ```
 
-If that key or the site's security keys change, Nimbus can no longer read the saved credentials. It shows a notice, and you enter the keys again in **Media → Nimbus → Settings**. Settings saved by older versions are encrypted the next time an admin opens the dashboard.
+If that key or the site's security keys change, Plume can no longer read the saved credentials. It shows a notice, and you enter the keys again in **Media → Plume → Settings**. Settings saved by older versions are encrypted the next time an admin opens the dashboard.
 
 A [config export](/docs/reference/config-export/) still contains the credentials in plain text, so keep export files private.
 
@@ -110,7 +110,7 @@ These keys work, but you can only change them with [WP-CLI](/docs/reference/wp-c
 | `offload_allowed_mime_types` | Empty | Comma separated list. Wildcards like `image/*` work. Empty allows all types. |
 | `storage_class` | `STANDARD` | Sent as the storage class on upload. Leave it unless your provider documents other values. |
 | `delete_remote_on_wp_delete` | On | Deletes remote files when an attachment is deleted. |
-| `visibility` | `public-read` | Stored, but Nimbus does not apply it to uploads. |
+| `visibility` | `public-read` | Stored, but Plume does not apply it to uploads. |
 
 ```bash
 wp nimbus config --offload_min_size_kb=50

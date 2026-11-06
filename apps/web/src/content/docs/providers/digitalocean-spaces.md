@@ -1,13 +1,13 @@
 ---
 title: Connect DigitalOcean Spaces
 nav: DigitalOcean Spaces
-description: Create a DigitalOcean Space and Spaces access keys, enter the region and keys in Nimbus, and offload your WordPress media with optional CDN delivery.
+description: Create a DigitalOcean Space and Spaces access keys, enter the region and keys in Plume, and offload your WordPress media with optional CDN delivery.
 section: providers
 order: 5
 logo: digitalocean
 ---
 
-DigitalOcean Spaces is S3-compatible storage with a built-in CDN option. Nimbus builds the Spaces endpoint from the region you choose.
+DigitalOcean Spaces is S3-compatible storage with a built-in CDN option. Plume builds the Spaces endpoint from the region you choose.
 
 ## 1. Create Spaces keys
 
@@ -20,7 +20,7 @@ Spaces keys are separate from your DigitalOcean API tokens. A personal access to
 
 ## 2. Fill in the setup wizard
 
-Open **Media → Nimbus** and choose **DigitalOcean Spaces**.
+Open **Media → Plume** and choose **DigitalOcean Spaces**.
 
 | Field | Where to find it |
 | --- | --- |
@@ -46,6 +46,6 @@ wp nimbus process-pending --limit=500
 ## Notes
 
 - To use the Spaces CDN, enable it on the Space and enter the CDN address or your custom CDN domain as the Custom Domain.
-- Path-style requests are off for Spaces. Nimbus sets this for you.
+- Path-style requests are off for Spaces. Plume sets this for you.
 
 > **Tip:** Keep the Space and your server in nearby regions to speed up the first bulk migration.

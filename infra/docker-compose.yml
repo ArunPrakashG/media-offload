@@ -1,4 +1,4 @@
-# Nimbus – production infrastructure
+# Plume – production infrastructure
 #
 # All containers are named nimbus-* and share the internal nimbus_net network.
 # Only nimbus-web is exposed to the host (127.0.0.1) so your server's reverse

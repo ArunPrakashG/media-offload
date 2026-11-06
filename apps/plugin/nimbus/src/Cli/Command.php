@@ -28,7 +28,7 @@ final class Command
     }
 
     \WP_CLI::add_command('nimbus config', [$this, 'config'], [
-      'shortdesc' => 'Show or update Nimbus plugin settings.',
+      'shortdesc' => 'Show or update Plume plugin settings.',
     ]);
     \WP_CLI::add_command('nimbus process-pending', [$this, 'process_pending'], [
       'shortdesc' => 'Process queued pending offloads.',
