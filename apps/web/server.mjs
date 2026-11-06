@@ -6,7 +6,7 @@ import http from 'node:http';
 process.env.ASTRO_NODE_AUTOSTART = 'disabled';
 const { handler } = await import('./dist/server/entry.mjs');
 
-const SITE = 'https://usenimbus.dev';
+const SITE = 'https://plume.arunprakashg.com';
 const host = process.env.HOST ?? '0.0.0.0';
 const port = Number(process.env.PORT ?? 4321);
 

@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 
 final class SettingsUi
 {
-  private const RESTORE_DOCS_URL = 'https://usenimbus.dev/docs/guides/restoring-files/';
+  private const RESTORE_DOCS_URL = 'https://plume.arunprakashg.com/docs/guides/restoring-files/';
   private const DONATE_URL = 'https://buymeacoffee.com/arunprakashg';
 
   private ProviderCatalog $providerCatalog;
@@ -325,7 +325,7 @@ final class SettingsUi
       return $links;
     }
 
-    $links[] = '<a href="https://usenimbus.dev/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'plume-media-offload') . '</a>';
+    $links[] = '<a href="https://plume.arunprakashg.com/docs/" target="_blank" rel="noopener noreferrer">' . esc_html__('Docs', 'plume-media-offload') . '</a>';
     $links[] = '<a href="' . esc_url(self::DONATE_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Buy me a coffee', 'plume-media-offload') . '</a>';
 
     return $links;

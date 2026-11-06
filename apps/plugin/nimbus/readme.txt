@@ -5,7 +5,7 @@ Tags: media offload, amazon s3, cloudflare r2, s3-compatible, cdn
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.3.4
+Stable tag: 0.3.5
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -59,7 +59,7 @@ For Amazon S3 and Google Cloud Storage, quick connect gives you a command to run
 
 **Cache purge (optional, off by default).** If you turn on Cloudflare cache purging, the plugin sends the URLs of changed or deleted media and the Cloudflare API token you entered to the Cloudflare API (api.cloudflare.com), so Cloudflare clears its cached copies. Terms and privacy as above. Proxy cache purging sends a purge request to the address you configure.
 
-**Documentation links.** Links in the admin screens to the plugin documentation at usenimbus.dev open in your browser when you click them. The plugin itself sends no data to that site.
+**Documentation links.** Links in the admin screens to the plugin documentation at plume.arunprakashg.com open in your browser when you click them. The plugin itself sends no data to that site.
 
 == Third-Party Libraries ==
 
@@ -103,6 +103,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 4. Offload status for each file in the Media Library.
 
 == Changelog ==
+
+= 0.3.5 =
+* The project site and documentation moved to plume.arunprakashg.com.
 
 = 0.3.4 =
 * Renamed from Nimbus to Plume Media Offload for the WordPress.org directory. The plugin folder and text domain are now plume-media-offload.
@@ -153,6 +156,9 @@ Please use the support forum on WordPress.org or contact us at contact@arunpraka
 * Free license registration.
 
 == Upgrade Notice ==
+
+= 0.3.5 =
+Documentation links point to the new site address.
 
 = 0.3.4 =
 Renamed to Plume Media Offload and tightened permission checks. If you installed from GitHub, deactivate the old copy, activate this one, then remove the old plugin folder by SFTP rather than with Delete.

@@ -6,6 +6,12 @@ updated: 2026-11-03
 
 Every release of Plume, newest first. Since 0.2.0, Plume is a single free, open-source plugin. Every feature listed here is included on every install, with no license key.
 
+## 0.3.5 · November 2026
+
+### Changed
+
+- The project site and documentation moved to plume.arunprakashg.com. The old usenimbus.dev address redirects there.
+
 ## 0.3.4 · November 2026
 
 The plugin is now called Plume Media Offload (formerly Nimbus) in WordPress, after feedback from the WordPress.org plugin review.
